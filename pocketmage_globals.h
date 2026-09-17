@@ -67,6 +67,20 @@ void checkCrashState();
 void checkRTCPowerLoss();
 void applicationEinkHandler();
 void processKB();
+
+// OS app entry points invoked by the keyboard app switcher. Replaced by the
+// APP_INIT() hook once the OS stops supplying them.
+void TXT_INIT(String inPath = "");
+void FILEWIZ_INIT();
+void USB_INIT();
+void COMM_INIT();
+void SETTINGS_INIT();
+void TASKS_INIT();
+void CALENDAR_INIT();
+void JOURNAL_INIT();
+void LEXICON_INIT();
+void TERMINAL_INIT();
+void APPLOADER_INIT();
 #endif
 
 #endif  // POCKETMAGE_GLOBALS_H

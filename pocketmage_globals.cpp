@@ -3,9 +3,8 @@
 
 #include <esp_system.h>
 
-#if OTA_APP
-// In OS builds these symbols are owned by the OS (PocketMage_PDA src/globals.cpp).
-// An OTA app links against the SDK alone, so the SDK provides them here.
+// Shared state owned by the SDK. The OS and OTA apps both link against it, so
+// these symbols are defined here once and nowhere else.
 SPIClass *vspi = nullptr;
 SPIClass *hspi = nullptr;
 fs::FS *global_fs = nullptr;
@@ -25,7 +24,6 @@ int OLED_BRIGHTNESS = 255;
 int OLED_MAX_FPS = 60;
 bool MUTE_BUZZER = false;
 bool SD_SPI_COMPATIBILITY = false;
-#endif  // OTA_APP
 
 namespace pocketmage {
 
