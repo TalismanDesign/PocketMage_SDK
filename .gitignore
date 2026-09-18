@@ -4,3 +4,6 @@ dist/
 .DS_Store
 .pio/
 .vscode/
+__pycache__/
+pocketmage_i18n/pocketmage_i18n_gen.h
+pocketmage_i18n/pocketmage_i18n_gen.cpp
