@@ -1,13 +1,23 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// OTA App
-// Is this an OTA APP? // set -DOTA_APP_FLAG=1 in platformio.ini
-#if OTA_APP_FLAG
-#define OTA_APP true
-#else
-#define OTA_APP false
+// COMPILE TARGET
+// Either:
+//   PM_TARGET_HOST - the PocketMageOS firmware.
+//   PM_TARGET_APP  - an external app compiled to a .app.elf.
+#if defined(PM_TARGET_HOST) && defined(PM_TARGET_APP)
+#error "PM_TARGET_HOST and PM_TARGET_APP are mutually exclusive"
 #endif
+#ifndef PM_TARGET_HOST
+#ifndef PM_TARGET_APP
+#if OTA_APP_FLAG
+#define PM_TARGET_APP 1
+#else
+#define PM_TARGET_HOST 1
+#endif
+#endif
+#endif
+
 
 // CONFIGURATION & SETTINGS
 #define KB_COOLDOWN 3                           // Keypress cooldown

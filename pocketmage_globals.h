@@ -52,16 +52,16 @@ void checkRTCPowerLoss();
 }  // namespace pocketmage
 
 // Entry points supplied by the linked app.
-#if OTA_APP
+#if PM_TARGET_APP
 void APP_INIT();
 void processKB_APP();
 void einkHandler_APP();
 #endif
 
-// Boot hooks provided by the PocketMage OS when the SDK is linked into it.
-// See PocketMage_PDA src/UTILS.cpp. In OTA builds the SDK supplies its own
+// Boot hooks provided by the PocketMage host when the SDK is linked into it.
+// See PocketMage_PDA src/UTILS.cpp. In app builds the SDK supplies its own
 // equivalents (pocketmage::loadSettings / pocketmage::recoverFromCrash).
-#if !OTA_APP
+#if PM_TARGET_HOST
 void loadState(bool changeState = true, char bootKey = 0);
 void checkCrashState();
 void checkRTCPowerLoss();

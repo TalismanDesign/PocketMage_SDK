@@ -1,0 +1,11 @@
+# Curated host-export surface for external apps.
+# Each line is a GLOBAL symbol the host must export to loaded .app.elf files.
+# Apps may only reference these symbols.
+
+OLED
+KB
+EINK
+BZ
+CLOCK
+PM_SDAUTO
+pocketmage_sdk_version

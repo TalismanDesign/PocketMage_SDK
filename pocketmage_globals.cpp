@@ -60,3 +60,7 @@ void recoverFromCrash() {
 }
 
 }  // namespace pocketmage
+
+// App-visible ABI version, imported by external apps to check the running
+// host release against the SDK they were built with (see symbols.list).
+extern "C" const char pocketmage_sdk_version[] = "0.1.0";

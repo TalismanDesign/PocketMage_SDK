@@ -23,9 +23,9 @@ void setupClock(){
     delay(1000);
   }
 
-  // Check if there was a power loss. OTA apps use the SDK;
-  // the OS has its own hook
-  #if OTA_APP
+  // Check if there was a power loss. App builds use the SDK hook;
+  // the host has its own
+  #if PM_TARGET_APP
     pocketmage::checkRTCPowerLoss();
   #else
     checkRTCPowerLoss();

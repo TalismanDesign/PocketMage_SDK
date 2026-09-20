@@ -198,57 +198,58 @@ void deepSleep(bool alternateScreenSaver) {
 
 // returns true if reboot flag set, false if skipped by user
 bool setRebootFlagOTA() {
-  if (OTA_APP) {
-    ESP_LOGE(TAG, "Entering OTA reboot mode");
-    OLED().oledWord(TR(STR_SYS_REBOOT_WARNING));
-    PWR_BTN_event = false;
-    unsigned long i = millis();
-    unsigned long j = millis();
-    while ((j - i) <= 3000) {  // 3 sec
-      // exit immediately if power button pressed again
-      if (PWR_BTN_event) {
-        ESP_LOGE(TAG, "Exiting setReboot continuing to returning true");
-        PWR_BTN_event = false;
-        break;
-      }
-      j = millis();
-      if (digitalRead(KB_IRQ) == 0) {
-        OLED().oledWord(TR(STR_GOOD_SAVE));
-        delay(500);
-        CLOCK().setPrevTimeMillis(millis());
-        keypad.flush();
-        return false;
-      }
+#if PM_TARGET_APP
+  ESP_LOGE(TAG, "Entering OTA reboot mode");
+  OLED().oledWord(TR(STR_SYS_REBOOT_WARNING));
+  PWR_BTN_event = false;
+  unsigned long i = millis();
+  unsigned long j = millis();
+  while ((j - i) <= 3000) {  // 3 sec
+    // exit immediately if power button pressed again
+    if (PWR_BTN_event) {
+      ESP_LOGE(TAG, "Exiting setReboot continuing to returning true");
+      PWR_BTN_event = false;
+      break;
     }
-    // timed out of loop, set reboot flag
-    ESP_LOGE(TAG, "setting reboot flag for OTA");
-    prefs.begin("PocketMage", false);
-    prefs.putBool("OTA_Reboot", true);
-    prefs.end();
-    return true;
+    j = millis();
+    if (digitalRead(KB_IRQ) == 0) {
+      OLED().oledWord(TR(STR_GOOD_SAVE));
+      delay(500);
+      CLOCK().setPrevTimeMillis(millis());
+      keypad.flush();
+      return false;
+    }
   }
-  // PocketMage OS, no reboot flag needed
+  // timed out of loop, set reboot flag
+  ESP_LOGE(TAG, "setting reboot flag for OTA");
+  prefs.begin("PocketMage", false);
+  prefs.putBool("OTA_Reboot", true);
+  prefs.end();
+  return true;
+#else
+  // PocketMage host, no reboot flag needed
   ESP_LOGE(TAG, "Running in PocketMage OS, no reboot needed");
   return true;
+#endif
 }
 
 
 
 // checks if reboot flag is set, clears flag and reboots to PocketMage OS
 void checkRebootOTA() {
-  if (OTA_APP) {
-    ESP_LOGE(TAG, "Checking OTA reboot flag");
-    prefs.begin("PocketMage", false);
-    if (prefs.getBool("OTA_Reboot", false) == true) {
-      prefs.putBool("OTA_Reboot", false);
-      prefs.end();
-      rebootToPocketMage();
-      return;
-    }
+#if PM_TARGET_APP
+  ESP_LOGE(TAG, "Checking OTA reboot flag");
+  prefs.begin("PocketMage", false);
+  if (prefs.getBool("OTA_Reboot", false) == true) {
+    prefs.putBool("OTA_Reboot", false);
     prefs.end();
+    rebootToPocketMage();
     return;
   }
+  prefs.end();
+#else
   ESP_LOGE(TAG, "In pocketmageOS, skipping Checking OTA reboot flag");
+#endif
 }
 
 void IRAM_ATTR PWR_BTN_irq() {
@@ -348,8 +349,10 @@ void PocketMage_INIT() {
   setupOled();
 
   // SHOW "PocketMage" while DEVICE BOOTS
-  if (!OTA_APP && !seamlessReboot)
+  #if PM_TARGET_HOST
+  if (!seamlessReboot)
     OLED().oledWord("   PocketMage   ", true, false);
+  #endif
 
   // KEYBOARD SETUP
   setupKB(KB_IRQ);
@@ -400,7 +403,7 @@ void PocketMage_INIT() {
   randomSeed(analogRead(BAT_SENS));
 
   // Load State
-  #if OTA_APP
+  #if PM_TARGET_APP
     pocketmage::loadSettings();
   #else
     loadState();
@@ -408,7 +411,7 @@ void PocketMage_INIT() {
   ESP_LOGD(TAG, "loaded state");
 
   // Recover persisted state after an abnormal reset.
-  #if OTA_APP
+  #if PM_TARGET_APP
     pocketmage::recoverFromCrash();
   #else
     checkCrashState();
@@ -421,15 +424,15 @@ void PocketMage_INIT() {
     BZ().playJingle(Jingles::Startup);
 
   // WiFi task (radio stays off until a wifi* or ssh command enables it)
-  #if !OTA_APP
+  #if PM_TARGET_HOST
     P_WIFI.begin();
   #endif
 
   // Clear any excess keystrokes
   keypad.flush();
 
-  // OTA apps initialize here
-  #if OTA_APP
+  // Apps initialize here
+  #if PM_TARGET_APP
     APP_INIT();
   #endif
 }

@@ -186,7 +186,7 @@ void setupEink() {
 void einkHandler(void* parameter) {
   vTaskDelay(pdMS_TO_TICKS(250));
   for (;;) {
-    #if OTA_APP
+    #if PM_TARGET_APP
       einkHandler_APP();
     #else
       applicationEinkHandler();
