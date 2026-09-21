@@ -18,12 +18,12 @@
 #include <pocketmage_globals.h>
 #include <pocketmage_wifi/pocketmage_wifi.h>
 
+#include "driver/gpio.h"
+#include "driver/rtc_io.h"
 #include "esp_ota_ops.h"
 #include "esp_partition.h"
 #include "esp_system.h"
 #include "esp_task_wdt.h"
-#include "driver/rtc_io.h"
-#include "driver/gpio.h"
 
 static constexpr const char* TAG = "SYSTEM";
 
@@ -142,7 +142,8 @@ void deepSleep(bool alternateScreenSaver) {
               f.close();
               display.drawBitmap(0, 0, buf, 320, 240, GxEPD_BLACK);
               FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
-              FontEngine::drawText(DisplayTarget::EINK, 5, display.height() - 5, binFiles[fileIndex], FontStyle::MonoBold);
+              FontEngine::drawText(DisplayTarget::EINK, 5, display.height() - 5,
+                                   binFiles[fileIndex], FontStyle::MonoBold);
             } else {
               f.close();
             }
@@ -186,11 +187,11 @@ void deepSleep(bool alternateScreenSaver) {
   prefs.putString("editingFile", PM_SDAUTO().getEditingFile());
   prefs.putBool("Seamless_Reboot", false);
   prefs.end();
-  
-  // Power down peripherals
-  #if POCKETMAGE_HW_VERSION == 2
-    setLoadSwitch(false);
-  #endif
+
+// Power down peripherals
+#if POCKETMAGE_HW_VERSION == 2
+  setLoadSwitch(false);
+#endif
 
   // Sleep the ESP32
   esp_deep_sleep_start();
@@ -233,8 +234,6 @@ bool setRebootFlagOTA() {
 #endif
 }
 
-
-
 // checks if reboot flag is set, clears flag and reboots to PocketMage OS
 void checkRebootOTA() {
 #if PM_TARGET_APP
@@ -267,15 +266,15 @@ void hardReset(void* parameter) {
 
     // Hold power button for 3s to return home
     if ((millis() - heldSince) > 3000) {
-      OLED().sysMessage(TR(STR_SYS_PROCESS_INTERRUPTED),1000);
+      OLED().sysMessage(TR(STR_SYS_PROCESS_INTERRUPTED), 1000);
 
 #if !OTA_APP_FLAG
       resetRequested = true;
 #else
-      pocketmage::deepSleep(); // OTA App has no home screen, so we just sleep
+      pocketmage::deepSleep();  // OTA App has no home screen, so we just sleep
 #endif
 
-      heldSince = millis(); // Reset so it doesn't constantly trigger
+      heldSince = millis();  // Reset so it doesn't constantly trigger
     }
 
     vTaskDelay(pdMS_TO_TICKS(50));
@@ -289,26 +288,25 @@ void PocketMage_INIT() {
   // Release any held GPIOs
   gpio_deep_sleep_hold_dis();
 
-  int isolation_pins[] = {SPI_MOSI, SPI_SCK, OLED_CS, OLED_DC, OLED_RST, 
-                          EPD_CS, EPD_DC, EPD_RST, EPD_BUSY, SD_CLK, 
-                          SD_CMD, SD_D0, SD_D1, SD_D2, SD_D3, 
-                          I2C_SCL, I2C_SDA, USB_MUX_PIN, BZ_PIN, LOAD_SWITCH};
+  int isolation_pins[] = {SPI_MOSI, SPI_SCK,  OLED_CS, OLED_DC,     OLED_RST, EPD_CS,     EPD_DC,
+                          EPD_RST,  EPD_BUSY, SD_CLK,  SD_CMD,      SD_D0,    SD_D1,      SD_D2,
+                          SD_D3,    I2C_SCL,  I2C_SDA, USB_MUX_PIN, BZ_PIN,   LOAD_SWITCH};
 
   for (int p : isolation_pins) {
     gpio_hold_dis((gpio_num_t)p);
-    
-    // If the pin is 0-21, it is an RTC pin on the S3. 
+
+    // If the pin is 0-21, it is an RTC pin on the S3.
     // We must release the RTC lock as well to be safe.
     if (p <= 21) {
       rtc_gpio_hold_dis((gpio_num_t)p);
     }
   }
 
-  // Enable peripherals (prod only)
-  #if POCKETMAGE_HW_VERSION == 2
-    pinMode(LOAD_SWITCH, OUTPUT);
-    setLoadSwitch(true);
-  #endif
+// Enable peripherals (prod only)
+#if POCKETMAGE_HW_VERSION == 2
+  pinMode(LOAD_SWITCH, OUTPUT);
+  setLoadSwitch(true);
+#endif
 
   // Check if in OTA app
   pocketmage::checkRebootOTA();
@@ -330,14 +328,17 @@ void PocketMage_INIT() {
   Serial.begin(115200);
   Wire.begin(I2C_SDA, I2C_SCL);
 
-  // Initialize Second I2C Bus (prod only)
-  #if POCKETMAGE_HW_VERSION == 2
-    Wire1.begin(SWITCHED_I2C_SDA, SWITCHED_I2C_SCL); // Note: Devices on Wire1 - Cap Touch, Expansion Port
-  #endif
+// Initialize Second I2C Bus (prod only)
+#if POCKETMAGE_HW_VERSION == 2
+  Wire1.begin(SWITCHED_I2C_SDA,
+              SWITCHED_I2C_SCL);  // Note: Devices on Wire1 - Cap Touch, Expansion Port
+#endif
 
-
-  vspi = new SPIClass(FSPI /*VSPI*/);
-  vspi->begin(SPI_SCK, -1, SPI_MOSI, -1);
+  // Use the global SPI instance pinned to the dedicated bus pins.
+  // The ESP32-S3 global SPI defaults to CLK=GPIO12/MOSI=11/MISO=13, which are exactly the SDMMC
+  // pins (SD_CLK=12, SD_CMD=11, SD_D0=13); the two drivers fight over GPIO12
+  SPI.begin(SPI_SCK, -1, SPI_MOSI, -1);
+  vspi = &SPI;
   pinMode(vspi->pinSS(), OUTPUT);
 
   // WAKE INTERRUPT SETUP
@@ -348,16 +349,16 @@ void PocketMage_INIT() {
   // OLED SETUP
   setupOled();
 
-  // SHOW "PocketMage" while DEVICE BOOTS
-  #if PM_TARGET_HOST
+// SHOW "PocketMage" while DEVICE BOOTS
+#if PM_TARGET_HOST
   if (!seamlessReboot)
     OLED().oledWord("   PocketMage   ", true, false);
-  #endif
+#endif
 
   // KEYBOARD SETUP
   setupKB(KB_IRQ);
   ESP_LOGD(TAG, "setup keyboard");
-  
+
   // EINK HANDLER SETUP
   setupEink();
   ESP_LOGD(TAG, "setup eink");
@@ -376,13 +377,13 @@ void PocketMage_INIT() {
   }
 
   // Start hardreset task
-  xTaskCreatePinnedToCore(pocketmage::hardReset,    // Function name
-                          "hardReset",              // Task name
-                          2048,                     // Stack size
-                          NULL,                     // Parameters
-                          0,                        // Priority
-                          NULL,                     // Task handle
-                          1                         // Core ID
+  xTaskCreatePinnedToCore(pocketmage::hardReset,  // Function name
+                          "hardReset",            // Task name
+                          2048,                   // Stack size
+                          NULL,                   // Parameters
+                          0,                      // Priority
+                          NULL,                   // Task handle
+                          1                       // Core ID
   );
 
   // SET CPU CLOCK FOR POWER SAVE MODE
@@ -394,28 +395,28 @@ void PocketMage_INIT() {
   // CAPACATIVE TOUCH SETUP
   setupTouch();
   ESP_LOGD(TAG, "setup touch");
-  
+
   // RTC SETUP
   setupClock();
   ESP_LOGD(TAG, "setup clock");
-  
+
   // Set "random" seed
   randomSeed(analogRead(BAT_SENS));
 
   // Load State
-  #if PM_TARGET_APP
-    pocketmage::loadSettings();
-  #else
-    loadState();
-  #endif
+#if PM_TARGET_APP
+  pocketmage::loadSettings();
+#else
+  loadState();
+#endif
   ESP_LOGD(TAG, "loaded state");
 
   // Recover persisted state after an abnormal reset.
-  #if PM_TARGET_APP
-    pocketmage::recoverFromCrash();
-  #else
-    checkCrashState();
-  #endif
+#if PM_TARGET_APP
+  pocketmage::recoverFromCrash();
+#else
+  checkCrashState();
+#endif
 
   // STARTUP JINGLE
   setupBZ();
@@ -424,25 +425,24 @@ void PocketMage_INIT() {
     BZ().playJingle(Jingles::Startup);
 
   // WiFi task (radio stays off until a wifi* or ssh command enables it)
-  #if PM_TARGET_HOST
-    P_WIFI.begin();
-  #endif
+#if PM_TARGET_HOST
+  P_WIFI.begin();
+#endif
 
   // Clear any excess keystrokes
   keypad.flush();
 
-  // Apps initialize here
-  #if PM_TARGET_APP
-    APP_INIT();
-  #endif
+// Apps initialize here
+#if PM_TARGET_APP
+  APP_INIT();
+#endif
 }
 
 void setLoadSwitch(bool state) {
   if (!state) {
-    int isolation_pins[] = {SPI_MOSI, SPI_SCK, OLED_CS, OLED_DC, OLED_RST, 
-                            EPD_CS, EPD_DC, EPD_RST, EPD_BUSY, SD_CLK, 
-                            SD_CMD, SD_D0, SD_D1, SD_D2, SD_D3, 
-                            I2C_SCL, I2C_SDA, USB_MUX_PIN, BZ_PIN};
+    int isolation_pins[] = {SPI_MOSI, SPI_SCK,  OLED_CS, OLED_DC,     OLED_RST, EPD_CS, EPD_DC,
+                            EPD_RST,  EPD_BUSY, SD_CLK,  SD_CMD,      SD_D0,    SD_D1,  SD_D2,
+                            SD_D3,    I2C_SCL,  I2C_SDA, USB_MUX_PIN, BZ_PIN};
 
     for (int p : isolation_pins) {
       // Set to high-Z
@@ -451,14 +451,14 @@ void setLoadSwitch(bool state) {
       gpio_pullup_dis((gpio_num_t)p);
       gpio_pulldown_dis((gpio_num_t)p);
       // Tell the ESP32 to FREEZE this pin's state during deep sleep
-      gpio_hold_en((gpio_num_t)p); 
+      gpio_hold_en((gpio_num_t)p);
     }
-    
+
     // Enable global deep sleep isolation
     gpio_deep_sleep_hold_en();
   } else {
     // If turning back on, you would need to unhold them:
-    // gpio_hold_dis(...) 
+    // gpio_hold_dis(...)
   }
 
   digitalWrite(LOAD_SWITCH, state);
@@ -535,4 +535,3 @@ pocketmage::ScopedCpuBoost::ScopedCpuBoost() {
 pocketmage::ScopedCpuBoost::~ScopedCpuBoost() {
   setCpuSpeed(prevFreq_);
 }
-

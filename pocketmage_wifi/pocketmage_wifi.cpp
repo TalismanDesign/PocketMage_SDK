@@ -3,7 +3,6 @@
 #include <pocketmage_i18n/pocketmage_i18n.h>
 
 #include <esp_log.h>
-#include <esp_task_wdt.h>
 
 #include <cstring>
 
@@ -245,7 +244,6 @@ void PocketMageWifi::taskLoop() {
   unsigned long lastAutoScan = 0;
   setStatus(TR(STR_WIFI_IDLE));
   while (true) {
-    esp_task_wdt_reset();  // Reset watchdog
     // Wait for command or periodic auto-scan
     if (xQueueReceive(_commandQueue, &cmd, pdMS_TO_TICKS(200)) == pdTRUE) {
       switch (cmd) {

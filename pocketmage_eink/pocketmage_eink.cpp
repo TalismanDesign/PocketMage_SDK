@@ -159,9 +159,15 @@ int PocketmageEink::countLines(const String& input, size_t maxLineLength) {
 
 void PocketmageEink::forceSlowFullUpdate(bool force) { forceSlowFullUpdate_ = force; }
 
+// UC8253 controller is rated to 20MHz SPI; keep well under it. The default
+// 4MHz upload time is small next to the 1-3s panel refresh, so this mostly
+// reduces time the shared SPI2 bus is occupied by the eink framebuffer.
+static const uint32_t kEinkSpiClockHz = 16000000UL;
+
 void setupEink() {
   einkMutex = xSemaphoreCreateRecursiveMutex();
-  display.init(115200);
+  display.init(115200, true, 10, false,
+               SPI, SPISettings(kEinkSpiClockHz, MSBFIRST, SPI_MODE0));
   pm_eink.markPanelNeedsFullRefresh();
   display.setRotation(3);
   display.setFullWindow();
