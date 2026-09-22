@@ -1,0 +1,68 @@
+name: SDK CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  example-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare the Python Cauldron
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Xtensa Toolchain
+        run: |
+          set -euo pipefail
+          VER=esp-15.2.0_20251204
+          SHA=3d50f5cd5f173acfd524e07c1cd69bc99585731a415ca2e5bce879997fe602b8
+          TGT="$HOME/.espressif/tools/xtensa-esp-elf/$VER"
+          URL="https://github.com/espressif/crosstool-NG/releases/download/$VER/xtensa-esp-elf-15.2.0_20251204-x86_64-linux-gnu.tar.xz"
+          mkdir -p "$TGT"
+          curl -fsSL -o /tmp/xtensa-esp-elf.tar.xz "$URL"
+          echo "$SHA  /tmp/xtensa-esp-elf.tar.xz" | sha256sum -c -
+          tar -xJf /tmp/xtensa-esp-elf.tar.xz -C "$TGT"
+          test -x "$TGT/xtensa-esp-elf/bin/xtensa-esp32s3-elf-g++"
+          echo "toolchain installed at $TGT/xtensa-esp-elf"
+
+      - name: Build Example App
+        working-directory: examples/hello_app
+        run: make clean all check pack
+
+      - name: Assert artifact little-endian
+        working-directory: examples/hello_app/build
+        run: |
+          set -euo pipefail
+          xtensa-esp-elf-readelf -h hello_app.app.elf | grep -q 'little endian'
+          tar -tf hello_app.tar | grep -q -- 'hello_app.app.elf'
+          tar -tf hello_app.tar | grep -q -- 'hello_app_ICON.bin'
+
+  i18n-generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare the Python Cauldron
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Regenerate i18n tables from SDK catalogs
+        run: |
+          set -euo pipefail
+          python pocketmage_i18n/tools/gen_i18n.py --force \
+            --catalog pocketmage_i18n/languages \
+            --out-dir /tmp/pm-sdk-i18n
+          test -s /tmp/pm-sdk-i18n/pocketmage_i18n_gen.h
+          test -s /tmp/pm-sdk-i18n/pocketmage_i18n_gen.cpp
+          echo "tables generated"

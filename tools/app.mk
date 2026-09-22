@@ -25,6 +25,8 @@ APP_SRCS    ?= main.cpp
 APP_NAME    ?= $(notdir $(CURDIR))
 APP_BUILD_DIR ?= build
 APP_OUT     := $(APP_BUILD_DIR)/$(APP_NAME).app.elf
+APP_ICON    ?= $(CURDIR)/$(APP_NAME)_ICON.bin
+APP_TAR     := $(APP_BUILD_DIR)/$(APP_NAME).tar
 
 SDK_ROOT    ?= $(error SDK_ROOT must be set)
 
@@ -33,6 +35,7 @@ SDK_ROOT    ?= $(error SDK_ROOT must be set)
 # Probe newest to oldest: espressif toolchain dirs, then the PlatformIO
 # package, then whatever is on PATH.
 ESP_TOOLCHAIN_BIN := $(firstword $(wildcard \
+  $(HOME)/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin \
   $(HOME)/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20251107/xtensa-esp-elf/bin \
   $(HOME)/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin \
   $(HOME)/.platformio/packages/toolchain-xtensa-esp32s3/bin))
@@ -63,7 +66,7 @@ APP_STRIP_FLAGS += --remove-section=.xtensa.info
 
 APP_OBJS := $(patsubst %,$(APP_BUILD_DIR)/%.o,$(basename $(APP_SRCS)))
 
-.PHONY: all elf check clean
+.PHONY: all elf check clean pack
 all: $(APP_OUT)
 
 elf: $(APP_OUT)
@@ -86,6 +89,12 @@ check: $(APP_OUT)
 	@echo "entry: $$($(XTENSA_READELF) -h $< | awk '/Entry point/ {print $$4}')"
 	@echo "undefined symbols (resolved by host at load time):"
 	@$(XTENSA_READELF) -s -W $< | awk '$$5 ~ /GLOBAL/ && $$7 == "UND" {print $$8}' | sort -u
+
+pack: $(APP_OUT) $(APP_ICON)
+	@tar -cf $(APP_TAR) -C $(APP_BUILD_DIR) $(APP_NAME).app.elf
+	@tar -uf $(APP_TAR) -C $(CURDIR) $(APP_NAME)_ICON.bin
+	@echo "packed $(APP_TAR) ($$(wc -c < $(APP_TAR)) bytes)"
+	@tar -tvf $(APP_TAR)
 
 clean:
 	rm -rf $(APP_BUILD_DIR)
