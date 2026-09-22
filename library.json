@@ -50,7 +50,10 @@
         "includeDir": ".",
         "srcDir": ".",
         "srcFilter": [
-            "+<**>"
+            "+<**>",
+            "-<examples/>",
+            "-<tools/>",
+            "-<docs/>"
         ]
     }
 }

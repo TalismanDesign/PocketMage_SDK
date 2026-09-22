@@ -44,7 +44,8 @@ def get_host_globals(readelf, host_elf, symbol_types=None):
     return globals_
 
 
-def save_c_file(symbols, output, symbol_table, exclude_symbols=None):
+def save_c_file(symbols, output, symbol_table, exclude_symbols=None,
+                cpp=False, include_headers=None):
     if exclude_symbols is None:
         exclude_symbols = ['elf_find_sym']
 
@@ -56,12 +57,21 @@ def save_c_file(symbols, output, symbol_table, exclude_symbols=None):
     buf += ' * SPDX-License-Identifier: Apache-2.0\n'
     buf += ' *\n'
     buf += f' * Generated from the curated PocketMage SDK export list.\n'
+    buf += ' * DO NOT EDIT: regenerate with tools/symbols.py.\n'
     buf += ' */\n\n'
 
     buf += '#include <stddef.h>\n\n'
     buf += '#include "private/elf_symbol.h"\n\n'
 
-    if filtered_symbols:
+    if cpp:
+        # C++ hosts export functions/objects whose real prototypes live in
+        # headers; a bare `extern int` declaration cannot name them, so the
+        # caller passes the owning headers instead.
+        for header in (include_headers or []):
+            buf += f'#include <{header}>\n'
+        if include_headers:
+            buf += '\n'
+    elif filtered_symbols:
         buf += '/* Extern declarations from curated export list */\n\n'
         buf += '#pragma GCC diagnostic push\n'
         buf += '#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"\n'
@@ -71,13 +81,22 @@ def save_c_file(symbols, output, symbol_table, exclude_symbols=None):
 
     symbol_table_var = f'g_{symbol_table}_elfsyms'
     buf += f'/* Available ELF symbols table: {symbol_table_var} */\n'
-    buf += f'\nconst struct esp_elfsym {symbol_table_var}[] = {{\n'
+    if cpp:
+        buf += '/* C linkage: the loader core is C and references this unmangled. */\n'
+        buf += '/* Explicit extern: namespace-scope const defaults to internal\n'
+        buf += ' * linkage in C++, which would let the compiler discard the table. */\n'
+        buf += '\nextern "C" {\n'
+        buf += f'\nextern const struct esp_elfsym {symbol_table_var}[] = {{\n'
+    else:
+        buf += f'\nconst struct esp_elfsym {symbol_table_var}[] = {{\n'
 
     for symbol_name in filtered_symbols:
         buf += f'    ESP_ELFSYM_EXPORT({symbol_name}),\n'
 
     buf += '    ESP_ELFSYM_END\n'
     buf += '};\n'
+    if cpp:
+        buf += '}\n'
 
     with open(output, 'w+') as f:
         f.write(buf)
@@ -113,7 +132,20 @@ def main():
     parser.add_argument(
         '--output-file',
         required=True,
-        help='Output path for the generated C table',
+        help='Output path for the generated table',
+    )
+    parser.add_argument(
+        '--cpp',
+        action='store_true',
+        help='Emit C++ (for hosts exporting C++ symbols): includes from '
+             '--include-header replace the `extern int` declarations and the '
+             'table gets C linkage',
+    )
+    parser.add_argument(
+        '--include-header',
+        action='append',
+        default=[],
+        help='Header owning exported symbols (repeatable, --cpp only)',
     )
     parser.add_argument(
         '--exclude',
@@ -137,7 +169,9 @@ def main():
         curated = [name for name in curated if name in host_globals]
 
     exclude = ['elf_find_sym', 'g_customer_elfsyms'] + args.exclude
-    save_c_file(curated, args.output_file, args.symbol_table, exclude_symbols=exclude)
+    save_c_file(curated, args.output_file, args.symbol_table,
+                exclude_symbols=exclude, cpp=args.cpp,
+                include_headers=args.include_header)
     print(f'saved {len(curated)} exported symbols to {args.output_file}')
 
 

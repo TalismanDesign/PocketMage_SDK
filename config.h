@@ -8,14 +8,8 @@
 #if defined(PM_TARGET_HOST) && defined(PM_TARGET_APP)
 #error "PM_TARGET_HOST and PM_TARGET_APP are mutually exclusive"
 #endif
-#ifndef PM_TARGET_HOST
-#ifndef PM_TARGET_APP
-#if OTA_APP_FLAG
-#define PM_TARGET_APP 1
-#else
-#define PM_TARGET_HOST 1
-#endif
-#endif
+#if !defined(PM_TARGET_HOST) && !defined(PM_TARGET_APP)
+#error "Define PM_TARGET_HOST (OS firmware) or PM_TARGET_APP (external .app.elf)"
 #endif
 
 

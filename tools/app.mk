@@ -72,6 +72,10 @@ $(APP_OUT): $(APP_SRCS) | $(APP_BUILD_DIR)
 	$(XTENSA_CXX) $(APP_CPPFLAGS) $(APP_CXXFLAGS) $(APP_SRCS) $(APP_LDFLAGS) -o $@.raw
 	$(XTENSA_STRIP) $(APP_STRIP_FLAGS) $@.raw -o $@
 	rm -f $@.raw
+	@if ! $(XTENSA_READELF) -h $@ 2>/dev/null | grep -q 'little endian'; then \
+	  echo "error: $(APP_NAME).app.elf is big-endian; the loader requires a little-endian ELF (use the xtensa-esp-elf toolchain)" >&2; \
+	  rm -f $@; exit 1; \
+	fi
 	@echo "built $(APP_NAME).app.elf ($$(wc -c < $@) bytes)"
 
 $(APP_BUILD_DIR):

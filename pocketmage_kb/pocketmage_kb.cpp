@@ -914,7 +914,6 @@ char PocketmageKB::updateKeypress() {
                     // Excluded during onboarding: the wizard owns app state
                     // until finished; special-char cycling still works.
                     if (activeCycleLen == 12 && CurrentAppState != USB_APP && CurrentAppState != ONBOARDING) { // cyc_appSwitch trigger length
-#if !OTA_APP_FLAG
                         if (cycleIndex == 1) TXT_INIT("");
                         else if (cycleIndex == 2) FILEWIZ_INIT();
                         else if (cycleIndex == 3) USB_INIT();
@@ -926,7 +925,6 @@ char PocketmageKB::updateKeypress() {
                         else if (cycleIndex == 9) LEXICON_INIT();
                         else if (cycleIndex == 10) TERMINAL_INIT();
                         else if (cycleIndex == 11) APPLOADER_INIT();
-#endif
                         // If 0 ("cancel"), do nothing.
                         if (cycleIndex == 0) {
                             if (shift_oneshot) { shift_oneshot = false; sync_and_update_state(); }

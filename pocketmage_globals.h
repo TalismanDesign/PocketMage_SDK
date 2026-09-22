@@ -28,7 +28,7 @@ extern TaskHandle_t einkHandlerTaskHandle;  // E-ink refresh task (defined in po
 enum KBState { NORMAL, SHIFT, FUNC, FN_SHIFT };
 
 // ===================== APP STATES =====================
-enum AppState { HOME, TXT, FILEWIZ, USB_APP, COMM, SETTINGS, TASKS, CALENDAR, JOURNAL, LEXICON, APPLOADER, TERMINAL, ONBOARDING };
+enum AppState { HOME, TXT, FILEWIZ, USB_APP, COMM, SETTINGS, TASKS, CALENDAR, JOURNAL, LEXICON, APPLOADER, TERMINAL, ONBOARDING, ELFAPP };
 extern AppState CurrentAppState;
 
 // ===================== BATTERY HELPER =====================

@@ -268,11 +268,7 @@ void hardReset(void* parameter) {
     if ((millis() - heldSince) > 3000) {
       OLED().sysMessage(TR(STR_SYS_PROCESS_INTERRUPTED), 1000);
 
-#if !OTA_APP_FLAG
       resetRequested = true;
-#else
-      pocketmage::deepSleep();  // OTA App has no home screen, so we just sleep
-#endif
 
       heldSince = millis();  // Reset so it doesn't constantly trigger
     }
