@@ -1,0 +1,48 @@
+{
+  "title": "PocketMage SDK",
+  "description": "",
+  "pages": [
+    {
+      "title": "App binary contract (ABI)",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/",
+      "description": "The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.",
+      "priority": "medium"
+    },
+    {
+      "title": "Building an app",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/build/",
+      "description": "The toolchain, the project layout, and the make targets that produce a shippable ELF and tar.",
+      "priority": "medium"
+    },
+    {
+      "title": "Internationalization (i18n)",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/i18n/",
+      "description": "Translation catalogs, the gen_i18n.py generator, ownership rules, and what the merge validates.",
+      "priority": "medium"
+    },
+    {
+      "title": "PocketMage SDK Documentation",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/",
+      "description": "Official SDK for building PocketMage apps: the ELF app contract, build tooling, symbol surface, publishing flow, and the migration path.",
+      "priority": "high"
+    },
+    {
+      "title": "Migrating an existing app",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/migration/",
+      "description": "Moving a pre-ELF app to the runtime-load flow: what changed, the eight steps, and the traps that bite.",
+      "priority": "medium"
+    },
+    {
+      "title": "Publishing an app",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/publish/",
+      "description": "The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device.",
+      "priority": "medium"
+    },
+    {
+      "title": "Symbols and the dependency contract",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/symbols/",
+      "description": "The host-export surface apps resolve against, how to read an app's dependency list, and the rules for changing the surface.",
+      "priority": "medium"
+    }
+  ]
+}

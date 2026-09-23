@@ -1,0 +1,8 @@
+[WARN] missing-type /app-abi/  (using fallback 'concept')
+[WARN] missing-type /build/  (using fallback 'concept')
+[WARN] missing-type /i18n/  (using fallback 'concept')
+[WARN] missing-type /  (using fallback 'concept')
+[WARN] missing-type /migration/  (using fallback 'concept')
+[WARN] missing-type /publish/  (using fallback 'concept')
+[WARN] missing-type /symbols/  (using fallback 'concept')
+[WARN] orphan-concept root  (no inbound links)

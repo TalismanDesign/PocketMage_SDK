@@ -1,0 +1,1146 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.17">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/PocketMage_SDK/docs/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/PocketMage_SDK/docs/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    <title>
+      App binary contract (ABI) : PocketMage SDK
+    </title>
+    
+    
+
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mudmj9nb">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mudmj9nb">
+    
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mudmj9nb" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mudmj9nb" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.">
+<link rel="canonical" href="https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/">
+<meta property="og:title" content="App binary contract (ABI) - PocketMage SDK">
+<meta property="og:description" content="The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.">
+<meta property="og:url" content="https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="App binary contract (ABI) - PocketMage SDK">
+<meta name="twitter:description" content="The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.">
+
+
+
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mudmj9nb" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mudmj9nb" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mudmj9nb" >
+
+    
+    
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/app-abi.md">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+<h1><a href="../">
+                PocketMage SDK
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="Main Navigation">
+  <ul>
+    
+      <li class="" >
+      
+        <a href="../" class=" "
+          >
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Home
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../app-abi/" class="active "
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            App ABI
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../build/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building Apps
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../symbols/" class=" "
+          >
+           
+<svg class="lucide-icon icon-box " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-box"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+  <path d="m3.3 7 8.7 5 8.7-5" />
+  <path d="M12 22V12" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Symbols
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../publish/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../migration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book-open"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 7v14" />
+  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Migration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://talismandesign.github.io/PocketMage_PDA/docs" class=" "
+          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+           
+<svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cpu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v2" />
+  <path d="M12 2v2" />
+  <path d="M17 20v2" />
+  <path d="M17 2v2" />
+  <path d="M2 12h2" />
+  <path d="M2 17h2" />
+  <path d="M2 7h2" />
+  <path d="M20 12h2" />
+  <path d="M20 17h2" />
+  <path d="M20 7h2" />
+  <path d="M7 20v2" />
+  <path d="M7 2v2" />
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="8" y="8" width="8" height="8" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            PocketMageOS docs
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://github.com/TalismanDesign/PocketMage_SDK" class=" "
+          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+           
+<svg class="lucide-icon icon-github " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-github"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+  <path d="M9 18c-4.51 2-5-2-7-2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            GitHub
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="Toggle Sidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  App binary contract (ABI)
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+                
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="Search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">Search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+
+    
+    <button class="theme-toggle-button" aria-label="Toggle theme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22App%20binary%20contract%20(ABI)%22%0Adescription%3A%20%22The%20binary%20shape%20the%20loader%20accepts%2C%20how%20it%20is%20mapped%20and%20run%2C%20and%20the%20failure%20modes%20that%20bite.%22%0A---%0A%0A%23%20App%20binary%20contract%20(ABI)%0A%0AThe%20loader%20accepts%20exactly%20one%20thing%3A%20a%2032-bit%20%60ET_DYN%60%20ELF%2C%20little-endian%2C%0Aentry%20%60app_main%60.%20Anything%20else%20fails%20to%20load.%20Build%20and%20packaging%20mechanics%0Alive%20in%20%5Bbuild.md%5D(build.md)%3B%20the%20symbol%20surface%20in%20%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Format%0A%0A-%20%60e_ident%5BEI_CLASS%5D%60%20%3D%20%60ELFCLASS32%60%0A-%20%60e_ident%5BEI_DATA%5D%60%20%3D%20%60ELFDATA2LSB%60%0A-%20%60e_type%60%20%3D%20%60ET_DYN%60%20(position%20independent)%0A-%20entry%20%3D%20the%20%60app_main%60%20symbol%0A%0AThe%20loader%20reads%20the%20ELF%20structures%20with%20plain%20native%20reads.%20No%20byte%0Aswapping%2C%20no%20endianness%20validation.%20A%20big-endian%20file%20decodes%20into%20garbage%0Aand%20the%20load%20fails%2C%20which%20is%20why%20%60app.mk%60%20asserts%20endianness%20after%20link%20and%0Arefuses%20to%20keep%20a%20bad%20artifact.%0A%0AOnly%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%20emits%20output%20the%20loader%20can%0Aread.%20The%20PlatformIO%20package%20emits%20the%20wrong%20byte%20order%20and%20is%20unusable%20for%0Aapps%3B%20see%20%5Bbuild.md%5D(build.md)%20for%20install%20paths.%0A%0A%23%23%20Entry%20point%0A%0AThe%20host%20looks%20up%20%60app_main%60%20by%20name%20and%20calls%20it%20on%20core%201%20in%20a%20task%20with%20a%0A16%20KB%20stack%3A%0A%0A%60%60%60c%0Aint%20main(int%20argc%2C%20char%20**argv)%3B%20%20%20%2F%2F%20renamed%20to%20app_main%20at%20build%20time%0A%60%60%60%0A%0AThe%20build%20passes%20%60-Dmain%3Dapp_main%20-e%20app_main%60%2C%20so%20an%20app%20writes%20its%20entry%0Awith%20C%20linkage%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%0A%60%60%60%0A%0A%60argv%5B0%5D%60%20is%20the%20app%20base%20name%2C%20%60argv%5B1%5D%60%20is%20the%20absolute%20path%20of%20the%20loaded%0AELF.%20Returning%20from%20%60main%60%20tears%20the%20app%20down%20(the%20load%20is%20deinitialized)%20and%0Acontrol%20returns%20to%20the%20OS.%20There%20is%20no%20run-forever%20semantics%3B%20a%20UI%20app%20hands%0Acontrol%20back%20through%20the%20SDK%2Fhost%20API%20cooperatively%2C%20then%20returns.%20End%20the%0Alifetime.%20A%20%60main%60%20that%20never%20returns%20leaks%20the%20run%20task.%0A%0A%23%23%20How%20loading%20works%0A%0AThe%20host%20vendors%20the%20upstream%20%60esp_elf_loader%60%20(see%20%60lib%2FELFLoader%60).%20At%20load%0Atime%3A%0A%0A1.%20Text%20maps%20into%20%60MALLOC_CAP_EXEC%60%20memory%20(IRAM)%20through%20the%20bus%20address%0A%20%20%20mirror%2C%20so%20code%20is%20executable%20on%20the%20S3.%20Do%20not%20enable%0A%20%20%20%60CONFIG_ELF_LOADER_LOAD_PSRAM%60%3A%20on%20ESP32-S3%2C%20code%20in%20PSRAM%20is%20not%0A%20%20%20executable%2C%20app%20or%20firmware.%0A2.%20Data%2Frodata%20maps%20into%20%60MALLOC_CAP_8BIT%60%20DRAM%20segments.%0A3.%20Every%20relocation%20and%20every%20undefined%20symbol%20resolves%20from%20the%20host&#039;s%20own%0A%20%20%20live%20memory.%0A%0ASo%20apps%20link%20%60-nostdlib%60%3A%20no%20newlib%2C%20no%20libstdc%2B%2B%2C%20no%20SDK%20copy%20in%20the%20ELF.%0AEverything%20an%20app%20references%20must%20resolve%20at%20load%20time%20from%20the%20host.%20Linking%0Anewlib%20into%20the%20app%20is%20wasteful%20and%20collides%20with%20host%20globals.%20Don&#039;t.%0A%0A%23%23%20Runtime%20environment%0A%0A-%20The%20app%20shares%20the%20host&#039;s%20heap.%20Loading%20costs%20roughly%20the%20ELF%20size%20plus%20a%0A%20%20fixed%20reserve%3B%20%60runElfApp%60%20refuses%20to%20launch%20when%20free%20%60MALLOC_CAP_8BIT%60%0A%20%20drops%20below%20that%20floor.%20Keep%20the%20app%20small.%0A-%20The%20app%20runs%20in-process.%20It%20can%20call%20anything%20the%20host%20exports%20-%20the%0A%20%20display%2C%20keyboard%20stack%2C%20translation%20engine%2C%20peripheral%20drivers%20-%20at%20native%0A%20%20speed%2C%20no%20IPC.%0A-%20Stack%20is%20not%20heap.%20The%20run%20task%20gives%2016%20KB%3B%20deep%20recursion%20or%20fat%20frames%0A%20%20blow%20it.%20Move%20working%20sets%20to%20the%20heap.%0A%0A%23%23%20Sections%20and%20strip%0A%0A%60app.mk%60%20links%20with%20%60--gc-sections%60%20(functions%20and%20data)%20and%20strips%0Aloader-irrelevant%20sections%2C%20so%20the%20delivered%20ELF%20comes%20down%20to%20%60.text%60%2C%0A%60.rodata%60%2C%20%60.got%60%2C%20%60.rela.dyn%60%2C%20%60.rela.plt%60%2C%20%60.dynsym%60%2C%20%60.dynstr%60%2C%20%60.hash%60%2C%0A%60.shstrtab%60.%20Everything%20else%20is%20removed.%20Code%20that%20depends%20on%20other%20sections%0Aexisting%20is%20unsupported.%20Don&#039;t%20write%20it.%0A%0A%23%23%20Endianness%20failure%20modes%0A%0A%7C%20Symptom%20at%20load%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Cause%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20--------------------------------------------%20%7C%20---------------------------------%20%7C%0A%7C%20garbage%20%2F%20instruction%20fetch%20fault%20in%20IRAM%20%20%20%20%7C%20ELF%20fields%20decoded%20wrong%20(BE)%20%20%20%20%20%7C%0A%7C%20%60esp_elf_load_section%60%20fault%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20misaligned%20%2F%20incorrect%20section%20data%20%7C%0A%7C%20load%20%22succeeds%22%2C%20entry%20behaves%20wildly%20%20%20%20%20%20%20%20%7C%20wrong%20sizes%20from%20BE%20headers%20%20%20%20%20%20%20%7C%0A%0AThe%20build-time%20guard%20catches%20BE%20before%20it%20reaches%20a%20device%3A%20if%20the%20last%0A%60make%60%20line%20is%20%60error%3A%20...%20big-endian%20...%60%2C%20rebuild%20with%20the%20espressif%0Atoolchain%20(see%20%5Bbuild.md%5D(build.md)).%0A%0A%23%23%20Stability%20rules%20for%20SDK%20authors%0A%0A-%20The%20format%2C%20entry%20point%2C%20and%20load%20strategy%20are%20public%20contract.%20Changing%20how%0A%20%20an%20app%20maps%20or%20invokes%20takes%20a%20%60major%60%20bump%20of%20%60pocketmage_sdk_version%60%20and%0A%20%20a%20migration%20note.%0A-%20Exports%20are%20additive.%20Removing%20or%20changing%20an%20export%20breaks%20live%20apps.%20See%0A%20%20%5BCONTRIBUTING.md%5D(..%2FCONTRIBUTING.md)." style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>App ABI</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">Copy Context</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="app-binary-contract-abi" class="docmd-heading"><a href="#app-binary-contract-abi" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>App binary contract (ABI)</h1>
+<p>The loader accepts exactly one thing: a 32-bit <code>ET_DYN</code> ELF, little-endian,<br>
+entry <code>app_main</code>. Anything else fails to load. Build and packaging mechanics<br>
+live in <a href="../build/">build.md</a>; the symbol surface in <a href="../symbols/">symbols.md</a>.</p>
+<h2 id="app-binary-contract-abi-format" class="docmd-heading"><a href="#app-binary-contract-abi-format" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Format</h2>
+<ul>
+<li><code>e_ident[EI_CLASS]</code> = <code>ELFCLASS32</code></li>
+<li><code>e_ident[EI_DATA]</code> = <code>ELFDATA2LSB</code></li>
+<li><code>e_type</code> = <code>ET_DYN</code> (position independent)</li>
+<li>entry = the <code>app_main</code> symbol</li>
+</ul>
+<p>The loader reads the ELF structures with plain native reads. No byte<br>
+swapping, no endianness validation. A big-endian file decodes into garbage<br>
+and the load fails, which is why <code>app.mk</code> asserts endianness after link and<br>
+refuses to keep a bad artifact.</p>
+<p>Only the espressif <code>xtensa-esp-elf</code> toolchain emits output the loader can<br>
+read. The PlatformIO package emits the wrong byte order and is unusable for<br>
+apps; see <a href="../build/">build.md</a> for install paths.</p>
+<h2 id="app-binary-contract-abi-entry-point" class="docmd-heading"><a href="#app-binary-contract-abi-entry-point" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Entry point</h2>
+<p>The host looks up <code>app_main</code> by name and calls it on core 1 in a task with a<br>
+16 KB stack:</p>
+<pre class="hljs"><code class="language-c"><span class="hljs-keyword">int</span> <span class="hljs-title function_">main</span>(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> <span class="hljs-punctuation">**</span>argv);   <span class="hljs-comment">// renamed to app_main at build time</span>
+</code></pre>
+<p>The build passes <code>-Dmain=app_main -e app_main</code>, so an app writes its entry<br>
+with C linkage:</p>
+<pre class="hljs"><code class="language-cpp">extern <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-keyword">int</span> <span class="hljs-title function_">main</span>(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> <span class="hljs-punctuation">**</span>argv)
+</code></pre>
+<p><code>argv[0]</code> is the app base name, <code>argv[1]</code> is the absolute path of the loaded<br>
+ELF. Returning from <code>main</code> tears the app down (the load is deinitialized) and<br>
+control returns to the OS. There is no run-forever semantics; a UI app hands<br>
+control back through the SDK/host API cooperatively, then returns. End the<br>
+lifetime. A <code>main</code> that never returns leaks the run task.</p>
+<h2 id="app-binary-contract-abi-how-loading-works" class="docmd-heading"><a href="#app-binary-contract-abi-how-loading-works" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How loading works</h2>
+<p>The host vendors the upstream <code>esp_elf_loader</code> (see <code>lib/ELFLoader</code>). At load<br>
+time:</p>
+<ol>
+<li>Text maps into <code>MALLOC_CAP_EXEC</code> memory (IRAM) through the bus address<br>
+mirror, so code is executable on the S3. Do not enable<br>
+<code>CONFIG_ELF_LOADER_LOAD_PSRAM</code>: on ESP32-S3, code in PSRAM is not<br>
+executable, app or firmware.</li>
+<li>Data/rodata maps into <code>MALLOC_CAP_8BIT</code> DRAM segments.</li>
+<li>Every relocation and every undefined symbol resolves from the host’s own<br>
+live memory.</li>
+</ol>
+<p>So apps link <code>-nostdlib</code>: no newlib, no libstdc++, no SDK copy in the ELF.<br>
+Everything an app references must resolve at load time from the host. Linking<br>
+newlib into the app is wasteful and collides with host globals. Don’t.</p>
+<h2 id="app-binary-contract-abi-runtime-environment" class="docmd-heading"><a href="#app-binary-contract-abi-runtime-environment" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Runtime environment</h2>
+<ul>
+<li>The app shares the host’s heap. Loading costs roughly the ELF size plus a<br>
+fixed reserve; <code>runElfApp</code> refuses to launch when free <code>MALLOC_CAP_8BIT</code><br>
+drops below that floor. Keep the app small.</li>
+<li>The app runs in-process. It can call anything the host exports - the<br>
+display, keyboard stack, translation engine, peripheral drivers - at native<br>
+speed, no IPC.</li>
+<li>Stack is not heap. The run task gives 16 KB; deep recursion or fat frames<br>
+blow it. Move working sets to the heap.</li>
+</ul>
+<h2 id="app-binary-contract-abi-sections-and-strip" class="docmd-heading"><a href="#app-binary-contract-abi-sections-and-strip" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Sections and strip</h2>
+<p><code>app.mk</code> links with <code>--gc-sections</code> (functions and data) and strips<br>
+loader-irrelevant sections, so the delivered ELF comes down to <code>.text</code>,<br>
+<code>.rodata</code>, <code>.got</code>, <code>.rela.dyn</code>, <code>.rela.plt</code>, <code>.dynsym</code>, <code>.dynstr</code>, <code>.hash</code>,<br>
+<code>.shstrtab</code>. Everything else is removed. Code that depends on other sections<br>
+existing is unsupported. Don’t write it.</p>
+<h2 id="app-binary-contract-abi-endianness-failure-modes" class="docmd-heading"><a href="#app-binary-contract-abi-endianness-failure-modes" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Endianness failure modes</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Symptom at load</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>garbage / instruction fetch fault in IRAM</td>
+<td>ELF fields decoded wrong (BE)</td>
+</tr>
+<tr>
+<td><code>esp_elf_load_section</code> fault</td>
+<td>misaligned / incorrect section data</td>
+</tr>
+<tr>
+<td>load “succeeds”, entry behaves wildly</td>
+<td>wrong sizes from BE headers</td>
+</tr>
+</tbody>
+</table>
+</div><p>The build-time guard catches BE before it reaches a device: if the last<br>
+<code>make</code> line is <code>error: ... big-endian ...</code>, rebuild with the espressif<br>
+toolchain (see <a href="../build/">build.md</a>).</p>
+<h2 id="app-binary-contract-abi-stability-rules-for-sdk-authors" class="docmd-heading"><a href="#app-binary-contract-abi-stability-rules-for-sdk-authors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Stability rules for SDK authors</h2>
+<ul>
+<li>The format, entry point, and load strategy are public contract. Changing how<br>
+an app maps or invokes takes a <code>major</code> bump of <code>pocketmage_sdk_version</code> and<br>
+a migration note.</li>
+<li>Exports are additive. Removing or changing an export breaks live apps. See<br>
+<a href="../../CONTRIBUTING/">CONTRIBUTING.md</a>.</li>
+</ul>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>Previous</small><strong>
+                            Home
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../build/" class="next-page">
+                        <span><small>Next</small>
+                          <strong>
+                            Building Apps
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#app-binary-contract-abi" class="toc-link">App binary contract (ABI)</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#app-binary-contract-abi-format" class="toc-link">Format</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#app-binary-contract-abi-entry-point" class="toc-link">Entry point</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#app-binary-contract-abi-how-loading-works" class="toc-link">How loading works</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#app-binary-contract-abi-runtime-environment" class="toc-link">Runtime environment</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#app-binary-contract-abi-sections-and-strip" class="toc-link">Sections and strip</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#app-binary-contract-abi-endianness-failure-modes" class="toc-link">Endianness failure modes</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#app-binary-contract-abi-stability-rules-for-sdk-authors" class="toc-link">Stability rules for SDK authors</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+              
+            </div>
+            <div class="page-footer-actions">
+              
+              
+                <span class="git-last-updated" data-timestamp="1790138970000">
+                  <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span class="git-label">Last updated:</span>
+                  <span class="git-time" data-timestamp="1790138970000"></span>
+                  
+                  <div class="git-commit-tooltip" role="tooltip">
+                    <div class="git-tooltip-title">Recent commits</div>
+                    <ul class="git-commit-list">
+                      
+                        <li class="git-commit-item">
+                          <div class="git-commit-avatar" title="NellowTCS">
+                            
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
+                            
+                          </div>
+                          <div class="git-commit-details">
+                            <div class="git-commit-message" title="Docs">Docs</div>
+                            <div class="git-commit-meta">
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1790138970000"></span>
+                            </div>
+                          </div>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                  
+                </span>
+              
+              <span class="git-spacer"></span>
+              
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/docs/docs/app-abi.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                  
+<svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-pencil"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+  <path d="m15 5 4 4" />
+</svg>
+
+                  Edit this page
+                </a>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="footer-complete">
+  <div class="footer-complete-top">
+      <div class="footer-brand">
+          
+            <span class="footer-title">PocketMage SDK</span>
+          
+          
+            <p class="footer-desc">The official SDK for PocketMage apps: each app is an ELF the OS loads and runs in-process.</p>
+          
+        </div>
+        
+          <div class="footer-columns">
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Documentation</span>
+                <ul>
+                  
+                    <li><a href="app-abi/" >App ABI</a></li>
+                  
+                    <li><a href="build/" >Building Apps</a></li>
+                  
+                    <li><a href="publish/" >Publishing</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Community</span>
+                <ul>
+                  
+                    <li><a href="https://talismandesign.github.io/PocketMage_PDA/docs" >PocketMageOS docs</a></li>
+                  
+                    <li><a href="https://github.com/TalismanDesign/PocketMage_SDK" >GitHub</a></li>
+                  
+                    <li><a href="https://discord.gg/KSCapSf4XH" >Discord</a></li>
+                  
+                </ul>
+              </div>
+            
+          </div>
+        
+      </div>
+      <div class="footer-complete-bottom">
+        <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/TalismanDesign/PocketMage_SDK">View on GitHub</a>.</div>
+        
+          <div class="branding-footer">
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+          </div>
+        
+      </div>
+  </footer>
+
+        </div>
+      </div>
+      
+      <script src="../assets/js/docmd-main.js?v=mudmj9nb"></script>
+      
+      <script src="../assets/js/docmd-git.js?v=mudmj9nb"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mudmj9nb" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mudmj9nb" ></script>
+<script src="../assets/js/docmd-search.js?v=mudmj9nb" ></script>
+<script src="../assets/js/docmd-git.js?v=mudmj9nb" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

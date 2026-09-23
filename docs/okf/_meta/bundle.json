@@ -1,0 +1,92 @@
+{
+  "okf_version": "0.8.17",
+  "bundle": {
+    "name": "pocketmage-sdk",
+    "title": "PocketMage SDK",
+    "description": "",
+    "url": "https://talismandesign.github.io/PocketMage_SDK/docs",
+    "generated_by": "@docmd/plugin-okf",
+    "generated_at": "2026-09-23T04:49:51.782Z",
+    "default_type": "concept"
+  },
+  "stats": {
+    "concepts": 7,
+    "by_type": {
+      "concept": 7
+    },
+    "locales": [],
+    "versions": []
+  },
+  "concepts": [
+    {
+      "id": "app-abi",
+      "type": "concept",
+      "title": "App binary contract (ABI)",
+      "path": "/app-abi/",
+      "file": "concepts/app-abi.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "build",
+      "type": "concept",
+      "title": "Building an app",
+      "path": "/build/",
+      "file": "concepts/build.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "i18n",
+      "type": "concept",
+      "title": "Internationalization (i18n)",
+      "path": "/i18n/",
+      "file": "concepts/i18n.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "root",
+      "type": "concept",
+      "title": "PocketMage SDK Documentation",
+      "path": "/",
+      "file": "concepts/root.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "migration",
+      "type": "concept",
+      "title": "Migrating an existing app",
+      "path": "/migration/",
+      "file": "concepts/migration.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "publish",
+      "type": "concept",
+      "title": "Publishing an app",
+      "path": "/publish/",
+      "file": "concepts/publish.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "symbols",
+      "type": "concept",
+      "title": "Symbols and the dependency contract",
+      "path": "/symbols/",
+      "file": "concepts/symbols.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    }
+  ]
+}

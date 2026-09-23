@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://talismandesign.github.io/PocketMage_SDK/docs/sitemap.xml
