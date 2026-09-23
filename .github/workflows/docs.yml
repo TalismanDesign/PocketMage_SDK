@@ -1,0 +1,39 @@
+name: Deploy SDK Docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.0"
+
+      - name: Build Docs
+        working-directory: docs
+        run: |
+          set -euo pipefail
+          npm ci
+          npm run build
+
+      - name: Prepare Pages assets
+        run: |
+          set -euo pipefail
+          mkdir -p gh-pages-root/docs
+          cp -r docs/site/* gh-pages-root/docs/
+
+      - name: Deploy all assets to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: gh-pages-root
+          keep_files: true
+          commit_message: Deploy SDK Docs
