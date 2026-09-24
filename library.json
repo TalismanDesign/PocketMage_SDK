@@ -1,6 +1,6 @@
 {
     "name": "pocketmagesdk",
-    "version": "1.0.0",
+    "version": "0.1.0",
     "description": "The official SDK for developing and publishing PocketMage internal, external, and Wrench apps.",
     "keywords": [
         "PocketMage",

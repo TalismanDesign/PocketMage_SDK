@@ -38,6 +38,12 @@ jobs:
         working-directory: examples/hello_app
         run: make clean all check pack
 
+      - name: Assert example passes the pm gate
+        run: |
+          set -euo pipefail
+          pip install .
+          pm check examples/hello_app
+
       - name: Assert artifact little-endian
         working-directory: examples/hello_app/build
         run: |
@@ -45,6 +51,52 @@ jobs:
           xtensa-esp-elf-readelf -h hello_app.app.elf | grep -q 'little endian'
           tar -tf hello_app.tar | grep -q -- 'hello_app.app.elf'
           tar -tf hello_app.tar | grep -q -- 'hello_app_ICON.bin'
+
+      - name: Build and gate the ABI-version example
+        run: |
+          set -euo pipefail
+          make -C examples/version_app clean all
+          pm check examples/version_app
+
+      - name: Build and reject the negative fixture
+        run: |
+          set -euo pipefail
+          make -C examples/broken_app clean all
+          if pm check examples/broken_app; then
+            echo "broken_app must fail the export gate" >&2
+            exit 1
+          fi
+          echo "broken_app correctly rejected"
+
+      - name: Golden artifact and host-table tests
+        run: |
+          set -euo pipefail
+          export PM_READELF="$HOME/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin/xtensa-esp32s3-elf-readelf"
+          python3 -m unittest -v tools/pm/tests/test_golden.py tools/pm/tests/test_release.py
+
+  version-sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: All version lands read VERSION
+        run: |
+          set -euo pipefail
+          V="$(tr -d '[:space:]' < VERSION)"
+          grep -Eq "pocketmage_sdk_version\[\] = \"$V\"" pocketmage_globals.cpp
+          IFS=. read -r VMAJ VMIN VPAT <<< "$V"
+          grep -Eq "#define POCKETMAGE_SDK_VERSION_MAJOR $VMAJ([^0-9]|$)" pocketmage_app_version.h
+          grep -Eq "#define POCKETMAGE_SDK_VERSION_MINOR $VMIN([^0-9]|$)" pocketmage_app_version.h
+          grep -Eq "#define POCKETMAGE_SDK_VERSION_PATCH $VPAT([^0-9]|$)" pocketmage_app_version.h
+          ! grep -Eq '^version = ' pyproject.toml
+          python3 - "$V" <<'PY'
+          import json
+          import sys
+          version = sys.argv[1]
+          assert json.load(open("library.json"))["version"] == version
+          PY
+          echo "VERSION ($V) matches pocketmage_globals.cpp, pocketmage_app_version.h, library.json, and pyproject"
 
   i18n-generate:
     runs-on: ubuntu-latest
@@ -66,3 +118,65 @@ jobs:
           test -s /tmp/pm-sdk-i18n/pocketmage_i18n_gen.h
           test -s /tmp/pm-sdk-i18n/pocketmage_i18n_gen.cpp
           echo "tables generated"
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare the Python Cauldron
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: ruff checks the pm toolchain and tests
+        run: |
+          python -m pip install --quiet ruff
+          ruff check tools/
+
+      - name: gate-scoped sources are clang-formatted
+        run: |
+          sudo apt-get install -y -qq clang-format
+          clang-format --dry-run --Werror \
+            pocketmage_globals.cpp \
+            pocketmage_app_version.h \
+            examples/hello_app/main.cpp \
+            examples/version_app/main.cpp \
+            examples/broken_app/main.cpp
+
+  pm-cli:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare the Python Cauldron
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install the SDK
+        run: pip install .
+
+      - name: pm reports the SDK version
+        run: |
+          set -euo pipefail
+          pm version | grep -Eq '[0-9]+\.[0-9]+\.[0-9]+'
+          pm --help | grep -q 'new'
+
+      - name: pm exports and release are reachable
+        run: |
+          set -euo pipefail
+          pm exports --help | grep -q -- '--host'
+          pm release --help | grep -qE 'major|minor|patch'
+
+      - name: pm test suite
+        run: python3 -m unittest discover -s tools/pm/tests

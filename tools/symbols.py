@@ -56,7 +56,7 @@ def save_c_file(symbols, output, symbol_table, exclude_symbols=None,
     buf += ' *\n'
     buf += ' * SPDX-License-Identifier: Apache-2.0\n'
     buf += ' *\n'
-    buf += f' * Generated from the curated PocketMage SDK export list.\n'
+    buf += ' * Generated from the curated PocketMage SDK export list.\n'
     buf += ' * DO NOT EDIT: regenerate with tools/symbols.py.\n'
     buf += ' */\n\n'
 

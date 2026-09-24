@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pocketmage-sdk"
+dynamic = ["version"]
+description = "PocketMage SDK developer CLI"
+requires-python = ">=3.10"
+dependencies = ["tuiro~=0.1.1"]
+
+[tool.setuptools.dynamic]
+version = {file = ["VERSION"]}
+
+[project.optional-dependencies]
+dev = ["pytest", "ruff"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[project.scripts]
+pm = "tools.pm.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["tools", "tools.pm*"]

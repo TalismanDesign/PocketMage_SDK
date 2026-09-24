@@ -83,4 +83,8 @@ void TERMINAL_INIT();
 void APPLOADER_INIT();
 #endif
 
+// ABI version the host exports to loaded apps (symbols.list). Bump it together
+// with VERSION at the repo root (pm release does).
+extern "C" const char pocketmage_sdk_version[];
+
 #endif  // POCKETMAGE_GLOBALS_H

@@ -1,5 +1,5 @@
-#include <pocketmage_globals.h>
 #include <pocketmage.h>
+#include <pocketmage_globals.h>
 
 #include <esp_system.h>
 
@@ -48,8 +48,8 @@ void loadSettings() {
 
 void recoverFromCrash() {
   esp_reset_reason_t reason = esp_reset_reason();
-  if (reason != ESP_RST_PANIC && reason != ESP_RST_WDT &&
-      reason != ESP_RST_TASK_WDT && reason != ESP_RST_INT_WDT) {
+  if (reason != ESP_RST_PANIC && reason != ESP_RST_WDT && reason != ESP_RST_TASK_WDT &&
+      reason != ESP_RST_INT_WDT) {
     return;
   }
 
@@ -59,8 +59,10 @@ void recoverFromCrash() {
   PM_SDAUTO().setEditingFile("");
 }
 
-}  // namespace pocketmage
+} // namespace pocketmage
 
-// App-visible ABI version, imported by external apps to check the running
-// host release against the SDK they were built with (see symbols.list).
+// App-visible ABI version, read by external apps to compare the running host
+// release with the SDK they were built against (see symbols.list).
+// Must match the VERSION file at the repo root: CI fails the build when the
+// two drift.
 extern "C" const char pocketmage_sdk_version[] = "0.1.0";

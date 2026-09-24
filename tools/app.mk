@@ -30,6 +30,17 @@ APP_TAR     := $(APP_BUILD_DIR)/$(APP_NAME).tar
 
 SDK_ROOT    ?= $(error SDK_ROOT must be set)
 
+# Version the app was built against, read from VERSION at the SDK root.
+# Exposed as PM_SDK_VERSION* so an app can compare its build-time SDK with the
+# running host's pocketmage_sdk_version export.
+ifneq ($(shell test -f $(SDK_ROOT)/VERSION && echo yes),yes)
+$(error VERSION file missing at $(SDK_ROOT)/VERSION)
+endif
+PM_SDK_VERSION := $(shell cat $(SDK_ROOT)/VERSION)
+PM_SDK_VERSION_MAJOR := $(shell cut -d. -f1 $(SDK_ROOT)/VERSION)
+PM_SDK_VERSION_MINOR := $(shell cut -d. -f2 $(SDK_ROOT)/VERSION)
+PM_SDK_VERSION_PATCH := $(shell cut -d. -f3 $(SDK_ROOT)/VERSION)
+
 # toolchain
 
 # Probe newest to oldest: espressif toolchain dirs, then the PlatformIO
@@ -52,6 +63,10 @@ APP_CXXFLAGS += -fdata-sections -ffunction-sections -fvisibility=hidden
 APP_CXXFLAGS += -fno-exceptions -fno-rtti -fno-threadsafe-statics
 APP_CXXFLAGS += -Wall -Wextra
 APP_CPPFLAGS += -I$(SDK_ROOT) -DPM_TARGET_APP=1
+APP_CPPFLAGS += -DPM_SDK_VERSION=\"$(PM_SDK_VERSION)\"
+APP_CPPFLAGS += -DPM_SDK_VERSION_MAJOR=$(PM_SDK_VERSION_MAJOR)
+APP_CPPFLAGS += -DPM_SDK_VERSION_MINOR=$(PM_SDK_VERSION_MINOR)
+APP_CPPFLAGS += -DPM_SDK_VERSION_PATCH=$(PM_SDK_VERSION_PATCH)
 APP_LDFLAGS  := -nostartfiles -nostdlib -fPIC -shared -e app_main
 APP_LDFLAGS  += -fdata-sections -ffunction-sections -Wl,--gc-sections
 APP_LDFLAGS  += -fvisibility=hidden
@@ -66,10 +81,19 @@ APP_STRIP_FLAGS += --remove-section=.xtensa.info
 
 APP_OBJS := $(patsubst %,$(APP_BUILD_DIR)/%.o,$(basename $(APP_SRCS)))
 
-.PHONY: all elf check clean pack
+.PHONY: all elf check clean pack pm-info
 all: $(APP_OUT)
 
 elf: $(APP_OUT)
+
+# App + toolchain info for tools/pm (pm build/check).
+pm-info:
+	@echo "APP_NAME=$(APP_NAME)"
+	@echo "APP_OUT=$(APP_OUT)"
+	@echo "APP_TAR=$(APP_TAR)"
+	@echo "APP_ICON=$(APP_ICON)"
+	@echo "SDK_ROOT=$(SDK_ROOT)"
+	@echo "XTENSA_READELF=$(XTENSA_READELF)"
 
 $(APP_OUT): $(APP_SRCS) | $(APP_BUILD_DIR)
 	$(XTENSA_CXX) $(APP_CPPFLAGS) $(APP_CXXFLAGS) $(APP_SRCS) $(APP_LDFLAGS) -o $@.raw
@@ -84,7 +108,9 @@ $(APP_OUT): $(APP_SRCS) | $(APP_BUILD_DIR)
 $(APP_BUILD_DIR):
 	mkdir -p $@
 
-# Verify the artifact
+# Inspect the artifact: entry point and the host dependency list. Informational
+# only; `pm check` enforces, validated against the export surface (see
+# docs/docs/symbols.md).
 check: $(APP_OUT)
 	@echo "entry: $$($(XTENSA_READELF) -h $< | awk '/Entry point/ {print $$4}')"
 	@echo "undefined symbols (resolved by host at load time):"
