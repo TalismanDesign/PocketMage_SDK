@@ -4,10 +4,10 @@ title: "Building an app"
 description: "The toolchain, the project layout, and the make targets that produce a shippable ELF and tar."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/build/"
 path: /build/
-updated: 2026-09-23
+updated: 2026-09-24
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-23T04:49:51.779Z"
+  generated_at: "2026-09-24T05:42:26.156Z"
 ---
 ---
 title: "Building an app"
@@ -77,7 +77,7 @@ toolchain independently of the SDK.
 | Target        | Result                                                        |
 | ------------- | ------------------------------------------------------------- |
 | `make`        | Builds `build/<name>.app.elf`, stripped, endianness-asserted  |
-| `make check`  | Prints the entry point and every undefined symbol (the app's host dependency list) |
+| `make check`  | Prints the entry point and every undefined symbol (the app's host dependency list). Informational; the enforcing gate is `pm check` |
 | `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf` and `<name>_ICON.bin` (see [publish.md](publish.md)) |
 | `make clean`  | Removes `build/`                                              |
 
@@ -97,6 +97,11 @@ keep the undefined-symbol list (from `make check`) small and intentional; see
 The SDK builds with `-Wall -Wextra`, exceptions and RTTI disabled, and hidden
 visibility. Keep the code warning-free.
 
+`app.mk` injects `PM_SDK_VERSION` plus `PM_SDK_VERSION_MAJOR/MINOR/PATCH` from
+the repo `VERSION` file, so an app always sees `POCKETMAGE_SDK_VERSION_*` in
+`pocketmage_app_version.h` alongside the host-exported string literal
+`pocketmage_sdk_version`; see [app-abi.md](app-abi.md).
+
 ## Icon
 
 `<name>_ICON.bin` is an optional 200-byte file: a 40x40, 1-bit-per-pixel
@@ -112,5 +117,12 @@ generator the way `platformio.ini` shows in that doc.
 
 ## Before you ship
 
-Run `make clean all check` before every commit. `make pack` is the
-deliverable; verify the tar's members with `tar -tf build/<name>.tar`.
+Run `make clean all` then `pm check` before every commit; `pm check` is the
+gate CI runs, and `--host-elf <firmware.elf>` pins the host export surface
+exactly (see [symbols.md](symbols.md)). `make pack` is the deliverable;
+verify the tar's members with `tar -tf build/<name>.tar`.
+
+The repo ships three ready-to-build examples under `examples/`:
+`hello_app` (baseline), `version_app` (reads the ABI version via
+`pocketmage_app_version.h`), and `broken_app` (CI's negative fixture: it
+references a symbol the host does not export and must fail `pm check`).

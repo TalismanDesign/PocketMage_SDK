@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mudmj9nb">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mudmj9nb">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=muf3uqjg">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=muf3uqjg">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mudmj9nb" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mudmj9nb" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=muf3uqjg" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=muf3uqjg" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The toolchain, the project layout, and the make targets that produce a shippable ELF and tar.">
@@ -123,9 +123,9 @@
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mudmj9nb" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mudmj9nb" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mudmj9nb" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=muf3uqjg" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=muf3uqjg" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=muf3uqjg" >
 
     
     
@@ -659,7 +659,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Building%20an%20app%22%0Adescription%3A%20%22The%20toolchain%2C%20the%20project%20layout%2C%20and%20the%20make%20targets%20that%20produce%20a%20shippable%20ELF%20and%20tar.%22%0A---%0A%0A%23%20Building%20an%20app%0A%0AThe%20whole%20build%20system%20is%20one%20%60Makefile%60%20that%20includes%20the%20SDK%20recipe%20in%0A%60tools%2Fapp.mk%60.%0A%0A%23%23%20Project%20layout%0A%0A%60%60%60text%0Amyapp%2F%0A%20%20Makefile%20%20%20%20%20%20%20%23%20include%20of%20tools%2Fapp.mk%0A%20%20main.cpp%0A%20%20myapp_ICON.bin%20%23%20optional%2040x40%20icon%2C%20see%20Icon%20below%0A%20%20src%2Fi18n%2F%20%20%20%20%20%20%23%20optional%20app%20translation%20catalog%0A%60%60%60%0A%0A%60%60%60make%0ASDK_ROOT%20%3F%3D%20%24(abspath%20..%2F..)%20%20%20%20%20%20%23%20path%20to%20this%20repo%0Ainclude%20%24(SDK_ROOT)%2Ftools%2Fapp.mk%0A%60%60%60%0A%0AEverything%20is%20overridable%20on%20the%20command%20line%20or%20in%20the%20%60Makefile%60%3A%0A%60APP_SRCS%60%20(default%20%60main.cpp%60)%2C%20%60APP_NAME%60%20(default%20the%20directory%20basename)%2C%0A%60APP_BUILD_DIR%60%20(default%20%60build%60)%2C%20%60XTENSA_CXX%60%20(default%3A%20probed%20toolchain).%0A%0A%23%23%20Toolchain%0A%0A%7C%20Requirement%20%7C%20Value%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------%20%7C%20------------------------------------------%20%7C%0A%7C%20Compiler%20%20%20%20%7C%20espressif%20%60xtensa-esp32s3-elf-g%2B%2B%60%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Output%20%20%20%20%20%20%7C%20little-endian%20(required%20by%20the%20loader)%20%20%20%20%20%7C%0A%0AThe%20PlatformIO%20%60toolchain-xtensa-esp32s3%60%20package%20emits%20big-endian%20ELFs%20and%0Ais%20unusable%20for%20apps%3B%20if%20it%20is%20the%20only%20compiler%20found%2C%20%60app.mk%60%20fails%20the%0Abuild%20with%20a%20clear%20error.%20Install%20the%20espressif%20toolchain%20so%20it%20lands%20at%20one%0Aof%20the%20probed%20paths%20(newest%20first)%3A%0A%0A%60%60%60sh%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-15.2.0_20251204%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20251107%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20241119%2Fxtensa-esp-elf%2Fbin%0A%60%60%60%0A%0A%60esp-15.2.0_20251204%60%20is%20the%20one%20SDK%20CI%20pins%20(URL%20and%20SHA256).%20It%20is%20the%0Aeasiest%20known-good%20install%3A%0A%0A%60%60%60sh%0AVER%3Desp-15.2.0_20251204%0ASHA%3D3d50f5cd5f173acfd524e07c1cd69bc99585731a415ca2e5bce879997fe602b8%0AURL%3D%22https%3A%2F%2Fgithub.com%2Fespressif%2Fcrosstool-NG%2Freleases%2Fdownload%2F%24VER%2Fxtensa-esp-elf-15.2.0_20251204-x86_64-linux-gnu.tar.xz%22%0Amkdir%20-p%20%22%24HOME%2F.espressif%2Ftools%2Fxtensa-esp-elf%2F%24VER%22%0Acurl%20-fsSL%20-o%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%20%22%24URL%22%0Aecho%20%22%24SHA%20%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%22%20%7C%20sha256sum%20-c%20-%0Atar%20-xJf%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%20-C%20%22%24HOME%2F.espressif%2Ftools%2Fxtensa-esp-elf%2F%24VER%22%0A%60%60%60%0A%0AThe%20example%20builds%20with%20any%20probed%20version.%20The%20host%20OS%20pins%20its%20own%0Atoolchain%20independently%20of%20the%20SDK.%0A%0A%23%23%20Targets%0A%0A%7C%20Target%20%20%20%20%20%20%20%20%7C%20Result%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------%20%7C%20-------------------------------------------------------------%20%7C%0A%7C%20%60make%60%20%20%20%20%20%20%20%20%7C%20Builds%20%60build%2F%3Cname%3E.app.elf%60%2C%20stripped%2C%20endianness-asserted%20%20%7C%0A%7C%20%60make%20check%60%20%20%7C%20Prints%20the%20entry%20point%20and%20every%20undefined%20symbol%20(the%20app&#039;s%20host%20dependency%20list)%20%7C%0A%7C%20%60make%20pack%60%20%20%20%7C%20Builds%20%60build%2F%3Cname%3E.tar%60%20with%20%60%3Cname%3E.app.elf%60%20and%20%60%3Cname%3E_ICON.bin%60%20(see%20%5Bpublish.md%5D(publish.md))%20%7C%0A%7C%20%60make%20clean%60%20%20%7C%20Removes%20%60build%2F%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20endianness%20assertion%20runs%20after%20every%20link.%20A%20big-endian%20artifact%20gets%0Adeleted%20and%20the%20build%20fails.%0A%0A%23%23%20Entry%20point%0A%0A%60extern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%60%2C%20renamed%20to%20%60app_main%60%20via%0A%60-Dmain%3Dapp_main%20-e%20app_main%60.%20See%20%5Bapp-abi.md%5D(app-abi.md)%20for%20the%20full%0Acontract.%20Everything%20the%20app%20calls%20resolves%20from%20the%20host%20at%20load%20time%2C%20so%0Akeep%20the%20undefined-symbol%20list%20(from%20%60make%20check%60)%20small%20and%20intentional%3B%20see%0A%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Compiler%20flags%0A%0AThe%20SDK%20builds%20with%20%60-Wall%20-Wextra%60%2C%20exceptions%20and%20RTTI%20disabled%2C%20and%20hidden%0Avisibility.%20Keep%20the%20code%20warning-free.%0A%0A%23%23%20Icon%0A%0A%60%3Cname%3E_ICON.bin%60%20is%20an%20optional%20200-byte%20file%3A%20a%2040x40%2C%201-bit-per-pixel%0Abitmap%20(5%20bytes%20per%20row%2C%208%20pixels%20per%20byte)%2C%20drawn%20by%20the%20OS%20as%20the%20app%20icon.%0AMissing%20icons%20fall%20back%20to%20the%20OS%20default.%20%60make%20pack%60%20requires%20the%20file%20next%0Ato%20the%20%60Makefile%60%3B%20without%20one%20the%20pack%20step%20errors.%0A%0A%23%23%20Translations%0A%0AAn%20app%20that%20shows%20strings%20uses%20its%20own%20catalog%3B%20see%20%5Bi18n.md%5D(i18n.md).%20The%0Ashort%20version%3A%20put%20a%20%60src%2Fi18n%2F%60%20tree%20in%20your%20app%20and%20merge%20it%20via%20the%0Agenerator%20the%20way%20%60platformio.ini%60%20shows%20in%20that%20doc.%0A%0A%23%23%20Before%20you%20ship%0A%0ARun%20%60make%20clean%20all%20check%60%20before%20every%20commit.%20%60make%20pack%60%20is%20the%0Adeliverable%3B%20verify%20the%20tar&#039;s%20members%20with%20%60tar%20-tf%20build%2F%3Cname%3E.tar%60." style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Building%20an%20app%22%0Adescription%3A%20%22The%20toolchain%2C%20the%20project%20layout%2C%20and%20the%20make%20targets%20that%20produce%20a%20shippable%20ELF%20and%20tar.%22%0A---%0A%0A%23%20Building%20an%20app%0A%0AThe%20whole%20build%20system%20is%20one%20%60Makefile%60%20that%20includes%20the%20SDK%20recipe%20in%0A%60tools%2Fapp.mk%60.%0A%0A%23%23%20Project%20layout%0A%0A%60%60%60text%0Amyapp%2F%0A%20%20Makefile%20%20%20%20%20%20%20%23%20include%20of%20tools%2Fapp.mk%0A%20%20main.cpp%0A%20%20myapp_ICON.bin%20%23%20optional%2040x40%20icon%2C%20see%20Icon%20below%0A%20%20src%2Fi18n%2F%20%20%20%20%20%20%23%20optional%20app%20translation%20catalog%0A%60%60%60%0A%0A%60%60%60make%0ASDK_ROOT%20%3F%3D%20%24(abspath%20..%2F..)%20%20%20%20%20%20%23%20path%20to%20this%20repo%0Ainclude%20%24(SDK_ROOT)%2Ftools%2Fapp.mk%0A%60%60%60%0A%0AEverything%20is%20overridable%20on%20the%20command%20line%20or%20in%20the%20%60Makefile%60%3A%0A%60APP_SRCS%60%20(default%20%60main.cpp%60)%2C%20%60APP_NAME%60%20(default%20the%20directory%20basename)%2C%0A%60APP_BUILD_DIR%60%20(default%20%60build%60)%2C%20%60XTENSA_CXX%60%20(default%3A%20probed%20toolchain).%0A%0A%23%23%20Toolchain%0A%0A%7C%20Requirement%20%7C%20Value%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------%20%7C%20------------------------------------------%20%7C%0A%7C%20Compiler%20%20%20%20%7C%20espressif%20%60xtensa-esp32s3-elf-g%2B%2B%60%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Output%20%20%20%20%20%20%7C%20little-endian%20(required%20by%20the%20loader)%20%20%20%20%20%7C%0A%0AThe%20PlatformIO%20%60toolchain-xtensa-esp32s3%60%20package%20emits%20big-endian%20ELFs%20and%0Ais%20unusable%20for%20apps%3B%20if%20it%20is%20the%20only%20compiler%20found%2C%20%60app.mk%60%20fails%20the%0Abuild%20with%20a%20clear%20error.%20Install%20the%20espressif%20toolchain%20so%20it%20lands%20at%20one%0Aof%20the%20probed%20paths%20(newest%20first)%3A%0A%0A%60%60%60sh%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-15.2.0_20251204%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20251107%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20241119%2Fxtensa-esp-elf%2Fbin%0A%60%60%60%0A%0A%60esp-15.2.0_20251204%60%20is%20the%20one%20SDK%20CI%20pins%20(URL%20and%20SHA256).%20It%20is%20the%0Aeasiest%20known-good%20install%3A%0A%0A%60%60%60sh%0AVER%3Desp-15.2.0_20251204%0ASHA%3D3d50f5cd5f173acfd524e07c1cd69bc99585731a415ca2e5bce879997fe602b8%0AURL%3D%22https%3A%2F%2Fgithub.com%2Fespressif%2Fcrosstool-NG%2Freleases%2Fdownload%2F%24VER%2Fxtensa-esp-elf-15.2.0_20251204-x86_64-linux-gnu.tar.xz%22%0Amkdir%20-p%20%22%24HOME%2F.espressif%2Ftools%2Fxtensa-esp-elf%2F%24VER%22%0Acurl%20-fsSL%20-o%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%20%22%24URL%22%0Aecho%20%22%24SHA%20%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%22%20%7C%20sha256sum%20-c%20-%0Atar%20-xJf%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%20-C%20%22%24HOME%2F.espressif%2Ftools%2Fxtensa-esp-elf%2F%24VER%22%0A%60%60%60%0A%0AThe%20example%20builds%20with%20any%20probed%20version.%20The%20host%20OS%20pins%20its%20own%0Atoolchain%20independently%20of%20the%20SDK.%0A%0A%23%23%20Targets%0A%0A%7C%20Target%20%20%20%20%20%20%20%20%7C%20Result%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------%20%7C%20-------------------------------------------------------------%20%7C%0A%7C%20%60make%60%20%20%20%20%20%20%20%20%7C%20Builds%20%60build%2F%3Cname%3E.app.elf%60%2C%20stripped%2C%20endianness-asserted%20%20%7C%0A%7C%20%60make%20check%60%20%20%7C%20Prints%20the%20entry%20point%20and%20every%20undefined%20symbol%20(the%20app&#039;s%20host%20dependency%20list).%20Informational%3B%20the%20enforcing%20gate%20is%20%60pm%20check%60%20%7C%0A%7C%20%60make%20pack%60%20%20%20%7C%20Builds%20%60build%2F%3Cname%3E.tar%60%20with%20%60%3Cname%3E.app.elf%60%20and%20%60%3Cname%3E_ICON.bin%60%20(see%20%5Bpublish.md%5D(publish.md))%20%7C%0A%7C%20%60make%20clean%60%20%20%7C%20Removes%20%60build%2F%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20endianness%20assertion%20runs%20after%20every%20link.%20A%20big-endian%20artifact%20gets%0Adeleted%20and%20the%20build%20fails.%0A%0A%23%23%20Entry%20point%0A%0A%60extern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%60%2C%20renamed%20to%20%60app_main%60%20via%0A%60-Dmain%3Dapp_main%20-e%20app_main%60.%20See%20%5Bapp-abi.md%5D(app-abi.md)%20for%20the%20full%0Acontract.%20Everything%20the%20app%20calls%20resolves%20from%20the%20host%20at%20load%20time%2C%20so%0Akeep%20the%20undefined-symbol%20list%20(from%20%60make%20check%60)%20small%20and%20intentional%3B%20see%0A%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Compiler%20flags%0A%0AThe%20SDK%20builds%20with%20%60-Wall%20-Wextra%60%2C%20exceptions%20and%20RTTI%20disabled%2C%20and%20hidden%0Avisibility.%20Keep%20the%20code%20warning-free.%0A%0A%60app.mk%60%20injects%20%60PM_SDK_VERSION%60%20plus%20%60PM_SDK_VERSION_MAJOR%2FMINOR%2FPATCH%60%20from%0Athe%20repo%20%60VERSION%60%20file%2C%20so%20an%20app%20always%20sees%20%60POCKETMAGE_SDK_VERSION_*%60%20in%0A%60pocketmage_app_version.h%60%20alongside%20the%20host-exported%20string%20literal%0A%60pocketmage_sdk_version%60%3B%20see%20%5Bapp-abi.md%5D(app-abi.md).%0A%0A%23%23%20Icon%0A%0A%60%3Cname%3E_ICON.bin%60%20is%20an%20optional%20200-byte%20file%3A%20a%2040x40%2C%201-bit-per-pixel%0Abitmap%20(5%20bytes%20per%20row%2C%208%20pixels%20per%20byte)%2C%20drawn%20by%20the%20OS%20as%20the%20app%20icon.%0AMissing%20icons%20fall%20back%20to%20the%20OS%20default.%20%60make%20pack%60%20requires%20the%20file%20next%0Ato%20the%20%60Makefile%60%3B%20without%20one%20the%20pack%20step%20errors.%0A%0A%23%23%20Translations%0A%0AAn%20app%20that%20shows%20strings%20uses%20its%20own%20catalog%3B%20see%20%5Bi18n.md%5D(i18n.md).%20The%0Ashort%20version%3A%20put%20a%20%60src%2Fi18n%2F%60%20tree%20in%20your%20app%20and%20merge%20it%20via%20the%0Agenerator%20the%20way%20%60platformio.ini%60%20shows%20in%20that%20doc.%0A%0A%23%23%20Before%20you%20ship%0A%0ARun%20%60make%20clean%20all%60%20then%20%60pm%20check%60%20before%20every%20commit%3B%20%60pm%20check%60%20is%20the%0Agate%20CI%20runs%2C%20and%20%60--host-elf%20%3Cfirmware.elf%3E%60%20pins%20the%20host%20export%20surface%0Aexactly%20(see%20%5Bsymbols.md%5D(symbols.md)).%20%60make%20pack%60%20is%20the%20deliverable%3B%0Averify%20the%20tar&#039;s%20members%20with%20%60tar%20-tf%20build%2F%3Cname%3E.tar%60.%0A%0AThe%20repo%20ships%20three%20ready-to-build%20examples%20under%20%60examples%2F%60%3A%0A%60hello_app%60%20(baseline)%2C%20%60version_app%60%20(reads%20the%20ABI%20version%20via%0A%60pocketmage_app_version.h%60)%2C%20and%20%60broken_app%60%20(CI&#039;s%20negative%20fixture%3A%20it%0Areferences%20a%20symbol%20the%20host%20does%20not%20export%20and%20must%20fail%20%60pm%20check%60)." style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -794,7 +794,7 @@ toolchain independently of the SDK.</p>
 </tr>
 <tr>
 <td><code>make check</code></td>
-<td>Prints the entry point and every undefined symbol (the app’s host dependency list)</td>
+<td>Prints the entry point and every undefined symbol (the app’s host dependency list). Informational; the enforcing gate is <code>pm check</code></td>
 </tr>
 <tr>
 <td><code>make pack</code></td>
@@ -817,6 +817,10 @@ keep the undefined-symbol list (from <code>make check</code>) small and intentio
 <h2 id="building-an-app-compiler-flags" class="docmd-heading"><a href="#building-an-app-compiler-flags" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Compiler flags</h2>
 <p>The SDK builds with <code>-Wall -Wextra</code>, exceptions and RTTI disabled, and hidden<br>
 visibility. Keep the code warning-free.</p>
+<p><code>app.mk</code> injects <code>PM_SDK_VERSION</code> plus <code>PM_SDK_VERSION_MAJOR/MINOR/PATCH</code> from<br>
+the repo <code>VERSION</code> file, so an app always sees <code>POCKETMAGE_SDK_VERSION_*</code> in<br>
+<code>pocketmage_app_version.h</code> alongside the host-exported string literal<br>
+<code>pocketmage_sdk_version</code>; see <a href="../app-abi/">app-abi.md</a>.</p>
 <h2 id="building-an-app-icon" class="docmd-heading"><a href="#building-an-app-icon" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Icon</h2>
 <p><code>&lt;name&gt;_ICON.bin</code> is an optional 200-byte file: a 40x40, 1-bit-per-pixel<br>
 bitmap (5 bytes per row, 8 pixels per byte), drawn by the OS as the app icon.<br>
@@ -827,8 +831,14 @@ to the <code>Makefile</code>; without one the pack step errors.</p>
 short version: put a <code>src/i18n/</code> tree in your app and merge it via the<br>
 generator the way <code>platformio.ini</code> shows in that doc.</p>
 <h2 id="building-an-app-before-you-ship" class="docmd-heading"><a href="#building-an-app-before-you-ship" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Before you ship</h2>
-<p>Run <code>make clean all check</code> before every commit. <code>make pack</code> is the<br>
-deliverable; verify the tar’s members with <code>tar -tf build/&lt;name&gt;.tar</code>.</p>
+<p>Run <code>make clean all</code> then <code>pm check</code> before every commit; <code>pm check</code> is the<br>
+gate CI runs, and <code>--host-elf &lt;firmware.elf&gt;</code> pins the host export surface<br>
+exactly (see <a href="../symbols/">symbols.md</a>). <code>make pack</code> is the deliverable;<br>
+verify the tar’s members with <code>tar -tf build/&lt;name&gt;.tar</code>.</p>
+<p>The repo ships three ready-to-build examples under <code>examples/</code>:<br>
+<code>hello_app</code> (baseline), <code>version_app</code> (reads the ABI version via<br>
+<code>pocketmage_app_version.h</code>), and <code>broken_app</code> (CI’s negative fixture: it<br>
+references a symbol the host does not export and must fail <code>pm check</code>).</p>
 
                 
                   <div class="page-navigation">
@@ -953,13 +963,13 @@ deliverable; verify the tar’s members with <code>tar -tf build/&lt;name&gt;.ta
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1790138970000">
+                <span class="git-last-updated" data-timestamp="1790228527000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1790138970000"></span>
+                  <span class="git-time" data-timestamp="1790228527000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -972,10 +982,10 @@ deliverable; verify the tar’s members with <code>tar -tf build/&lt;name&gt;.ta
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Docs">Docs</div>
+                            <div class="git-commit-message" title="pm cli">pm cli</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1790138970000"></span>
+                              <span class="git-commit-date" data-timestamp="1790228527000"></span>
                             </div>
                           </div>
                         </li>
@@ -1068,13 +1078,13 @@ deliverable; verify the tar’s members with <code>tar -tf build/&lt;name&gt;.ta
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mudmj9nb"></script>
+      <script src="../assets/js/docmd-main.js?v=muf3uqjg"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mudmj9nb"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mudmj9nb" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mudmj9nb" ></script>
-<script src="../assets/js/docmd-search.js?v=mudmj9nb" ></script>
-<script src="../assets/js/docmd-git.js?v=mudmj9nb" type="module"></script>
+      <script src="../assets/js/docmd-git.js?v=muf3uqjg"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=muf3uqjg" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=muf3uqjg" ></script>
+<script src="../assets/js/docmd-search.js?v=muf3uqjg" ></script>
+<script src="../assets/js/docmd-git.js?v=muf3uqjg" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

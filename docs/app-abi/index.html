@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mudmj9nb">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mudmj9nb">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=muf3uqjg">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=muf3uqjg">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mudmj9nb" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mudmj9nb" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=muf3uqjg" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=muf3uqjg" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.">
@@ -123,9 +123,9 @@
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mudmj9nb" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mudmj9nb" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mudmj9nb" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=muf3uqjg" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=muf3uqjg" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=muf3uqjg" >
 
     
     
@@ -659,7 +659,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22App%20binary%20contract%20(ABI)%22%0Adescription%3A%20%22The%20binary%20shape%20the%20loader%20accepts%2C%20how%20it%20is%20mapped%20and%20run%2C%20and%20the%20failure%20modes%20that%20bite.%22%0A---%0A%0A%23%20App%20binary%20contract%20(ABI)%0A%0AThe%20loader%20accepts%20exactly%20one%20thing%3A%20a%2032-bit%20%60ET_DYN%60%20ELF%2C%20little-endian%2C%0Aentry%20%60app_main%60.%20Anything%20else%20fails%20to%20load.%20Build%20and%20packaging%20mechanics%0Alive%20in%20%5Bbuild.md%5D(build.md)%3B%20the%20symbol%20surface%20in%20%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Format%0A%0A-%20%60e_ident%5BEI_CLASS%5D%60%20%3D%20%60ELFCLASS32%60%0A-%20%60e_ident%5BEI_DATA%5D%60%20%3D%20%60ELFDATA2LSB%60%0A-%20%60e_type%60%20%3D%20%60ET_DYN%60%20(position%20independent)%0A-%20entry%20%3D%20the%20%60app_main%60%20symbol%0A%0AThe%20loader%20reads%20the%20ELF%20structures%20with%20plain%20native%20reads.%20No%20byte%0Aswapping%2C%20no%20endianness%20validation.%20A%20big-endian%20file%20decodes%20into%20garbage%0Aand%20the%20load%20fails%2C%20which%20is%20why%20%60app.mk%60%20asserts%20endianness%20after%20link%20and%0Arefuses%20to%20keep%20a%20bad%20artifact.%0A%0AOnly%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%20emits%20output%20the%20loader%20can%0Aread.%20The%20PlatformIO%20package%20emits%20the%20wrong%20byte%20order%20and%20is%20unusable%20for%0Aapps%3B%20see%20%5Bbuild.md%5D(build.md)%20for%20install%20paths.%0A%0A%23%23%20Entry%20point%0A%0AThe%20host%20looks%20up%20%60app_main%60%20by%20name%20and%20calls%20it%20on%20core%201%20in%20a%20task%20with%20a%0A16%20KB%20stack%3A%0A%0A%60%60%60c%0Aint%20main(int%20argc%2C%20char%20**argv)%3B%20%20%20%2F%2F%20renamed%20to%20app_main%20at%20build%20time%0A%60%60%60%0A%0AThe%20build%20passes%20%60-Dmain%3Dapp_main%20-e%20app_main%60%2C%20so%20an%20app%20writes%20its%20entry%0Awith%20C%20linkage%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%0A%60%60%60%0A%0A%60argv%5B0%5D%60%20is%20the%20app%20base%20name%2C%20%60argv%5B1%5D%60%20is%20the%20absolute%20path%20of%20the%20loaded%0AELF.%20Returning%20from%20%60main%60%20tears%20the%20app%20down%20(the%20load%20is%20deinitialized)%20and%0Acontrol%20returns%20to%20the%20OS.%20There%20is%20no%20run-forever%20semantics%3B%20a%20UI%20app%20hands%0Acontrol%20back%20through%20the%20SDK%2Fhost%20API%20cooperatively%2C%20then%20returns.%20End%20the%0Alifetime.%20A%20%60main%60%20that%20never%20returns%20leaks%20the%20run%20task.%0A%0A%23%23%20How%20loading%20works%0A%0AThe%20host%20vendors%20the%20upstream%20%60esp_elf_loader%60%20(see%20%60lib%2FELFLoader%60).%20At%20load%0Atime%3A%0A%0A1.%20Text%20maps%20into%20%60MALLOC_CAP_EXEC%60%20memory%20(IRAM)%20through%20the%20bus%20address%0A%20%20%20mirror%2C%20so%20code%20is%20executable%20on%20the%20S3.%20Do%20not%20enable%0A%20%20%20%60CONFIG_ELF_LOADER_LOAD_PSRAM%60%3A%20on%20ESP32-S3%2C%20code%20in%20PSRAM%20is%20not%0A%20%20%20executable%2C%20app%20or%20firmware.%0A2.%20Data%2Frodata%20maps%20into%20%60MALLOC_CAP_8BIT%60%20DRAM%20segments.%0A3.%20Every%20relocation%20and%20every%20undefined%20symbol%20resolves%20from%20the%20host&#039;s%20own%0A%20%20%20live%20memory.%0A%0ASo%20apps%20link%20%60-nostdlib%60%3A%20no%20newlib%2C%20no%20libstdc%2B%2B%2C%20no%20SDK%20copy%20in%20the%20ELF.%0AEverything%20an%20app%20references%20must%20resolve%20at%20load%20time%20from%20the%20host.%20Linking%0Anewlib%20into%20the%20app%20is%20wasteful%20and%20collides%20with%20host%20globals.%20Don&#039;t.%0A%0A%23%23%20Runtime%20environment%0A%0A-%20The%20app%20shares%20the%20host&#039;s%20heap.%20Loading%20costs%20roughly%20the%20ELF%20size%20plus%20a%0A%20%20fixed%20reserve%3B%20%60runElfApp%60%20refuses%20to%20launch%20when%20free%20%60MALLOC_CAP_8BIT%60%0A%20%20drops%20below%20that%20floor.%20Keep%20the%20app%20small.%0A-%20The%20app%20runs%20in-process.%20It%20can%20call%20anything%20the%20host%20exports%20-%20the%0A%20%20display%2C%20keyboard%20stack%2C%20translation%20engine%2C%20peripheral%20drivers%20-%20at%20native%0A%20%20speed%2C%20no%20IPC.%0A-%20Stack%20is%20not%20heap.%20The%20run%20task%20gives%2016%20KB%3B%20deep%20recursion%20or%20fat%20frames%0A%20%20blow%20it.%20Move%20working%20sets%20to%20the%20heap.%0A%0A%23%23%20Sections%20and%20strip%0A%0A%60app.mk%60%20links%20with%20%60--gc-sections%60%20(functions%20and%20data)%20and%20strips%0Aloader-irrelevant%20sections%2C%20so%20the%20delivered%20ELF%20comes%20down%20to%20%60.text%60%2C%0A%60.rodata%60%2C%20%60.got%60%2C%20%60.rela.dyn%60%2C%20%60.rela.plt%60%2C%20%60.dynsym%60%2C%20%60.dynstr%60%2C%20%60.hash%60%2C%0A%60.shstrtab%60.%20Everything%20else%20is%20removed.%20Code%20that%20depends%20on%20other%20sections%0Aexisting%20is%20unsupported.%20Don&#039;t%20write%20it.%0A%0A%23%23%20Endianness%20failure%20modes%0A%0A%7C%20Symptom%20at%20load%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Cause%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20--------------------------------------------%20%7C%20---------------------------------%20%7C%0A%7C%20garbage%20%2F%20instruction%20fetch%20fault%20in%20IRAM%20%20%20%20%7C%20ELF%20fields%20decoded%20wrong%20(BE)%20%20%20%20%20%7C%0A%7C%20%60esp_elf_load_section%60%20fault%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20misaligned%20%2F%20incorrect%20section%20data%20%7C%0A%7C%20load%20%22succeeds%22%2C%20entry%20behaves%20wildly%20%20%20%20%20%20%20%20%7C%20wrong%20sizes%20from%20BE%20headers%20%20%20%20%20%20%20%7C%0A%0AThe%20build-time%20guard%20catches%20BE%20before%20it%20reaches%20a%20device%3A%20if%20the%20last%0A%60make%60%20line%20is%20%60error%3A%20...%20big-endian%20...%60%2C%20rebuild%20with%20the%20espressif%0Atoolchain%20(see%20%5Bbuild.md%5D(build.md)).%0A%0A%23%23%20Stability%20rules%20for%20SDK%20authors%0A%0A-%20The%20format%2C%20entry%20point%2C%20and%20load%20strategy%20are%20public%20contract.%20Changing%20how%0A%20%20an%20app%20maps%20or%20invokes%20takes%20a%20%60major%60%20bump%20of%20%60pocketmage_sdk_version%60%20and%0A%20%20a%20migration%20note.%0A-%20Exports%20are%20additive.%20Removing%20or%20changing%20an%20export%20breaks%20live%20apps.%20See%0A%20%20%5BCONTRIBUTING.md%5D(..%2FCONTRIBUTING.md)." style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22App%20binary%20contract%20(ABI)%22%0Adescription%3A%20%22The%20binary%20shape%20the%20loader%20accepts%2C%20how%20it%20is%20mapped%20and%20run%2C%20and%20the%20failure%20modes%20that%20bite.%22%0A---%0A%0A%23%20App%20binary%20contract%20(ABI)%0A%0AThe%20loader%20accepts%20exactly%20one%20thing%3A%20a%2032-bit%20%60ET_DYN%60%20ELF%2C%20little-endian%2C%0Aentry%20%60app_main%60.%20Anything%20else%20fails%20to%20load.%20Build%20and%20packaging%20mechanics%0Alive%20in%20%5Bbuild.md%5D(build.md)%3B%20the%20symbol%20surface%20in%20%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Format%0A%0A-%20%60e_ident%5BEI_CLASS%5D%60%20%3D%20%60ELFCLASS32%60%0A-%20%60e_ident%5BEI_DATA%5D%60%20%3D%20%60ELFDATA2LSB%60%0A-%20%60e_type%60%20%3D%20%60ET_DYN%60%20(position%20independent)%0A-%20entry%20%3D%20the%20%60app_main%60%20symbol%0A%0AThe%20loader%20reads%20the%20ELF%20structures%20with%20plain%20native%20reads.%20No%20byte%0Aswapping%2C%20no%20endianness%20validation.%20A%20big-endian%20file%20decodes%20into%20garbage%0Aand%20the%20load%20fails%2C%20which%20is%20why%20%60app.mk%60%20asserts%20endianness%20after%20link%20and%0Arefuses%20to%20keep%20a%20bad%20artifact.%0A%0AOnly%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%20emits%20output%20the%20loader%20can%0Aread.%20The%20PlatformIO%20package%20emits%20the%20wrong%20byte%20order%20and%20is%20unusable%20for%0Aapps%3B%20see%20%5Bbuild.md%5D(build.md)%20for%20install%20paths.%0A%0A%23%23%20Entry%20point%0A%0AThe%20host%20looks%20up%20%60app_main%60%20by%20name%20and%20calls%20it%20on%20core%201%20in%20a%20task%20with%20a%0A16%20KB%20stack%3A%0A%0A%60%60%60c%0Aint%20main(int%20argc%2C%20char%20**argv)%3B%20%20%20%2F%2F%20renamed%20to%20app_main%20at%20build%20time%0A%60%60%60%0A%0AThe%20build%20passes%20%60-Dmain%3Dapp_main%20-e%20app_main%60%2C%20so%20an%20app%20writes%20its%20entry%0Awith%20C%20linkage%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%0A%60%60%60%0A%0A%60argv%5B0%5D%60%20is%20the%20app%20base%20name%2C%20%60argv%5B1%5D%60%20is%20the%20absolute%20path%20of%20the%20loaded%0AELF.%20Returning%20from%20%60main%60%20tears%20the%20app%20down%20(the%20load%20is%20deinitialized)%20and%0Acontrol%20returns%20to%20the%20OS.%20There%20is%20no%20run-forever%20semantics%3B%20a%20UI%20app%20hands%0Acontrol%20back%20through%20the%20SDK%2Fhost%20API%20cooperatively%2C%20then%20returns.%20End%20the%0Alifetime.%20A%20%60main%60%20that%20never%20returns%20leaks%20the%20run%20task.%0A%0A%23%23%20How%20loading%20works%0A%0AThe%20host%20vendors%20the%20upstream%20%60esp_elf_loader%60%20(see%20%60lib%2FELFLoader%60).%20At%20load%0Atime%3A%0A%0A1.%20Text%20maps%20into%20%60MALLOC_CAP_EXEC%60%20memory%20(IRAM)%20through%20the%20bus%20address%0A%20%20%20mirror%2C%20so%20code%20is%20executable%20on%20the%20S3.%20Do%20not%20enable%0A%20%20%20%60CONFIG_ELF_LOADER_LOAD_PSRAM%60%3A%20on%20ESP32-S3%2C%20code%20in%20PSRAM%20is%20not%0A%20%20%20executable%2C%20app%20or%20firmware.%0A2.%20Data%2Frodata%20maps%20into%20%60MALLOC_CAP_8BIT%60%20DRAM%20segments.%0A3.%20Every%20relocation%20and%20every%20undefined%20symbol%20resolves%20from%20the%20host&#039;s%20own%0A%20%20%20live%20memory.%0A%0AThe%20upstream%20%60esp_elf%60%20loader%20does%20not%20run%20relocation-time%20constructors%2C%20so%0Aany%20%60.init_array%60%20the%20app%20links%20in%20is%20never%20executed.%20Keep%20the%20app%20free%20of%0Aconstructor%20sections%20(%60-fno-exceptions%20-fno-rtti%20-fno-threadsafe-statics%60%20are%0Aon%20by%20default%20in%20%60app.mk%60)%3B%20%60pm%20check%60%20warns%20if%20a%20%60.init_array%60%20slips%20in.%0ADo%20not%20rely%20on%20static-construction%20order%20at%20load%20time.%0A%0ASo%20apps%20link%20%60-nostdlib%60%3A%20no%20newlib%2C%20no%20libstdc%2B%2B%2C%20no%20SDK%20copy%20in%20the%20ELF.%0AEverything%20an%20app%20references%20must%20resolve%20at%20load%20time%20from%20the%20host.%20Linking%0Anewlib%20into%20the%20app%20is%20wasteful%20and%20collides%20with%20host%20globals.%20Don&#039;t.%0A%0A%23%23%20SDK%20version%20stamp%0A%0AThe%20host%20exports%20the%20ABI%20version%20as%20a%20string%20symbol%2C%20defined%20in%0A%60pocketmage_globals.cpp%60%20and%20curated%20in%20%60symbols.list%60%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20const%20char%20pocketmage_sdk_version%5B%5D%3B%20%20%2F%2F%20e.g.%20%220.1.0%22%0A%60%60%60%0A%0AApps%20consume%20it%20through%20the%20macro%20surface%20in%20%60pocketmage_app_version.h%60%3A%0A%60POCKETMAGE_SDK_VERSION_STRING%60%2C%20%60POCKETMAGE_SDK_VERSION_MAJOR%60%2C%0A%60POCKETMAGE_SDK_VERSION_MINOR%60%2C%20%60POCKETMAGE_SDK_VERSION_PATCH%60.%20The%20firmware%0Aloads%20these%20macros%20from%20%60-DPM_SDK_VERSION_*%60%20supplied%20by%20%60app.mk%60%2C%20and%20the%0AOS&#039;s%20loader%20export%20table%20(generated%20from%20%60symbols.list%60%20via%20%60tools%2Fsymbols.py%60)%0Amust%20contain%20the%20matching%20string%20symbol.%0A%0AKeeping%20VERSION%2C%20the%20string%20literal%2C%20the%20header%20macros%2C%20and%20%60library.json%60%20in%0Async%20is%20enforced%20by%20the%20CI%20%60version-sync%60%20job%20and%20%60pm%20release%60%2C%20which%0Arewrites%20all%20four%20together.%0A%0A%23%23%20Runtime%20environment%0A%0A-%20The%20app%20shares%20the%20host&#039;s%20heap.%20Loading%20costs%20roughly%20the%20ELF%20size%20plus%20a%0A%20%20fixed%20reserve%3B%20%60runElfApp%60%20refuses%20to%20launch%20when%20free%20%60MALLOC_CAP_8BIT%60%0A%20%20drops%20below%20that%20floor.%20Keep%20the%20app%20small.%0A-%20The%20app%20runs%20in-process.%20It%20can%20call%20anything%20the%20host%20exports%20-%20the%0A%20%20display%2C%20keyboard%20stack%2C%20translation%20engine%2C%20peripheral%20drivers%20-%20at%20native%0A%20%20speed%2C%20no%20IPC.%0A-%20Stack%20is%20not%20heap.%20The%20run%20task%20gives%2016%20KB%3B%20deep%20recursion%20or%20fat%20frames%0A%20%20blow%20it.%20Move%20working%20sets%20to%20the%20heap.%0A%0A%23%23%20Sections%20and%20strip%0A%0A%60app.mk%60%20links%20with%20%60--gc-sections%60%20(functions%20and%20data)%20and%20strips%0Aloader-irrelevant%20sections%2C%20so%20the%20delivered%20ELF%20comes%20down%20to%20%60.text%60%2C%0A%60.rodata%60%2C%20%60.got%60%2C%20%60.rela.dyn%60%2C%20%60.rela.plt%60%2C%20%60.dynsym%60%2C%20%60.dynstr%60%2C%20%60.hash%60%2C%0A%60.shstrtab%60.%20Everything%20else%20is%20removed.%20Code%20that%20depends%20on%20other%20sections%0Aexisting%20is%20unsupported.%20Don&#039;t%20write%20it.%0A%0A%23%23%20Endianness%20failure%20modes%0A%0A%7C%20Symptom%20at%20load%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Cause%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20--------------------------------------------%20%7C%20---------------------------------%20%7C%0A%7C%20garbage%20%2F%20instruction%20fetch%20fault%20in%20IRAM%20%20%20%20%7C%20ELF%20fields%20decoded%20wrong%20(BE)%20%20%20%20%20%7C%0A%7C%20%60esp_elf_load_section%60%20fault%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20misaligned%20%2F%20incorrect%20section%20data%20%7C%0A%7C%20load%20%22succeeds%22%2C%20entry%20behaves%20wildly%20%20%20%20%20%20%20%20%7C%20wrong%20sizes%20from%20BE%20headers%20%20%20%20%20%20%20%7C%0A%0AThe%20build-time%20guard%20catches%20BE%20before%20it%20reaches%20a%20device%3A%20if%20the%20last%0A%60make%60%20line%20is%20%60error%3A%20...%20big-endian%20...%60%2C%20rebuild%20with%20the%20espressif%0Atoolchain%20(see%20%5Bbuild.md%5D(build.md)).%0A%0A%23%23%20Stability%20rules%20for%20SDK%20authors%0A%0A-%20The%20format%2C%20entry%20point%2C%20and%20load%20strategy%20are%20public%20contract.%20Changing%20how%0A%20%20an%20app%20maps%20or%20invokes%20takes%20a%20%60major%60%20bump%20of%20%60pocketmage_sdk_version%60%20and%0A%20%20a%20migration%20note.%0A-%20Exports%20are%20additive.%20Removing%20or%20changing%20an%20export%20breaks%20live%20apps.%20See%0A%20%20%5BCONTRIBUTING.md%5D(..%2FCONTRIBUTING.md)." style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -768,9 +768,28 @@ executable, app or firmware.</li>
 <li>Every relocation and every undefined symbol resolves from the host’s own<br>
 live memory.</li>
 </ol>
+<p>The upstream <code>esp_elf</code> loader does not run relocation-time constructors, so<br>
+any <code>.init_array</code> the app links in is never executed. Keep the app free of<br>
+constructor sections (<code>-fno-exceptions -fno-rtti -fno-threadsafe-statics</code> are<br>
+on by default in <code>app.mk</code>); <code>pm check</code> warns if a <code>.init_array</code> slips in.<br>
+Do not rely on static-construction order at load time.</p>
 <p>So apps link <code>-nostdlib</code>: no newlib, no libstdc++, no SDK copy in the ELF.<br>
 Everything an app references must resolve at load time from the host. Linking<br>
 newlib into the app is wasteful and collides with host globals. Don’t.</p>
+<h2 id="app-binary-contract-abi-sdk-version-stamp" class="docmd-heading"><a href="#app-binary-contract-abi-sdk-version-stamp" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>SDK version stamp</h2>
+<p>The host exports the ABI version as a string symbol, defined in<br>
+<code>pocketmage_globals.cpp</code> and curated in <code>symbols.list</code>:</p>
+<pre class="hljs"><code class="language-cpp">extern <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> pocketmage_sdk_version[];  <span class="hljs-comment">// e.g. &quot;0.1.0&quot;</span>
+</code></pre>
+<p>Apps consume it through the macro surface in <code>pocketmage_app_version.h</code>:<br>
+<code>POCKETMAGE_SDK_VERSION_STRING</code>, <code>POCKETMAGE_SDK_VERSION_MAJOR</code>,<br>
+<code>POCKETMAGE_SDK_VERSION_MINOR</code>, <code>POCKETMAGE_SDK_VERSION_PATCH</code>. The firmware<br>
+loads these macros from <code>-DPM_SDK_VERSION_*</code> supplied by <code>app.mk</code>, and the<br>
+OS’s loader export table (generated from <code>symbols.list</code> via <code>tools/symbols.py</code>)<br>
+must contain the matching string symbol.</p>
+<p>Keeping VERSION, the string literal, the header macros, and <code>library.json</code> in<br>
+sync is enforced by the CI <code>version-sync</code> job and <code>pm release</code>, which<br>
+rewrites all four together.</p>
 <h2 id="app-binary-contract-abi-runtime-environment" class="docmd-heading"><a href="#app-binary-contract-abi-runtime-environment" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Runtime environment</h2>
 <ul>
 <li>The app shares the host’s heap. Loading costs roughly the ELF size plus a<br>
@@ -918,6 +937,10 @@ a migration note.</li>
         </li>
       
         <li class="toc-item toc-level-2">
+          <a href="#app-binary-contract-abi-sdk-version-stamp" class="toc-link">SDK version stamp</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
           <a href="#app-binary-contract-abi-runtime-environment" class="toc-link">Runtime environment</a>
         </li>
       
@@ -942,13 +965,13 @@ a migration note.</li>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1790138970000">
+                <span class="git-last-updated" data-timestamp="1790228527000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1790138970000"></span>
+                  <span class="git-time" data-timestamp="1790228527000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -961,10 +984,10 @@ a migration note.</li>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Docs">Docs</div>
+                            <div class="git-commit-message" title="pm cli">pm cli</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1790138970000"></span>
+                              <span class="git-commit-date" data-timestamp="1790228527000"></span>
                             </div>
                           </div>
                         </li>
@@ -1057,13 +1080,13 @@ a migration note.</li>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mudmj9nb"></script>
+      <script src="../assets/js/docmd-main.js?v=muf3uqjg"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mudmj9nb"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mudmj9nb" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mudmj9nb" ></script>
-<script src="../assets/js/docmd-search.js?v=mudmj9nb" ></script>
-<script src="../assets/js/docmd-git.js?v=mudmj9nb" type="module"></script>
+      <script src="../assets/js/docmd-git.js?v=muf3uqjg"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=muf3uqjg" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=muf3uqjg" ></script>
+<script src="../assets/js/docmd-search.js?v=muf3uqjg" ></script>
+<script src="../assets/js/docmd-git.js?v=muf3uqjg" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

@@ -4,10 +4,10 @@ title: "App binary contract (ABI)"
 description: "The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/"
 path: /app-abi/
-updated: 2026-09-23
+updated: 2026-09-24
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-23T04:49:51.778Z"
+  generated_at: "2026-09-24T05:42:26.155Z"
 ---
 ---
 title: "App binary contract (ABI)"
@@ -71,9 +71,35 @@ time:
 3. Every relocation and every undefined symbol resolves from the host's own
    live memory.
 
+The upstream `esp_elf` loader does not run relocation-time constructors, so
+any `.init_array` the app links in is never executed. Keep the app free of
+constructor sections (`-fno-exceptions -fno-rtti -fno-threadsafe-statics` are
+on by default in `app.mk`); `pm check` warns if a `.init_array` slips in.
+Do not rely on static-construction order at load time.
+
 So apps link `-nostdlib`: no newlib, no libstdc++, no SDK copy in the ELF.
 Everything an app references must resolve at load time from the host. Linking
 newlib into the app is wasteful and collides with host globals. Don't.
+
+## SDK version stamp
+
+The host exports the ABI version as a string symbol, defined in
+`pocketmage_globals.cpp` and curated in `symbols.list`:
+
+```cpp
+extern "C" const char pocketmage_sdk_version[];  // e.g. "0.1.0"
+```
+
+Apps consume it through the macro surface in `pocketmage_app_version.h`:
+`POCKETMAGE_SDK_VERSION_STRING`, `POCKETMAGE_SDK_VERSION_MAJOR`,
+`POCKETMAGE_SDK_VERSION_MINOR`, `POCKETMAGE_SDK_VERSION_PATCH`. The firmware
+loads these macros from `-DPM_SDK_VERSION_*` supplied by `app.mk`, and the
+OS's loader export table (generated from `symbols.list` via `tools/symbols.py`)
+must contain the matching string symbol.
+
+Keeping VERSION, the string literal, the header macros, and `library.json` in
+sync is enforced by the CI `version-sync` job and `pm release`, which
+rewrites all four together.
 
 ## Runtime environment
 

@@ -68,9 +68,35 @@ time:
 3. Every relocation and every undefined symbol resolves from the host's own
    live memory.
 
+The upstream `esp_elf` loader does not run relocation-time constructors, so
+any `.init_array` the app links in is never executed. Keep the app free of
+constructor sections (`-fno-exceptions -fno-rtti -fno-threadsafe-statics` are
+on by default in `app.mk`); `pm check` warns if a `.init_array` slips in.
+Do not rely on static-construction order at load time.
+
 So apps link `-nostdlib`: no newlib, no libstdc++, no SDK copy in the ELF.
 Everything an app references must resolve at load time from the host. Linking
 newlib into the app is wasteful and collides with host globals. Don't.
+
+## SDK version stamp
+
+The host exports the ABI version as a string symbol, defined in
+`pocketmage_globals.cpp` and curated in `symbols.list`:
+
+```cpp
+extern "C" const char pocketmage_sdk_version[];  // e.g. "0.1.0"
+```
+
+Apps consume it through the macro surface in `pocketmage_app_version.h`:
+`POCKETMAGE_SDK_VERSION_STRING`, `POCKETMAGE_SDK_VERSION_MAJOR`,
+`POCKETMAGE_SDK_VERSION_MINOR`, `POCKETMAGE_SDK_VERSION_PATCH`. The firmware
+loads these macros from `-DPM_SDK_VERSION_*` supplied by `app.mk`, and the
+OS's loader export table (generated from `symbols.list` via `tools/symbols.py`)
+must contain the matching string symbol.
+
+Keeping VERSION, the string literal, the header macros, and `library.json` in
+sync is enforced by the CI `version-sync` job and `pm release`, which
+rewrites all four together.
 
 ## Runtime environment
 
@@ -183,7 +209,7 @@ toolchain independently of the SDK.
 | Target        | Result                                                        |
 | ------------- | ------------------------------------------------------------- |
 | `make`        | Builds `build/<name>.app.elf`, stripped, endianness-asserted  |
-| `make check`  | Prints the entry point and every undefined symbol (the app's host dependency list) |
+| `make check`  | Prints the entry point and every undefined symbol (the app's host dependency list). Informational; the enforcing gate is `pm check` |
 | `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf` and `<name>_ICON.bin` (see [publish.md](publish.md)) |
 | `make clean`  | Removes `build/`                                              |
 
@@ -203,6 +229,11 @@ keep the undefined-symbol list (from `make check`) small and intentional; see
 The SDK builds with `-Wall -Wextra`, exceptions and RTTI disabled, and hidden
 visibility. Keep the code warning-free.
 
+`app.mk` injects `PM_SDK_VERSION` plus `PM_SDK_VERSION_MAJOR/MINOR/PATCH` from
+the repo `VERSION` file, so an app always sees `POCKETMAGE_SDK_VERSION_*` in
+`pocketmage_app_version.h` alongside the host-exported string literal
+`pocketmage_sdk_version`; see [app-abi.md](app-abi.md).
+
 ## Icon
 
 `<name>_ICON.bin` is an optional 200-byte file: a 40x40, 1-bit-per-pixel
@@ -218,8 +249,15 @@ generator the way `platformio.ini` shows in that doc.
 
 ## Before you ship
 
-Run `make clean all check` before every commit. `make pack` is the
-deliverable; verify the tar's members with `tar -tf build/<name>.tar`.
+Run `make clean all` then `pm check` before every commit; `pm check` is the
+gate CI runs, and `--host-elf <firmware.elf>` pins the host export surface
+exactly (see [symbols.md](symbols.md)). `make pack` is the deliverable;
+verify the tar's members with `tar -tf build/<name>.tar`.
+
+The repo ships three ready-to-build examples under `examples/`:
+`hello_app` (baseline), `version_app` (reads the ABI version via
+`pocketmage_app_version.h`), and `broken_app` (CI's negative fixture: it
+references a symbol the host does not export and must fail `pm check`).
 
 ---
 
@@ -265,7 +303,7 @@ An app adds one catalog directory of its own:
 ```
 
 A catalog directory has one subdirectory per language, named by the language
-code. `en` is required and authoritative for that catalog's string order.
+code. `en` is required and defines that catalog's string order.
 
 ## Catalog format
 
@@ -282,10 +320,10 @@ msgid "Hello"
 msgstr "Hello"
 ```
 
-That directive, in the base catalog, is the single source of truth for the
-language list and order. Each catalog's `en` file defines the order of the
-strings that catalog contributes; the catalog's other languages must list the
-same `msgctxt`s, with the same `msgid`s, in the same order.
+That directive, in the base catalog, is where the language list and order
+come from. Each catalog's `en` file defines the order of the strings that
+catalog contributes; the catalog's other languages must list the same
+`msgctxt`s, with the same `msgid`s, in the same order.
 
 A language missing from a catalog falls back to that catalog's English text,
 so an English-only app catalog is valid without translating anything.
@@ -660,7 +698,8 @@ description: "The host-export surface apps resolve against, how to read an app's
 Apps link `-nostdlib`. Nothing ships with the binary that satisfies a
 reference; at load time the host resolves every undefined symbol from its own
 live memory. The app's undefined-symbol list is therefore its real dependency
-contract, and `make check` prints it.
+contract. `make check` prints it; `pm check` interprets it against the host
+surface.
 
 ## The surface
 
@@ -693,11 +732,14 @@ host's newlib globals and need no entry in the curated lists.
 
 ```sh
 make check   # prints entry + every undefined symbol
+pm check     # classes each symbol and exits non-zero on a broken contract
 ```
 
 Everything in that list must exist in the host's global view when the app
-loads, or the load fails. When host visibility is in doubt, `make check` is
-the ground truth for the app under build.
+loads, or the load fails. `pm check` is the exact gate when run
+against a host firmware ELF (`--host-elf`): every undefined symbol must resolve
+to a host global. Without a host ELF it falls back to the curated lists plus a
+libc allowlist and reports anything outside that set as unconfirmed.
 
 ## Editing the surface
 
@@ -708,6 +750,10 @@ Rules for SDK authors:
 - Every added symbol must exist as a `GLOBAL` in the firmware image and be
   added to both `symbols.list` and the host's `host_exports.list`, then
   regenerate the host table with `tools/symbols.py --host-elf ...`.
+- Run `pm exports` (add `--all` for extras too) before committing a surface
+  change: it reconciles `symbols.list` against the host's `host_exports.list`
+  and fails when a curated symbol is not exported. Keep both lists in sync
+  in the same change.
 - Bump `pocketmage_sdk_version` when the surface changes. It is exported, and
   stored so the OS can version apps against the surface.
 - Keep the set small. Exporting a broad slice of the firmware binds the ABI
@@ -715,10 +761,18 @@ Rules for SDK authors:
 
 ## Versioning and gating
 
-`pocketmage_sdk_version` is exported so apps can adapt to surface changes. A
-future `pm` tool will gate an app build against the host export set (the
-mirror of `make check`) before release. Until then, `make check` plus the two
-curated lists are the contract.
+`pocketmage_sdk_version` is exported so apps can adapt to surface changes.
+`pm check` gates an app against the host export set before release: the mirror
+of `make check`, with the curated lists as the reference when no host ELF is
+available.
+
+Ship a new version with `pm release <major|minor|patch>` (add
+`--message TEXT` for a CHANGELOG bullet). It validates VERSION, the
+`pocketmage_sdk_version` literal in `pocketmage_globals.cpp`,
+`pocketmage_app_version.h`, and `library.json` first, then rewrites all four
+and folds an `[N.N.N]` header at the top of `CHANGELOG.md`. No write happens
+if any file disagrees. The command stages nothing in git; commit the four
+files and the changelog together.
 
 ---
 
