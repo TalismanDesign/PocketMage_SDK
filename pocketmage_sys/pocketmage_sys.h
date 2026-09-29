@@ -19,13 +19,9 @@ extern volatile bool SDActive;
 extern volatile int battState;       // Battery state
 extern volatile bool PWR_BTN_event;  // Power button event **shared with library**
 
-extern bool rebootToPocketMage();
-
 namespace pocketmage{
   void setCpuSpeed(int newFreq);
   void deepSleep(bool alternateScreenSaver = false);
-  bool setRebootFlagOTA();
-  void checkRebootOTA();
   void IRAM_ATTR PWR_BTN_irq();
 
   class ScopedCpuBoost {

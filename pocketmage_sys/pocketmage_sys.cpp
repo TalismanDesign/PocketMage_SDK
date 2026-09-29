@@ -20,8 +20,6 @@
 
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
-#include "esp_ota_ops.h"
-#include "esp_partition.h"
 #include "esp_system.h"
 #include "esp_task_wdt.h"
 
@@ -33,30 +31,6 @@ bool mscEnabled = false;
 bool sinkEnabled = false;
 volatile bool SDActive = false;
 volatile int battState = 0;  // Battery state
-
-///////////////////////////////////////////////////////////////////////////////
-//            Use this function in apps to return to PocketMage OS           //
-bool rebootToPocketMage() {
-  const esp_partition_t* partition =
-      esp_partition_find_first(ESP_PARTITION_TYPE_APP,
-                               ESP_PARTITION_SUBTYPE_APP_OTA_0,  // instead of FACTORY
-                               nullptr);
-  if (!partition) {
-    Serial.println("OTA0 partition not found");
-    return false;
-  }
-
-  esp_err_t err = esp_ota_set_boot_partition(partition);
-  if (err != ESP_OK) {
-    Serial.printf("esp_ota_set_boot_partition failed: %d\n", (int)err);
-    return false;
-  }
-
-  Serial.println("Boot partition set to OTA0 (PocketMage OS). Restarting...");
-  esp_restart();
-  return true;
-}
-///////////////////////////////////////////////////////////////////////////////
 
 namespace pocketmage {
 void setCpuSpeed(int newFreq) {
@@ -197,60 +171,6 @@ void deepSleep(bool alternateScreenSaver) {
   esp_deep_sleep_start();
 }
 
-// returns true if reboot flag set, false if skipped by user
-bool setRebootFlagOTA() {
-#if PM_TARGET_APP
-  ESP_LOGE(TAG, "Entering OTA reboot mode");
-  OLED().oledWord(TR(STR_SYS_REBOOT_WARNING));
-  PWR_BTN_event = false;
-  unsigned long i = millis();
-  unsigned long j = millis();
-  while ((j - i) <= 3000) {  // 3 sec
-    // exit immediately if power button pressed again
-    if (PWR_BTN_event) {
-      ESP_LOGE(TAG, "Exiting setReboot continuing to returning true");
-      PWR_BTN_event = false;
-      break;
-    }
-    j = millis();
-    if (digitalRead(KB_IRQ) == 0) {
-      OLED().oledWord(TR(STR_GOOD_SAVE));
-      delay(500);
-      CLOCK().setPrevTimeMillis(millis());
-      keypad.flush();
-      return false;
-    }
-  }
-  // timed out of loop, set reboot flag
-  ESP_LOGE(TAG, "setting reboot flag for OTA");
-  prefs.begin("PocketMage", false);
-  prefs.putBool("OTA_Reboot", true);
-  prefs.end();
-  return true;
-#else
-  // PocketMage host, no reboot flag needed
-  ESP_LOGE(TAG, "Running in PocketMage OS, no reboot needed");
-  return true;
-#endif
-}
-
-// checks if reboot flag is set, clears flag and reboots to PocketMage OS
-void checkRebootOTA() {
-#if PM_TARGET_APP
-  ESP_LOGE(TAG, "Checking OTA reboot flag");
-  prefs.begin("PocketMage", false);
-  if (prefs.getBool("OTA_Reboot", false) == true) {
-    prefs.putBool("OTA_Reboot", false);
-    prefs.end();
-    rebootToPocketMage();
-    return;
-  }
-  prefs.end();
-#else
-  ESP_LOGE(TAG, "In pocketmageOS, skipping Checking OTA reboot flag");
-#endif
-}
-
 void IRAM_ATTR PWR_BTN_irq() {
   PWR_BTN_event = true;
 }
@@ -304,11 +224,7 @@ void PocketMage_INIT() {
   setLoadSwitch(true);
 #endif
 
-  // Check if in OTA app
-  pocketmage::checkRebootOTA();
-
   // Check if seamless restart
-  ESP_LOGE(TAG, "Checking OTA reboot flag");
   bool seamlessReboot = false;
   prefs.begin("PocketMage", false);
   if (prefs.getBool("Seamless_Reboot", false) == true) {
