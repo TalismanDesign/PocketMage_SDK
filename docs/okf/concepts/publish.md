@@ -4,10 +4,10 @@ title: "Publishing an app"
 description: "The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/publish/"
 path: /publish/
-updated: 2026-09-29
+updated: 2026-09-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-29T21:48:29.503Z"
+  generated_at: "2026-09-30T00:52:21.272Z"
 ---
 ---
 title: "Publishing an app"

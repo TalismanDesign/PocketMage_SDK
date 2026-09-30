@@ -5,15 +5,161 @@ bundle:
   description: ""
   url: "https://talismandesign.github.io/PocketMage_SDK/docs"
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-29T21:48:29.504Z"
+  generated_at: "2026-09-30T00:52:21.273Z"
   default_type: concept
 stats:
-  concepts: 7
+  concepts: 29
   by_type:
+    api: 18
     concept: 7
+    guide: 4
   locales: 
   versions: 
 concepts:
+  - id: api-assets
+    type: api
+    title: "Built-in asset bitmaps (libAssets.h)"
+    path: /api/assets/
+    file: concepts/api-assets.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-bz
+    type: api
+    title: "Buzzer (pocketmage_bz)"
+    path: /api/bz/
+    file: concepts/api-bz.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-clock
+    type: api
+    title: "Clock (pocketmage_clock)"
+    path: /api/clock/
+    file: concepts/api-clock.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-configuration
+    type: api
+    title: Configuration
+    path: /api/configuration/
+    file: concepts/api-configuration.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-eink
+    type: api
+    title: "E-Ink (pocketmage_eink)"
+    path: /api/eink/
+    file: concepts/api-eink.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-font
+    type: api
+    title: "Fonts & Text (pocketmage_font)"
+    path: /api/font/
+    file: concepts/api-font.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-frames
+    type: api
+    title: "Frames (frames.h)"
+    path: /api/frames/
+    file: concepts/api-frames.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-i18n-runtime
+    type: api
+    title: "Internationalization (i18n)"
+    path: /api/i18n-runtime/
+    file: concepts/api-i18n-runtime.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api
+    type: api
+    title: "API Reference"
+    path: /api/
+    file: concepts/api.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-io
+    type: api
+    title: "Text utilities (pocketmage_io)"
+    path: /api/io/
+    file: concepts/api-io.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-kb
+    type: api
+    title: "Keyboard (pocketmage_kb)"
+    path: /api/kb/
+    file: concepts/api-kb.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-layout
+    type: api
+    title: "Layout (pocketmage_layout)"
+    path: /api/layout/
+    file: concepts/api-layout.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-oled
+    type: api
+    title: "OLED (pocketmage_oled)"
+    path: /api/oled/
+    file: concepts/api-oled.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-sd
+    type: api
+    title: "SD card (pocketmage_sd)"
+    path: /api/sd/
+    file: concepts/api-sd.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-sys
+    type: api
+    title: "System (pocketmage_sys, pocketmage_globals)"
+    path: /api/sys/
+    file: concepts/api-sys.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-touch
+    type: api
+    title: "Touch (pocketmage_touch)"
+    path: /api/touch/
+    file: concepts/api-touch.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-ui
+    type: api
+    title: "UI helpers (pocketmage_ui)"
+    path: /api/ui/
+    file: concepts/api-ui.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-wifi
+    type: api
+    title: "WiFi (pocketmage_wifi)"
+    path: /api/wifi/
+    file: concepts/api-wifi.md
+    locale: ""
+    version: ""
+    tags: 
   - id: app-abi
     type: concept
     title: "App binary contract (ABI)"
@@ -27,6 +173,38 @@ concepts:
     title: "Building an app"
     path: /build/
     file: concepts/build.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: guides
+    type: guide
+    title: "PocketMage SDK guides"
+    path: /guides/
+    file: concepts/guides.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: guides-lifecycle
+    type: guide
+    title: "App lifecycle"
+    path: /guides/lifecycle/
+    file: concepts/guides-lifecycle.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: guides-making-apps
+    type: guide
+    title: "Making an app"
+    path: /guides/making-apps/
+    file: concepts/guides-making-apps.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: guides-rendering
+    type: guide
+    title: Rendering
+    path: /guides/rendering/
+    file: concepts/guides-rendering.md
     locale: ""
     version: ""
     tags: 

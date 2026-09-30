@@ -4,14 +4,58 @@
 
 ## Documentation Files
 
+- [Built-in asset bitmaps (libAssets.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/assets/)
+  Compiled-in PROGMEM bitmaps for the status bar, screensavers, and battery gauge.
+- [Buzzer (pocketmage_bz)](https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/)
+  PWM buzzer output, Note/Jingle data model, and the built-in melodies.
+- [Clock (pocketmage_clock)](https://talismandesign.github.io/PocketMage_SDK/docs/api/clock/)
+  The PCF8563 RTC: reading, setting, validity, and the auto-sleep timer bookkeeping.
+- [Configuration](https://talismandesign.github.io/PocketMage_SDK/docs/api/configuration/)
+  Compile-time pins and knobs in config.h, persistent preference globals, and how an app sees the SDK version.
+- [E-Ink (pocketmage_eink)](https://talismandesign.github.io/PocketMage_SDK/docs/api/eink/)
+  The 320x240 GDEQ031T10 panel: PocketmageEink, the background refresh task, and refresh policy.
+- [Fonts & Text (pocketmage_font)](https://talismandesign.github.io/PocketMage_SDK/docs/api/font/)
+  FontStyle roles, DisplayTarget, the FontEngine static API, and the default font table.
+- [Frames (frames.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/frames/)
+  The Frame data model and the e-ink text/bitmap rendering engine.
+- [Internationalization (i18n)](https://talismandesign.github.io/PocketMage_SDK/docs/api/i18n-runtime/)
+  Lang/StringID tables, the TR() lookup, runtime language switching, and command aliases.
+- [API Reference](https://talismandesign.github.io/PocketMage_SDK/docs/api/)
+  Every component an app links against: the umbrella header, the singleton accessors, and the per-component pages.
+- [Text utilities (pocketmage_io)](https://talismandesign.github.io/PocketMage_SDK/docs/api/io/)
+  Small string helpers apps use for command parsing and data marshaling.
+- [Keyboard (pocketmage_kb)](https://talismandesign.github.io/PocketMage_SDK/docs/api/kb/)
+  The TCA8418 matrix keyboard and USB HID stack: modifiers, key events, and scanning.
+- [Layout (pocketmage_layout)](https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/)
+  Canonical display geometry, the row-pitch helper, and the text-fit free functions.
+- [OLED (pocketmage_oled)](https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/)
+  The 256x32 SSD1326 OLED: PocketmageOled class, the u8g2 object, and the status line.
+- [SD card (pocketmage_sd)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sd/)
+  Filesystems, files, metadata, and the dual SDMMC/SDSPI mode switch.
+- [System (pocketmage_sys, pocketmage_globals)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/)
+  Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state.
+- [Touch (pocketmage_touch)](https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/)
+  The MPR121 capacitive slider: scroll offsets, line scrolling, and gesture vectors.
+- [UI helpers (pocketmage_ui)](https://talismandesign.github.io/PocketMage_SDK/docs/api/ui/)
+  Screen scaffolding, scrollbars, list rows, inverted chips, and the OLED cycle picker.
+- [WiFi (pocketmage_wifi)](https://talismandesign.github.io/PocketMage_SDK/docs/api/wifi/)
+  The station radio service: enabled/scan/connect lifecycle, status queries, and saved credentials.
 - [App binary contract (ABI)](https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/)
   The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.
 - [Building an app](https://talismandesign.github.io/PocketMage_SDK/docs/build/)
   The toolchain, the project layout, and the make targets that produce a shippable ELF and tar.
+- [PocketMage SDK guides](https://talismandesign.github.io/PocketMage_SDK/docs/guides/)
+  How to build apps, understand their lifecycle, and draw to both displays.
+- [App lifecycle](https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/)
+  Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits.
+- [Making an app](https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/)
+  Scaffold, build, pack, and run your first PocketMage app.
+- [Rendering](https://talismandesign.github.io/PocketMage_SDK/docs/guides/rendering/)
+  Which draw calls go where, the E-Ink buffered refresh model, and the scroll loop.
 - [Internationalization (i18n)](https://talismandesign.github.io/PocketMage_SDK/docs/i18n/)
   Translation catalogs, the gen_i18n.py generator, ownership rules, and what the merge validates.
 - [PocketMage SDK Documentation](https://talismandesign.github.io/PocketMage_SDK/docs/)
-  Official SDK for building PocketMage apps: the ELF app contract, build tooling, symbol surface, publishing flow, and the migration path.
+  Official SDK for building PocketMage apps: guides, the full component API reference, the ELF app contract, and publishing.
 - [Migrating an existing app](https://talismandesign.github.io/PocketMage_SDK/docs/migration/)
   Moving a pre-ELF app to the runtime-load flow: what changed, the eight steps, and the traps that bite.
 - [Publishing an app](https://talismandesign.github.io/PocketMage_SDK/docs/publish/)

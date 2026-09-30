@@ -1,0 +1,2039 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.17">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/PocketMage_SDK/docs/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/PocketMage_SDK/docs/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    <title>
+      Touch (pocketmage_touch) : PocketMage SDK
+    </title>
+    
+    
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mune4scf">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mune4scf">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mune4scf" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mune4scf" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="The MPR121 capacitive slider: scroll offsets, line scrolling, and gesture vectors.">
+<link rel="canonical" href="https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/">
+<meta property="og:title" content="Touch (pocketmage_touch) - PocketMage SDK">
+<meta property="og:description" content="The MPR121 capacitive slider: scroll offsets, line scrolling, and gesture vectors.">
+<meta property="og:url" content="https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Touch (pocketmage_touch) - PocketMage SDK">
+<meta name="twitter:description" content="The MPR121 capacitive slider: scroll offsets, line scrolling, and gesture vectors.">
+
+
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mune4scf" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mune4scf" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mune4scf" >
+
+    
+    
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/api/touch.md">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+<h1><a href="../../">
+                PocketMage SDK
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="Main Navigation">
+  <ul>
+    
+      <li class="" >
+      
+        <a href="../../" class=" "
+          >
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Home
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Guides
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../guides/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Guide index
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../guides/making-apps/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Making an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../guides/lifecycle/" class=" "
+          >
+           
+<svg class="lucide-icon icon-activity " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-activity"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            App lifecycle
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../guides/rendering/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Rendering
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-boxes"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
+  <path d="m7 16.5-4.74-2.85" />
+  <path d="m7 16.5 5-3" />
+  <path d="M7 16.5v5.17" />
+  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
+  <path d="m17 16.5-5-3" />
+  <path d="m17 16.5 4.74-2.85" />
+  <path d="M17 16.5v5.17" />
+  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
+  <path d="M12 8 7.26 5.15" />
+  <path d="m12 8 4.74-2.85" />
+  <path d="M12 13.5V8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            API Reference
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../api/" class=" "
+          >
+           
+<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-boxes"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
+  <path d="m7 16.5-4.74-2.85" />
+  <path d="m7 16.5 5-3" />
+  <path d="M7 16.5v5.17" />
+  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
+  <path d="m17 16.5-5-3" />
+  <path d="m17 16.5 4.74-2.85" />
+  <path d="M17 16.5v5.17" />
+  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
+  <path d="M12 8 7.26 5.15" />
+  <path d="m12 8 4.74-2.85" />
+  <path d="M12 13.5V8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            API overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/configuration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-sliders " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sliders-vertical"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 8h4" />
+  <path d="M12 21v-9" />
+  <path d="M12 8V3" />
+  <path d="M17 16h4" />
+  <path d="M19 12V3" />
+  <path d="M19 21v-5" />
+  <path d="M3 14h4" />
+  <path d="M5 10V3" />
+  <path d="M5 21v-7" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Configuration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/oled/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            OLED
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/eink/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            E-Ink
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/font/" class=" "
+          >
+           
+<svg class="lucide-icon icon-text " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-text-align-start"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 5H3" />
+  <path d="M15 12H3" />
+  <path d="M17 19H3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Fonts &amp; text
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/layout/" class=" "
+          >
+           
+<svg class="lucide-icon icon-ruler " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Layout
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/ui/" class=" "
+          >
+           
+<svg class="lucide-icon icon-layout-grid " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layout-grid"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            UI helpers
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/sd/" class=" "
+          >
+           
+<svg class="lucide-icon icon-hard-drive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-hard-drive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 16h.01" />
+  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+  <path d="M21.946 12.013H2.054" />
+  <path d="M6 16h.01" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            SD card
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/kb/" class=" "
+          >
+           
+<svg class="lucide-icon icon-keyboard " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-keyboard"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 8h.01" />
+  <path d="M12 12h.01" />
+  <path d="M14 8h.01" />
+  <path d="M16 12h.01" />
+  <path d="M18 8h.01" />
+  <path d="M6 8h.01" />
+  <path d="M7 16h10" />
+  <path d="M8 12h.01" />
+  <rect width="20" height="16" x="2" y="4" rx="2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Keyboard
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../api/touch/" class="active "
+          >
+           
+<svg class="lucide-icon icon-hand " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-hand"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+  <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+  <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+  <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Touch
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/bz/" class=" "
+          >
+           
+<svg class="lucide-icon icon-volume " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-volume"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Buzzer
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/clock/" class=" "
+          >
+           
+<svg class="lucide-icon icon-clock " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-clock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Clock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/wifi/" class=" "
+          >
+           
+<svg class="lucide-icon icon-wifi " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wifi"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20h.01" />
+  <path d="M2 8.82a15 15 0 0 1 20 0" />
+  <path d="M5 12.859a10 10 0 0 1 14 0" />
+  <path d="M8.5 16.429a5 5 0 0 1 7 0" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            WiFi
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/sys/" class=" "
+          >
+           
+<svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cpu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v2" />
+  <path d="M12 2v2" />
+  <path d="M17 20v2" />
+  <path d="M17 2v2" />
+  <path d="M2 12h2" />
+  <path d="M2 17h2" />
+  <path d="M2 7h2" />
+  <path d="M20 12h2" />
+  <path d="M20 17h2" />
+  <path d="M20 7h2" />
+  <path d="M7 20v2" />
+  <path d="M7 2v2" />
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="8" y="8" width="8" height="8" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            System
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/i18n-runtime/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n (runtime)
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/io/" class=" "
+          >
+           
+<svg class="lucide-icon icon-type " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-type"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 4v16" />
+  <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
+  <path d="M9 20h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Text utilities
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/frames/" class=" "
+          >
+           
+<svg class="lucide-icon icon-frame " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-frame"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="22" x2="2" y1="6" y2="6" />
+  <line x1="22" x2="2" y1="18" y2="18" />
+  <line x1="6" x2="6" y1="2" y2="22" />
+  <line x1="18" x2="18" y1="2" y2="22" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Frames
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/assets/" class=" "
+          >
+           
+<svg class="lucide-icon icon-image " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-image"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Built-in assets
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../app-abi/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            App ABI
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../build/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building Apps
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../symbols/" class=" "
+          >
+           
+<svg class="lucide-icon icon-box " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-box"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+  <path d="m3.3 7 8.7 5 8.7-5" />
+  <path d="M12 22V12" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Symbols
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../publish/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n catalogs
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../migration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book-open"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 7v14" />
+  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Migration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://talismandesign.github.io/PocketMage_PDA/docs" class=" "
+          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+           
+<svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cpu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v2" />
+  <path d="M12 2v2" />
+  <path d="M17 20v2" />
+  <path d="M17 2v2" />
+  <path d="M2 12h2" />
+  <path d="M2 17h2" />
+  <path d="M2 7h2" />
+  <path d="M20 12h2" />
+  <path d="M20 17h2" />
+  <path d="M20 7h2" />
+  <path d="M7 20v2" />
+  <path d="M7 2v2" />
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="8" y="8" width="8" height="8" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            PocketMageOS docs
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://github.com/TalismanDesign/PocketMage_SDK" class=" "
+          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+           
+<svg class="lucide-icon icon-github " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-github"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+  <path d="M9 18c-4.51 2-5-2-7-2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            GitHub
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="Toggle Sidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  Touch (pocketmage_touch)
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+                
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="Search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">Search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+
+    
+    <button class="theme-toggle-button" aria-label="Toggle theme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Touch%20(pocketmage_touch)%22%0Adescription%3A%20%22The%20MPR121%20capacitive%20slider%3A%20scroll%20offsets%2C%20line%20scrolling%2C%20and%20gesture%20vectors.%22%0A---%0A%0A%23%20Touch%20API%0A%0A%60PocketmageTOUCH%60%20reads%20the%20MPR121%20capacitive%20slider%20and%20derives%20scroll%20gestures%3A%20a%20per-line%20dynamic%20offset%20for%20text%20apps%2C%20a%20step-wise%20%60lineScroll%60%20for%20list%20views%2C%20and%20a%20raw%20scroll%20vector%20for%20preview%20panels.%0A%0A%23%23%20Access%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0APocketmageTOUCH%26%20touch%20%3D%20TOUCH()%3B%0AAdafruit_MPR121%26%20cap%20%3D%20cap%3B%20%20%20%2F%2F%20raw%20driver%20(slider%20pads%200..8)%0A%60%60%60%0A%0A%60TOUCH()%60%20is%20the%20single%20instance.%20%60setupTouch()%60%20runs%20in%20%60PocketMage_INIT()%60.%20The%20slider%20reports%20the%20lowest-touched%20pad%2C%20which%20handles%20physical%20finger%20overlap%3B%20a%20%22touch%22%20is%20a%20pad%20index%200..8.%0A%0A%23%23%20Reference%0A%0A%23%23%23%20Window%20%2F%20dynamic%20scroll%0A%0A%60%60%60cpp%0Avoid%20updateScrollFromTouch()%3B%0Along%20int%20getDynamicScroll()%20const%3B%0Avoid%20setDynamicScroll(long%20int%20val)%3B%0Avoid%20setPrevDynamicScroll(long%20int%20val)%3B%0A%60%60%60%0A%0A%60updateScrollFromTouch()%60%20maps%20a%20pad%20press%20to%20a%20page%20offset%3A%20sliding%20finger%20up%20(higher%20pad%20index)%20scrolls%20forward%2C%20down%20scrolls%20back%2C%20bounded%20by%20%60allLines.size()%20-%20EINK().maxLines()%60.%20The%20result%20is%20%60getDynamicScroll()%60%2C%20which%20%60OLED().oledScroll()%60%20uses%20for%20its%20window.%20Touches%20reset%20the%20auto%20sleep%20timer.%20Returns%20nothing%3B%20call%20it%20each%20loop%20iteration%20for%20the%20text%20pages.%0A%0A%23%23%23%20Step%20scrolling%0A%0A%60%60%60cpp%0Abool%20updateScroll(int%20maxScroll%2C%20ulong%26%20lineScroll%2C%20int%20stepSize%20%3D%201)%3B%0A%60%60%60%0A%0AMoves%20%60lineScroll%60%20by%20%60stepSize%60%20per%20pad%20step%2C%20clamped%20to%20%60maxScroll%60.%20Returns%20true%20when%20the%20view%20actually%20changed%20(so%20the%20caller%20redraws%20only%20then).%20%60stepSize%60%20makes%20fast-scroll%20modes%20possible.%0A%0A%23%23%23%20Gesture%20vector%0A%0A%60%60%60cpp%0Aint%20getScrollVector()%3B%0Aint%20getDiff()%20const%3B%0Avoid%20setLastTouch(int%20val)%3B%0Avoid%20setLastTouchTime(unsigned%20long%20val)%3B%0Avoid%20resetLastTouch()%3B%0Aint%20getLastTouch()%20const%3B%0Aunsigned%20long%20getLastTouchTime()%20const%3B%0Along%20int%20getPrevDynamicScroll()%20const%3B%0A%60%60%60%0A%0A%60getScrollVector()%60%20returns%20the%20signed%20movement%20of%20the%20most%20recent%20pad%20step%20(%60lastTouchPos%20-%20touchPos%60)%2C%200%20when%20idle%20or%20outside%20a%20one%20or%20two%20pad%20step.%20The%20remaining%20getters%2Fsetters%20expose%20the%20raw%20state%20(%60lastTouch%5BPos%5D%60%2C%20%60lastTouchPosTime%60%2C%20%60prev_dynamicScroll_%60)%20for%20views%20that%20need%20to%20track%20gesture%20timing%20themselves.%20%60getDiff()%60%20is%20%60dynamicScroll_%20-%20prev_dynamicScroll_%60.%0A%0A%23%23%20Timeout%0A%0AAfter%20%60TOUCH_TIMEOUT_MS%60%20(1200%20ms)%20with%20no%20touch%2C%20the%20gesture%20state%20resets%20so%20the%20next%20new%20touch%20is%20treated%20as%20the%20start%20of%20a%20fresh%20gesture%20(no%20stale%20step%20or%20vector).%20The%20reset%20also%20flags%20%60newLineAdded%60%20when%20the%20offset%20changed%2C%20so%20a%20preview%20can%20refresh%20once.%0A%0A%23%23%20Example%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0Avoid%20onLoop()%20%7B%0A%20%20TOUCH().updateScrollFromTouch()%3B%0A%20%20%2F%2F%20page%20view%20scrolls%20with%20TOUCH().getDynamicScroll()%3B%0A%7D%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>API Reference</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>Touch</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">Copy Context</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="touch-api" class="docmd-heading"><a href="#touch-api" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Touch API</h1>
+<p><code>PocketmageTOUCH</code> reads the MPR121 capacitive slider and derives scroll gestures: a per-line dynamic offset for text apps, a step-wise <code>lineScroll</code> for list views, and a raw scroll vector for preview panels.</p>
+<h2 id="touch-api-access" class="docmd-heading"><a href="#touch-api-access" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Access</h2>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-comment">#include &lt;pocketmage.h&gt;</span>
+
+PocketmageTOUCH<span class="hljs-punctuation">&amp;</span> touch <span class="hljs-punctuation">=</span> <span class="hljs-title function_">TOUCH</span>();
+Adafruit_MPR121<span class="hljs-punctuation">&amp;</span> cap <span class="hljs-punctuation">=</span> cap;   <span class="hljs-comment">// raw driver (slider pads 0..8)</span>
+</code></pre>
+<p><code>TOUCH()</code> is the single instance. <code>setupTouch()</code> runs in <code>PocketMage_INIT()</code>. The slider reports the lowest-touched pad, which handles physical finger overlap; a “touch” is a pad index 0…8.</p>
+<h2 id="touch-api-reference" class="docmd-heading"><a href="#touch-api-reference" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Reference</h2>
+<h3 id="touch-api-reference-window-dynamic-scroll" class="docmd-heading"><a href="#touch-api-reference-window-dynamic-scroll" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Window / dynamic scroll</h3>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> <span class="hljs-title function_">updateScrollFromTouch</span>();
+long <span class="hljs-keyword">int</span> <span class="hljs-title function_">getDynamicScroll</span>() <span class="hljs-keyword">const</span>;
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">setDynamicScroll</span>(long <span class="hljs-keyword">int</span> val);
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">setPrevDynamicScroll</span>(long <span class="hljs-keyword">int</span> val);
+</code></pre>
+<p><code>updateScrollFromTouch()</code> maps a pad press to a page offset: sliding finger up (higher pad index) scrolls forward, down scrolls back, bounded by <code>allLines.size() - EINK().maxLines()</code>. The result is <code>getDynamicScroll()</code>, which <code>OLED().oledScroll()</code> uses for its window. Touches reset the auto sleep timer. Returns nothing; call it each loop iteration for the text pages.</p>
+<h3 id="touch-api-reference-step-scrolling" class="docmd-heading"><a href="#touch-api-reference-step-scrolling" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Step scrolling</h3>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">bool</span> <span class="hljs-title function_">updateScroll</span>(<span class="hljs-keyword">int</span> maxScroll, ulong<span class="hljs-punctuation">&amp;</span> lineScroll, <span class="hljs-keyword">int</span> stepSize <span class="hljs-punctuation">=</span> <span class="hljs-number">1</span>);
+</code></pre>
+<p>Moves <code>lineScroll</code> by <code>stepSize</code> per pad step, clamped to <code>maxScroll</code>. Returns true when the view actually changed (so the caller redraws only then). <code>stepSize</code> makes fast-scroll modes possible.</p>
+<h3 id="touch-api-reference-gesture-vector" class="docmd-heading"><a href="#touch-api-reference-gesture-vector" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Gesture vector</h3>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">int</span> <span class="hljs-title function_">getScrollVector</span>();
+<span class="hljs-keyword">int</span> <span class="hljs-title function_">getDiff</span>() <span class="hljs-keyword">const</span>;
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">setLastTouch</span>(<span class="hljs-keyword">int</span> val);
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">setLastTouchTime</span>(unsigned long val);
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">resetLastTouch</span>();
+<span class="hljs-keyword">int</span> <span class="hljs-title function_">getLastTouch</span>() <span class="hljs-keyword">const</span>;
+unsigned long <span class="hljs-title function_">getLastTouchTime</span>() <span class="hljs-keyword">const</span>;
+long <span class="hljs-keyword">int</span> <span class="hljs-title function_">getPrevDynamicScroll</span>() <span class="hljs-keyword">const</span>;
+</code></pre>
+<p><code>getScrollVector()</code> returns the signed movement of the most recent pad step (<code>lastTouchPos - touchPos</code>), 0 when idle or outside a one or two pad step. The remaining getters/setters expose the raw state (<code>lastTouch[Pos]</code>, <code>lastTouchPosTime</code>, <code>prev_dynamicScroll_</code>) for views that need to track gesture timing themselves. <code>getDiff()</code> is <code>dynamicScroll_ - prev_dynamicScroll_</code>.</p>
+<h2 id="touch-api-timeout" class="docmd-heading"><a href="#touch-api-timeout" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Timeout</h2>
+<p>After <code>TOUCH_TIMEOUT_MS</code> (1200 ms) with no touch, the gesture state resets so the next new touch is treated as the start of a fresh gesture (no stale step or vector). The reset also flags <code>newLineAdded</code> when the offset changed, so a preview can refresh once.</p>
+<h2 id="touch-api-example" class="docmd-heading"><a href="#touch-api-example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Example</h2>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-comment">#include &lt;pocketmage.h&gt;</span>
+
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">onLoop</span>() {
+  <span class="hljs-title function_">TOUCH</span>().<span class="hljs-title function_">updateScrollFromTouch</span>();
+  <span class="hljs-comment">// page view scrolls with TOUCH().getDynamicScroll();</span>
+}
+</code></pre>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../api/kb/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>Previous</small><strong>
+                            Keyboard
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../api/bz/" class="next-page">
+                        <span><small>Next</small>
+                          <strong>
+                            Buzzer
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#touch-api" class="toc-link">Touch API</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#touch-api-access" class="toc-link">Access</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#touch-api-reference" class="toc-link">Reference</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#touch-api-reference-window-dynamic-scroll" class="toc-link">Window / dynamic scroll</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#touch-api-reference-step-scrolling" class="toc-link">Step scrolling</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#touch-api-reference-gesture-vector" class="toc-link">Gesture vector</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#touch-api-timeout" class="toc-link">Timeout</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#touch-api-example" class="toc-link">Example</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+              
+            </div>
+            <div class="page-footer-actions">
+              
+              
+                <span class="git-last-updated" data-timestamp="1790729515000">
+                  <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span class="git-label">Last updated:</span>
+                  <span class="git-time" data-timestamp="1790729515000"></span>
+                  
+                  <div class="git-commit-tooltip" role="tooltip">
+                    <div class="git-tooltip-title">Recent commits</div>
+                    <ul class="git-commit-list">
+                      
+                        <li class="git-commit-item">
+                          <div class="git-commit-avatar" title="NellowTCS">
+                            
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
+                            
+                          </div>
+                          <div class="git-commit-details">
+                            <div class="git-commit-message" title="DOCS">DOCS</div>
+                            <div class="git-commit-meta">
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1790729515000"></span>
+                            </div>
+                          </div>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                  
+                </span>
+              
+              <span class="git-spacer"></span>
+              
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/docs/docs/api/touch.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                  
+<svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-pencil"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+  <path d="m15 5 4 4" />
+</svg>
+
+                  Edit this page
+                </a>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="footer-complete">
+  <div class="footer-complete-top">
+      <div class="footer-brand">
+          
+            <span class="footer-title">PocketMage SDK</span>
+          
+          
+            <p class="footer-desc">The official SDK for PocketMage apps: each app is an ELF the OS loads and runs in-process.</p>
+          
+        </div>
+        
+          <div class="footer-columns">
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Guides</span>
+                <ul>
+                  
+                    <li><a href="guides/making-apps/" >Making an app</a></li>
+                  
+                    <li><a href="guides/lifecycle/" >App lifecycle</a></li>
+                  
+                    <li><a href="guides/rendering/" >Rendering</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">API Reference</span>
+                <ul>
+                  
+                    <li><a href="api/" >Overview</a></li>
+                  
+                    <li><a href="api/oled/" >OLED</a></li>
+                  
+                    <li><a href="api/eink/" >E-Ink</a></li>
+                  
+                    <li><a href="api/sys/" >System</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Platform</span>
+                <ul>
+                  
+                    <li><a href="app-abi/" >App ABI</a></li>
+                  
+                    <li><a href="build/" >Building Apps</a></li>
+                  
+                    <li><a href="symbols/" >Symbols</a></li>
+                  
+                    <li><a href="publish/" >Publishing</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Community</span>
+                <ul>
+                  
+                    <li><a href="https://talismandesign.github.io/PocketMage_PDA/docs" >PocketMageOS docs</a></li>
+                  
+                    <li><a href="https://github.com/TalismanDesign/PocketMage_SDK" >GitHub</a></li>
+                  
+                    <li><a href="https://discord.gg/KSCapSf4XH" >Discord</a></li>
+                  
+                </ul>
+              </div>
+            
+          </div>
+        
+      </div>
+      <div class="footer-complete-bottom">
+        <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/TalismanDesign/PocketMage_SDK">View on GitHub</a>.</div>
+        
+          <div class="branding-footer">
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+          </div>
+        
+      </div>
+  </footer>
+
+        </div>
+      </div>
+      
+      <script src="../../assets/js/docmd-main.js?v=mune4scf"></script>
+      
+      <script src="../../assets/js/docmd-git.js?v=mune4scf"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mune4scf" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mune4scf" ></script>
+<script src="../../assets/js/docmd-search.js?v=mune4scf" ></script>
+<script src="../../assets/js/docmd-git.js?v=mune4scf" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

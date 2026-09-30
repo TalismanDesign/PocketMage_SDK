@@ -1,12 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/assets/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/clock/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/configuration/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/eink/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/font/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/frames/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/i18n-runtime/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/io/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/kb/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/sd/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/ui/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/wifi/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/build/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/guides/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/guides/rendering/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -1,0 +1,2130 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.8.17">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/PocketMage_SDK/docs/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/PocketMage_SDK/docs/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    <title>
+      System (pocketmage_sys, pocketmage_globals) : PocketMage SDK
+    </title>
+    
+    
+
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mune4scf">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mune4scf">
+    
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mune4scf" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mune4scf" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state.">
+<link rel="canonical" href="https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/">
+<meta property="og:title" content="System (pocketmage_sys, pocketmage_globals) - PocketMage SDK">
+<meta property="og:description" content="Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state.">
+<meta property="og:url" content="https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="System (pocketmage_sys, pocketmage_globals) - PocketMage SDK">
+<meta name="twitter:description" content="Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state.">
+
+
+
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mune4scf" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mune4scf" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mune4scf" >
+
+    
+    
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/api/sys.md">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+<h1><a href="../../">
+                PocketMage SDK
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="Main Navigation">
+  <ul>
+    
+      <li class="" >
+      
+        <a href="../../" class=" "
+          >
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Home
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Guides
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../guides/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Guide index
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../guides/making-apps/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Making an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../guides/lifecycle/" class=" "
+          >
+           
+<svg class="lucide-icon icon-activity " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-activity"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            App lifecycle
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../guides/rendering/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Rendering
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-boxes"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
+  <path d="m7 16.5-4.74-2.85" />
+  <path d="m7 16.5 5-3" />
+  <path d="M7 16.5v5.17" />
+  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
+  <path d="m17 16.5-5-3" />
+  <path d="m17 16.5 4.74-2.85" />
+  <path d="M17 16.5v5.17" />
+  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
+  <path d="M12 8 7.26 5.15" />
+  <path d="m12 8 4.74-2.85" />
+  <path d="M12 13.5V8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            API Reference
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../api/" class=" "
+          >
+           
+<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-boxes"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
+  <path d="m7 16.5-4.74-2.85" />
+  <path d="m7 16.5 5-3" />
+  <path d="M7 16.5v5.17" />
+  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
+  <path d="m17 16.5-5-3" />
+  <path d="m17 16.5 4.74-2.85" />
+  <path d="M17 16.5v5.17" />
+  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
+  <path d="M12 8 7.26 5.15" />
+  <path d="m12 8 4.74-2.85" />
+  <path d="M12 13.5V8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            API overview
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/configuration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-sliders " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sliders-vertical"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 8h4" />
+  <path d="M12 21v-9" />
+  <path d="M12 8V3" />
+  <path d="M17 16h4" />
+  <path d="M19 12V3" />
+  <path d="M19 21v-5" />
+  <path d="M3 14h4" />
+  <path d="M5 10V3" />
+  <path d="M5 21v-7" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Configuration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/oled/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            OLED
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/eink/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            E-Ink
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/font/" class=" "
+          >
+           
+<svg class="lucide-icon icon-text " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-text-align-start"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 5H3" />
+  <path d="M15 12H3" />
+  <path d="M17 19H3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Fonts &amp; text
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/layout/" class=" "
+          >
+           
+<svg class="lucide-icon icon-ruler " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Layout
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/ui/" class=" "
+          >
+           
+<svg class="lucide-icon icon-layout-grid " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layout-grid"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            UI helpers
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/sd/" class=" "
+          >
+           
+<svg class="lucide-icon icon-hard-drive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-hard-drive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 16h.01" />
+  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+  <path d="M21.946 12.013H2.054" />
+  <path d="M6 16h.01" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            SD card
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/kb/" class=" "
+          >
+           
+<svg class="lucide-icon icon-keyboard " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-keyboard"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 8h.01" />
+  <path d="M12 12h.01" />
+  <path d="M14 8h.01" />
+  <path d="M16 12h.01" />
+  <path d="M18 8h.01" />
+  <path d="M6 8h.01" />
+  <path d="M7 16h10" />
+  <path d="M8 12h.01" />
+  <rect width="20" height="16" x="2" y="4" rx="2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Keyboard
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/touch/" class=" "
+          >
+           
+<svg class="lucide-icon icon-hand " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-hand"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+  <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+  <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+  <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Touch
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/bz/" class=" "
+          >
+           
+<svg class="lucide-icon icon-volume " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-volume"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Buzzer
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/clock/" class=" "
+          >
+           
+<svg class="lucide-icon icon-clock " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-clock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Clock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/wifi/" class=" "
+          >
+           
+<svg class="lucide-icon icon-wifi " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wifi"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20h.01" />
+  <path d="M2 8.82a15 15 0 0 1 20 0" />
+  <path d="M5 12.859a10 10 0 0 1 14 0" />
+  <path d="M8.5 16.429a5 5 0 0 1 7 0" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            WiFi
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../../api/sys/" class="active "
+          >
+           
+<svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cpu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v2" />
+  <path d="M12 2v2" />
+  <path d="M17 20v2" />
+  <path d="M17 2v2" />
+  <path d="M2 12h2" />
+  <path d="M2 17h2" />
+  <path d="M2 7h2" />
+  <path d="M20 12h2" />
+  <path d="M20 17h2" />
+  <path d="M20 7h2" />
+  <path d="M7 20v2" />
+  <path d="M7 2v2" />
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="8" y="8" width="8" height="8" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            System
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/i18n-runtime/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n (runtime)
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/io/" class=" "
+          >
+           
+<svg class="lucide-icon icon-type " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-type"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 4v16" />
+  <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
+  <path d="M9 20h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Text utilities
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/frames/" class=" "
+          >
+           
+<svg class="lucide-icon icon-frame " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-frame"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="22" x2="2" y1="6" y2="6" />
+  <line x1="22" x2="2" y1="18" y2="18" />
+  <line x1="6" x2="6" y1="2" y2="22" />
+  <line x1="18" x2="18" y1="2" y2="22" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Frames
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/assets/" class=" "
+          >
+           
+<svg class="lucide-icon icon-image " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-image"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Built-in assets
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../app-abi/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            App ABI
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../build/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building Apps
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../symbols/" class=" "
+          >
+           
+<svg class="lucide-icon icon-box " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-box"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+  <path d="m3.3 7 8.7 5 8.7-5" />
+  <path d="M12 22V12" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Symbols
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../publish/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n catalogs
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../migration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book-open"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 7v14" />
+  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Migration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://talismandesign.github.io/PocketMage_PDA/docs" class=" "
+          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+           
+<svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cpu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v2" />
+  <path d="M12 2v2" />
+  <path d="M17 20v2" />
+  <path d="M17 2v2" />
+  <path d="M2 12h2" />
+  <path d="M2 17h2" />
+  <path d="M2 7h2" />
+  <path d="M20 12h2" />
+  <path d="M20 17h2" />
+  <path d="M20 7h2" />
+  <path d="M7 20v2" />
+  <path d="M7 2v2" />
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="8" y="8" width="8" height="8" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            PocketMageOS docs
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://github.com/TalismanDesign/PocketMage_SDK" class=" "
+          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+           
+<svg class="lucide-icon icon-github " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-github"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+  <path d="M9 18c-4.51 2-5-2-7-2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            GitHub
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      
+      
+      <div class="main-content-wrapper">
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="Toggle Sidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  System (pocketmage_sys, pocketmage_globals)
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+                
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="Search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">Search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+
+    
+    <button class="theme-toggle-button" aria-label="Toggle theme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+</div>
+
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22System%20(pocketmage_sys%2C%20pocketmage_globals)%22%0Adescription%3A%20%22Peripheral%20init%2C%20CPU%20speed%2C%20deep%20sleep%2C%20crash%20recovery%2C%20and%20the%20shared%20global%20state.%22%0A---%0A%0A%23%20System%20API%0A%0AThe%20system%20module%20owns%20the%20board%20bring-up%2C%20the%20CPU%20clock%2C%20deep%20sleep%2C%20the%20power%20button%2C%20and%20the%20shared%20globals%20(%60battState%60%2C%20%60allLines%60%2C%20%60CurrentAppState%60%2C%20the%20SPI%20buses%2C%20and%20NVS%20%60prefs%60).%20Apps%20use%20it%20for%20power%20management%20and%20boot-time%20configuration%3B%20the%20OS%20uses%20it%20for%20full%20bring-up.%0A%0A%23%23%20Access%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%60%60%60%0A%0A%23%23%20Shared%20globals%0A%0A%60pocketmage_globals%60%20defines%20the%20state%20both%20the%20OS%20and%20apps%20link%20against.%0A%0A%23%23%23%20SPI%20and%20filesystem%0A%0A%60%60%60cpp%0Aextern%20SPIClass*%20vspi%3B%20%20%20%20%2F%2F%20the%20global%20SPI%20on%20SPI_SCK%2FSPI_MOSI%0Aextern%20SPIClass*%20hspi%3B%0Aextern%20fs%3A%3AFS*%20%20%20global_fs%3B%20%20%2F%2F%20active%20filesystem%20(SD_MMC%20or%20SD)%0A%60%60%60%0A%0A%60PocketMage_INIT%60%20wires%20%60vspi%20%3D%20%26SPI%60%20and%20pins%20the%20pins%20documented%20in%20%5Bconfiguration%5D(configuration.md).%0A%0A%23%23%23%20NVS%0A%0A%60%60%60cpp%0Aextern%20Preferences%20prefs%3B%20%20%20%2F%2F%20%22PocketMage%22%20namespace%0A%60%60%60%0A%0AThe%20shared%20Preferences%20handle.%20%60pocketmage%3A%3AloadSettings()%60%20reads%20the%20persistent%20toggles%20into%20the%20%60config.h%60%20globals%20(%60TIMEOUT%60%2C%20%60SAVE_POWER%60%2C%20%60FAST_REFRESH%60%2C%20%60OLED_BRIGHTNESS%60%2C%20the%20UI%20language%2C%20...)%3B%20an%20app%20that%20reads%20preferences%20uses%20%60prefs%60%20directly%20with%20the%20same%20namespace.%0A%0A%23%23%23%20App%20state%0A%0A%60%60%60cpp%0Aenum%20AppState%20%7B%20HOME%2C%20TXT%2C%20FILEWIZ%2C%20USB_APP%2C%20COMM%2C%20SETTINGS%2C%20TASKS%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20CALENDAR%2C%20JOURNAL%2C%20LEXICON%2C%20APPLOADER%2C%20TERMINAL%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20ONBOARDING%2C%20ELFAPP%20%7D%3B%0Aextern%20AppState%20CurrentAppState%3B%0A%60%60%60%0A%0AThe%20OS&#039;s%20app%20dispatch%20enum.%20%60ELFAPP%60%20is%20the%20state%20set%20while%20a%20loaded%20ELF%20app%20is%20running%3B%20the%20OS%20restores%20%60HOME%60%20when%20it%20exits.%0A%0A%23%23%23%20Keyboard%20state%0A%0A%60%60%60cpp%0Aenum%20KBState%20%7B%20NORMAL%2C%20SHIFT%2C%20FUNC%2C%20FN_SHIFT%20%7D%3B%0A%60%60%60%0A%0AThe%20keyboard%20modifier%20state%2C%20mirrored%20by%20%60KB().setKeyboardState()%60.%0A%0A%23%23%23%20%60pocketmage%3A%3A%60%20namespace%0A%0A%60%60%60cpp%0Anamespace%20pocketmage%20%7B%0A%20%20void%20loadSettings()%3B%20%20%20%20%20%20%20%20%20%20%2F%2F%20load%20NVS%20settings%20into%20the%20config.h%20globals%0A%20%20void%20recoverFromCrash()%3B%20%20%20%20%20%20%2F%2F%20reset%20app%20state%20after%20a%20panic%2Fwatchdog%0A%20%20void%20checkRTCPowerLoss()%3B%20%20%20%20%20%2F%2F%20baseline%20the%20RTC%20when%20it%20has%20lost%20power%0A%7D%0A%60%60%60%0A%0A-%20%60loadSettings()%60%20reads%20every%20persistent%20toggle%20from%20%60prefs%60%20and%20sets%20the%20UI%20language.%20Apps%20call%20it%20during%20%60APP_INIT%60%20(the%20OS%20reaches%20it%20via%20%60PocketMage_INIT%60%20on%20the%20host%20path).%0A-%20%60recoverFromCrash()%60%20checks%20the%20ESP%20reset%20reason%20and%2C%20on%20panic%20or%20watchdog%20reset%2C%20resets%20%60CurrentAppState%60%20to%20%60HOME%60%20and%20clears%20the%20editing-file%20pointer%20so%20the%20device%20boots%20clean.%0A-%20%60checkRTCPowerLoss()%60%20re-baselines%20the%20RTC%20when%20its%20power%20was%20lost.%0A%0A%23%23%23%20Battery%20helper%0A%0A%60%60%60cpp%0Ainline%20float%20getBatteryVoltage()%20%7B%0A%20%20return%20(analogRead(BAT_SENS)%20*%20(3.3%20%2F%204095.0)%20*%202)%20%2B%200.2%3B%0A%7D%0A%60%60%60%0A%0A%60battState%60%20(0%20through%205)%20indexes%20the%20battery%20bitmaps%20used%20by%20the%20OLED%20status%20line%20(%5Boled%5D(oled.md)%2C%20%5Bassets%5D(assets.md)).%0A%0A%23%23%20CPU%20speed%0A%0A%60%60%60cpp%0Avoid%20pocketmage%3A%3AsetCpuSpeed(int%20newFreq)%3B%0A%60%60%60%0A%0AClamps%20to%20the%20valid%20S3%20frequencies%20%60%7B240%2C%20160%2C%2080%2C%2040%2C%2020%2C%2010%7D%60%20and%20returns%20early%20if%20the%20CPU%20is%20already%20there.%20WiFi%20stalls%20below%20240%20MHz%20on%20the%20S3%2C%20so%20a%20request%20that%20would%20drop%20the%20clock%20below%20%60WIFI_CPU_FREQ_MHZ%60%20(240)%20while%20%60P_WIFI%60%20is%20not%20%60Off%60%20is%20ignored.%20%60POWER_SAVE_FREQ%60%20(40)%20is%20the%20OS&#039;s%20idle%20speed%3B%20%60sysMessage%60%20and%20the%20WiFi%20service%20bump%20back%20to%20240%20when%20they%20need%20it.%0A%0A%23%23%23%20Scope%20guard%0A%0A%60%60%60cpp%0Aclass%20pocketmage%3A%3AScopedCpuBoost%20%7B%0Apublic%3A%0A%20%20ScopedCpuBoost()%3B%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20raises%20to%20240%20MHz%20if%20not%20already%20there%0A%20%20~ScopedCpuBoost()%3B%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20restores%20the%20previous%20frequency%0A%7D%3B%0A%60%60%60%0A%0ANon-copyable%20RAII.%20Usable%20as%20a%20stack%20local%20around%20a%20latency-critical%20section.%0A%0A%23%23%20Deep%20sleep%0A%0A%60%60%60cpp%0Avoid%20pocketmage%3A%3AdeepSleep(bool%20alternateScreenSaver%20%3D%20false)%3B%0A%60%60%60%0A%0AFull%20power-down%20sequence%3A%0A%0A1.%20Power-saves%20the%20OLED.%0A2.%20Stops%20the%20%60einkHandlerTask%60%20under%20the%20panel%20lock%2C%20so%20an%20in-flight%20refresh%20completes.%0A3.%20Plays%20%60Jingles%3A%3AShutdown%60.%0A4.%20Draws%20a%20screensaver%20(custom%20%60%2Fassets%2Fbackgrounds%2F*.bin%60%2C%20else%20a%20random%20built-in)%20at%20rotation%203%2C%20or%20the%20alternate%20screensaver%20when%20asked.%20%60SAVE_POWER%60%20drops%20the%20CPU%20to%20%60POWER_SAVE_FREQ%60%20for%20the%20draw.%0A5.%20Clears%20the%20buffer%2C%20hibernates%20the%20panel%2C%20unlocks%20it.%0A6.%20Persists%20%60CurrentAppState%60%2C%20the%20editing%20file%2C%20and%20clears%20the%20seamless%20reboot%20flag.%0A7.%20On%20production%20hardware%2C%20isolates%20the%20peripheral%20pins%20with%20%60setLoadSwitch(false)%60%20(GPIO%20hold%20%2B%20%60gpio_deep_sleep_hold_en%60).%0A8.%20%60esp_deep_sleep_start()%60.%0A%0AWake%20is%20on%20the%20%60KB_IRQ%60%20falling%20edge%20(configured%20in%20%60PocketMage_INIT%60).%20Resume%20re-runs%20%60PocketMage_INIT%60%2C%20which%20clears%20the%20pin%20holds%20and%20re-inits%20peripherals.%0A%0A%23%23%20Power%20button%0A%0A%60%60%60cpp%0Avoid%20IRAM_ATTR%20pocketmage%3A%3APWR_BTN_irq()%3B%0Aextern%20volatile%20bool%20PWR_BTN_event%3B%0A%60%60%60%0A%0AThe%20FALLING-edge%20interrupt%20service%20routine%20sets%20%60PWR_BTN_event%60.%20The%20OS%20consumes%20it%20for%20wake%2Fshutdown%20handling%3B%20holding%20%60PWR_BTN%60%20for%203%20seconds%20while%20awake%20raises%20the%20hard-reset-to-home%20path%20(%60resetRequested%60%2C%20see%20the%20%60hardReset%60%20task).%20%60SDActive%60%2C%20%60mscEnabled%60%2C%20and%20%60sinkEnabled%60%20are%20the%20status-line%20indicators%20apps%20toggle%20for%20long%20I%2FO.%0A%0A%23%23%20Bring-up%0A%0A%60%60%60cpp%0Avoid%20PocketMage_INIT()%3B%0A%60%60%60%0A%0AThe%20one-call%20bring-up%3A%20release%20GPIO%20holds%2C%20enable%20the%20load%20switch%20(production)%2C%20read%20the%20seamless%20reboot%20flag%2C%20%60FontEngine%3A%3Ainit()%60%2C%20Serial%2C%20Wire%20(plus%20Wire1%20on%20production)%2C%20the%20global%20SPI%2C%20the%20keyboard%20wake%20pin%2C%20%60setupOled()%60%2C%20%60setupKB()%60%2C%20%60setupEink()%60%2C%20%60setupSD()%60%2C%20power-button%20interrupt%20%2B%20MP2722%20power%20init%2C%20the%20hard-reset%20task%2C%20the%20power-save%20clock%2C%20%60setupTouch()%60%2C%20%60setupClock()%60%2C%20the%20random%20seed%2C%20settings%20load%2C%20crash%20recovery%2C%20%60setupBZ()%60%20%2B%20startup%20jingle%2C%20the%20WiFi%20service%20(host%20only)%2C%20key%20flush%2C%20then%20the%20app%20hook%20%60APP_INIT()%60%20(app%20builds).%20Apps%20do%20not%20call%20it%3B%20it%20runs%20as%20part%20of%20the%20OS%20or%20the%20app%20entry%20shim.%0A%0A%23%23%20Text%20line%20buffer%0A%0A%60%60%60cpp%0Aextern%20volatile%20bool%20resetRequested%3B%0Aextern%20volatile%20bool%20newLineAdded%3B%0Aextern%20std%3A%3Avector%3CString%3E%20allLines%3B%20%20%20%2F%2F%20the%20text%20editor&#039;s%20line%20list%0Aextern%20bool%20noTimeout%3B%0Aextern%20void%20setLoadSwitch(bool%20state)%3B%0A%60%60%60%0A%0A%60allLines%60%20is%20the%20shared%20text%20buffer%20the%20OS&#039;s%20TXT%20flow%20and%20%60vectorToString%60%20%2F%20%60stringToVector%60%20operate%20on%3B%20%60noTimeout%60%20suppresses%20the%20auto-sleep%20timeout.%20%60setLoadSwitch(false)%60%20is%20the%20production%20deep-sleep%20pin%20isolation%20path%20described%20above.%0A%0A%23%23%20Example%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0Avoid%20onUserExit()%20%7B%0A%20%20%7B%0A%20%20%20%20pocketmage%3A%3AScopedCpuBoost%20boost%3B%20%20%20%2F%2F%20240%20MHz%20for%20the%20save%0A%20%20%20%20%2F%2F%20write%20the%20document...%0A%20%20%7D%20%20%2F%2F%20back%20to%20the%20previous%20speed%0A%20%20pocketmage%3A%3AdeepSleep()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20and%20go%20to%20sleep%0A%7D%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>API Reference</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>System</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">Copy Context</span>
+                        </button>
+                      
+                    </div>
+                  
+                </div>
+                
+                <h1 id="system-api" class="docmd-heading"><a href="#system-api" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>System API</h1>
+<p>The system module owns the board bring-up, the CPU clock, deep sleep, the power button, and the shared globals (<code>battState</code>, <code>allLines</code>, <code>CurrentAppState</code>, the SPI buses, and NVS <code>prefs</code>). Apps use it for power management and boot-time configuration; the OS uses it for full bring-up.</p>
+<h2 id="system-api-access" class="docmd-heading"><a href="#system-api-access" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Access</h2>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-comment">#include &lt;pocketmage.h&gt;</span>
+</code></pre>
+<h2 id="system-api-shared-globals" class="docmd-heading"><a href="#system-api-shared-globals" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Shared globals</h2>
+<p><code>pocketmage_globals</code> defines the state both the OS and apps link against.</p>
+<h3 id="system-api-shared-globals-spi-and-filesystem" class="docmd-heading"><a href="#system-api-shared-globals-spi-and-filesystem" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>SPI and filesystem</h3>
+<pre class="hljs"><code class="language-cpp">extern SPIClass<span class="hljs-punctuation">*</span> vspi;    <span class="hljs-comment">// the global SPI on SPI_SCK/SPI_MOSI</span>
+extern SPIClass<span class="hljs-punctuation">*</span> hspi;
+extern fs<span class="hljs-punctuation">::</span>FS<span class="hljs-punctuation">*</span>   global_fs;  <span class="hljs-comment">// active filesystem (SD_MMC or SD)</span>
+</code></pre>
+<p><code>PocketMage_INIT</code> wires <code>vspi = &amp;SPI</code> and pins the pins documented in <a href="../configuration/">configuration</a>.</p>
+<h3 id="system-api-shared-globals-nvs" class="docmd-heading"><a href="#system-api-shared-globals-nvs" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>NVS</h3>
+<pre class="hljs"><code class="language-cpp">extern Preferences prefs;   <span class="hljs-comment">// &quot;PocketMage&quot; namespace</span>
+</code></pre>
+<p>The shared Preferences handle. <code>pocketmage::loadSettings()</code> reads the persistent toggles into the <code>config.h</code> globals (<code>TIMEOUT</code>, <code>SAVE_POWER</code>, <code>FAST_REFRESH</code>, <code>OLED_BRIGHTNESS</code>, the UI language, …); an app that reads preferences uses <code>prefs</code> directly with the same namespace.</p>
+<h3 id="system-api-shared-globals-app-state" class="docmd-heading"><a href="#system-api-shared-globals-app-state" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>App state</h3>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">enum</span> AppState { HOME, TXT, FILEWIZ, USB_APP, COMM, SETTINGS, TASKS,
+                CALENDAR, JOURNAL, LEXICON, APPLOADER, TERMINAL,
+                ONBOARDING, ELFAPP };
+extern AppState CurrentAppState;
+</code></pre>
+<p>The OS’s app dispatch enum. <code>ELFAPP</code> is the state set while a loaded ELF app is running; the OS restores <code>HOME</code> when it exits.</p>
+<h3 id="system-api-shared-globals-keyboard-state" class="docmd-heading"><a href="#system-api-shared-globals-keyboard-state" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Keyboard state</h3>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">enum</span> KBState { NORMAL, SHIFT, FUNC, FN_SHIFT };
+</code></pre>
+<p>The keyboard modifier state, mirrored by <code>KB().setKeyboardState()</code>.</p>
+<h3 id="system-api-shared-globals-pocketmage-namespace" class="docmd-heading"><a href="#system-api-shared-globals-pocketmage-namespace" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>pocketmage::</code> namespace</h3>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">namespace</span> pocketmage {
+  <span class="hljs-keyword">void</span> <span class="hljs-title function_">loadSettings</span>();          <span class="hljs-comment">// load NVS settings into the config.h globals</span>
+  <span class="hljs-keyword">void</span> <span class="hljs-title function_">recoverFromCrash</span>();      <span class="hljs-comment">// reset app state after a panic/watchdog</span>
+  <span class="hljs-keyword">void</span> <span class="hljs-title function_">checkRTCPowerLoss</span>();     <span class="hljs-comment">// baseline the RTC when it has lost power</span>
+}
+</code></pre>
+<ul>
+<li><code>loadSettings()</code> reads every persistent toggle from <code>prefs</code> and sets the UI language. Apps call it during <code>APP_INIT</code> (the OS reaches it via <code>PocketMage_INIT</code> on the host path).</li>
+<li><code>recoverFromCrash()</code> checks the ESP reset reason and, on panic or watchdog reset, resets <code>CurrentAppState</code> to <code>HOME</code> and clears the editing-file pointer so the device boots clean.</li>
+<li><code>checkRTCPowerLoss()</code> re-baselines the RTC when its power was lost.</li>
+</ul>
+<h3 id="system-api-shared-globals-battery-helper" class="docmd-heading"><a href="#system-api-shared-globals-battery-helper" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Battery helper</h3>
+<pre class="hljs"><code class="language-cpp">inline <span class="hljs-keyword">float</span> <span class="hljs-title function_">getBatteryVoltage</span>() {
+  <span class="hljs-keyword">return</span> (<span class="hljs-title function_">analogRead</span>(BAT_SENS) <span class="hljs-punctuation">*</span> (<span class="hljs-number">3.3</span> <span class="hljs-punctuation">/</span> <span class="hljs-number">4095.0</span>) <span class="hljs-punctuation">*</span> <span class="hljs-number">2</span>) <span class="hljs-punctuation">+</span> <span class="hljs-number">0.2</span>;
+}
+</code></pre>
+<p><code>battState</code> (0 through 5) indexes the battery bitmaps used by the OLED status line (<a href="../oled/">oled</a>, <a href="../../../assets/">assets</a>).</p>
+<h2 id="system-api-cpu-speed" class="docmd-heading"><a href="#system-api-cpu-speed" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>CPU speed</h2>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> pocketmage<span class="hljs-punctuation">::</span><span class="hljs-title function_">setCpuSpeed</span>(<span class="hljs-keyword">int</span> newFreq);
+</code></pre>
+<p>Clamps to the valid S3 frequencies <code>{240, 160, 80, 40, 20, 10}</code> and returns early if the CPU is already there. WiFi stalls below 240 MHz on the S3, so a request that would drop the clock below <code>WIFI_CPU_FREQ_MHZ</code> (240) while <code>P_WIFI</code> is not <code>Off</code> is ignored. <code>POWER_SAVE_FREQ</code> (40) is the OS’s idle speed; <code>sysMessage</code> and the WiFi service bump back to 240 when they need it.</p>
+<h3 id="system-api-cpu-speed-scope-guard" class="docmd-heading"><a href="#system-api-cpu-speed-scope-guard" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Scope guard</h3>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">class</span> pocketmage<span class="hljs-punctuation">::</span>ScopedCpuBoost {
+<span class="hljs-keyword">public</span><span class="hljs-punctuation">:</span>
+  <span class="hljs-title function_">ScopedCpuBoost</span>();            <span class="hljs-comment">// raises to 240 MHz if not already there</span>
+  <span class="hljs-punctuation">~</span><span class="hljs-title function_">ScopedCpuBoost</span>();           <span class="hljs-comment">// restores the previous frequency</span>
+};
+</code></pre>
+<p>Non-copyable RAII. Usable as a stack local around a latency-critical section.</p>
+<h2 id="system-api-deep-sleep" class="docmd-heading"><a href="#system-api-deep-sleep" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Deep sleep</h2>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> pocketmage<span class="hljs-punctuation">::</span><span class="hljs-title function_">deepSleep</span>(<span class="hljs-keyword">bool</span> alternateScreenSaver <span class="hljs-punctuation">=</span> <span class="hljs-keyword">false</span>);
+</code></pre>
+<p>Full power-down sequence:</p>
+<ol>
+<li>Power-saves the OLED.</li>
+<li>Stops the <code>einkHandlerTask</code> under the panel lock, so an in-flight refresh completes.</li>
+<li>Plays <code>Jingles::Shutdown</code>.</li>
+<li>Draws a screensaver (custom <code>/assets/backgrounds/*.bin</code>, else a random built-in) at rotation 3, or the alternate screensaver when asked. <code>SAVE_POWER</code> drops the CPU to <code>POWER_SAVE_FREQ</code> for the draw.</li>
+<li>Clears the buffer, hibernates the panel, unlocks it.</li>
+<li>Persists <code>CurrentAppState</code>, the editing file, and clears the seamless reboot flag.</li>
+<li>On production hardware, isolates the peripheral pins with <code>setLoadSwitch(false)</code> (GPIO hold + <code>gpio_deep_sleep_hold_en</code>).</li>
+<li><code>esp_deep_sleep_start()</code>.</li>
+</ol>
+<p>Wake is on the <code>KB_IRQ</code> falling edge (configured in <code>PocketMage_INIT</code>). Resume re-runs <code>PocketMage_INIT</code>, which clears the pin holds and re-inits peripherals.</p>
+<h2 id="system-api-power-button" class="docmd-heading"><a href="#system-api-power-button" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Power button</h2>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> IRAM_ATTR pocketmage<span class="hljs-punctuation">::</span><span class="hljs-title function_">PWR_BTN_irq</span>();
+extern volatile <span class="hljs-keyword">bool</span> PWR_BTN_event;
+</code></pre>
+<p>The FALLING-edge interrupt service routine sets <code>PWR_BTN_event</code>. The OS consumes it for wake/shutdown handling; holding <code>PWR_BTN</code> for 3 seconds while awake raises the hard-reset-to-home path (<code>resetRequested</code>, see the <code>hardReset</code> task). <code>SDActive</code>, <code>mscEnabled</code>, and <code>sinkEnabled</code> are the status-line indicators apps toggle for long I/O.</p>
+<h2 id="system-api-bring-up" class="docmd-heading"><a href="#system-api-bring-up" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Bring-up</h2>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> <span class="hljs-title function_">PocketMage_INIT</span>();
+</code></pre>
+<p>The one-call bring-up: release GPIO holds, enable the load switch (production), read the seamless reboot flag, <code>FontEngine::init()</code>, Serial, Wire (plus Wire1 on production), the global SPI, the keyboard wake pin, <code>setupOled()</code>, <code>setupKB()</code>, <code>setupEink()</code>, <code>setupSD()</code>, power-button interrupt + MP2722 power init, the hard-reset task, the power-save clock, <code>setupTouch()</code>, <code>setupClock()</code>, the random seed, settings load, crash recovery, <code>setupBZ()</code> + startup jingle, the WiFi service (host only), key flush, then the app hook <code>APP_INIT()</code> (app builds). Apps do not call it; it runs as part of the OS or the app entry shim.</p>
+<h2 id="system-api-text-line-buffer" class="docmd-heading"><a href="#system-api-text-line-buffer" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Text line buffer</h2>
+<pre class="hljs"><code class="language-cpp">extern volatile <span class="hljs-keyword">bool</span> resetRequested;
+extern volatile <span class="hljs-keyword">bool</span> newLineAdded;
+extern std<span class="hljs-punctuation">::</span>vector<span class="hljs-punctuation">&lt;</span>String<span class="hljs-punctuation">&gt;</span> allLines;   <span class="hljs-comment">// the text editor&#039;s line list</span>
+extern <span class="hljs-keyword">bool</span> noTimeout;
+extern <span class="hljs-keyword">void</span> <span class="hljs-title function_">setLoadSwitch</span>(<span class="hljs-keyword">bool</span> state);
+</code></pre>
+<p><code>allLines</code> is the shared text buffer the OS’s TXT flow and <code>vectorToString</code> / <code>stringToVector</code> operate on; <code>noTimeout</code> suppresses the auto-sleep timeout. <code>setLoadSwitch(false)</code> is the production deep-sleep pin isolation path described above.</p>
+<h2 id="system-api-example" class="docmd-heading"><a href="#system-api-example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Example</h2>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-comment">#include &lt;pocketmage.h&gt;</span>
+
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">onUserExit</span>() {
+  {
+    pocketmage<span class="hljs-punctuation">::</span>ScopedCpuBoost boost;   <span class="hljs-comment">// 240 MHz for the save</span>
+    <span class="hljs-comment">// write the document...</span>
+  }  <span class="hljs-comment">// back to the previous speed</span>
+  pocketmage<span class="hljs-punctuation">::</span><span class="hljs-title function_">deepSleep</span>();              <span class="hljs-comment">// and go to sleep</span>
+}
+</code></pre>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../../api/wifi/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>Previous</small><strong>
+                            WiFi
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../../api/i18n-runtime/" class="next-page">
+                        <span><small>Next</small>
+                          <strong>
+                            i18n (runtime)
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              
+              <div class="toc-sidebar">
+                
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#system-api" class="toc-link">System API</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#system-api-access" class="toc-link">Access</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#system-api-shared-globals" class="toc-link">Shared globals</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#system-api-shared-globals-spi-and-filesystem" class="toc-link">SPI and filesystem</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#system-api-shared-globals-nvs" class="toc-link">NVS</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#system-api-shared-globals-app-state" class="toc-link">App state</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#system-api-shared-globals-keyboard-state" class="toc-link">Keyboard state</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#system-api-shared-globals-pocketmage-namespace" class="toc-link">pocketmage:: namespace</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#system-api-shared-globals-battery-helper" class="toc-link">Battery helper</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#system-api-cpu-speed" class="toc-link">CPU speed</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#system-api-cpu-speed-scope-guard" class="toc-link">Scope guard</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#system-api-deep-sleep" class="toc-link">Deep sleep</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#system-api-power-button" class="toc-link">Power button</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#system-api-bring-up" class="toc-link">Bring-up</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#system-api-text-line-buffer" class="toc-link">Text line buffer</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#system-api-example" class="toc-link">Example</a>
+        </li>
+      
+    </ul>
+  </div>
+
+              </div>
+              
+            </div>
+            <div class="page-footer-actions">
+              
+              
+                <span class="git-last-updated" data-timestamp="1790729515000">
+                  <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span class="git-label">Last updated:</span>
+                  <span class="git-time" data-timestamp="1790729515000"></span>
+                  
+                  <div class="git-commit-tooltip" role="tooltip">
+                    <div class="git-tooltip-title">Recent commits</div>
+                    <ul class="git-commit-list">
+                      
+                        <li class="git-commit-item">
+                          <div class="git-commit-avatar" title="NellowTCS">
+                            
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
+                            
+                          </div>
+                          <div class="git-commit-details">
+                            <div class="git-commit-message" title="DOCS">DOCS</div>
+                            <div class="git-commit-meta">
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1790729515000"></span>
+                            </div>
+                          </div>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                  
+                </span>
+              
+              <span class="git-spacer"></span>
+              
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/docs/docs/api/sys.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                  
+<svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-pencil"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+  <path d="m15 5 4 4" />
+</svg>
+
+                  Edit this page
+                </a>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="footer-complete">
+  <div class="footer-complete-top">
+      <div class="footer-brand">
+          
+            <span class="footer-title">PocketMage SDK</span>
+          
+          
+            <p class="footer-desc">The official SDK for PocketMage apps: each app is an ELF the OS loads and runs in-process.</p>
+          
+        </div>
+        
+          <div class="footer-columns">
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Guides</span>
+                <ul>
+                  
+                    <li><a href="guides/making-apps/" >Making an app</a></li>
+                  
+                    <li><a href="guides/lifecycle/" >App lifecycle</a></li>
+                  
+                    <li><a href="guides/rendering/" >Rendering</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">API Reference</span>
+                <ul>
+                  
+                    <li><a href="api/" >Overview</a></li>
+                  
+                    <li><a href="api/oled/" >OLED</a></li>
+                  
+                    <li><a href="api/eink/" >E-Ink</a></li>
+                  
+                    <li><a href="api/sys/" >System</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Platform</span>
+                <ul>
+                  
+                    <li><a href="app-abi/" >App ABI</a></li>
+                  
+                    <li><a href="build/" >Building Apps</a></li>
+                  
+                    <li><a href="symbols/" >Symbols</a></li>
+                  
+                    <li><a href="publish/" >Publishing</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Community</span>
+                <ul>
+                  
+                    <li><a href="https://talismandesign.github.io/PocketMage_PDA/docs" >PocketMageOS docs</a></li>
+                  
+                    <li><a href="https://github.com/TalismanDesign/PocketMage_SDK" >GitHub</a></li>
+                  
+                    <li><a href="https://discord.gg/KSCapSf4XH" >Discord</a></li>
+                  
+                </ul>
+              </div>
+            
+          </div>
+        
+      </div>
+      <div class="footer-complete-bottom">
+        <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/TalismanDesign/PocketMage_SDK">View on GitHub</a>.</div>
+        
+          <div class="branding-footer">
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+          </div>
+        
+      </div>
+  </footer>
+
+        </div>
+      </div>
+      
+      <script src="../../assets/js/docmd-main.js?v=mune4scf"></script>
+      
+      <script src="../../assets/js/docmd-git.js?v=mune4scf"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mune4scf" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mune4scf" ></script>
+<script src="../../assets/js/docmd-search.js?v=mune4scf" ></script>
+<script src="../../assets/js/docmd-git.js?v=mune4scf" type="module"></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+      
+      
+      
+  </body>
+</html>

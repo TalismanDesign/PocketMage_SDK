@@ -4,6 +4,1761 @@
 
 ---
 
+## [Built-in asset bitmaps (libAssets.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/assets/)
+
+---
+title: "Built-in asset bitmaps (libAssets.h)"
+description: "Compiled-in PROGMEM bitmaps for the status bar, screensavers, and battery gauge."
+---
+
+# Built-in assets
+
+The SDK ships small PROGMEM bitmaps for the OS status line and screensavers. Apps can draw them directly with the E-Ink/OLED bitmap primitives, or they can draw custom assets from the SD card (`/assets/...`, see [publishing](../publish.md)) instead.
+
+```cpp
+#include <pocketmage.h>
+// assets are visible from the umbrella via libAssets.h
+```
+
+## Battery gauge
+
+Six frames, indexed 0 (empty) to 5 (full):
+
+```cpp
+extern const unsigned char _batt0 [] PROGMEM;
+extern const unsigned char _batt1 [] PROGMEM;
+extern const unsigned char _batt2 [] PROGMEM;
+extern const unsigned char _batt3 [] PROGMEM;
+extern const unsigned char _batt4 [] PROGMEM;
+extern const unsigned char _batt5 [] PROGMEM;
+extern const unsigned char* batt_allArray[6];
+```
+
+The OLED status line selects `batt_allArray[battState]`, where `battState` comes from `getBatteryVoltage()` ([sys](sys.md)). Frame dimensions follow `kOledInfoBatteryW`/`kOledInfoBatteryH` ([layout](layout.md)).
+
+## Scroll indicator
+
+```cpp
+extern const unsigned char scrolloled0 [] PROGMEM;
+```
+
+## Sleep icons
+
+```cpp
+extern const unsigned char sleep0 [] PROGMEM;
+extern const unsigned char sleep1 [] PROGMEM;
+```
+
+## Screensavers
+
+```cpp
+extern const unsigned char _ScreenSaver0 [] PROGMEM;
+extern const unsigned char _ScreenSaver1 [] PROGMEM;
+// ... through
+extern const unsigned char _ScreenSaver17 [] PROGMEM;
+extern const unsigned char* ScreenSaver_allArray[18];
+```
+
+18 built-in 320x240 1-bit screensavers. `deepSleep()` picks one at random at rotation 3, unless `/assets/backgrounds/*.bin` files exist on the card (in which case a card background wins).
+
+## Not implemented
+
+The `KBStatus*` entries are declared but not populated; they are not used by the OS and their license is pending. Avoid them.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+#include <pocketmage_assets/libAssets.h>   // included by pocketmage.h
+
+void drawOwnBatteryGauge(int x, int y) {
+  FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
+  EINK().drawBitmap(x, y, batt_allArray[battState], 10, 6, GxEPD_BLACK);
+}
+
+
+---
+
+## [Buzzer (pocketmage_bz)](https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/)
+
+---
+title: "Buzzer (pocketmage_bz)"
+description: "PWM buzzer output, Note/Jingle data model, and the built-in melodies."
+---
+
+# Buzzer API
+
+`PocketmageBZ` drives the PWM buzzer (10-bit LEDC channel 1 on `BZ_PIN`) and plays note sequences ("jingles"). Melodies are compile-time `Jingle` values: `constexpr` note arrays plus a length, so a tune costs no RAM at runtime.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+
+PocketmageBZ& bz = BZ();
+```
+
+`BZ()` is the single instance. `setupBZ()` runs in `PocketMage_INIT()` and calls `begin()`; the startup jingle plays automatically.
+
+## Data model
+
+```cpp
+struct Note {
+  int key;      // MIDI-ish note number (NOTE_* constants)
+  int duration; // arbitrary ticks (see NOTE_* in the header)
+};
+
+struct Jingle {
+  const Note* notes;  // PROGMEM-friendly constant array
+  size_t len;
+};
+
+namespace Jingles {
+  extern const Jingle Startup;    // ascending arpeggio
+  extern const Jingle Shutdown;   // descending arpeggio
+}
+```
+
+Built-in melodies use `NOTE_A8` / `NOTE_B8` / `NOTE_C8` / `NOTE_D8` constants from the include set. A custom jingle is just a new `constexpr` note array plus a `Jingle`:
+
+```cpp
+constexpr static const Note myNotes[] = {
+    {NOTE_A8, 120}, {NOTE_B8, 120}, {NOTE_C8, 120}, {NOTE_D8, 120}};
+const Jingle myMelody = {myNotes, sizeof(myNotes) / sizeof(myNotes[0])};
+```
+
+## Class reference
+
+```cpp
+class PocketmageBZ {
+public:
+  PocketmageBZ();
+  bool begin(int channel = 0);
+  void end();
+  void playJingle(const Jingle& jingle);
+};
+```
+
+- `begin(channel)` attaches the buzzer to the PWM channel and is idempotent in `setupBZ()`.
+- `playJingle(jingle)` plays the sequence synchronously (back-to-back notes) and re-attaches the channel if it was torn down. Use `MUTE_BUZZER` to silence without removing calls.
+
+`PWM_CHANNEL` is `LEDC_CHANNEL_1`, `PWM_RESOLUTION` is `LEDC_TIMER_10_BIT`.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void announce() {
+  BZ().playJingle(Jingles::Startup);
+}
+
+
+---
+
+## [Clock (pocketmage_clock)](https://talismandesign.github.io/PocketMage_SDK/docs/api/clock/)
+
+---
+title: "Clock (pocketmage_clock)"
+description: "The PCF8563 RTC: reading, setting, validity, and the auto-sleep timer bookkeeping."
+---
+
+# Clock API
+
+`PocketmageCLOCK` wraps the PCF8563 real-time clock on the primary I2C bus. It answers "what time is it," sets the time from a user string, validates the chip, and tracks the millis-based auto-sleep timeout that the OS feeds from idle activity.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+
+PocketmageCLOCK& clock = CLOCK();
+```
+
+`CLOCK()` is the single instance. `setupClock()` runs in `PocketMage_INIT()`; `wireClock()` performs the I2C wire-up the RTC needs and is called from there.
+
+## Class reference
+
+```cpp
+class PocketmageCLOCK {
+public:
+  bool begin();
+  void setTimeFromString(String timeStr);
+  bool isValid();
+
+  void setToCompileTimeUTC();
+  DateTime nowDT();
+  RTC_PCF8563& getRTC();
+
+  long getTimeDiff();
+  volatile long getTimeoutMillis() const;
+  volatile long getPrevTimeMillis() const;
+  void setTimeoutMillis(long t);
+  void setPrevTimeMillis(long t);
+};
+```
+
+### Reading and setting time
+
+- `nowDT()` returns an `RTClib::DateTime` for draw code (`now.hour()`, `now.minute()`, `now.dayOfTheWeek()`, ...).
+- `setTimeFromString("HH:MM")` sets the current day's time and rejects bad input with a `STR_INVALID` OLED message instead of a bad write.
+- `setToCompileTimeUTC()` sets the clock from `__DATE__`/`__TIME__` (used by `SET_CLOCK_ON_UPLOAD`).
+- `isValid()` returns false until `begin()` succeeds, and checks the RTC year is sane (2020..2099) to catch a reset or dead cell. `checkRTCPowerLoss()` (see [sys](sys.md)) re-baselines when the RTC has lost power.
+- `getRTC()` hands out the raw driver for anything not covered.
+
+### Timeout bookkeeping
+
+The auto-sleep timer is a pair of millis stamps in `timeoutMillis_` / `prevTimeMillis_`. The OS calls `setPrevTimeMillis(millis())` on every user interaction (keypress, touch, SD activity poke) and compares with `getTimeDiff()` against the `TIMEOUT` setting to decide when to sleep. Reads never mutate; `setTimeoutMillis`/`setPrevTimeMillis` are the only writes. The same pair is reused by the touch driver to reset idle on touches, so a scroll keeps the device awake automatically.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void drawClockLine() {
+  DateTime now = CLOCK().nowDT();
+  OLED().oledWord(String(now.hour()) + ":" +
+                  String(now.minute() < 10 ? "0" : "") + String(now.minute()));
+}
+
+
+---
+
+## [Configuration](https://talismandesign.github.io/PocketMage_SDK/docs/api/configuration/)
+
+---
+title: "Configuration"
+description: "Compile-time pins and knobs in config.h, persistent preference globals, and how an app sees the SDK version."
+---
+
+# Configuration
+
+`config.h` holds the compile-time hardware map and tuning knobs for the SDK. It is included by the umbrella header, so no extra include is needed. Apps read these constants; only firmware builds may change their values.
+
+## Compile target
+
+```c
+#if defined(PM_TARGET_HOST) && defined(PM_TARGET_APP)
+#error "PM_TARGET_HOST and PM_TARGET_APP are mutually exclusive"
+#endif
+#if !defined(PM_TARGET_HOST) && !defined(PM_TARGET_APP)
+#error "Define PM_TARGET_HOST (OS firmware) or PM_TARGET_APP (external .app.elf)"
+#endif
+```
+
+Define exactly one. The preprocessor enforces it with a hard error.
+
+## Tuning knobs
+
+| Constant                 | Default | Meaning                                    |
+| ------------------------ | ------- | ------------------------------------------ |
+| `KB_COOLDOWN`            | 3       | keypress cooldown (ms)                     |
+| `MAX_FILES`              | 10      | file slots in the SD file list             |
+| `FORMAT_SPIFFS_IF_FAILED`| `true`  | format SPIFFS on mount failure             |
+| `SLEEPMODE`              | `"TEXT"`| sleep screen: TEXT, SPLASH, or CLOCK        |
+| `TXT_APP_STYLE`          | 1       | TXT renderer: 1 = current, 0 = unsupported |
+| `SET_CLOCK_ON_UPLOAD`    | `false` | set the clock from compile time on upload  |
+| `TOUCH_TIMEOUT_MS`       | 1200    | ms before scrolling returns to typing      |
+| `SYS_METADATA_FILE`      | `"/sys/SDMMC_META.txt"` | filesystem metadata path |
+| `POWER_SAVE_FREQ`        | 40      | CPU MHz when power saving                  |
+| `IDLE_TIME`              | 20000   | ms of idle before sleep                    |
+| `FAST_REFRESH_AFTER`     | 5       | fast partial refreshes before a clean      |
+| `FULL_REFRESH_AFTER`     | 5 or 10 | full refresh cadence (5 beta, 10 prod)     |
+
+`FULL_REFRESH_AFTER` is hardware-dependent: production (`POCKETMAGE_HW_VERSION == 2`) uses 10, beta uses 5.
+
+## Pin map
+
+| Group        | Constants   | Notes                                    |
+| ------------ | ----------- | ---------------------------------------- |
+| I2C          | `I2C_SDA=36`, `I2C_SCL=35` | primary bus: OLED, clock              |
+| Switched I2C | `SWITCHED_I2C_SDA=42`, `SWITCHED_I2C_SCL=48` | production only: touch, expansion |
+| USB mux      | `USB_MUX_PIN=7` |                                           |
+| Keyboard     | `KB_IRQ=8`  | wake source, falling edge                 |
+| Power        | `PWR_BTN=0`, `BAT_SENS=4`, `CHRG_SENS=39`, `LOAD_SWITCH=38` |  |
+| RTC          | `RTC_INT=1` |                                            |
+| OLED         | `OLED_CS=47`, `OLED_DC=46`, `OLED_RST=45` | SPI                          |
+| E-Ink        | `EPD_CS=2`, `EPD_DC=21`, `EPD_RST=9`, `EPD_BUSY=37` | SPI                |
+| SDMMC        | `SD_CLK=12`, `SD_CMD=11`, `SD_D0..D3=13,5,6,10` | 4-bit bus          |
+| SDSPI        | `SD_CS=10`, `SD_MOSI=11`, `SD_SCK=12`, `SD_MISO=13` | fallback mode   |
+| SPI shared   | `SPI_MOSI=14`, `SPI_SCK=15` | the SPI object both display drivers use |
+| Buzzer       | `BZ_PIN=17` | PWM output                                 |
+
+The SPI pins overlap the SDMMC pins (`SD_CLK` is also `SPI_SCK`). The two SD modes share the same physical pins by design; see [sd](sd.md) for the mode switch. `PocketMage_INIT` uses a single global `SPI` instance wired to `SPI_SCK`/`SPI_MOSI` precisely so display and SDSPI do not fight over GPIO12.
+
+## Persistent preferences
+
+`config.h` declares the runtime settings stored in NVS under the `"PocketMage"` namespace. The SDK owns their defaults; apps read and write them with `prefs` (also in [globals](sys.md)):
+
+```c
+extern int TIMEOUT;          // auto sleep timeout, seconds
+extern bool DEBUG_VERBOSE;   // extra debug output
+extern bool SYSTEM_CLOCK;    // show clock on the OLED status line
+extern bool SHOW_YEAR;       // show year in clock
+extern bool SAVE_POWER;      // CPU frequency power saving
+extern bool ALLOW_NO_MICROSD;
+extern bool HOME_ON_BOOT;
+extern bool FAST_REFRESH;    // experimental fast partial refresh
+extern int OLED_BRIGHTNESS;  // 0..255
+extern int OLED_MAX_FPS;
+extern bool MUTE_BUZZER;
+extern bool SD_SPI_COMPATIBILITY;
+```
+
+`pocketmage::loadSettings()` (see [sys](sys.md)) loads them from NVS with these defaults. Changing a value writes it back through `prefs.begin(...)` in the `"PocketMage"` namespace.
+
+## App version stamping
+
+Apps built with `tools/app.mk` get `PM_SDK_VERSION` plus `PM_SDK_VERSION_MAJOR/MINOR/PATCH` on the command line from the repo `VERSION` file. `pocketmage_app_version.h` exposes them as macros:
+
+```c
+POCKETMAGE_SDK_VERSION_STRING   // "0.1.0"
+POCKETMAGE_SDK_VERSION_MAJOR
+POCKETMAGE_SDK_VERSION_MINOR
+POCKETMAGE_SDK_VERSION_PATCH
+```
+
+The host exports the same version as the `pocketmage_sdk_version` string symbol, so an app can compare its build-time SDK with the running OS at load time (see [app-abi](../app-abi.md) and version_app in
+
+
+---
+
+## [E-Ink (pocketmage_eink)](https://talismandesign.github.io/PocketMage_SDK/docs/api/eink/)
+
+---
+title: "E-Ink (pocketmage_eink)"
+description: "The 320x240 GDEQ031T10 panel: PocketmageEink, the background refresh task, and refresh policy."
+---
+
+# E-Ink API
+
+The 320x240 GDEQ031T10 e-ink panel is the full-page working display. Text rendering goes through `FontEngine` via the `u8g2f` bridge; `PocketmageEink` owns the panel driver, the refresh policy (fast partial vs slow full), the status bar, and a background refresh task.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+
+PocketmageEink& eink = EINK();       // singleton
+DisplayT& einkDisplay = display;     // GxEPD2 BW driver
+U8G2_FOR_ADAFRUIT_GFX &tf = u8g2f;   // text bridge for the panel
+```
+
+`EINK()` returns the single instance. `setupEink()` runs in `PocketMage_INIT()`: it initializes the panel at 16 MHz SPI, sets rotation 3, starts `einkHandlerTask` on core 0 (10 KB stack, priority 1), and registers the `u8g2f` bridge with black on white defaults.
+
+## Refresh policy
+
+All panel drawing goes through `refresh()`, which owns the update rhythm:
+
+- **`FAST_REFRESH` off (production default).** Every `refresh()` is a full update with `display()`; a fast waveform is used for normal redraws and a slow ~3s waveform for the periodic clean, tracked by `FULL_REFRESH_AFTER`. The panel is hibernated afterwards.
+- **`FAST_REFRESH` on (beta default).** Differential partial updates (~0.65s) with a full update at boot, after wake, and every `FAST_REFRESH_AFTER` partials; a slow clean removes accumulated ghosting. `forceSlowFullUpdate(true)` forces the next refresh to take the slow full path regardless of counters.
+
+`markPanelNeedsFullRefresh()` forces a real full update on the next refresh; the OS calls it at wake so the panel resyncs with GxEPD2's previous-image RAM.
+
+## Class reference
+
+### `PocketmageEink`
+
+```cpp
+class PocketmageEink {
+public:
+  void setLineSpacing(uint8_t lineSpacing);
+  void setFullRefreshAfter(uint8_t fullRefreshAfter);
+  void refresh();
+  void setFastFullRefresh(bool setting);
+  void statusBar(const String& input, bool fullWindow = false);
+  void drawStatusBar(const String& input);
+  void resetDisplay(bool clearScreen = true, uint16_t color = GxEPD_WHITE);
+  int  countLines(const String& input, size_t maxLineLength = 29);
+  uint8_t getFontHeight();
+  int maxLines();
+  uint16_t getEinkTextWidth(const String& s);
+  uint8_t getLineSpacing();
+  DisplayT& getDisplay();
+  void forceSlowFullUpdate(bool force);
+  void markPanelNeedsFullRefresh();
+  void lockPanel();
+  void unlockPanel();
+};
+```
+
+#### `refresh`
+
+Renders the current buffer per the refresh policy above. It takes the panel mutex for the whole redraw; another task already holding the panel blocks until it finishes. Clears the framebuffer and powers the panel off (or hibernates in the legacy path) afterwards, so the next screen build starts from white.
+
+#### `statusBar` / `drawStatusBar`
+
+Draws the 26px status band: a bounded 20px box with the text in the white region above it, a battery box on the right (30px), and the input text fitted with `kLabelCascade` + ellipsis. `drawStatusBar` does the band; `statusBar(true)` forces a partial-window draw first so only the band area refreshes when the caller relies on `display()` afterward.
+
+#### `resetDisplay`
+
+Sets rotation 3 and the full window, optionally filling `color`. Call before rebuilding a screen when the prior frame is unknown.
+
+#### Layout helpers
+
+- `countLines(input, maxLineLength)` counts rendered lines for an unwrapped string (wraps at `\n` and at `maxLineLength`).
+- `maxLines()` returns how many body lines fit the content region.
+- `getFontHeight()` and `getEinkTextWidth()` measure with `FontStyle::Body` (see [font](font.md)).
+
+#### `lockPanel` / `unlockPanel`
+
+The recursive mutex. `refresh()` takes it itself; hold it when a task draws into the framebuffer directly, so a background refresh cannot swap buffers mid-draw. See [threading](index.md#reading-a-component-page).
+
+## The background task
+
+```cpp
+void einkHandler(void *parameter);
+```
+
+Created by `setupEink()` on core 0: after a 250 ms settle it calls the app hook `einkHandler_APP()` (app builds) or `applicationEinkHandler()` (host builds, see [`pocketmage_globals.h`](https://github.com/TalismanDesign/PocketMage_SDK/blob/main/pocketmage_globals.h)) every 50 ms, then yields. The hook is where an app does its periodic redraws. On deep sleep the task is deleted under the panel lock so an in-flight refresh completes first.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+extern "C" int main(int, char**) {
+  FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
+  FontEngine::drawText(DisplayTarget::EINK, 8, 120, "hello eink",
+                       FontStyle::Heading1);
+  EINK().statusBar("pocketmage");
+  EINK().refresh();
+  return 0;
+}
+```
+
+The buffer is the GLCD framebuffer of `display`; fill it with
+
+
+---
+
+## [Fonts & Text (pocketmage_font)](https://talismandesign.github.io/PocketMage_SDK/docs/api/font/)
+
+---
+title: "Fonts & Text (pocketmage_font)"
+description: "FontStyle roles, DisplayTarget, the FontEngine static API, and the default font table."
+---
+
+# Font API
+
+`FontEngine` is the single text path for both displays. Apps pick a logical `FontStyle` (a role, not a font file) and a `DisplayTarget` (OLED or E-Ink); the engine resolves the concrete u8g2 font, measures widths, caches metrics, and sets draw colors per target.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+```
+
+`FontEngine` is a static-only class; there is no instance. The default table is `kDefaultFontTable`. `FontEngine::init()` runs inside `PocketMage_INIT()` and must precede any draw or measure call.
+
+## Roles and targets
+
+```cpp
+enum class FontStyle : uint8_t {
+  Tiny, Body, BodyBold, BodyItalic, BodyBoldItalic, Medium, Small,
+  BodyNarrow, Mono, MonoBold, MonoItalic, MonoBoldItalic,
+  Sans, SansBold, SansItalic, SansBoldItalic,
+  Caption, Heading3, Heading2, Heading1, Large, OledWord,
+  Terminal, TerminalBig, ClockDigit,
+  _StyleCount   // sentinel, must be last
+};
+
+enum class DisplayTarget : uint8_t {
+  OLED,   // u8g2 SSD1326
+  EINK,   // u8g2f bridge on the GxEPD2 buffer
+};
+```
+
+Each role maps to a differ fonte per target. The comment on each member in the header names the concrete font (for example `Body` is `ncenR10_tf`, `Heading1` is `ncenB24_tf`). `Tiny` is `u8g2_font_5x7_tf`, the size used for the OLED status line.
+
+## Structs
+
+### `FontEntry`
+
+```cpp
+struct FontEntry {
+  const uint8_t* oled;   // u8g2 font for the OLED
+  const uint8_t* eink;   // u8g2 font for the E-Ink
+  uint8_t        height; // full cell height in pixels
+};
+```
+
+### `FontTable`
+
+A complete per-language/region table: one `FontEntry` per role plus the TXT markdown-editor matrix `txt[3][4][4]` indexed by family x size x variant. Applied with `FontEngine::init(&table)`; `nullptr` re-applies the built-in default.
+
+The TXT matrix indices are named constants:
+
+```cpp
+enum : uint8_t {
+  TxtFamilySerif = 0, TxtFamilySans = 1, TxtFamilyMono = 2,
+  TxtSizeBody    = 0, TxtSizeH3    = 1, TxtSizeH2 = 2, TxtSizeH1 = 3,
+  TxtVariantN    = 0, TxtVariantB  = 1, TxtVariantI = 2, TxtVariantBI = 3,
+};
+```
+
+Heading regular variants alias to their bold font; headings are always bold. `kDefaultFontTable` is the English/global table.
+
+## `FontEngine` reference
+
+```cpp
+class FontEngine {
+public:
+  static void init(const FontTable* table = nullptr);
+
+  static void drawText(DisplayTarget target, int x, int y,
+                       const char* text, FontStyle style);
+  static void drawText(DisplayTarget target, int x, int y,
+                       const String& text, FontStyle style);
+  static void drawGlyph(DisplayTarget target, int x, int y,
+                        uint16_t unicode, FontStyle style);
+
+  static int textWidth(DisplayTarget target, const char* text, FontStyle style);
+  static int textWidth(DisplayTarget target, const String& text, FontStyle style);
+  static FontStyle fitStyle(DisplayTarget target, const char* text, int maxWidth,
+                            const FontStyle* cascade, int count);
+  static int charWidth(DisplayTarget target, uint16_t unicode, FontStyle style);
+  static int fontHeight(DisplayTarget target, FontStyle style);
+  static int fontAscent(DisplayTarget target, FontStyle style);
+  static int fontDescent(DisplayTarget target, FontStyle style);
+  static void setTextColor(DisplayTarget target, uint16_t color);
+
+  static void drawTextTxt(DisplayTarget target, int x, int y, const char* text,
+                          uint8_t family, uint8_t sizeIdx, uint8_t variant);
+  static void drawGlyphTxt(DisplayTarget target, int x, int y, uint16_t unicode,
+                           uint8_t family, uint8_t sizeIdx, uint8_t variant);
+  static int textWidthTxt(DisplayTarget target, const char* text,
+                          uint8_t family, uint8_t sizeIdx, uint8_t variant);
+  static int charWidthTxt(DisplayTarget target, uint16_t unicode,
+                          uint8_t family, uint8_t sizeIdx, uint8_t variant);
+  static int fontHeightTxt(uint8_t family, uint8_t sizeIdx, uint8_t variant);
+};
+```
+
+### Drawing
+
+- `drawText` / `drawGlyph` render UTF-8 text or a single codepoint at `(x, y)`; `y` is the baseline, not the top (U8g2 convention).
+- Out-of-range `family`/`sizeIdx`/`variant` in the `Txt` variants clamp to the body entry rather than fault.
+
+### Measuring
+
+- `textWidth` measures without changing the currently applied font, so layout code can interleave measure/draw freely.
+- `charWidth` uses a per-style cache for codepoints 32 through 255 on the OLED target; other codepoints and the E-Ink target are measured live.
+- `fontHeight` / `fontAscent` / `fontDescent` are measured lazily on first per (target, style) call and cached; layout code never switches fonts merely to measure.
+
+### `fitStyle`
+
+The width-aware selection used by the HOME/APPLOADER grid to keep localized app names inside the 60px cell pitch: picks the largest cascade entry (ordered largest first) whose `textWidth` fits `maxWidth`, or the smallest when none fit. Typical cascade: `kLabelCascade` (`Body`, `BodyNarrow`, `Small`).
+
+### `setTextColor`
+
+Value semantics match u8g2 draw color: 0 = black, 1 = white. Only the requested target's color is touched, so an E-Ink status-bar draw never changes the OLED draw color and vice versa. Set the E-Ink color before the first draw of a screen; the bridge defaults are black-on-white from `setupEink()`.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void drawTitle() {
+  FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
+  FontEngine::drawText(DisplayTarget::EINK, 8, 60, "PocketMage",
+                       FontStyle::Heading1);
+
+  int w = FontEngine::textWidth(DisplayTarget::OLED, "Files", FontStyle::Body);
+  // center on the OLED
+  FontEngine::drawText(DisplayTarget::OLED,
+                       (kOledWidth - w) / 2, kOledWordBaseline,
+                       "Files", FontStyle::Body);
+}
+```
+
+Remember `y` is the baseline. `kOledWordBaseline` (16) and the
+
+
+---
+
+## [Frames (frames.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/frames/)
+
+---
+title: "Frames (frames.h)"
+description: "The Frame data model and the e-ink text/bitmap rendering engine."
+---
+
+# Frames API
+
+The frames module is the E-Ink text engine used by the OS's built-in apps. A `Frame` describes a screen region and its content (text or bitmap); `einkFramesDynamic` renders the frame stack with a scrollbar, cursor, and current-selection highlight.
+
+## Content window model
+
+```cpp
+struct LineView {
+  const char* ptr;   // NUL-terminated string in RAM or PROGMEM
+  uint16_t    len;   // byte length (without the '\0')
+  uint8_t     flags; // LineFlags
+};
+
+struct TextSource {               // read-only interface for any line list
+  virtual ~TextSource() {}
+  virtual size_t   size() const = 0;
+  virtual LineView line(size_t i) const = 0;
+};
+```
+
+`LineFlags` is `LF_NONE`, `LF_RIGHT`, `LF_CENTER`.
+
+Two concrete sources:
+
+```cpp
+template<size_t MAX_LINES, size_t BUF_BYTES>
+struct FixedArenaSource : TextSource {
+  char buf[BUF_BYTES];
+  uint16_t off[MAX_LINES];
+  size_t nLines = 0, used = 0;
+  void clear();
+  bool pushLine(const char* s, uint16_t len, uint8_t flags = LF_NONE);
+};
+
+struct ProgmemTableSource : TextSource {
+  const char* const* table;  // PROGMEM array of PROGMEM strings
+  size_t count;
+};
+```
+
+- `FixedArenaSource` owns its storage and copies pushed lines in; `pushLine` returns false when full (`MAX_LINES` or `BUF_BYTES`), so the caller can drop the oldest line.
+- `ProgmemTableSource` wraps a PROGMEM table with no copy; lines are read character lengths with `strlen_P`.
+
+The SDK declares the shared default sources:
+
+```cpp
+extern FixedArenaSource<512, 16384> frameLines;  // the live app window
+extern ProgmemTableSource helpSrc;
+extern const char* const HELP_LINES[] PROGMEM;   // plus HELP_COUNT and the
+extern const size_t HELP_COUNT;                  // unit-conversion tables
+```
+
+The unit-conversion screen tables (length, area, volume, mass, temperature, energy, speed, pressure, data, angle, time, power, force, frequency) follow the `UNIT_TYPES_LINES`/`CONV_*_LINES` naming pattern, each with its `_COUNT`.
+
+## The `Frame` layout
+
+```cpp
+class Frame {
+public:
+  enum class Kind : uint8_t { none, text, bitmap };
+  int left, right, top, bottom;              // current geometry
+  int origLeft, origRight, origTop, origBottom;
+  int extendLeft, extendRight, extendTop, extendBottom;
+  int bitmapW = 0, bitmapH = 0;
+  bool cursor = false, box = false, invert = false, overlap = false;
+  int choice = -1;                           // selected row index
+  long scroll = 0, prevScroll = -1, lastTotal = -1;
+  int maxLines = 0;
+  Kind kind = Kind::none;
+  const TextSource* source = nullptr;        // text frames
+  const uint8_t* bitmap = nullptr;           // bitmap frames
+  const uint8_t* font = nullptr;
+  ...
+  bool hasText()   const;
+  bool hasBitmap() const;
+};
+```
+
+Constructors: a plain region `Frame(l, r, t, b, cursor, box)`, a text frame `Frame(l, r, t, b, &source, cursor, box)`, and a bitmap frame `Frame(l, r, t, b, bitmapPtr, width, height, cursor, box)`.
+
+Global frame state:
+
+```cpp
+extern Frame testBitmapScreen, testBitmapScreen1, testBitmapScreen2;
+extern Frame testTextScreen;
+extern Frame* CurrentFrameState;
+extern int currentFrameChoice;
+extern int frameSelection;
+extern std::vector<Frame*> frames;
+```
+
+## Render and helpers
+
+```cpp
+void einkFramesDynamic(std::vector<Frame*>& frames, bool doFull_);
+```
+
+Renders every frame in the stack over the E-Ink buffer: readable-text padding (`kFrameTextPadX`, `kFrameCursorPad`), scrollbar from `updateScroll`, the current-selection highlight at `frame.choice`, and the cursor. The caller picks the screen refresh mode; the frame engine itself only fills the buffer.
+
+```cpp
+std::vector<String> formatText(Frame& frame, int maxTextWidth);
+void drawLineInFrame(String& srcLine, int lineIndex, Frame& frame,
+                     int usableY, bool clearLine);
+void drawFrameBox(int usableX, int usableY, int usableWidth,
+                  int usableHeight, bool invert);
+int  computeCursorX(Frame& frame, bool rightAlign, bool centerAlign,
+                    int16_t x1, uint16_t lineWidth);
+std::vector<String> sourceToVector(const TextSource* src);
+String frameChoiceString(const Frame& f);
+void updateScroll(Frame* currentFrameState, int prevScroll,
+                  int currentScroll, bool reset = false);
+void updateScrollFromTouch_Frame();
+void oledScrollFrame();
+void getVisibleRange(Frame* f, long totalLines, long& startLine,
+                     long& endLine);
+```
+
+`getVisibleRange` computes the slice of `totalLines` visible inside the frame given its scroll position, which is what callers iterate to draw windowed content.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void runList() {
+  frameLines.clear();
+  frameLines.pushLine("line one");
+  frameLines.pushLine("line two");
+  Frame f(8, 312, 26, kEinkContentH, &frameLines, /*cursor=*/true,
+          /*box=*/true);
+  f.choice = 0;
+  std::vector<Frame*> stack = {&f};
+  einkFramesDynamic(stack, /*doFull=*/false);
+  EINK().refresh();
+}
+
+
+---
+
+## [Internationalization (i18n)](https://talismandesign.github.io/PocketMage_SDK/docs/api/i18n-runtime/)
+
+---
+title: "Internationalization (i18n)"
+description: "Lang/StringID tables, the TR() lookup, runtime language switching, and command aliases."
+---
+
+# Internationalization API
+
+The i18n module turns every user-visible string into a `StringID`, and a per-language table supplies the active-language text. Apps get translated strings with `TR(STR_X)` and can switch the active language at runtime.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+```
+
+`I18n` is a static-only class; there is no instance. The `Lang` and `StringID` enums are **generated** from the catalogs in `pocketmage_i18n/` into `pocketmage_i18n_gen.h` (that header drives the tables, not the other way round). `StringID` ids look like `STR_INVALID`, `STR_TODAY`, `STR_SETTINGS`; `Lang` has one member per shipped language.
+
+## Lookup
+
+```cpp
+static const char* get(StringID id);
+#define TR(id) I18n::get(id)
+```
+
+`TR(STR_X)` returns the active language's text for the id, pointing into the table storage (do not free it). The canonical reference strings live in the English table.
+
+Indexed blocks make whole tables selectable:
+
+```cpp
+static const char* monthName(int month);    // 1..12, else the ERR entry
+static const char* dayName(int idx);        // 0..6, Sunday-first
+static const char* appName(int idx);        // home grid label, 0..10
+static const char* kbAppName(int idx);      // app-switcher badge, 0..11
+```
+
+## Language switching
+
+```cpp
+static void setLanguage(Lang lang);
+static bool setLanguageByCode(const char* code);
+static Lang language();
+static int  languageCount();
+static const char* code();              // active two-letter code ("en")
+static const char* code(int idx);
+static const char* nativeName();        // active native name ("Français")
+static const char* nativeName(int idx);
+```
+
+- `setLanguage` switches the active table; out-of-range values clamp to English.
+- `setLanguageByCode("fr")` switches by two-letter code and returns false (leaving the current language untouched) for an unknown code.
+- `languageCount()` is the number of shipped languages for building a language picker; `code(idx)`/`nativeName(idx)` back its rows in catalog order.
+
+The OS persists the choice to NVS ([configuration](configuration.md)); on setup the app applies it, and the font table is re-applied because displayed text may now use different accents ([font](font.md)).
+
+## Command aliases
+
+```cpp
+static String normalizeCommand(const String& raw);
+```
+
+The command parser's front door. It:
+
+1. Folds the input (UTF-8 diacritics to ASCII, lowercased). Curly quotes, dashes, and truncated sequences are dropped.
+2. Resolves the first word (or the whole line for multi-word aliases such as the easter eggs) against the alias catalog to the canonical English verb.
+3. Preserves any argument text (filenames, etc.) byte-for-byte.
+
+So both `"réglages"` and `"reglages"` resolve to settings, while file arguments keep their exact bytes. Unmatched input returns unchanged.
+
+## Adding a language
+
+The string tables are generated (see `pocketmage_i18n/README`): add a `.po` catalog and re-run the generator, and the `Lang` enum, `StringID`-ordered table, and string block for `appName`/`kbAppName`/months/days all follow. Fallback rules: a missing id in a non-English table falls back to the
+
+
+---
+
+## [API Reference](https://talismandesign.github.io/PocketMage_SDK/docs/api/)
+
+---
+title: "API Reference"
+description: "Every component an app links against: the umbrella header, the singleton accessors, and the per-component pages."
+---
+
+# API Reference
+
+The SDK exposes the PocketMage hardware and OS services to loaded apps through a set of component objects plus free functions. Every component is declared in `pocketmage.h`, the umbrella header an app includes first:
+
+```cpp
+#include <pocketmage.h>
+```
+
+`pocketmage.h` pulls in every component header, `config.h`, the `frames` and `assets` modules, and `Preferences.h`. It also includes `pocketmage_app_version.h` when the build defines `PM_TARGET_APP`, so the SDK-version macros are always available to apps.
+
+## Compile target
+
+`config.h` requires exactly one of these to be defined, and fails the build otherwise:
+
+| Macro           | Meaning                                                       |
+| --------------- | ------------------------------------------------------------- |
+| `PM_TARGET_HOST` | the PocketMageOS firmware links the SDK in-process            |
+| `PM_TARGET_APP`  | an external app compiled to a loadable `.app.elf`            |
+
+The two are mutually exclusive; defining both is a build error. Apps declare `PM_TARGET_APP` (see [Building an app](../build.md)).
+
+## The singleton pattern
+
+Most components are owned by a single global instance created inside the SDK and reached through a global accessor function. The accessor returns a reference; null checks are unnecessary once the component's `setup*()` call has run in `PocketMage_INIT()`.
+
+| Component   | Accessor    | Hardware / role                                  | API page            |
+| ----------- | ----------- | ------------------------------------------------ | ------------------- |
+| OLED        | `OLED()`    | 256x32 SSD1326 OLED, status line                  | [oled](oled.md)     |
+| E-Ink       | `EINK()`    | 320x240 GDEQ031T10 panel, full-page rendering     | [eink](eink.md)     |
+| Font        | `FontEngine` | unified text on both displays                     | [font](font.md)     |
+| Layout      | (free)      | display geometry constants, text fit helpers      | [layout](layout.md) |
+| UI helpers  | (free)      | status bars, list rows, chips                     | [ui](ui.md)         |
+| SD card     | `PM_SDAUTO()` | files, metadata, dos/flash filesystem             | [sd](sd.md)         |
+| Keyboard    | `KB()`      | TCA8418 matrix + USB HID                           | [kb](kb.md)         |
+| Touch       | `TOUCH()`   | MPR121 slider, scroll gestures                     | [touch](touch.md)   |
+| Buzzer      | `BZ()`      | PWM buzzer, jingles                               | [bz](bz.md)         |
+| Clock       | `CLOCK()`   | PCF8563 RTC, timeout bookkeeping                   | [clock](clock.md)   |
+| WiFi        | `P_WIFI`    | station radio service (apps may call)              | [wifi](wifi.md)     |
+| System      | (free)      | init, CPU speed, deep sleep                        | [sys](sys.md)       |
+| I18n        | `I18n`      | language tables, command normalization             | [i18n-runtime](i18n-runtime.md) |
+| Text utils  | (free)      | string split/join/parse helpers                    | [io](io.md)         |
+| Frames      | `Frame`     | e-ink text/bitmap frame model, scrolling           | [frames](frames.md) |
+| Assets      | (free)      | PROGMEM bitmaps: battery, sleep, screensavers      | [assets](assets.md) |
+| Config      | (free)      | pins, counters, prefs, SDK version stamping        | [configuration](configuration.md) |
+
+The `frames` component is used by the OS's built-in apps. Third-party apps start from the simpler primitives in [oled](oled.md), [eink](eink.md), [font](font.md), and [layout](layout.md).
+
+## Reading a component page
+
+Every API page follows the same shape:
+
+- **Access**: how the object is reached and what to include.
+- **Lifecycle**: the `setup*()` call in `PocketMage_INIT()` that must run first, and how the component behaves across deep sleep and app load.
+- **Reference**: one section per class or function. Signatures are verbatim from the headers; notes state runtime behavior, threading constraints, and return values.
+- **Example**: a minimal snippet, usually drawing to one of the two displays.
+
+Threading notes matter: the E-Ink panel is guarded by a recursive mutex and refreshed from a background task; code running in other tasks must take the
+
+
+---
+
+## [Text utilities (pocketmage_io)](https://talismandesign.github.io/PocketMage_SDK/docs/api/io/)
+
+---
+title: "Text utilities (pocketmage_io)"
+description: "Small string helpers apps use for command parsing and data marshaling."
+---
+
+# Text utilities API
+
+`pocketmage_io` is a set of small string helpers for parsing and formatting. They operate on `Arduino String` and `std::vector<String>`.
+
+## Reference
+
+```cpp
+std::vector<String> splitString(const String& str, char delimiter);
+String joinString(const std::vector<String>& parts, char delimiter);
+String removeChar(String str, char character);
+int stringToInt(const String& str, int defaultVal = -1);
+```
+
+- **`splitString`** splits on `delimiter`, keeping empty tokens: `"a||b"` with `'|'` becomes `{"a", "", "b"}`. Use it for command or CSV-style input where empty fields matter.
+- **`joinString`** is the inverse: joins `parts` with `delimiter` between pairs.
+- **`removeChar`** strips every occurrence of `character` and returns the new string (a copy; the argument is taken by value).
+- **`stringToInt`** parses a decimal integer and returns `defaultVal` when the string is empty, contains non-digits, or fails to parse. This is the safe integer reader for user input (never `atoi` on untrusted text).
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+int parseDuration(String raw) {
+  // "play 15" -> 15, anything else -> -1
+  std::vector<String> parts = splitString(raw, ' ');
+  if (parts.size() != 2) return -1;
+  return stringToInt(parts[1], -1);
+}
+
+
+---
+
+## [Keyboard (pocketmage_kb)](https://talismandesign.github.io/PocketMage_SDK/docs/api/kb/)
+
+---
+title: "Keyboard (pocketmage_kb)"
+description: "The TCA8418 matrix keyboard and USB HID stack: modifiers, key events, and scanning."
+---
+
+# Keyboard API
+
+`PocketmageKB` wraps the TCA8418 key matrix plus the USB HID stack and turns button presses into characters, honoring the modifier state machine (NORMAL, SHIFT, FUNC, FN_SHIFT) and a cooldown filter.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+
+PocketmageKB& kb = KB();
+Adafruit_TCA8418& pad = keypad;   // raw driver
+```
+
+`KB()` is the single instance. `setupKB(KB_IRQ)` runs in `PocketMage_INIT()` and wires `KB_IRQ` as the wake source. The OS stays responsive through the shared `PWR_BTN_event`/keypad interrupt flow; an app polls `updateKeypress()` from its main loop.
+
+## Modifier state
+
+```cpp
+enum KBState { NORMAL, SHIFT, FUNC, FN_SHIFT };   // pocketmage_globals.h
+
+void setKeyboardState(int kbState);
+int  getKeyboardState() const;
+void toggleShift();
+void toggleFn();
+```
+
+`toggleShift` / `toggleFn` flip the modifier bits (FUNC toggles the Fn layer, and Shift within it). `getKeyboardState()` drives the OLED modifier badge in the status line. Layers compose: FN+Shift selects the `FN_SHIFT` layer for the secondary symbols.
+
+## Key events
+
+```cpp
+char updateKeypress();
+bool acceptKey();
+void checkUSBKB();
+```
+
+- `updateKeypress()` returns the next character from either the USB HID FIFO (checked first) or the TCA8418 event FIFO, draining one key per call. It never blocks. The TCA8418 overflow register is cleared after each read so keys are not lost on a burst; the hardware FIFO is drained until empty before the `TCA8418_event_` flag clears.
+- `acceptKey()` gating: returns true only if at least `KB_COOLDOWN` ms passed since the last accepted press. Use it before handling a key that must not auto-repeat.
+- `checkUSBKB()` services the USB HID connection (call periodically).
+
+The interrupt flag is exposed as a member (`TCA8418_event_`) and set by `setTCA8418Event()`; apps typically rely on the FIFO-drain behavior of `updateKeypress()` instead of the flag.
+
+## Interrupt control
+
+```cpp
+void disableInterrupts();
+void enableInterrupts();
+void flush();
+```
+
+`disableInterrupts`/`enableInterrupts` gate the driver interrupts around long I/O; `flush()` drops any queued events (used at boot to clear stale presses, and after sleep).
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void pumpKeys() {
+  char c = KB().updateKeypress();
+  if (c == '\0') return;
+  if (!KB().acceptKey()) return;
+  // handle the character
+}
+
+
+---
+
+## [Layout (pocketmage_layout)](https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/)
+
+---
+title: "Layout (pocketmage_layout)"
+description: "Canonical display geometry, the row-pitch helper, and the text-fit free functions."
+---
+
+# Layout API
+
+The layout module centralizes display geometry and the text-fitting helpers used by the OS and the display primitives. It commits to one hardware pair: a 256x32 SSD1326 OLED and a 320x240 GDEQ031T10 e-ink panel.
+
+## Geometry constants
+
+```cpp
+constexpr int kOledWidth  = 256;
+constexpr int kOledHeight = 32;
+constexpr int kEinkWidth  = 320;
+constexpr int kEinkHeight = 240;
+
+constexpr int kEinkStatusH  = 26;                 // bottom status band
+constexpr int kEinkContentH = kEinkHeight - kEinkStatusH;  // 214
+```
+
+The e-ink content region is `kEinkHeight - kEinkStatusH` tall; the status band is owned by `EINK().drawStatusBar()`.
+
+## Text frames
+
+```cpp
+constexpr int kFrameTextPadX  = 4;   // left text pad inside an e-ink frame
+constexpr int kFrameCursorPad = 16;  // right/center clearance for the cursor
+```
+
+## OLED baselines and the info line
+
+```cpp
+constexpr int kOledWordBaseline      = 16;  // oledWord/sysMessage center
+constexpr int kOledWordLargeBaseline = 21;  // oledWord allowLarge heading
+constexpr int kOledEditBaseline      = 20;  // oledLine input/cursor
+constexpr int kOledEditRightPad      = 8;
+constexpr int kOledEditCursorX       = 0;
+constexpr int kOledEditCursorY       = 1;
+constexpr int kOledEditCursorH       = 22;
+constexpr int kOledInfoBaseline      = kOledHeight;       // status line
+constexpr int kOledInfoBatteryW      = 10;
+constexpr int kOledInfoBatteryH      = 6;
+constexpr int kOledInfoBatteryY      = kOledHeight - kOledInfoBatteryH;
+constexpr int kOledInfoGap           = 6;
+constexpr int kOledInfoFirstX        = kOledInfoBatteryW + kOledInfoGap;
+```
+
+Progress bar and sysMessage overlay geometry:
+
+```cpp
+constexpr int kOledProgressMaxW  = kEinkWidth - 5;  // reference width
+constexpr float kOledProgressFullFrac = 0.8f;       // "full" arrow threshold
+constexpr int kOledSysMsgPadX   = 8;
+constexpr int kOledSysMsgFrameH = kOledHeight + 16;
+constexpr int kOledSysMsgRadius = 10;
+constexpr int kOledSysMsgRaise  = 5;
+```
+
+## Scroll preview
+
+```cpp
+constexpr int kOledScrollPreviewW = 128;   // preview strip width
+constexpr int kOledScrollRowPitch = 4;     // bar vertical pitch
+constexpr int kOledScrollBarH     = 2;
+constexpr int kOledScrollBaseY    = 28;
+constexpr int kOledScrollNormX    = 61;
+constexpr int kOledScrollTabX     = 68;
+constexpr int kOledScrollNormMaxW = 56;
+constexpr int kOledScrollTabMaxW  = 49;
+constexpr int kOledScrollTextX    = 140;
+constexpr int kOledScrollLabelY   = 12;
+constexpr int kOledScrollValueY   = 24;
+```
+
+## Icon grid and label cascade
+
+```cpp
+constexpr int kIconCellSize = 40;   // app icon cell
+constexpr int kIconNameGap  = 13;   // icon-to-name baseline gap
+constexpr int kGridLabelMaxW = 60;  // max label width = cell pitch
+
+static constexpr FontStyle kLabelCascade[] = {
+  FontStyle::Body, FontStyle::BodyNarrow, FontStyle::Small,
+};
+```
+
+`kLabelCascade` is the standard fit cascade (all serif: `ncenR10`, `timR10`, `ncenR08`) used by the HOME/APPLOADER grid and the SETTINGS list. `einkRowPitch()` converts a style to a canonical row height:
+
+```cpp
+inline int einkRowPitch(FontStyle s) {
+  return FontEngine::fontHeight(DisplayTarget::EINK, s) + EINK().getLineSpacing();
+}
+```
+
+## Free functions
+
+### `sliceThatFits`
+
+```cpp
+size_t sliceThatFits(const char* s, size_t n, int maxTextWidth, FontStyle style);
+```
+
+Returns the byte length of the longest prefix of `s[0..n)` that fits in `maxTextWidth` at `style`, word-aware: a trailing space boundary is preferred, so a caller can slice line by line without mid-word cuts. Stops at a newline (returns the fit before it, or 1 for a bare newline). Returns 0 when nothing fits.
+
+### `truncateWithEllipsis`
+
+```cpp
+String truncateWithEllipsis(const String& text, int maxWidthPx, FontStyle style,
+                            DisplayTarget target = DisplayTarget::EINK);
+```
+
+Truncates `text` to `maxWidthPx` and appends `"..."` (binary-search cut, so it is fast even on long strings). The cut lands on a UTF-8 character boundary: continuation bytes are backed off until the prefix ends cleanly. Returns `text` unchanged when it already fits.
+
+### `wordWrap`
+
+```cpp
+std::vector<String> wordWrap(const String& text, int maxWidthPx, FontStyle style);
+```
+
+Wraps to whole words, one string per line, using `sliceThatFits`. Lines are trimmed; an overlong word pushes as a single (n) line.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void drawBudget(std::vector<String>& lines) {
+  int y = einkRowPitch(FontStyle::Body);
+  for (const String& line : lines) {
+    FontEngine::drawText(DisplayTarget::EINK, kFrameTextPadX, y, line,
+                         FontStyle::Body);
+    y += einkRowPitch(FontStyle::Body);
+    if (y > kEinkContentH) break;
+  }
+}
+
+
+---
+
+## [OLED (pocketmage_oled)](https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/)
+
+---
+title: "OLED (pocketmage_oled)"
+description: "The 256x32 SSD1326 OLED: PocketmageOled class, the u8g2 object, and the status line."
+---
+
+# OLED API
+
+The 256x32 SSD1326 SPI OLED shows the short text line, the status bar, and the battery/clock info during normal interaction. Text on it goes through `FontEngine` (see [font](font.md)); the `PocketmageOled` methods handle the whole-buffer draws, the info bar, and power save.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+
+PocketmageOled& oled = OLED();   // singleton
+U8G2_SSD1326_ER_256X32_F_4W_HW_SPI &u8g2u = u8g2;  // raw driver, if needed
+```
+
+`OLED()` returns the single instance held by the SDK. `u8g2` is the raw U8G2 driver object; draw directly to it only when a `PocketmageOled` method does not cover the primitive you need. `setupOled()` runs inside `PocketMage_INIT()` before anything uses the display.
+
+## Class reference
+
+### `PocketmageOled`
+
+```cpp
+class PocketmageOled {
+public:
+  explicit PocketmageOled(U8G2 &u);
+
+  void oledWord(String word, bool allowLarge = false,
+                bool showInfo = true, String bottomText = "");
+  void oledLine(String line, int input_pos, bool doProgressBar = true,
+                String bottomMsg = "", bool deferSend = false);
+  void sysMessage(String msg, int showTime = 1500);
+  void oledScroll();
+  void infoBar();
+  void setPowerSave(bool enable);
+  bool getPowerSave() const;
+};
+```
+
+#### `oledWord`
+
+Centers `word` on the display. Font size cascades down (OledWord then Heading3, BodyBold, Caption) until the text fits 256px. With `allowLarge`, an 18pt `Heading2` first attempt is used when it fits. Unless `showInfo` is false with no `bottomText`, the status line is drawn first. A `bottomText` replaces the status line. Sends the buffer.
+
+#### `oledLine`
+
+Renders one editor line at the edit baseline with a block cursor at `input_pos`, a top progress bar showing how far the line is past the reference width, and the info bar (or `bottomMsg`). Use it for text-input screens. `deferSend` leaves the buffer pending so the caller draws extra primitives and sends once.
+
+#### `sysMessage`
+
+Raises a framed message from the bottom of the display, holds it for `showTime` ms, and lowers it. Temporarily bumps the CPU to 240 MHz for the animation and restores `POWER_SAVE_FREQ` when `SAVE_POWER` is set. Use it for transient confirmations and errors.
+
+#### `oledScroll`
+
+The line-scroll preview view for text apps: a left bar strip proportional to line lengths, a `n/total` line counter, and the current line preview. Reads `allLines` and `TOUCH().getDynamicScroll()` (see [touch](touch.md) and [sys](sys.md)).
+
+#### `infoBar`
+
+The OLED status line: keyboard modifier, battery bitmap indexed by `battState`, clock and date (when `SYSTEM_CLOCK`), and the MSC, sink, and SD indicators. Called internally by `oledWord` and `oledLine`.
+
+#### `setPowerSave`
+
+Toggles the driver power save and stores the flag. `getPowerSave()` returns the stored state.
+
+## Status line
+
+The bottom row (baseline `kOledInfoBaseline`, 26px tall) is the status line. Battery uses the `batt_allArray` bitmaps indexed by the shared `battState` global; the clock cell uses `I18n::dayName()` and the active month/day/year. `SYSTEM_CLOCK` and `SHOW_YEAR` are the persistent toggles from [configuration](configuration.md).
+
+## Threading
+
+The OLED driver is called directly; there is no ownership lock. Keep OLED draws to the task that owns the screen (the app's main flow or the keyboard task) and never interleave with an [eink](eink.md) redraw on the same SPI bus without coordination. Deep sleep power-saves the OLED first (see [sys](sys.md)).
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void showStatus() {
+  OLED().oledWord("Files", /*allowLarge=*/true);
+  OLED().sysMessage("Saved", 1200);
+  OLED().setPowerSave(false);
+}
+```
+
+`bottomText` display string is drawn centered in the status-line slot; `allowLarge` with a short word renders the `Heading2` variant at the large
+
+
+---
+
+## [SD card (pocketmage_sd)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sd/)
+
+---
+title: "SD card (pocketmage_sd)"
+description: "Filesystems, files, metadata, and the dual SDMMC/SDSPI mode switch."
+---
+
+# SD card API
+
+The SD card is the device's persistent storage: the OS keeps its files, metadata, app slots, and the app data sandbox there. `PocketmageSD` abstracts the two bus modes, the file bookkeeping, and the per-file metadata format, and exposes raw FS helpers for arbitrary paths.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+
+PocketmageSD& sd = PM_SDAUTO();   // alias of PM_SD(); both names exist
+```
+
+`PM_SD()` and `PM_SDAUTO()` return the same single instance; `PM_SDAUTO` is the name the host exports to loaded apps (see [symbols](../symbols.md)). `setupSD()` runs in `PocketMage_INIT()`.
+
+## Mode switch
+
+```cpp
+enum Mode { SDMMC = 0, SDSPI = 1 };
+void setMode(Mode m);
+Mode getMode() const;
+```
+
+`setupSD()` tries 4-bit SDMMC (pins `SD_CLK/CMD/D0..D3`) at boot and, if that fails, falls back to SPI mode (`SD_CS/MOSI/SCK/MISO`) on the shared SPI bus. The mode is visible through `getMode()`; `SD_SPI_COMPATIBILITY` persists the last known-good mode. `beginIO()` / `endIO()` toggle the `SDActive` status-line indicator around longer operations and can be called per file operation.
+
+## File bookkeeping
+
+The class tracks the OS's working set:
+
+```cpp
+void saveFile();                    // writes workingFile_ (temp -> real)
+void writeMetadata(const String& path);
+void loadFile(bool showOLED = true);
+void delFile(String fileName);
+void deleteMetadata(String path);
+void renFile(String oldFile, String newFile);
+void renMetadata(String oldPath, String newPath);
+void copyFile(String oldFile, String newFile);
+void appendToFile(String path, String inText);
+```
+
+- `loadFile` opens the editing file into the in-memory buffer, optionally flashing the OLED.
+- Metadata files record a timestamp and a byte count (see `countVisibleCharsFile`), updated by `saveFile`/`writeMetadata` and removed by the matching `delete*`/`ren*`. The metadata path is derived from the file path.
+- `saveFile` moves the temp working file to the final name, updates metadata, and refreshes the file list slot. All operations toggle `SDActive` and honor the active mode's FS instance.
+
+## Getters / setters
+
+```cpp
+bool    getNoSD() const;         // true when no card was found
+void    setNoSD(bool v);
+String  getWorkingFile() const;
+void    setWorkingFile(const String& v);
+String  getEditingFile() const;
+void    setEditingFile(const String& v);
+String  getFilesListIndex(int index) const;
+void    setFilesListIndex(int index, const String& v);
+```
+
+`MAX_FILES` (10) file slots back the file list used by the picker. The `excludedFiles_` set (`/temp.txt`, `/settings.txt`, `/tasks.txt`) never appears in listings.
+
+## Raw FS helpers
+
+```cpp
+void    listDir(fs::FS& fs, const char* dirname);
+void    readFile(fs::FS& fs, const char* path);
+String  readFileToString(fs::FS& fs, const char* path);
+void    writeFile(fs::FS& fs, const char* path, const char* message);
+void    appendFile(fs::FS& fs, const char* path, const char* message);
+void    renameFile(fs::FS& fs, const char* path1, const char* path2);
+void    deleteFile(fs::FS& fs, const char* path);
+bool    readBinaryFile(const char* path, uint8_t* buf, size_t len);
+size_t  getFileSize(const char* path);
+```
+
+Standard file operations that take an explicit `fs::FS`. Apps storing their assets read them from `/assets/<name>` (see [publishing](../publish.md)) with `readFileToString` / `readBinaryFile`; `readBinaryFile` returns false on a partial read.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+extern "C" int main(int, char**) {
+  if (PM_SDAUTO().getNoSD()) return 0;
+  PM_SDAUTO().appendToFile("/assets/home/notes.txt", "remember: milk\n");
+  String text = PM_SDAUTO().readFileToString(*global_fs, "/assets/home/notes.txt");
+  // draw text...
+  return 0;
+}
+
+
+---
+
+## [System (pocketmage_sys, pocketmage_globals)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/)
+
+---
+title: "System (pocketmage_sys, pocketmage_globals)"
+description: "Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state."
+---
+
+# System API
+
+The system module owns the board bring-up, the CPU clock, deep sleep, the power button, and the shared globals (`battState`, `allLines`, `CurrentAppState`, the SPI buses, and NVS `prefs`). Apps use it for power management and boot-time configuration; the OS uses it for full bring-up.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+```
+
+## Shared globals
+
+`pocketmage_globals` defines the state both the OS and apps link against.
+
+### SPI and filesystem
+
+```cpp
+extern SPIClass* vspi;    // the global SPI on SPI_SCK/SPI_MOSI
+extern SPIClass* hspi;
+extern fs::FS*   global_fs;  // active filesystem (SD_MMC or SD)
+```
+
+`PocketMage_INIT` wires `vspi = &SPI` and pins the pins documented in [configuration](configuration.md).
+
+### NVS
+
+```cpp
+extern Preferences prefs;   // "PocketMage" namespace
+```
+
+The shared Preferences handle. `pocketmage::loadSettings()` reads the persistent toggles into the `config.h` globals (`TIMEOUT`, `SAVE_POWER`, `FAST_REFRESH`, `OLED_BRIGHTNESS`, the UI language, ...); an app that reads preferences uses `prefs` directly with the same namespace.
+
+### App state
+
+```cpp
+enum AppState { HOME, TXT, FILEWIZ, USB_APP, COMM, SETTINGS, TASKS,
+                CALENDAR, JOURNAL, LEXICON, APPLOADER, TERMINAL,
+                ONBOARDING, ELFAPP };
+extern AppState CurrentAppState;
+```
+
+The OS's app dispatch enum. `ELFAPP` is the state set while a loaded ELF app is running; the OS restores `HOME` when it exits.
+
+### Keyboard state
+
+```cpp
+enum KBState { NORMAL, SHIFT, FUNC, FN_SHIFT };
+```
+
+The keyboard modifier state, mirrored by `KB().setKeyboardState()`.
+
+### `pocketmage::` namespace
+
+```cpp
+namespace pocketmage {
+  void loadSettings();          // load NVS settings into the config.h globals
+  void recoverFromCrash();      // reset app state after a panic/watchdog
+  void checkRTCPowerLoss();     // baseline the RTC when it has lost power
+}
+```
+
+- `loadSettings()` reads every persistent toggle from `prefs` and sets the UI language. Apps call it during `APP_INIT` (the OS reaches it via `PocketMage_INIT` on the host path).
+- `recoverFromCrash()` checks the ESP reset reason and, on panic or watchdog reset, resets `CurrentAppState` to `HOME` and clears the editing-file pointer so the device boots clean.
+- `checkRTCPowerLoss()` re-baselines the RTC when its power was lost.
+
+### Battery helper
+
+```cpp
+inline float getBatteryVoltage() {
+  return (analogRead(BAT_SENS) * (3.3 / 4095.0) * 2) + 0.2;
+}
+```
+
+`battState` (0 through 5) indexes the battery bitmaps used by the OLED status line ([oled](oled.md), [assets](assets.md)).
+
+## CPU speed
+
+```cpp
+void pocketmage::setCpuSpeed(int newFreq);
+```
+
+Clamps to the valid S3 frequencies `{240, 160, 80, 40, 20, 10}` and returns early if the CPU is already there. WiFi stalls below 240 MHz on the S3, so a request that would drop the clock below `WIFI_CPU_FREQ_MHZ` (240) while `P_WIFI` is not `Off` is ignored. `POWER_SAVE_FREQ` (40) is the OS's idle speed; `sysMessage` and the WiFi service bump back to 240 when they need it.
+
+### Scope guard
+
+```cpp
+class pocketmage::ScopedCpuBoost {
+public:
+  ScopedCpuBoost();            // raises to 240 MHz if not already there
+  ~ScopedCpuBoost();           // restores the previous frequency
+};
+```
+
+Non-copyable RAII. Usable as a stack local around a latency-critical section.
+
+## Deep sleep
+
+```cpp
+void pocketmage::deepSleep(bool alternateScreenSaver = false);
+```
+
+Full power-down sequence:
+
+1. Power-saves the OLED.
+2. Stops the `einkHandlerTask` under the panel lock, so an in-flight refresh completes.
+3. Plays `Jingles::Shutdown`.
+4. Draws a screensaver (custom `/assets/backgrounds/*.bin`, else a random built-in) at rotation 3, or the alternate screensaver when asked. `SAVE_POWER` drops the CPU to `POWER_SAVE_FREQ` for the draw.
+5. Clears the buffer, hibernates the panel, unlocks it.
+6. Persists `CurrentAppState`, the editing file, and clears the seamless reboot flag.
+7. On production hardware, isolates the peripheral pins with `setLoadSwitch(false)` (GPIO hold + `gpio_deep_sleep_hold_en`).
+8. `esp_deep_sleep_start()`.
+
+Wake is on the `KB_IRQ` falling edge (configured in `PocketMage_INIT`). Resume re-runs `PocketMage_INIT`, which clears the pin holds and re-inits peripherals.
+
+## Power button
+
+```cpp
+void IRAM_ATTR pocketmage::PWR_BTN_irq();
+extern volatile bool PWR_BTN_event;
+```
+
+The FALLING-edge interrupt service routine sets `PWR_BTN_event`. The OS consumes it for wake/shutdown handling; holding `PWR_BTN` for 3 seconds while awake raises the hard-reset-to-home path (`resetRequested`, see the `hardReset` task). `SDActive`, `mscEnabled`, and `sinkEnabled` are the status-line indicators apps toggle for long I/O.
+
+## Bring-up
+
+```cpp
+void PocketMage_INIT();
+```
+
+The one-call bring-up: release GPIO holds, enable the load switch (production), read the seamless reboot flag, `FontEngine::init()`, Serial, Wire (plus Wire1 on production), the global SPI, the keyboard wake pin, `setupOled()`, `setupKB()`, `setupEink()`, `setupSD()`, power-button interrupt + MP2722 power init, the hard-reset task, the power-save clock, `setupTouch()`, `setupClock()`, the random seed, settings load, crash recovery, `setupBZ()` + startup jingle, the WiFi service (host only), key flush, then the app hook `APP_INIT()` (app builds). Apps do not call it; it runs as part of the OS or the app entry shim.
+
+## Text line buffer
+
+```cpp
+extern volatile bool resetRequested;
+extern volatile bool newLineAdded;
+extern std::vector<String> allLines;   // the text editor's line list
+extern bool noTimeout;
+extern void setLoadSwitch(bool state);
+```
+
+`allLines` is the shared text buffer the OS's TXT flow and `vectorToString` / `stringToVector` operate on; `noTimeout` suppresses the auto-sleep timeout. `setLoadSwitch(false)` is the production deep-sleep pin isolation path described above.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void onUserExit() {
+  {
+    pocketmage::ScopedCpuBoost boost;   // 240 MHz for the save
+    // write the document...
+  }  // back to the previous speed
+  pocketmage::deepSleep();              // and go to sleep
+}
+
+
+---
+
+## [Touch (pocketmage_touch)](https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/)
+
+---
+title: "Touch (pocketmage_touch)"
+description: "The MPR121 capacitive slider: scroll offsets, line scrolling, and gesture vectors."
+---
+
+# Touch API
+
+`PocketmageTOUCH` reads the MPR121 capacitive slider and derives scroll gestures: a per-line dynamic offset for text apps, a step-wise `lineScroll` for list views, and a raw scroll vector for preview panels.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+
+PocketmageTOUCH& touch = TOUCH();
+Adafruit_MPR121& cap = cap;   // raw driver (slider pads 0..8)
+```
+
+`TOUCH()` is the single instance. `setupTouch()` runs in `PocketMage_INIT()`. The slider reports the lowest-touched pad, which handles physical finger overlap; a "touch" is a pad index 0..8.
+
+## Reference
+
+### Window / dynamic scroll
+
+```cpp
+void updateScrollFromTouch();
+long int getDynamicScroll() const;
+void setDynamicScroll(long int val);
+void setPrevDynamicScroll(long int val);
+```
+
+`updateScrollFromTouch()` maps a pad press to a page offset: sliding finger up (higher pad index) scrolls forward, down scrolls back, bounded by `allLines.size() - EINK().maxLines()`. The result is `getDynamicScroll()`, which `OLED().oledScroll()` uses for its window. Touches reset the auto sleep timer. Returns nothing; call it each loop iteration for the text pages.
+
+### Step scrolling
+
+```cpp
+bool updateScroll(int maxScroll, ulong& lineScroll, int stepSize = 1);
+```
+
+Moves `lineScroll` by `stepSize` per pad step, clamped to `maxScroll`. Returns true when the view actually changed (so the caller redraws only then). `stepSize` makes fast-scroll modes possible.
+
+### Gesture vector
+
+```cpp
+int getScrollVector();
+int getDiff() const;
+void setLastTouch(int val);
+void setLastTouchTime(unsigned long val);
+void resetLastTouch();
+int getLastTouch() const;
+unsigned long getLastTouchTime() const;
+long int getPrevDynamicScroll() const;
+```
+
+`getScrollVector()` returns the signed movement of the most recent pad step (`lastTouchPos - touchPos`), 0 when idle or outside a one or two pad step. The remaining getters/setters expose the raw state (`lastTouch[Pos]`, `lastTouchPosTime`, `prev_dynamicScroll_`) for views that need to track gesture timing themselves. `getDiff()` is `dynamicScroll_ - prev_dynamicScroll_`.
+
+## Timeout
+
+After `TOUCH_TIMEOUT_MS` (1200 ms) with no touch, the gesture state resets so the next new touch is treated as the start of a fresh gesture (no stale step or vector). The reset also flags `newLineAdded` when the offset changed, so a preview can refresh once.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void onLoop() {
+  TOUCH().updateScrollFromTouch();
+  // page view scrolls with TOUCH().getDynamicScroll();
+}
+
+
+---
+
+## [UI helpers (pocketmage_ui)](https://talismandesign.github.io/PocketMage_SDK/docs/api/ui/)
+
+---
+title: "UI helpers (pocketmage_ui)"
+description: "Screen scaffolding, scrollbars, list rows, inverted chips, and the OLED cycle picker."
+---
+
+# UI Helpers
+
+`pocketmage_ui` are the shared full-screen and list primitives that the OS's built-in apps build on, and that third-party apps can reuse directly. They draw into the E-Ink buffer, so pair them with a single `EINK().refresh()` (or `endEinkScreen`).
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+```
+
+All functions are free functions; there is no object. `DisplayT` is the e-ink driver (`display`) and `U8G2` is the OLED driver (`u8g2`).
+
+## Reference
+
+### Screen lifecycle
+
+```cpp
+enum class EinkRefresh : uint8_t { Normal, ForceFull };
+
+void beginEinkScreen(bool preserveBg = false);
+void endEinkScreen(const char* statusText, EinkRefresh mode = EinkRefresh::Normal);
+```
+
+- `beginEinkScreen(preserveBg)` calls `EINK().resetDisplay(!preserveBg)`: clear the buffer (or keep the previous background) and set the full window.
+- `endEinkScreen(statusText, mode)` draws the status band from `statusText` via `EINK().drawStatusBar`, then refreshes. `ForceFull` forces the slow full update before `refresh()` (for content changes that must not ghost).
+
+### `drawScrollbar`
+
+```cpp
+void drawScrollbar(int total, int visible, int index,
+                   int barX = -1, int barY = 0, int barH = -1,
+                   int barW = 3, bool clearBg = false,
+                   uint16_t fg = GxEPD_BLACK, uint16_t bg = GxEPD_WHITE);
+```
+
+Right-edge scrollbar. `barX`/`barH` of -1 default to the right edge and the full height. The handle is at least 15px tall and proportional to `visible/total`; `index` is clamped to the scroll range. `clearBg` erases the previous handle area first (the caller typically fills it with `bg`).
+
+### `drawListItem`
+
+```cpp
+void drawListItem(int x, int y, const String& text, int maxWidth = -1);
+```
+
+Draws a `Body` list row at `(x, y)`. With `maxWidth > 0` the text is truncated with an ellipsis to fit.
+
+### `drawChipText`
+
+```cpp
+int drawChipText(int x, int baselineY, const String& text,
+                 FontStyle style, int maxTextW,
+                 bool inverted, int chipMaxW = -1,
+                 int padX = 8, int chipH = 20, int bottomPad = 6);
+```
+
+Draws an inverted "tag" chip behind e-ink text (selected list rows, key badges). When `maxTextW > 0`, `style` is first re-selected with `fitStyle` against `kLabelCascade` and the text is truncated to fit. The chip rect is `inkW + 2*padX` wide and `chipH` tall, topped at `baselineY + bottomPad - chipH` with 4px corners; filling it does not disturb the text color for later draws (the bridge foreground is restored after an inverted chip). Returns the chip width in pixels.
+
+### `drawCyclePickerOLED`
+
+```cpp
+void drawCyclePickerOLED(U8G2& u8g2, const char* const* items, int count,
+                         int selected, const char* badge = nullptr);
+```
+
+The OLED cycle picker: a centered panel of `count` cells with the selected item filled, and an optional `badge` chip below the panel's bottom edge. Cells shrink (`kMaxCellW = 22`) so long lists never overflow 256px. Draws the full buffer contents; the caller sends the buffer.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+extern "C" int main(int, char**) {
+  beginEinkScreen();
+  drawListItem(8, 60, "WiFi", 200);
+  int w = drawChipText(200, 60, "On", FontStyle::Body, 60, true);
+  drawScrollbar(40, 6, 12);
+  endEinkScreen("Settings");
+  return 0;
+}
+
+
+---
+
+## [WiFi (pocketmage_wifi)](https://talismandesign.github.io/PocketMage_SDK/docs/api/wifi/)
+
+---
+title: "WiFi (pocketmage_wifi)"
+description: "The station radio service: enabled/scan/connect lifecycle, status queries, and saved credentials."
+---
+
+# WiFi API
+
+`PocketMageWifi` is the ESP32-S3 station radio as a non-blocking service. All control calls dispatch to a dedicated task; status reads are thread-safe. On the S3 the radio stalls below 240 MHz, so the service holds the CPU at `WIFI_CPU_FREQ_MHZ` (240) whenever the radio is not `Off`.
+
+## Access
+
+```cpp
+#include <pocketmage.h>
+
+PocketMageWifi& wifi = P_WIFI;
+```
+
+`P_WIFI` is a global reference to the singleton (`PocketMageWifi::getInstance()`). The host calls `P_WIFI.begin()` during `PocketMage_INIT()`; the radio stays off until something calls `enable()`.
+
+## State model
+
+```cpp
+enum class WifiRadioState {
+  Off, TurningOn, On, Scanning, Connecting, Connected, TurningOff
+};
+```
+
+## Class reference
+
+### Lifecycle
+
+```cpp
+void begin();   // one-time service init (event loop, netif, task)
+void stop();    // clean service shutdown
+```
+
+### Control (non-blocking, dispatched to the task)
+
+```cpp
+void enable();                          // turn the radio on
+void disable();                         // turn the radio off
+void scan();                            // start a scan
+void connect(const char* ssid, const char* password, bool save = true);
+void disconnect();
+void reconnect();                       // retry with saved creds
+```
+
+`connect(..., save)` persists the credentials under the `pmwifi` NVS namespace when `save` is true. `reconnect()` and auto-connect use the saved networks on boot.
+
+### Status (thread-safe)
+
+```cpp
+WifiRadioState getState() const;
+bool isConnected() const;
+bool isScanning() const;
+String getStatusMessage() const;
+String getConnectedSSID() const;
+String getIpAddress() const;
+int getRssi() const;
+String getLastError() const;
+```
+
+`getStatusMessage()` is a human-readable line for status displays. `getLastError()` carries the connection-failure reason text.
+
+### Scan results
+
+```cpp
+uint16_t getScanResultCount() const;
+bool getScanResult(uint16_t index, WifiApInfo& out) const;
+```
+
+`WifiApInfo` is a simplified AP record (`ssid`, `rssi`, `channel`, `authmode`). Results are capped at `MAX_SCAN_RESULTS` (20).
+
+### Saved credentials
+
+```cpp
+bool hasSavedCredentials(const char* ssid) const;
+bool loadSavedCredentials(const char* ssid, char* password, size_t maxLen) const;
+void clearSavedCredentials(const char* ssid);
+```
+
+### Events
+
+```cpp
+typedef std::function<void(void)> WifiEventCallback;
+void setEventCallback(WifiEventCallback cb);
+void dispatchEvents();
+```
+
+Set a callback with `setEventCallback` to be notified of state changes (the WiFi command screen uses it to trigger a redraw); call `dispatchEvents()` from the app loop to process pending notifications. The service handles backoff automatically (up to `MAX_RETRIES` with `RETRY_BASE_DELAY_MS` growing to `RETRY_MAX_DELAY_MS`).
+
+## Threading
+
+Control methods only enqueue a command and return. Status getters lock the service mutex. The service task holds the CPU at 240 MHz for the whole session; `pocketmage::setCpuSpeed` refuses any drop while the radio is not `Off` (see [sys](sys.md)).
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+void connectHome() {
+  P_WIFI.enable();
+  delay(200);
+  P_WIFI.connect("home-ssid", "hunter2");
+}
+
+void drawWifiStatus() {
+  // draw a status line from the thread-safe getters
+}
+
+
+---
+
 ## [App binary contract (ABI)](https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/)
 
 ---
@@ -261,6 +2016,253 @@ references a symbol the host does not export and must fail `pm check`).
 
 ---
 
+## [PocketMage SDK guides](https://talismandesign.github.io/PocketMage_SDK/docs/guides/)
+
+---
+title: "PocketMage SDK guides"
+description: "How to build apps, understand their lifecycle, and draw to both displays."
+---
+
+# SDK Guides
+
+These guides teach the PocketMage application model end to end. They pair with the [app ABI reference](app-abi.md) and the [API reference](../api/).
+
+## [Making an app](making-apps.md)
+
+From `pm new` to a running ELF: the app template, building with the SDK's make recipe, the delivery tar, and how the host loads it.
+
+## [App lifecycle](lifecycle.md)
+
+Entry point conventions, the `APP_INIT` hook, the bidirectional host/app export model, and how exiting returns control to the OS.
+
+## [Rendering](rendering.md)
+
+The two-display model: which draw calls target which panel, the E-Ink buffered refresh model, and the touch/scroll interaction loop.
+
+## Also see
+
+- [App ABI and binary layout](app-abi.md)
+- [Build pipeline for the host firmware](build.md)
+- [Export table and `symbols.list`](../symbols.md)
+- [Publishing an app](../publish.md)
+- [Internationalization catalogs](../i18n.md)
+
+
+---
+
+## [App lifecycle](https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/)
+
+---
+title: "App lifecycle"
+description: "Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits."
+---
+
+# App lifecycle
+
+A PocketMage app is a plugin that runs *inside* the host firmware's address space. Understanding where the app boundaries are is the whole battle: the app is a normal `main`, everything it touches comes from the host, and "exiting" is just `return`.
+
+## The entry point
+
+The ELF entry is `app_main`, produced by the build recipe's `-Dmain=app_main -e app_main`. Because an app is truly a freestanding ELF, the canonical program name is kept by writing:
+
+```cpp
+extern "C" int main(int argc, char** argv)
+```
+
+with `main` linked to `app_main`. `argc`/`argv` are the invocation arguments the OS passes. The Arduino-style `setup()`/`loop()` runtime is layered on top of this entry by the SDK's app-runtime shim, so apps that prefer that shape keep the same export.
+
+## Who owns the world
+
+- The app owns its code, its static data, and its calls into the host.
+- The host owns all hardware, all SDK singletons, the memory manager the app allocates from, and the thread that runs the app's entry nightly.
+- Nothing is statically linked into the app (`-nostdlib`, undefined references resolved at load). Any symbol the app uses that is not defined inside it must be in the host export table, or load fails the `pm check` surface (see [symbols](../symbols.md)).
+
+Build-time version macros (`PM_SDK_VERSION_*`) are baked into the app; the host exports the matching `pocketmage_sdk_version` string/runtime parts it was built against. An app compares its own compile-time version against the host's export to present a compatible pair (see the [version example](https://github.com/TalismanDesign/PocketMage_SDK/blob/main/examples/version_app/main.cpp)).
+
+## `APP_INIT`
+
+Apps receive one startup hook:
+
+```cpp
+void APP_INIT();   // defined by the app, invoked by the entry shim
+```
+
+The OS/SDK host reaches `APP_INIT()` after peripheral and singleton bring-up (displays, FS, clock, i18n, ...), so an app may read settings, open files, and prep its first screen there. The hook is also where boot-time apps decide whether to relaunch their UI at power-on.
+
+## Interactive lifetime
+
+While running, the app owns the loop:
+
+- Poll input: `KB().updateKeypress()`, `TOUCH().updateScroll*()`.
+- Draw: build the E-Ink buffer, refresh once, draw OLED text.
+- Sleep on idle: mirror the OS's `CLOCK().setPrevTimeMillis(millis())` poke or call `pocketmage::deepSleep()` explicitly.
+
+There is no cooperative yield handshake: the app either returns, sleeps, or keeps its own loop going. A CPU-heavy loop starves the WiFi and E-Ink tasks; prefer `pocketmage::ScopedCpuBoost` for short bursts and yield with `delay()` between frames.
+
+## Exiting
+
+```cpp
+return 0;   // plain exit; control returns to the OS cleanly
+```
+
+Exiting is just `return` from `main`. There is no reboot handoff and no exit API. The loader tears down the app context, restores `HOME`, and repaints. A crashing app (fault, uncaught aborts) follows the same OS recovery path as the built-in apps ([`recoverFromCrash`](../api/sys.md)); the device boots back to HOME rather than leaving the app stuck.
+
+## Built-in vs third-party
+
+The OS's `HOME`, TXT, and friends are compiled-in apps that live entirely on the host side. Third-party apps are the ELF path described here. Both inhabit the same `lib/PocketMage_SDK` API, so the same app code
+
+
+---
+
+## [Making an app](https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/)
+
+---
+title: "Making an app"
+description: "Scaffold, build, pack, and run your first PocketMage app."
+---
+
+# Making an app
+
+A PocketMage app is a position-independent xtensa ELF that the host firmware loads into RAM and runs in-process. It links nothing: newlib, libstdc++, and the SDK itself are all left undefined and resolved at load time against the host's export table (see [the ABI](app-abi.md) and [symbols](../symbols.md)).
+
+## 1. Scaffold
+
+```sh
+pm new myapp
+```
+
+This copies `examples/hello_app` into `./myapp`:
+
+- `main.cpp`, the app source.
+- `myapp_ICON.bin`, the 1-bit app icon (128x128, big-endian row-major) bundled into the delivery tar.
+- `Makefile`, a two-line file that sets an absolute `SDK_ROOT` and includes the SDK recipe.
+
+App names are `[A-Za-z][A-Za-z0-9_]*`; the name becomes the ELF, tar, icon, and install slot name. To start from an API walkthrough instead, open the [rendering guide](rendering.md) or the [version example](https://github.com/TalismanDesign/PocketMage_SDK/blob/main/examples/version_app/main.cpp).
+
+## 2. Write code
+
+```cpp
+#include <stdio.h>
+#include <unistd.h>
+
+extern "C" int main(int argc, char **argv) {
+  (void)argc;
+  (void)argv;
+  printf("hello from pocketmage sdk app\n");
+  for (int i = 0; i < 3; ++i) {
+    printf("tick %d\n", i);
+    sleep(1);
+  }
+  printf("app done\n");
+  return 0;
+}
+```
+
+That is the whole hello app: `main` with C linkage (the ABI entry point), libc working (`printf`, `sleep`), and a plain `return` to exit. Drop in `#include <pocketmage.h>` and the `PM_SD()`/`OLED()`/etc. singletons and you have a UI app.
+
+The SDK umbrella headers are only ever compiled as *declarations* inside an app; the implementations live in the host. `PM_SDK_VERSION*` macros are injected by the build so an app can compare against the running host's `pocketmage_sdk_version` export.
+
+## 3. Build
+
+```sh
+pm build myapp            # runs make; == the raw `make` path below
+```
+
+or directly:
+
+```sh
+make                      # uses SDK_ROOT from the scaffold Makefile
+```
+
+The recipe (`tools/app.mk`) compiles with `-fPIC -fno-exceptions -fno-rtti`, hides all visibility, link-strips the artifact, and verifies it is a little-endian ELF (the loader rejects big-endian targets). Output is `build/<name>.app.elf`.
+
+Useful override variables: `APP_SRCS` (default `main.cpp`), `APP_NAME`, `APP_BUILD_DIR`. The `pm-info` target prints everything the tooling needs.
+
+## 4. Check the ABI surface
+
+```sh
+pm check myapp
+```
+
+Lists the app's undefined GLOBAL symbols, which is exactly what the host must resolve. Keep that list inside the host export table ([`symbols.list`](../symbols.md)); `pm exports` diffs the list against the host export table so the two cannot drift.
+
+## 5. Pack
+
+```sh
+pm build myapp --pack     # build + pack
+# or:  pm pack myapp
+# or:  make pack
+```
+
+Produces `build/<name>.tar` containing the stripped ELF and the icon. That tar is what gets installed onto the SD card (see [publishing](../publish.md)).
+
+## 6. Run
+
+The OS's APPLOADER installs the app and its icon, and menus it on HOME. Launching the app runs `main` inside the host process; see [lifecycle](lifecycle.md) for what happens at start and exit, and
+
+
+---
+
+## [Rendering](https://talismandesign.github.io/PocketMage_SDK/docs/guides/rendering/)
+
+---
+title: "Rendering"
+description: "Which draw calls go where, the E-Ink buffered refresh model, and the scroll loop."
+---
+
+# Rendering
+
+PocketMage drives two panels from one shared app API. Getting pixel messages to the right panel and knowing when a refresh actually happens is the core of any screen.
+
+## Two targets, one `FontEngine`-dominated path
+
+- The **OLED** (256x32 SSD1326) is a fast status text panel drawn with u8g2: `OLED().oledWord`, `oledScroll`, `sysMessage`, and the info line.
+- The **E-Ink** (320x240 lambda) is the big document/list panel drawn by the SDK's buffer-based drivers: `EINK()` primitives, `FontEngine` with `DisplayTarget::EINK`, the [frames engine](../api/frames.md), and the [ui helpers](../api/ui.md).
+
+Every `FontEngine` call takes an explicit `DisplayTarget`, so the same measure/draw code works for both panels and the metrics are per-target. The OLED draw color and the E-Ink draw color are independent ([font](../api/font.md)).
+
+## The E-Ink refresh model
+
+The E-Ink driver is **buffered**: draw calls only write to the current buffer; nothing reaches the panel until a `refresh()` (or a full `-ForceFull` update). The canonical app rhythm is:
+
+```cpp
+beginEinkScreen();                    // clear buffer, set full window
+// ... FontEngine / EINK / ui draws ...
+endEinkScreen("Status text");         // draw status band + refresh
+```
+
+`beginEinkScreen(preserveBg)` optionally keeps the previous buffer background (for scrolling windows) instead of clearing. `endEinkScreen` adds the status bar for you. If you manage the window yourself, call `EINK().refresh()` directly; `EndEinkFullRefresh` exists for content that must not ghost.
+
+Status band ownership: the bottom `kEinkStatusH` (26) pixels belong to `drawStatusBar`. Content frames should stay within `kEinkContentH` (214) ([layout](../api/layout.md)).
+
+## Text metrics and layout
+
+- `y` in draw calls is the **baseline**, not the top.
+- Fit text before drawing: `FontEngine::textWidth` + `sliceThatFits`, or `truncateWithEllipsis` for a single line; `wordWrap` for paragraphs ([layout](../api/layout.md)).
+- Row pitch is `einkRowPitch(style)` = font height + line spacing; `Normal`-vs-`ForceFull` refresh choice rides on `EINK().getLineSpacing()`.
+- Named constants (`kFrameTextPadX`, `kOledWordBaseline`, `kOledInfoBaseline`, `kGridLabelMaxW`, ...) are in [layout](../api/layout.md); use them instead of literals.
+
+## The scroll loop
+
+These three views share one gesture-sensing core ([touch](../api/touch.md)):
+
+1. **Fixed window with offset**: `TOUCH().updateScrollFromTouch()`, then read `getDynamicScroll()` and draw the sliding window. Used by TXT.
+2. **Step scroll**: `TOUCH().updateScroll(maxScroll, lineScroll, step)`, redraw only when it returns `true`. Used by lists.
+3. **Gesture vector**: `TOUCH().getScrollVector()` for preview-band feedback (`t >= 1` scrolls by a page).
+
+Bind the scroll offset to `CLOCK().setPrevTimeMillis(millis())` on every touch so scrolling keeps the auto-sleep timer honest ([clock](../api/clock.md)).
+
+## OLED overlay patterns
+
+For transient feedback use `OLED().sysMessage(text, ms)`; it draws a framed dialog over whatever the E-Ink is showing and dismisses itself. Long text that the OLED cannot hold goes wider than the widget: pass longer strings only when they fit the panel, or use `OLED().oledScroll` for a running thumbnail of the E-Ink window.
+
+## Full examples
+
+`examples/hello_app` is the text-only skeleton. For draw-heavy apps, start from `examples/version_app`, which prints SDK version strings on
+
+
+---
+
 ## [Internationalization (i18n)](https://talismandesign.github.io/PocketMage_SDK/docs/i18n/)
 
 ---
@@ -454,44 +2456,112 @@ validation failure above, using small in-test catalogs.
 
 ---
 title: "PocketMage SDK Documentation"
-description: "Official SDK for building PocketMage apps: the ELF app contract, build tooling, symbol surface, publishing flow, and the migration path."
+description: "Official SDK for building PocketMage apps: guides, the full component API reference, the ELF app contract, and publishing."
 ---
 
 # PocketMage SDK Documentation
 
-PocketMage apps are ELF files the OS loads at runtime and runs in-process.
-These docs cover the binary contract, the build tooling, the symbol surface,
-packaging, i18n, and the migration path off the old firmware-flow apps.
+PocketMage apps are ELF files the host firmware loads at runtime and runs in-process. These docs cover how to write an app, every component of the app API, the binary contract, the build tooling, the symbol surface, and packaging.
 
+::: tag "Guides"
+::: tag "API reference"
 ::: tag "App ABI"
 ::: tag "Build tooling"
 ::: tag "Symbols"
 ::: tag "Publishing"
-::: tag "Migration"
 
-## Sections
+## Guides
+
+Start here. Walkthroughs of the whole app model.
+
+::: grids
+::: grid
+::: card "Making an app" icon:code
+From `pm new` to a running ELF: scaffold, build recipe, delivery tar, and the host loader.
+
+::: button "Open" ./guides/making-apps.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "App lifecycle" icon:activity
+Entry points, the host/app export model, `APP_INIT`, and exiting cleanly.
+
+::: button "Open" ./guides/lifecycle.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Rendering" icon:monitor
+The two-display model, the buffered E-Ink refresh rhythm, and the scroll loop.
+
+::: button "Open" ./guides/rendering.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Guides overview" icon:book
+Guide index and cross-links into the deep references.
+
+::: button "Open" ./guides/index.md icon:arrow-right
+:::
+:::
+:::
+
+## API reference
+
+Every header the SDK publishes, with semantics. Start at the overview.
+
+::: grids
+::: grid
+::: card "API overview" icon:boxes
+The umbrella header, the `PM_TARGET_HOST`/`PM_TARGET_APP` split, and how to read the per-component pages.
+
+::: button "Open" ./api/index.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Displays" icon:monitor
+OLED, E-Ink, Font, Layout, UI helpers.
+
+::: button "Open" ./api/oled.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Input" icon:keyboard
+Keyboard, Touch.
+
+::: button "Open" ./api/kb.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "System" icon:cpu
+Sys and globals, SD card, Clock, Buzzer, WiFi, i18n runtime.
+
+::: button "Open" ./api/sys.md icon:arrow-right
+:::
+:::
+:::
+
+## The binary contract
+
+How the framework itself is built and shipped.
 
 ::: grids
 ::: grid
 ::: card "App ABI" icon:book
-The binary shape the loader accepts: format, entry, load strategy, failure
-modes.
+The binary shape the loader accepts: format, entry, load strategy, failure modes.
 
 ::: button "Open" ./app-abi.md icon:arrow-right
 :::
 :::
 ::: grid
-::: card "Building Apps" icon:code
-A `Makefile` including `tools/app.mk` is the whole build system. Toolchain,
-targets, icon.
+::: card "Building Apps" icon:wrench
+A `Makefile` including `tools/app.mk` is the whole build system. Toolchain, targets, icon.
 
 ::: button "Open" ./build.md icon:arrow-right
 :::
 :::
 ::: grid
 ::: card "Symbols" icon:box
-The host-export surface an app's undefined list resolves against, and how to
-change it.
+The host-export surface an app's undefined list resolves against, and how to change it.
 
 ::: button "Open" ./symbols.md icon:arrow-right
 :::
@@ -504,7 +2574,7 @@ The delivery tar, the 40x40 icon, assets, and what APPLOADER does with them.
 :::
 :::
 ::: grid
-::: card "i18n" icon:terminal
+::: card "i18n catalogs" icon:terminal
 Catalogs, the generator, and the merge rules that keep string IDs stable.
 
 ::: button "Open" ./i18n.md icon:arrow-right
@@ -523,11 +2593,12 @@ Moving a pre-ELF app to the runtime-load flow.
 
 ::: steps
 
-1. Read the [App ABI](app-abi.md) contract.
-2. Set up the [build toolchain](build.md).
-3. Check what your app resolves against: [Symbols](symbols.md).
-4. Ship a tar: [Publishing](publish.md).
-5. Port existing code: [Migration](migration.md).
+1. Read the [guides](guides/making-apps.md), then the [API overview](api/index.md).
+2. Read the [App ABI](app-abi.md) contract.
+3. Set up the [build toolchain](build.md).
+4. Check what your app resolves against: [Symbols](symbols.md).
+5. Ship a tar: [Publishing](publish.md).
+6. Port existing code: [Migration](migration.md).
 
 :::
 
@@ -536,7 +2607,7 @@ Moving a pre-ELF app to the runtime-load flow.
 - [Reference example app](https://github.com/TalismanDesign/PocketMage_SDK/tree/main/examples/hello_app)
 - [PocketMageOS documentation](https://talismandesign.github.io/PocketMage_PDA/docs)
 - [GitHub Repository](https://github.com/TalismanDesign/PocketMage_SDK)
-- [Discord Community](https://discord.gg/KSCapSf4XH)
+
 
 ---
 
