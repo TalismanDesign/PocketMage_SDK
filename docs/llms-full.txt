@@ -1960,13 +1960,24 @@ loader-irrelevant sections, so the delivered ELF comes down to `.text`,
 `.shstrtab`. Everything else is removed. Code that depends on other sections
 existing is unsupported. Don't write it.
 
+## App manifest (`app.properties`)
+
+When loading an app from SD, the host reads `app.properties` from the app directory (max 1024 bytes). Recognized fields:
+
+- `name` – human-readable app name
+- `version` – app version string
+- `author` – author string
+- `scope` – symbol scope gate (default: `all`)
+
+Only `pm_*` symbols are scope-gated. libc, libstdc++, and ESP-IDF symbols remain available regardless of scope. The loader installs the scoped resolver before relocation and resets it on exit. argv metadata passed to `app_main` includes `name`, `elfPath`, `version`, and `author`.
+
 ## Endianness failure modes
 
-| Symptom at load                              | Cause                             |
-| -------------------------------------------- | --------------------------------- |
-| garbage / instruction fetch fault in IRAM    | ELF fields decoded wrong (BE)     |
+| Symptom at load                              | Cause                               |
+| -------------------------------------------- | ----------------------------------- |
+| garbage / instruction fetch fault in IRAM    | ELF fields decoded wrong (BE)       |
 | `esp_elf_load_section` fault                 | misaligned / incorrect section data |
-| load "succeeds", entry behaves wildly        | wrong sizes from BE headers       |
+| load "succeeds", entry behaves wildly        | wrong sizes from BE headers         |
 
 The build-time guard catches BE before it reaches a device: if the last
 `make` line is `error: ... big-endian ...`, rebuild with the espressif
@@ -1979,6 +1990,7 @@ toolchain (see [build.md](build.md)).
   a migration note.
 - Exports are additive. Removing or changing an export breaks live apps. See
   [CONTRIBUTING.md](../CONTRIBUTING.md).
+
 
 ---
 
@@ -2183,7 +2195,7 @@ While running, the app owns the loop:
 
 - Poll input: `pm_kb_read()` for a keypress, `pm_kb_state()` for the current modifier state.
 - Draw: build the E-Ink buffer, refresh once, draw OLED text.
-- Sleep on idle: mirror the OS's `CLOCK().setPrevTimeMillis(millis())` poke or call `pocketmage::deepSleep()` explicitly.
+- Sleep on idle: the host skips the idle timeout while an ELF app runs. Avoid poking the host idle timer and call `pocketmage::deepSleep()` explicitly when you want to enter deep sleep.
 
 There is no cooperative yield handshake: the app either returns, sleeps, or keeps its own loop going. A CPU-heavy loop starves the WiFi and E-Ink tasks; prefer `pocketmage::ScopedCpuBoost` for short bursts and yield with `delay()` between frames.
 
@@ -2340,11 +2352,9 @@ Status band ownership: the bottom `kEinkStatusH` (26) pixels belong to `drawStat
 
 These three views share one gesture-sensing core ([touch](../api/touch.md)):
 
-1. **Fixed window with offset**: `TOUCH().updateScrollFromTouch()`, then read `getDynamicScroll()` and draw the sliding window. Used by TXT.
-2. **Step scroll**: `TOUCH().updateScroll(maxScroll, lineScroll, step)`, redraw only when it returns `true`. Used by lists.
-3. **Gesture vector**: `TOUCH().getScrollVector()` for preview-band feedback (`t >= 1` scrolls by a page).
-
-Bind the scroll offset to `CLOCK().setPrevTimeMillis(millis())` on every touch so scrolling keeps the auto-sleep timer honest ([clock](../api/clock.md)).
+1. **Fixed window with offset**: `pm_touch_update_scroll_from_touch()`, then read `pm_touch_get_dynamic_scroll()` and draw the sliding window. Used by TXT.
+2. **Step scroll**: `pm_touch_update_scroll(maxScroll, lineScroll, step)`, redraw only when it returns `true`. Used by lists.
+3. **Gesture vector**: `pm_touch_get_scroll_vector()` for preview-band feedback (`t >= 1` scrolls by a page).
 
 ## OLED overlay patterns
 
@@ -2890,7 +2900,7 @@ libm         15 symbols     262 bytes
 libstdc++    87 symbols   3,403 bytes
 libsupc++    58 symbols   2,362 bytes
 libgcc       65 symbols   1,552 bytes
-total       531 symbols  12,975 bytes (12.7 KB)
+total       475 symbols  11,687 bytes (11.4 KB)
 ```
 
 That total includes the 124 curated `pm_*` entries. The runtime adds about

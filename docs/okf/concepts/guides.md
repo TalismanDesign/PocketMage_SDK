@@ -7,7 +7,7 @@ path: /guides/
 updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-05T01:48:20.788Z"
+  generated_at: "2026-10-05T06:26:55.154Z"
 ---
 ---
 title: "PocketMage SDK guides"

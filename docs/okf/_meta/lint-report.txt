@@ -7,6 +7,7 @@
 [WARN] missing-type /symbols/  (using fallback 'concept')
 [WARN] orphan-concept api-assets  (no inbound links)
 [WARN] orphan-concept api-bz  (no inbound links)
+[WARN] orphan-concept api-clock  (no inbound links)
 [WARN] orphan-concept api-configuration  (no inbound links)
 [WARN] orphan-concept api-eink  (no inbound links)
 [WARN] orphan-concept api-i18n-runtime  (no inbound links)

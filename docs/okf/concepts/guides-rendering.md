@@ -7,7 +7,7 @@ path: /guides/rendering/
 updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-05T01:48:20.789Z"
+  generated_at: "2026-10-05T06:26:55.156Z"
 ---
 ---
 title: "Rendering"
@@ -50,11 +50,9 @@ Status band ownership: the bottom `kEinkStatusH` (26) pixels belong to `drawStat
 
 These three views share one gesture-sensing core ([touch](../api/touch.md)):
 
-1. **Fixed window with offset**: `TOUCH().updateScrollFromTouch()`, then read `getDynamicScroll()` and draw the sliding window. Used by TXT.
-2. **Step scroll**: `TOUCH().updateScroll(maxScroll, lineScroll, step)`, redraw only when it returns `true`. Used by lists.
-3. **Gesture vector**: `TOUCH().getScrollVector()` for preview-band feedback (`t >= 1` scrolls by a page).
-
-Bind the scroll offset to `CLOCK().setPrevTimeMillis(millis())` on every touch so scrolling keeps the auto-sleep timer honest ([clock](../api/clock.md)).
+1. **Fixed window with offset**: `pm_touch_update_scroll_from_touch()`, then read `pm_touch_get_dynamic_scroll()` and draw the sliding window. Used by TXT.
+2. **Step scroll**: `pm_touch_update_scroll(maxScroll, lineScroll, step)`, redraw only when it returns `true`. Used by lists.
+3. **Gesture vector**: `pm_touch_get_scroll_vector()` for preview-band feedback (`t >= 1` scrolls by a page).
 
 ## OLED overlay patterns
 
