@@ -4,10 +4,10 @@ title: "PocketMage SDK Documentation"
 description: "Official SDK for building PocketMage apps: guides, the full component API reference, the ELF app contract, and publishing."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/"
 path: /
-updated: 2026-09-30
+updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-30T00:52:21.271Z"
+  generated_at: "2026-10-05T01:48:20.791Z"
 ---
 ---
 title: "PocketMage SDK Documentation"
@@ -159,6 +159,6 @@ Moving a pre-ELF app to the runtime-load flow.
 
 ## Links
 
-- [Reference example app](https://github.com/TalismanDesign/PocketMage_SDK/tree/main/examples/hello_app)
+- [App template repository](https://github.com/TalismanDesign/PocketMage_App)
 - [PocketMageOS documentation](https://talismandesign.github.io/PocketMage_PDA/docs)
 - [GitHub Repository](https://github.com/TalismanDesign/PocketMage_SDK)

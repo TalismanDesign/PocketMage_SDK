@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mune4scf">
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mune4scf">
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=muulc20a">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=muulc20a">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mune4scf" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mune4scf" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=muulc20a" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=muulc20a" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits.">
@@ -123,9 +123,9 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mune4scf" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mune4scf" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mune4scf" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=muulc20a" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=muulc20a" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=muulc20a" >
 
     
     
@@ -1554,7 +1554,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22App%20lifecycle%22%0Adescription%3A%20%22Entry%20points%2C%20build-time%20vs%20host%20symbols%2C%20the%20APP_INIT%20hook%2C%20and%20how%20an%20app%20exits.%22%0A---%0A%0A%23%20App%20lifecycle%0A%0AA%20PocketMage%20app%20is%20a%20plugin%20that%20runs%20*inside*%20the%20host%20firmware&#039;s%20address%20space.%20Understanding%20where%20the%20app%20boundaries%20are%20is%20the%20whole%20battle%3A%20the%20app%20is%20a%20normal%20%60main%60%2C%20everything%20it%20touches%20comes%20from%20the%20host%2C%20and%20%22exiting%22%20is%20just%20%60return%60.%0A%0A%23%23%20The%20entry%20point%0A%0AThe%20ELF%20entry%20is%20%60app_main%60%2C%20produced%20by%20the%20build%20recipe&#039;s%20%60-Dmain%3Dapp_main%20-e%20app_main%60.%20Because%20an%20app%20is%20truly%20a%20freestanding%20ELF%2C%20the%20canonical%20program%20name%20is%20kept%20by%20writing%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char**%20argv)%0A%60%60%60%0A%0Awith%20%60main%60%20linked%20to%20%60app_main%60.%20%60argc%60%2F%60argv%60%20are%20the%20invocation%20arguments%20the%20OS%20passes.%20The%20Arduino-style%20%60setup()%60%2F%60loop()%60%20runtime%20is%20layered%20on%20top%20of%20this%20entry%20by%20the%20SDK&#039;s%20app-runtime%20shim%2C%20so%20apps%20that%20prefer%20that%20shape%20keep%20the%20same%20export.%0A%0A%23%23%20Who%20owns%20the%20world%0A%0A-%20The%20app%20owns%20its%20code%2C%20its%20static%20data%2C%20and%20its%20calls%20into%20the%20host.%0A-%20The%20host%20owns%20all%20hardware%2C%20all%20SDK%20singletons%2C%20the%20memory%20manager%20the%20app%20allocates%20from%2C%20and%20the%20thread%20that%20runs%20the%20app&#039;s%20entry%20nightly.%0A-%20Nothing%20is%20statically%20linked%20into%20the%20app%20(%60-nostdlib%60%2C%20undefined%20references%20resolved%20at%20load).%20Any%20symbol%20the%20app%20uses%20that%20is%20not%20defined%20inside%20it%20must%20be%20in%20the%20host%20export%20table%2C%20or%20load%20fails%20the%20%60pm%20check%60%20surface%20(see%20%5Bsymbols%5D(..%2Fsymbols.md)).%0A%0ABuild-time%20version%20macros%20(%60PM_SDK_VERSION_*%60)%20are%20baked%20into%20the%20app%3B%20the%20host%20exports%20the%20matching%20%60pocketmage_sdk_version%60%20string%2Fruntime%20parts%20it%20was%20built%20against.%20An%20app%20compares%20its%20own%20compile-time%20version%20against%20the%20host&#039;s%20export%20to%20present%20a%20compatible%20pair%20(see%20the%20%5Bversion%20example%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_SDK%2Fblob%2Fmain%2Fexamples%2Fversion_app%2Fmain.cpp)).%0A%0A%23%23%20%60APP_INIT%60%0A%0AApps%20receive%20one%20startup%20hook%3A%0A%0A%60%60%60cpp%0Avoid%20APP_INIT()%3B%20%20%20%2F%2F%20defined%20by%20the%20app%2C%20invoked%20by%20the%20entry%20shim%0A%60%60%60%0A%0AThe%20OS%2FSDK%20host%20reaches%20%60APP_INIT()%60%20after%20peripheral%20and%20singleton%20bring-up%20(displays%2C%20FS%2C%20clock%2C%20i18n%2C%20...)%2C%20so%20an%20app%20may%20read%20settings%2C%20open%20files%2C%20and%20prep%20its%20first%20screen%20there.%20The%20hook%20is%20also%20where%20boot-time%20apps%20decide%20whether%20to%20relaunch%20their%20UI%20at%20power-on.%0A%0A%23%23%20Interactive%20lifetime%0A%0AWhile%20running%2C%20the%20app%20owns%20the%20loop%3A%0A%0A-%20Poll%20input%3A%20%60KB().updateKeypress()%60%2C%20%60TOUCH().updateScroll*()%60.%0A-%20Draw%3A%20build%20the%20E-Ink%20buffer%2C%20refresh%20once%2C%20draw%20OLED%20text.%0A-%20Sleep%20on%20idle%3A%20mirror%20the%20OS&#039;s%20%60CLOCK().setPrevTimeMillis(millis())%60%20poke%20or%20call%20%60pocketmage%3A%3AdeepSleep()%60%20explicitly.%0A%0AThere%20is%20no%20cooperative%20yield%20handshake%3A%20the%20app%20either%20returns%2C%20sleeps%2C%20or%20keeps%20its%20own%20loop%20going.%20A%20CPU-heavy%20loop%20starves%20the%20WiFi%20and%20E-Ink%20tasks%3B%20prefer%20%60pocketmage%3A%3AScopedCpuBoost%60%20for%20short%20bursts%20and%20yield%20with%20%60delay()%60%20between%20frames.%0A%0A%23%23%20Exiting%0A%0A%60%60%60cpp%0Areturn%200%3B%20%20%20%2F%2F%20plain%20exit%3B%20control%20returns%20to%20the%20OS%20cleanly%0A%60%60%60%0A%0AExiting%20is%20just%20%60return%60%20from%20%60main%60.%20There%20is%20no%20reboot%20handoff%20and%20no%20exit%20API.%20The%20loader%20tears%20down%20the%20app%20context%2C%20restores%20%60HOME%60%2C%20and%20repaints.%20A%20crashing%20app%20(fault%2C%20uncaught%20aborts)%20follows%20the%20same%20OS%20recovery%20path%20as%20the%20built-in%20apps%20(%5B%60recoverFromCrash%60%5D(..%2Fapi%2Fsys.md))%3B%20the%20device%20boots%20back%20to%20HOME%20rather%20than%20leaving%20the%20app%20stuck.%0A%0A%23%23%20Built-in%20vs%20third-party%0A%0AThe%20OS&#039;s%20%60HOME%60%2C%20TXT%2C%20and%20friends%20are%20compiled-in%20apps%20that%20live%20entirely%20on%20the%20host%20side.%20Third-party%20apps%20are%20the%20ELF%20path%20described%20here.%20Both%20inhabit%20the%20same%20%60lib%2FPocketMage_SDK%60%20API%2C%20so%20the%20same%20app%20code%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22App%20lifecycle%22%0Adescription%3A%20%22Entry%20points%2C%20build-time%20vs%20host%20symbols%2C%20the%20APP_INIT%20hook%2C%20and%20how%20an%20app%20exits.%22%0A---%0A%0A%23%20App%20lifecycle%0A%0AA%20PocketMage%20app%20is%20a%20plugin%20that%20runs%20*inside*%20the%20host%20firmware&#039;s%20address%20space.%20Understanding%20where%20the%20app%20boundaries%20are%20is%20the%20whole%20battle%3A%20the%20app%20is%20a%20normal%20%60main%60%2C%20everything%20it%20touches%20comes%20from%20the%20host%2C%20and%20%22exiting%22%20is%20just%20%60return%60.%0A%0A%23%23%20The%20entry%20point%0A%0AThe%20ELF%20entry%20is%20%60app_main%60%2C%20produced%20by%20the%20build%20recipe&#039;s%20%60-Dmain%3Dapp_main%20-e%20app_main%60.%20Because%20an%20app%20is%20truly%20a%20freestanding%20ELF%2C%20the%20canonical%20program%20name%20is%20kept%20by%20writing%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char**%20argv)%0A%60%60%60%0A%0Awith%20%60main%60%20linked%20to%20%60app_main%60.%20%60argc%60%2F%60argv%60%20are%20the%20invocation%20arguments%20the%20OS%20passes.%20The%20Arduino-style%20%60setup()%60%2F%60loop()%60%20runtime%20is%20layered%20on%20top%20of%20this%20entry%20by%20the%20SDK&#039;s%20app-runtime%20shim%2C%20so%20apps%20that%20prefer%20that%20shape%20keep%20the%20same%20export.%0A%0A%23%23%20Who%20owns%20the%20world%0A%0A-%20The%20app%20owns%20its%20code%2C%20its%20static%20data%2C%20and%20its%20calls%20into%20the%20host.%0A-%20The%20host%20owns%20all%20hardware%2C%20all%20SDK%20singletons%2C%20the%20memory%20manager%20the%20app%20allocates%20from%2C%20and%20the%20thread%20that%20runs%20the%20app&#039;s%20entry%20nightly.%0A-%20Nothing%20is%20statically%20linked%20into%20the%20app%20(%60-nostdlib%60%2C%20undefined%20references%20resolved%20at%20load).%20Any%20symbol%20the%20app%20uses%20that%20is%20not%20defined%20inside%20it%20must%20be%20in%20the%20host%20export%20table%2C%20or%20load%20fails%20the%20%60pm%20check%60%20surface%20(see%20%5Bsymbols%5D(..%2Fsymbols.md)).%0A%0ABuild-time%20version%20macros%20(%60PM_SDK_VERSION_*%60)%20are%20baked%20into%20the%20app%3B%20the%20host%20exports%20the%20matching%20%60pocketmage_sdk_version%60%20string%2Fruntime%20parts%20it%20was%20built%20against.%20An%20app%20compares%20its%20own%20compile-time%20version%20against%20the%20host&#039;s%20export%20to%20present%20a%20compatible%20pair.%0A%0A%23%23%20%60APP_INIT%60%0A%0AApps%20receive%20one%20startup%20hook%3A%0A%0A%60%60%60cpp%0Avoid%20APP_INIT()%3B%20%20%20%2F%2F%20defined%20by%20the%20app%2C%20invoked%20by%20the%20entry%20shim%0A%60%60%60%0A%0AThe%20OS%2FSDK%20host%20reaches%20%60APP_INIT()%60%20after%20peripheral%20and%20singleton%20bring-up%20(displays%2C%20FS%2C%20clock%2C%20i18n%2C%20...)%2C%20so%20an%20app%20may%20read%20settings%2C%20open%20files%2C%20and%20prep%20its%20first%20screen%20there.%20The%20hook%20is%20also%20where%20boot-time%20apps%20decide%20whether%20to%20relaunch%20their%20UI%20at%20power-on.%0A%0A%23%23%20Interactive%20lifetime%0A%0AWhile%20running%2C%20the%20app%20owns%20the%20loop%3A%0A%0A-%20Poll%20input%3A%20%60pm_kb_read()%60%20for%20a%20keypress%2C%20%60pm_kb_state()%60%20for%20the%20current%20modifier%20state.%0A-%20Draw%3A%20build%20the%20E-Ink%20buffer%2C%20refresh%20once%2C%20draw%20OLED%20text.%0A-%20Sleep%20on%20idle%3A%20mirror%20the%20OS&#039;s%20%60CLOCK().setPrevTimeMillis(millis())%60%20poke%20or%20call%20%60pocketmage%3A%3AdeepSleep()%60%20explicitly.%0A%0AThere%20is%20no%20cooperative%20yield%20handshake%3A%20the%20app%20either%20returns%2C%20sleeps%2C%20or%20keeps%20its%20own%20loop%20going.%20A%20CPU-heavy%20loop%20starves%20the%20WiFi%20and%20E-Ink%20tasks%3B%20prefer%20%60pocketmage%3A%3AScopedCpuBoost%60%20for%20short%20bursts%20and%20yield%20with%20%60delay()%60%20between%20frames.%0A%0A%23%23%20Exiting%0A%0A%60%60%60cpp%0Areturn%200%3B%20%20%20%2F%2F%20plain%20exit%3B%20control%20returns%20to%20the%20OS%20cleanly%0A%60%60%60%0A%0AExiting%20is%20just%20%60return%60%20from%20%60main%60.%20There%20is%20no%20reboot%20handoff%20and%20no%20exit%20API.%20The%20loader%20tears%20down%20the%20app%20context%2C%20restores%20%60HOME%60%2C%20and%20repaints.%20A%20crashing%20app%20(fault%2C%20uncaught%20aborts)%20follows%20the%20same%20OS%20recovery%20path%20as%20the%20built-in%20apps%20(%5B%60recoverFromCrash%60%5D(..%2Fapi%2Fsys.md))%3B%20the%20device%20boots%20back%20to%20HOME%20rather%20than%20leaving%20the%20app%20stuck.%0A%0A%23%23%20Built-in%20vs%20third-party%0A%0AThe%20OS&#039;s%20%60HOME%60%2C%20TXT%2C%20and%20friends%20are%20compiled-in%20apps%20that%20live%20entirely%20on%20the%20host%20side.%20Third-party%20apps%20are%20the%20ELF%20path%20described%20here.%20Both%20inhabit%20the%20same%20%60lib%2FPocketMage_SDK%60%20API%2C%20so%20the%20same%20app%20code%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1656,7 +1656,7 @@
 <li>The host owns all hardware, all SDK singletons, the memory manager the app allocates from, and the thread that runs the app’s entry nightly.</li>
 <li>Nothing is statically linked into the app (<code>-nostdlib</code>, undefined references resolved at load). Any symbol the app uses that is not defined inside it must be in the host export table, or load fails the <code>pm check</code> surface (see <a href="../../symbols/">symbols</a>).</li>
 </ul>
-<p>Build-time version macros (<code>PM_SDK_VERSION_*</code>) are baked into the app; the host exports the matching <code>pocketmage_sdk_version</code> string/runtime parts it was built against. An app compares its own compile-time version against the host’s export to present a compatible pair (see the <a href="https://github.com/TalismanDesign/PocketMage_SDK/blob/main/examples/version_app/main.cpp">version example</a>).</p>
+<p>Build-time version macros (<code>PM_SDK_VERSION_*</code>) are baked into the app; the host exports the matching <code>pocketmage_sdk_version</code> string/runtime parts it was built against. An app compares its own compile-time version against the host’s export to present a compatible pair.</p>
 <h2 id="app-lifecycle-appinit" class="docmd-heading"><a href="#app-lifecycle-appinit" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a><code>APP_INIT</code></h2>
 <p>Apps receive one startup hook:</p>
 <pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> <span class="hljs-title function_">APP_INIT</span>();   <span class="hljs-comment">// defined by the app, invoked by the entry shim</span>
@@ -1665,7 +1665,7 @@
 <h2 id="app-lifecycle-interactive-lifetime" class="docmd-heading"><a href="#app-lifecycle-interactive-lifetime" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Interactive lifetime</h2>
 <p>While running, the app owns the loop:</p>
 <ul>
-<li>Poll input: <code>KB().updateKeypress()</code>, <code>TOUCH().updateScroll*()</code>.</li>
+<li>Poll input: <code>pm_kb_read()</code> for a keypress, <code>pm_kb_state()</code> for the current modifier state.</li>
 <li>Draw: build the E-Ink buffer, refresh once, draw OLED text.</li>
 <li>Sleep on idle: mirror the OS’s <code>CLOCK().setPrevTimeMillis(millis())</code> poke or call <code>pocketmage::deepSleep()</code> explicitly.</li>
 </ul>
@@ -1792,13 +1792,13 @@
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1790729515000">
+                <span class="git-last-updated" data-timestamp="1791164862000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1790729515000"></span>
+                  <span class="git-time" data-timestamp="1791164862000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1811,10 +1811,10 @@
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="DOCS">DOCS</div>
+                            <div class="git-commit-message" title="Massive revamp">Massive revamp</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1790729515000"></span>
+                              <span class="git-commit-date" data-timestamp="1791164862000"></span>
                             </div>
                           </div>
                         </li>
@@ -1937,13 +1937,13 @@
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mune4scf"></script>
+      <script src="../../assets/js/docmd-main.js?v=muulc20a"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mune4scf"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mune4scf" ></script>
-<script src="../../assets/js/vendor/minisearch.js?v=mune4scf" ></script>
-<script src="../../assets/js/docmd-search.js?v=mune4scf" ></script>
-<script src="../../assets/js/docmd-git.js?v=mune4scf" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=muulc20a"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=muulc20a" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=muulc20a" ></script>
+<script src="../../assets/js/docmd-search.js?v=muulc20a" ></script>
+<script src="../../assets/js/docmd-git.js?v=muulc20a" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

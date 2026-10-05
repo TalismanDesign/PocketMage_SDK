@@ -4,10 +4,10 @@ title: "Migrating an existing app"
 description: "Moving a pre-ELF app to the runtime-load flow: what changed, the eight steps, and the traps that bite."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/migration/"
 path: /migration/
-updated: 2026-09-30
+updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-30T00:52:21.272Z"
+  generated_at: "2026-10-05T01:48:20.791Z"
 ---
 ---
 title: "Migrating an existing app"
@@ -42,8 +42,8 @@ the loader's job, not yours.
 1. **Get the toolchain.** Install the espressif `xtensa-esp-elf` toolchain
    into `~/.espressif/...` as shown in [build.md](build.md). Do not rely on
    the PlatformIO toolchain; it emits big-endian ELFs the loader cannot read.
-2. **Scaffold.** Copy `examples/hello_app` as a starting point. Its
-   `Makefile` (`include tools/app.mk`) is the whole build system.
+2. **Scaffold.** Run `pm new myapp`. Its `Makefile`
+   (`include tools/app.mk`) is the whole build system.
 3. **Port the entry.** Wrap your start logic in `extern "C" int
    main(int, char**)`. The build renames it to `app_main`. Fit the previous
    app's lifetime to the return-from-`main` model

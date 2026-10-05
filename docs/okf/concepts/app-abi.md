@@ -4,10 +4,10 @@ title: "App binary contract (ABI)"
 description: "The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/"
 path: /app-abi/
-updated: 2026-09-30
+updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-30T00:52:21.268Z"
+  generated_at: "2026-10-05T01:48:20.786Z"
 ---
 ---
 title: "App binary contract (ABI)"
@@ -80,6 +80,94 @@ Do not rely on static-construction order at load time.
 So apps link `-nostdlib`: no newlib, no libstdc++, no SDK copy in the ELF.
 Everything an app references must resolve at load time from the host. Linking
 newlib into the app is wasteful and collides with host globals. Don't.
+
+## Third-party libraries
+
+An app can link any C or C++ library that compiles for Xtensa. The host
+exports the C and C++ runtime symbols, so a library's references to `malloc`,
+`memcpy`, `operator new`, and the soft-float helpers resolve against the host
+instead of needing a copy in the app.
+
+Source is compiled into the app by overriding `APP_SRCS`:
+
+```make
+APP_SRCS = main.cpp third_party/cJSON.c
+```
+
+That keeps the app small. `tools/app.mk` links with `-Os`,
+`-ffunction-sections`, `--gc-sections` and `--strip-all`, so a library's
+unused functions are dropped: cJSON linked into an app comes to 5.2 KB rather
+than the size of its source.
+
+Two limits worth knowing. The host exports runtime symbols the firmware
+already links, so a library needing a function nothing in the firmware uses
+will not resolve until the host exports it deliberately. And symbol counts
+depend on the app's own optimization level: the same `std::vector` source at
+`-O0` wants 13 host symbols, at `-Os` it wants 7. `app.mk` uses `-Os`.
+
+`sscanf` is the one common libc function the host does not export. It exists
+in newlib but nothing in the firmware references it, so `--gc-sections` dropped
+it, and referencing it pulls in about 190 KB of stdio reentrancy. Prefer
+`strtod` or `strtol` in app code and in vendored libraries. See
+[symbols.md](symbols.md).
+
+## Calling the SDK from an app
+
+An app includes one header and calls plain C functions:
+
+```cpp
+#include <pm_app_api.h>
+
+pm_i18n_set_language(PM_LANG_ENGLISH);
+int w = pm_text_width(2, "Hello", 2);
+pm_oled_sysmsg("saved", 1500);
+```
+
+`pm_app_api.h` pulls in `pm_sdk_app.h`, which is generated from the SDK
+headers by `tools/gen_app_api.py`. Regenerate it after any SDK header change:
+
+```sh
+python3 tools/gen_app_api.py
+```
+
+Names are `pm_<module>_<method>` with the method converted from camelCase:
+`Eink::refresh` becomes `pm_eink_refresh()`. Enums are plain integers in the app,
+named `PM_TARGET_*`, `PM_STYLE_*` and `PM_LANG_*`, and they are generated in the
+SDK's own declaration order, so a value always means the same language or
+target. `PM_APP_API_ABI` in the generated header changes when a signature does.
+
+C++ types are projected at the boundary. `String` arguments become
+`const char*`, returned strings and `const char*` point into a small rotating
+pool that is overwritten by later calls, and an SDK method that needs the
+filesystem gets the host's global handle rather than taking one. Methods
+returning an SDK type an app cannot construct, such as `DateTime` or
+`WifiApInfo`, have no wrapper. Where the value matters, the accessor is
+flattened into plain fields instead: `pm_clock_epoch()` and
+`pm_clock_timestamp()` rather than a `DateTime` return.
+
+A function returning `std::vector<String>`, such as word wrapping, becomes a
+count call and an indexed getter, matching how the SDK already hands out scan
+results:
+
+```cpp
+char line[80];
+int lines = pm_layout_word_wrap_count(text, maxWidth, PM_STYLE_BODY);
+for (int i = 0; i < lines; i++) {
+  pm_layout_word_wrap_get(text, maxWidth, PM_STYLE_BODY, i, line, sizeof line);
+  draw(line);
+}
+```
+
+The getter writes into a buffer the caller owns rather than the string pool,
+because a wrapped paragraph can be far longer than the pool holds, and it
+returns `-1` for an out of range index. A function taking
+`const std::vector<String>&` takes a C array and a count instead:
+`pm_io_join_string(const char* const* items, int count, char delimiter)`.
+
+The generated wrappers are exported through `symbols.list`, so an app that links
+against `pm_sdk_app.h` resolves every symbol it names. A new wrapper belongs in
+that list before any app can call it; a name that is missing fails at load with
+`Can't find common <name>` rather than at link time.
 
 ## SDK version stamp
 

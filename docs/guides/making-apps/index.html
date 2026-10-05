@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mune4scf">
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mune4scf">
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=muulc20a">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=muulc20a">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mune4scf" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mune4scf" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=muulc20a" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=muulc20a" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Scaffold, build, pack, and run your first PocketMage app.">
@@ -123,9 +123,9 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mune4scf" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mune4scf" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mune4scf" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=muulc20a" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=muulc20a" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=muulc20a" >
 
     
     
@@ -1554,7 +1554,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Making%20an%20app%22%0Adescription%3A%20%22Scaffold%2C%20build%2C%20pack%2C%20and%20run%20your%20first%20PocketMage%20app.%22%0A---%0A%0A%23%20Making%20an%20app%0A%0AA%20PocketMage%20app%20is%20a%20position-independent%20xtensa%20ELF%20that%20the%20host%20firmware%20loads%20into%20RAM%20and%20runs%20in-process.%20It%20links%20nothing%3A%20newlib%2C%20libstdc%2B%2B%2C%20and%20the%20SDK%20itself%20are%20all%20left%20undefined%20and%20resolved%20at%20load%20time%20against%20the%20host&#039;s%20export%20table%20(see%20%5Bthe%20ABI%5D(app-abi.md)%20and%20%5Bsymbols%5D(..%2Fsymbols.md)).%0A%0A%23%23%201.%20Scaffold%0A%0A%60%60%60sh%0Apm%20new%20myapp%0A%60%60%60%0A%0AThis%20copies%20%60examples%2Fhello_app%60%20into%20%60.%2Fmyapp%60%3A%0A%0A-%20%60main.cpp%60%2C%20the%20app%20source.%0A-%20%60myapp_ICON.bin%60%2C%20the%201-bit%20app%20icon%20(128x128%2C%20big-endian%20row-major)%20bundled%20into%20the%20delivery%20tar.%0A-%20%60Makefile%60%2C%20a%20two-line%20file%20that%20sets%20an%20absolute%20%60SDK_ROOT%60%20and%20includes%20the%20SDK%20recipe.%0A%0AApp%20names%20are%20%60%5BA-Za-z%5D%5BA-Za-z0-9_%5D*%60%3B%20the%20name%20becomes%20the%20ELF%2C%20tar%2C%20icon%2C%20and%20install%20slot%20name.%20To%20start%20from%20an%20API%20walkthrough%20instead%2C%20open%20the%20%5Brendering%20guide%5D(rendering.md)%20or%20the%20%5Bversion%20example%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_SDK%2Fblob%2Fmain%2Fexamples%2Fversion_app%2Fmain.cpp).%0A%0A%23%23%202.%20Write%20code%0A%0A%60%60%60cpp%0A%23include%20%3Cstdio.h%3E%0A%23include%20%3Cunistd.h%3E%0A%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%20%7B%0A%20%20(void)argc%3B%0A%20%20(void)argv%3B%0A%20%20printf(%22hello%20from%20pocketmage%20sdk%20app%5Cn%22)%3B%0A%20%20for%20(int%20i%20%3D%200%3B%20i%20%3C%203%3B%20%2B%2Bi)%20%7B%0A%20%20%20%20printf(%22tick%20%25d%5Cn%22%2C%20i)%3B%0A%20%20%20%20sleep(1)%3B%0A%20%20%7D%0A%20%20printf(%22app%20done%5Cn%22)%3B%0A%20%20return%200%3B%0A%7D%0A%60%60%60%0A%0AThat%20is%20the%20whole%20hello%20app%3A%20%60main%60%20with%20C%20linkage%20(the%20ABI%20entry%20point)%2C%20libc%20working%20(%60printf%60%2C%20%60sleep%60)%2C%20and%20a%20plain%20%60return%60%20to%20exit.%20Drop%20in%20%60%23include%20%3Cpocketmage.h%3E%60%20and%20the%20%60PM_SD()%60%2F%60OLED()%60%2Fetc.%20singletons%20and%20you%20have%20a%20UI%20app.%0A%0AThe%20SDK%20umbrella%20headers%20are%20only%20ever%20compiled%20as%20*declarations*%20inside%20an%20app%3B%20the%20implementations%20live%20in%20the%20host.%20%60PM_SDK_VERSION*%60%20macros%20are%20injected%20by%20the%20build%20so%20an%20app%20can%20compare%20against%20the%20running%20host&#039;s%20%60pocketmage_sdk_version%60%20export.%0A%0A%23%23%203.%20Build%0A%0A%60%60%60sh%0Apm%20build%20myapp%20%20%20%20%20%20%20%20%20%20%20%20%23%20runs%20make%3B%20%3D%3D%20the%20raw%20%60make%60%20path%20below%0A%60%60%60%0A%0Aor%20directly%3A%0A%0A%60%60%60sh%0Amake%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20uses%20SDK_ROOT%20from%20the%20scaffold%20Makefile%0A%60%60%60%0A%0AThe%20recipe%20(%60tools%2Fapp.mk%60)%20compiles%20with%20%60-fPIC%20-fno-exceptions%20-fno-rtti%60%2C%20hides%20all%20visibility%2C%20link-strips%20the%20artifact%2C%20and%20verifies%20it%20is%20a%20little-endian%20ELF%20(the%20loader%20rejects%20big-endian%20targets).%20Output%20is%20%60build%2F%3Cname%3E.app.elf%60.%0A%0AUseful%20override%20variables%3A%20%60APP_SRCS%60%20(default%20%60main.cpp%60)%2C%20%60APP_NAME%60%2C%20%60APP_BUILD_DIR%60.%20The%20%60pm-info%60%20target%20prints%20everything%20the%20tooling%20needs.%0A%0A%23%23%204.%20Check%20the%20ABI%20surface%0A%0A%60%60%60sh%0Apm%20check%20myapp%0A%60%60%60%0A%0ALists%20the%20app&#039;s%20undefined%20GLOBAL%20symbols%2C%20which%20is%20exactly%20what%20the%20host%20must%20resolve.%20Keep%20that%20list%20inside%20the%20host%20export%20table%20(%5B%60symbols.list%60%5D(..%2Fsymbols.md))%3B%20%60pm%20exports%60%20diffs%20the%20list%20against%20the%20host%20export%20table%20so%20the%20two%20cannot%20drift.%0A%0A%23%23%205.%20Pack%0A%0A%60%60%60sh%0Apm%20build%20myapp%20--pack%20%20%20%20%20%23%20build%20%2B%20pack%0A%23%20or%3A%20%20pm%20pack%20myapp%0A%23%20or%3A%20%20make%20pack%0A%60%60%60%0A%0AProduces%20%60build%2F%3Cname%3E.tar%60%20containing%20the%20stripped%20ELF%20and%20the%20icon.%20That%20tar%20is%20what%20gets%20installed%20onto%20the%20SD%20card%20(see%20%5Bpublishing%5D(..%2Fpublish.md)).%0A%0A%23%23%206.%20Run%0A%0AThe%20OS&#039;s%20APPLOADER%20installs%20the%20app%20and%20its%20icon%2C%20and%20menus%20it%20on%20HOME.%20Launching%20the%20app%20runs%20%60main%60%20inside%20the%20host%20process%3B%20see%20%5Blifecycle%5D(lifecycle.md)%20for%20what%20happens%20at%20start%20and%20exit%2C%20and%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Making%20an%20app%22%0Adescription%3A%20%22Scaffold%2C%20build%2C%20pack%2C%20and%20run%20your%20first%20PocketMage%20app.%22%0A---%0A%0A%23%20Making%20an%20app%0A%0AA%20PocketMage%20app%20is%20a%20position-independent%20xtensa%20ELF%20that%20the%20host%20firmware%20loads%20into%20RAM%20and%20runs%20in-process.%20It%20links%20nothing%3A%20newlib%2C%20libstdc%2B%2B%2C%20and%20the%20SDK%20itself%20are%20all%20left%20undefined%20and%20resolved%20at%20load%20time%20against%20the%20host&#039;s%20export%20table%20(see%20%5Bthe%20ABI%5D(app-abi.md)%20and%20%5Bsymbols%5D(..%2Fsymbols.md)).%0A%0A%23%23%201.%20Scaffold%0A%0A%60%60%60sh%0Apm%20new%20myapp%0A%60%60%60%0A%0AThis%20clones%20the%20official%20template%20repository%20into%20%60.%2Fmyapp%60%3A%0A%0A-%20%60main.cpp%60%2C%20the%20app%20source.%0A-%20%60myapp_ICON.bin%60%2C%20the%201-bit%20app%20icon%20(128x128%2C%20big-endian%20row-major)%20bundled%20into%20the%20delivery%20tar.%0A-%20%60Makefile%60%2C%20a%20file%20that%20sets%20%60SDK_ROOT%60%20from%20%60PM_SDK_ROOT%60%20and%20includes%20the%20SDK%20recipe.%0A%0AThe%20template%20repository%20is%0A%5BPocketMage_App%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_App).%20Set%0A%60PM_TEMPLATE_REPO%60%20to%20scaffold%20from%20a%20fork.%0A%0AApp%20names%20are%20%60%5BA-Za-z%5D%5BA-Za-z0-9_%5D*%60%3B%20the%20name%20becomes%20the%20ELF%2C%20tar%2C%20icon%2C%20and%20install%20slot%20name.%20For%20an%20API%20walkthrough%2C%20open%20the%20%5Brendering%20guide%5D(rendering.md).%0A%0A%23%23%202.%20Write%20code%0A%0A%60%60%60cpp%0A%23include%20%3Cstdio.h%3E%0A%23include%20%3Cunistd.h%3E%0A%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%20%7B%0A%20%20(void)argc%3B%0A%20%20(void)argv%3B%0A%20%20printf(%22hello%20from%20pocketmage%20sdk%20app%5Cn%22)%3B%0A%20%20for%20(int%20i%20%3D%200%3B%20i%20%3C%203%3B%20%2B%2Bi)%20%7B%0A%20%20%20%20printf(%22tick%20%25d%5Cn%22%2C%20i)%3B%0A%20%20%20%20sleep(1)%3B%0A%20%20%7D%0A%20%20printf(%22app%20done%5Cn%22)%3B%0A%20%20return%200%3B%0A%7D%0A%60%60%60%0A%0AThat%20is%20the%20whole%20starter%20app%3A%20%60main%60%20with%20C%20linkage%20(the%20ABI%20entry%20point)%2C%20libc%20working%20(%60printf%60%2C%20%60sleep%60)%2C%20and%20a%20plain%20%60return%60%20to%20exit.%20Add%20%60%23include%20%3Cpm_app_api.h%3E%60%20and%20call%20the%20%60pm_*%60%20functions%2C%20such%20as%20%60pm_oled_send%60%20or%20%60pm_eink_refresh%60%2C%20and%20you%20have%20a%20UI%20app.%0A%0AThird-party%20C%20and%20C%2B%2B%20libraries%20work%20too.%20Compile%20their%20source%20into%20the%20app%20by%20overriding%20%60APP_SRCS%60%3B%20the%20host%20resolves%20their%20libc%20and%20runtime%20references.%20See%20%5Bapp-abi.md%5D(..%2Fapp-abi.md).%0A%0AThe%20SDK%20umbrella%20headers%20are%20only%20ever%20compiled%20as%20*declarations*%20inside%20an%20app%3B%20the%20implementations%20live%20in%20the%20host.%20%60PM_SDK_VERSION*%60%20macros%20are%20injected%20by%20the%20build%20so%20an%20app%20can%20compare%20against%20the%20running%20host&#039;s%20%60pocketmage_sdk_version%60%20export.%0A%0A%23%23%203.%20Build%0A%0A%60%60%60sh%0Apm%20build%20myapp%20%20%20%20%20%20%20%20%20%20%20%20%23%20runs%20make%3B%20%3D%3D%20the%20raw%20%60make%60%20path%20below%0A%60%60%60%0A%0Aor%20directly%3A%0A%0A%60%60%60sh%0Amake%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20uses%20SDK_ROOT%20from%20the%20scaffold%20Makefile%0A%60%60%60%0A%0AThe%20recipe%20(%60tools%2Fapp.mk%60)%20compiles%20with%20%60-fPIC%20-fno-exceptions%20-fno-rtti%60%2C%20hides%20all%20visibility%2C%20link-strips%20the%20artifact%2C%20and%20verifies%20it%20is%20a%20little-endian%20ELF%20(the%20loader%20rejects%20big-endian%20targets).%20Output%20is%20%60build%2F%3Cname%3E.app.elf%60.%0A%0AUseful%20override%20variables%3A%20%60APP_SRCS%60%20(default%20%60main.cpp%60)%2C%20%60APP_NAME%60%2C%20%60APP_BUILD_DIR%60.%20The%20%60pm-info%60%20target%20prints%20everything%20the%20tooling%20needs.%0A%0A%23%23%204.%20Check%20the%20ABI%20surface%0A%0A%60%60%60sh%0Apm%20check%20myapp%0A%60%60%60%0A%0ALists%20the%20app&#039;s%20undefined%20GLOBAL%20symbols%2C%20which%20is%20exactly%20what%20the%20host%20must%20resolve.%20Keep%20that%20list%20inside%20the%20host%20export%20table%20(%5B%60symbols.list%60%5D(..%2Fsymbols.md))%3B%20%60pm%20exports%60%20diffs%20the%20list%20against%20the%20host%20export%20table%20so%20the%20two%20cannot%20drift.%0A%0A%23%23%205.%20Pack%0A%0A%60%60%60sh%0Apm%20build%20myapp%20--pack%20%20%20%20%20%23%20build%20%2B%20pack%0A%23%20or%3A%20%20pm%20pack%20myapp%0A%23%20or%3A%20%20make%20pack%0A%60%60%60%0A%0AProduces%20%60build%2F%3Cname%3E.tar%60%20containing%20the%20stripped%20ELF%20and%20the%20icon.%20That%20tar%20is%20what%20gets%20installed%20onto%20the%20SD%20card%20(see%20%5Bpublishing%5D(..%2Fpublish.md)).%0A%0A%23%23%206.%20Run%0A%0AThe%20OS&#039;s%20APPLOADER%20installs%20the%20app%20and%20its%20icon%2C%20and%20menus%20it%20on%20HOME.%20Launching%20the%20app%20runs%20%60main%60%20inside%20the%20host%20process%3B%20see%20%5Blifecycle%5D(lifecycle.md)%20for%20what%20happens%20at%20start%20and%20exit%2C%20and%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1648,13 +1648,16 @@
 <h2 id="making-an-app-1-scaffold" class="docmd-heading"><a href="#making-an-app-1-scaffold" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>1. Scaffold</h2>
 <pre class="hljs"><code class="language-sh">pm <span class="hljs-keyword">new</span> myapp
 </code></pre>
-<p>This copies <code>examples/hello_app</code> into <code>./myapp</code>:</p>
+<p>This clones the official template repository into <code>./myapp</code>:</p>
 <ul>
 <li><code>main.cpp</code>, the app source.</li>
 <li><code>myapp_ICON.bin</code>, the 1-bit app icon (128x128, big-endian row-major) bundled into the delivery tar.</li>
-<li><code>Makefile</code>, a two-line file that sets an absolute <code>SDK_ROOT</code> and includes the SDK recipe.</li>
+<li><code>Makefile</code>, a file that sets <code>SDK_ROOT</code> from <code>PM_SDK_ROOT</code> and includes the SDK recipe.</li>
 </ul>
-<p>App names are <code>[A-Za-z][A-Za-z0-9_]*</code>; the name becomes the ELF, tar, icon, and install slot name. To start from an API walkthrough instead, open the <a href="../rendering/">rendering guide</a> or the <a href="https://github.com/TalismanDesign/PocketMage_SDK/blob/main/examples/version_app/main.cpp">version example</a>.</p>
+<p>The template repository is<br>
+<a href="https://github.com/TalismanDesign/PocketMage_App">PocketMage_App</a>. Set<br>
+<code>PM_TEMPLATE_REPO</code> to scaffold from a fork.</p>
+<p>App names are <code>[A-Za-z][A-Za-z0-9_]*</code>; the name becomes the ELF, tar, icon, and install slot name. For an API walkthrough, open the <a href="../rendering/">rendering guide</a>.</p>
 <h2 id="making-an-app-2-write-code" class="docmd-heading"><a href="#making-an-app-2-write-code" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>2. Write code</h2>
 <pre class="hljs"><code class="language-cpp"><span class="hljs-comment">#include &lt;stdio.h&gt;</span>
 <span class="hljs-comment">#include &lt;unistd.h&gt;</span>
@@ -1671,7 +1674,8 @@ extern <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-keyword"
   <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
 }
 </code></pre>
-<p>That is the whole hello app: <code>main</code> with C linkage (the ABI entry point), libc working (<code>printf</code>, <code>sleep</code>), and a plain <code>return</code> to exit. Drop in <code>#include &lt;pocketmage.h&gt;</code> and the <code>PM_SD()</code>/<code>OLED()</code>/etc. singletons and you have a UI app.</p>
+<p>That is the whole starter app: <code>main</code> with C linkage (the ABI entry point), libc working (<code>printf</code>, <code>sleep</code>), and a plain <code>return</code> to exit. Add <code>#include &lt;pm_app_api.h&gt;</code> and call the <code>pm_*</code> functions, such as <code>pm_oled_send</code> or <code>pm_eink_refresh</code>, and you have a UI app.</p>
+<p>Third-party C and C++ libraries work too. Compile their source into the app by overriding <code>APP_SRCS</code>; the host resolves their libc and runtime references. See <a href="../../app-abi/">app-abi.md</a>.</p>
 <p>The SDK umbrella headers are only ever compiled as <em>declarations</em> inside an app; the implementations live in the host. <code>PM_SDK_VERSION*</code> macros are injected by the build so an app can compare against the running host’s <code>pocketmage_sdk_version</code> export.</p>
 <h2 id="making-an-app-3-build" class="docmd-heading"><a href="#making-an-app-3-build" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>3. Build</h2>
 <pre class="hljs"><code class="language-sh">pm build myapp            <span class="hljs-comment"># runs make; == the raw `make` path below</span>
@@ -1809,13 +1813,13 @@ extern <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-keyword"
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1790729515000">
+                <span class="git-last-updated" data-timestamp="1791164862000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1790729515000"></span>
+                  <span class="git-time" data-timestamp="1791164862000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1828,10 +1832,10 @@ extern <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-keyword"
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="DOCS">DOCS</div>
+                            <div class="git-commit-message" title="Massive revamp">Massive revamp</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1790729515000"></span>
+                              <span class="git-commit-date" data-timestamp="1791164862000"></span>
                             </div>
                           </div>
                         </li>
@@ -1954,13 +1958,13 @@ extern <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-keyword"
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mune4scf"></script>
+      <script src="../../assets/js/docmd-main.js?v=muulc20a"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mune4scf"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mune4scf" ></script>
-<script src="../../assets/js/vendor/minisearch.js?v=mune4scf" ></script>
-<script src="../../assets/js/docmd-search.js?v=mune4scf" ></script>
-<script src="../../assets/js/docmd-git.js?v=mune4scf" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=muulc20a"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=muulc20a" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=muulc20a" ></script>
+<script src="../../assets/js/docmd-search.js?v=muulc20a" ></script>
+<script src="../../assets/js/docmd-git.js?v=muulc20a" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

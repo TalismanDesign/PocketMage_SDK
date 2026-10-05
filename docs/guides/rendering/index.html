@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mune4scf">
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mune4scf">
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=muulc20a">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=muulc20a">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mune4scf" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mune4scf" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=muulc20a" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=muulc20a" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Which draw calls go where, the E-Ink buffered refresh model, and the scroll loop.">
@@ -123,9 +123,9 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mune4scf" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mune4scf" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mune4scf" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=muulc20a" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=muulc20a" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=muulc20a" >
 
     
     
@@ -1554,7 +1554,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Rendering%22%0Adescription%3A%20%22Which%20draw%20calls%20go%20where%2C%20the%20E-Ink%20buffered%20refresh%20model%2C%20and%20the%20scroll%20loop.%22%0A---%0A%0A%23%20Rendering%0A%0APocketMage%20drives%20two%20panels%20from%20one%20shared%20app%20API.%20Getting%20pixel%20messages%20to%20the%20right%20panel%20and%20knowing%20when%20a%20refresh%20actually%20happens%20is%20the%20core%20of%20any%20screen.%0A%0A%23%23%20Two%20targets%2C%20one%20%60FontEngine%60-dominated%20path%0A%0A-%20The%20**OLED**%20(256x32%20SSD1326)%20is%20a%20fast%20status%20text%20panel%20drawn%20with%20u8g2%3A%20%60OLED().oledWord%60%2C%20%60oledScroll%60%2C%20%60sysMessage%60%2C%20and%20the%20info%20line.%0A-%20The%20**E-Ink**%20(320x240%20lambda)%20is%20the%20big%20document%2Flist%20panel%20drawn%20by%20the%20SDK&#039;s%20buffer-based%20drivers%3A%20%60EINK()%60%20primitives%2C%20%60FontEngine%60%20with%20%60DisplayTarget%3A%3AEINK%60%2C%20the%20%5Bframes%20engine%5D(..%2Fapi%2Fframes.md)%2C%20and%20the%20%5Bui%20helpers%5D(..%2Fapi%2Fui.md).%0A%0AEvery%20%60FontEngine%60%20call%20takes%20an%20explicit%20%60DisplayTarget%60%2C%20so%20the%20same%20measure%2Fdraw%20code%20works%20for%20both%20panels%20and%20the%20metrics%20are%20per-target.%20The%20OLED%20draw%20color%20and%20the%20E-Ink%20draw%20color%20are%20independent%20(%5Bfont%5D(..%2Fapi%2Ffont.md)).%0A%0A%23%23%20The%20E-Ink%20refresh%20model%0A%0AThe%20E-Ink%20driver%20is%20**buffered**%3A%20draw%20calls%20only%20write%20to%20the%20current%20buffer%3B%20nothing%20reaches%20the%20panel%20until%20a%20%60refresh()%60%20(or%20a%20full%20%60-ForceFull%60%20update).%20The%20canonical%20app%20rhythm%20is%3A%0A%0A%60%60%60cpp%0AbeginEinkScreen()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20clear%20buffer%2C%20set%20full%20window%0A%2F%2F%20...%20FontEngine%20%2F%20EINK%20%2F%20ui%20draws%20...%0AendEinkScreen(%22Status%20text%22)%3B%20%20%20%20%20%20%20%20%20%2F%2F%20draw%20status%20band%20%2B%20refresh%0A%60%60%60%0A%0A%60beginEinkScreen(preserveBg)%60%20optionally%20keeps%20the%20previous%20buffer%20background%20(for%20scrolling%20windows)%20instead%20of%20clearing.%20%60endEinkScreen%60%20adds%20the%20status%20bar%20for%20you.%20If%20you%20manage%20the%20window%20yourself%2C%20call%20%60EINK().refresh()%60%20directly%3B%20%60EndEinkFullRefresh%60%20exists%20for%20content%20that%20must%20not%20ghost.%0A%0AStatus%20band%20ownership%3A%20the%20bottom%20%60kEinkStatusH%60%20(26)%20pixels%20belong%20to%20%60drawStatusBar%60.%20Content%20frames%20should%20stay%20within%20%60kEinkContentH%60%20(214)%20(%5Blayout%5D(..%2Fapi%2Flayout.md)).%0A%0A%23%23%20Text%20metrics%20and%20layout%0A%0A-%20%60y%60%20in%20draw%20calls%20is%20the%20**baseline**%2C%20not%20the%20top.%0A-%20Fit%20text%20before%20drawing%3A%20%60FontEngine%3A%3AtextWidth%60%20%2B%20%60sliceThatFits%60%2C%20or%20%60truncateWithEllipsis%60%20for%20a%20single%20line%3B%20%60wordWrap%60%20for%20paragraphs%20(%5Blayout%5D(..%2Fapi%2Flayout.md)).%0A-%20Row%20pitch%20is%20%60einkRowPitch(style)%60%20%3D%20font%20height%20%2B%20line%20spacing%3B%20%60Normal%60-vs-%60ForceFull%60%20refresh%20choice%20rides%20on%20%60EINK().getLineSpacing()%60.%0A-%20Named%20constants%20(%60kFrameTextPadX%60%2C%20%60kOledWordBaseline%60%2C%20%60kOledInfoBaseline%60%2C%20%60kGridLabelMaxW%60%2C%20...)%20are%20in%20%5Blayout%5D(..%2Fapi%2Flayout.md)%3B%20use%20them%20instead%20of%20literals.%0A%0A%23%23%20The%20scroll%20loop%0A%0AThese%20three%20views%20share%20one%20gesture-sensing%20core%20(%5Btouch%5D(..%2Fapi%2Ftouch.md))%3A%0A%0A1.%20**Fixed%20window%20with%20offset**%3A%20%60TOUCH().updateScrollFromTouch()%60%2C%20then%20read%20%60getDynamicScroll()%60%20and%20draw%20the%20sliding%20window.%20Used%20by%20TXT.%0A2.%20**Step%20scroll**%3A%20%60TOUCH().updateScroll(maxScroll%2C%20lineScroll%2C%20step)%60%2C%20redraw%20only%20when%20it%20returns%20%60true%60.%20Used%20by%20lists.%0A3.%20**Gesture%20vector**%3A%20%60TOUCH().getScrollVector()%60%20for%20preview-band%20feedback%20(%60t%20%3E%3D%201%60%20scrolls%20by%20a%20page).%0A%0ABind%20the%20scroll%20offset%20to%20%60CLOCK().setPrevTimeMillis(millis())%60%20on%20every%20touch%20so%20scrolling%20keeps%20the%20auto-sleep%20timer%20honest%20(%5Bclock%5D(..%2Fapi%2Fclock.md)).%0A%0A%23%23%20OLED%20overlay%20patterns%0A%0AFor%20transient%20feedback%20use%20%60OLED().sysMessage(text%2C%20ms)%60%3B%20it%20draws%20a%20framed%20dialog%20over%20whatever%20the%20E-Ink%20is%20showing%20and%20dismisses%20itself.%20Long%20text%20that%20the%20OLED%20cannot%20hold%20goes%20wider%20than%20the%20widget%3A%20pass%20longer%20strings%20only%20when%20they%20fit%20the%20panel%2C%20or%20use%20%60OLED().oledScroll%60%20for%20a%20running%20thumbnail%20of%20the%20E-Ink%20window.%0A%0A%23%23%20Full%20examples%0A%0A%60examples%2Fhello_app%60%20is%20the%20text-only%20skeleton.%20For%20draw-heavy%20apps%2C%20start%20from%20%60examples%2Fversion_app%60%2C%20which%20prints%20SDK%20version%20strings%20on%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Rendering%22%0Adescription%3A%20%22Which%20draw%20calls%20go%20where%2C%20the%20E-Ink%20buffered%20refresh%20model%2C%20and%20the%20scroll%20loop.%22%0A---%0A%0A%23%20Rendering%0A%0APocketMage%20drives%20two%20panels%20from%20one%20shared%20app%20API.%20Getting%20pixel%20messages%20to%20the%20right%20panel%20and%20knowing%20when%20a%20refresh%20actually%20happens%20is%20the%20core%20of%20any%20screen.%0A%0A%23%23%20Two%20targets%2C%20one%20%60FontEngine%60-dominated%20path%0A%0A-%20The%20**OLED**%20(256x32%20SSD1326)%20is%20a%20fast%20status%20text%20panel.%20Apps%20reach%20it%20through%20%60pm_oled_send%60%2C%20%60pm_oled_sysmsg%60%2C%20and%20%60pm_oled_set_power_save%60.%0A-%20The%20**E-Ink**%20(320x240%20lambda)%20is%20the%20big%20document%2Flist%20panel.%20Apps%20draw%20it%20with%20%60pm_eink_pixel%60%2C%20%60pm_eink_rect%60%2C%20and%20%60pm_eink_refresh%60%2C%20plus%20the%20%5Bframes%20engine%5D(..%2Fapi%2Fframes.md)%20and%20the%20%5Bui%20helpers%5D(..%2Fapi%2Fui.md).%0A%0AEvery%20%60FontEngine%60%20call%20takes%20an%20explicit%20%60DisplayTarget%60%2C%20so%20the%20same%20measure%2Fdraw%20code%20works%20for%20both%20panels%20and%20the%20metrics%20are%20per-target.%20The%20OLED%20draw%20color%20and%20the%20E-Ink%20draw%20color%20are%20independent%20(%5Bfont%5D(..%2Fapi%2Ffont.md)).%0A%0A%23%23%20The%20E-Ink%20refresh%20model%0A%0AThe%20E-Ink%20driver%20is%20**buffered**%3A%20draw%20calls%20only%20write%20to%20the%20current%20buffer%3B%20nothing%20reaches%20the%20panel%20until%20a%20%60refresh()%60%20(or%20a%20full%20%60-ForceFull%60%20update).%20The%20canonical%20app%20rhythm%20is%3A%0A%0A%60%60%60cpp%0AbeginEinkScreen()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20clear%20buffer%2C%20set%20full%20window%0A%2F%2F%20...%20FontEngine%20%2F%20EINK%20%2F%20ui%20draws%20...%0AendEinkScreen(%22Status%20text%22)%3B%20%20%20%20%20%20%20%20%20%2F%2F%20draw%20status%20band%20%2B%20refresh%0A%60%60%60%0A%0A%60beginEinkScreen(preserveBg)%60%20optionally%20keeps%20the%20previous%20buffer%20background%20(for%20scrolling%20windows)%20instead%20of%20clearing.%20%60endEinkScreen%60%20adds%20the%20status%20bar%20for%20you.%20If%20you%20manage%20the%20window%20yourself%2C%20call%20%60pm_eink_refresh()%60%20directly%3B%20%60PM_REFRESH_FORCE_FULL%60%20exists%20for%20content%20that%20must%20not%20ghost.%0A%0AStatus%20band%20ownership%3A%20the%20bottom%20%60kEinkStatusH%60%20(26)%20pixels%20belong%20to%20%60drawStatusBar%60.%20Content%20frames%20should%20stay%20within%20%60kEinkContentH%60%20(214)%20(%5Blayout%5D(..%2Fapi%2Flayout.md)).%0A%0A%23%23%20Text%20metrics%20and%20layout%0A%0A-%20%60y%60%20in%20draw%20calls%20is%20the%20**baseline**%2C%20not%20the%20top.%0A-%20Fit%20text%20before%20drawing%3A%20%60pm_text_width%60%20%2B%20%60sliceThatFits%60%2C%20or%20%60truncateWithEllipsis%60%20for%20a%20single%20line%3B%20%60wordWrap%60%20for%20paragraphs%20(%5Blayout%5D(..%2Fapi%2Flayout.md)).%0A-%20Row%20pitch%20is%20%60einkRowPitch(style)%60%20%3D%20font%20height%20%2B%20line%20spacing%3B%20%60Normal%60-vs-%60ForceFull%60%20refresh%20choice%20rides%20on%20%60pm_eink_get_line_spacing()%60.%0A-%20Named%20constants%20(%60kFrameTextPadX%60%2C%20%60kOledWordBaseline%60%2C%20%60kOledInfoBaseline%60%2C%20%60kGridLabelMaxW%60%2C%20...)%20are%20in%20%5Blayout%5D(..%2Fapi%2Flayout.md)%3B%20use%20them%20instead%20of%20literals.%0A%0A%23%23%20The%20scroll%20loop%0A%0AThese%20three%20views%20share%20one%20gesture-sensing%20core%20(%5Btouch%5D(..%2Fapi%2Ftouch.md))%3A%0A%0A1.%20**Fixed%20window%20with%20offset**%3A%20%60TOUCH().updateScrollFromTouch()%60%2C%20then%20read%20%60getDynamicScroll()%60%20and%20draw%20the%20sliding%20window.%20Used%20by%20TXT.%0A2.%20**Step%20scroll**%3A%20%60TOUCH().updateScroll(maxScroll%2C%20lineScroll%2C%20step)%60%2C%20redraw%20only%20when%20it%20returns%20%60true%60.%20Used%20by%20lists.%0A3.%20**Gesture%20vector**%3A%20%60TOUCH().getScrollVector()%60%20for%20preview-band%20feedback%20(%60t%20%3E%3D%201%60%20scrolls%20by%20a%20page).%0A%0ABind%20the%20scroll%20offset%20to%20%60CLOCK().setPrevTimeMillis(millis())%60%20on%20every%20touch%20so%20scrolling%20keeps%20the%20auto-sleep%20timer%20honest%20(%5Bclock%5D(..%2Fapi%2Fclock.md)).%0A%0A%23%23%20OLED%20overlay%20patterns%0A%0AFor%20transient%20feedback%20use%20%60pm_oled_sysmsg(text%2C%20ms)%60%3B%20it%20draws%20a%20framed%20dialog%20over%20whatever%20the%20E-Ink%20is%20showing%20and%20dismisses%20itself.%20Long%20text%20that%20the%20OLED%20cannot%20hold%20goes%20wider%20than%20the%20widget%3A%20pass%20longer%20strings%20only%20when%20they%20fit%20the%20panel%2C%20or%20refresh%20a%20region%20for%20a%20running%20thumbnail%20of%20the%20E-Ink%20window.%0A%0A%23%23%20Full%20examples%0A%0A%60pm%20new%20myapp%60%20gives%20the%20text-only%20skeleton.%20For%20draw-heavy%20apps%2C%20start%20from%20the%0Asame%20template%20and%20call%20the%20E-Ink%20and%20OLED%20functions%20directly%3B%20see%0A%5Bapp-abi.md%5D(..%2Fapp-abi.md)%20for%20what%20the%20app%20process%20owns.%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1647,8 +1647,8 @@
 <p>PocketMage drives two panels from one shared app API. Getting pixel messages to the right panel and knowing when a refresh actually happens is the core of any screen.</p>
 <h2 id="rendering-two-targets-one-fontengine-dominated-path" class="docmd-heading"><a href="#rendering-two-targets-one-fontengine-dominated-path" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Two targets, one <code>FontEngine</code>-dominated path</h2>
 <ul>
-<li>The <strong>OLED</strong> (256x32 SSD1326) is a fast status text panel drawn with u8g2: <code>OLED().oledWord</code>, <code>oledScroll</code>, <code>sysMessage</code>, and the info line.</li>
-<li>The <strong>E-Ink</strong> (320x240 lambda) is the big document/list panel drawn by the SDK’s buffer-based drivers: <code>EINK()</code> primitives, <code>FontEngine</code> with <code>DisplayTarget::EINK</code>, the <a href="../../api/frames/">frames engine</a>, and the <a href="../../api/ui/">ui helpers</a>.</li>
+<li>The <strong>OLED</strong> (256x32 SSD1326) is a fast status text panel. Apps reach it through <code>pm_oled_send</code>, <code>pm_oled_sysmsg</code>, and <code>pm_oled_set_power_save</code>.</li>
+<li>The <strong>E-Ink</strong> (320x240 lambda) is the big document/list panel. Apps draw it with <code>pm_eink_pixel</code>, <code>pm_eink_rect</code>, and <code>pm_eink_refresh</code>, plus the <a href="../../api/frames/">frames engine</a> and the <a href="../../api/ui/">ui helpers</a>.</li>
 </ul>
 <p>Every <code>FontEngine</code> call takes an explicit <code>DisplayTarget</code>, so the same measure/draw code works for both panels and the metrics are per-target. The OLED draw color and the E-Ink draw color are independent (<a href="../../api/font/">font</a>).</p>
 <h2 id="rendering-the-e-ink-refresh-model" class="docmd-heading"><a href="#rendering-the-e-ink-refresh-model" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>The E-Ink refresh model</h2>
@@ -1657,13 +1657,13 @@
 <span class="hljs-comment">// ... FontEngine / EINK / ui draws ...</span>
 <span class="hljs-title function_">endEinkScreen</span>(<span class="hljs-string">&quot;Status text&quot;</span>);         <span class="hljs-comment">// draw status band + refresh</span>
 </code></pre>
-<p><code>beginEinkScreen(preserveBg)</code> optionally keeps the previous buffer background (for scrolling windows) instead of clearing. <code>endEinkScreen</code> adds the status bar for you. If you manage the window yourself, call <code>EINK().refresh()</code> directly; <code>EndEinkFullRefresh</code> exists for content that must not ghost.</p>
+<p><code>beginEinkScreen(preserveBg)</code> optionally keeps the previous buffer background (for scrolling windows) instead of clearing. <code>endEinkScreen</code> adds the status bar for you. If you manage the window yourself, call <code>pm_eink_refresh()</code> directly; <code>PM_REFRESH_FORCE_FULL</code> exists for content that must not ghost.</p>
 <p>Status band ownership: the bottom <code>kEinkStatusH</code> (26) pixels belong to <code>drawStatusBar</code>. Content frames should stay within <code>kEinkContentH</code> (214) (<a href="../../api/layout/">layout</a>).</p>
 <h2 id="rendering-text-metrics-and-layout" class="docmd-heading"><a href="#rendering-text-metrics-and-layout" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Text metrics and layout</h2>
 <ul>
 <li><code>y</code> in draw calls is the <strong>baseline</strong>, not the top.</li>
-<li>Fit text before drawing: <code>FontEngine::textWidth</code> + <code>sliceThatFits</code>, or <code>truncateWithEllipsis</code> for a single line; <code>wordWrap</code> for paragraphs (<a href="../../api/layout/">layout</a>).</li>
-<li>Row pitch is <code>einkRowPitch(style)</code> = font height + line spacing; <code>Normal</code>-vs-<code>ForceFull</code> refresh choice rides on <code>EINK().getLineSpacing()</code>.</li>
+<li>Fit text before drawing: <code>pm_text_width</code> + <code>sliceThatFits</code>, or <code>truncateWithEllipsis</code> for a single line; <code>wordWrap</code> for paragraphs (<a href="../../api/layout/">layout</a>).</li>
+<li>Row pitch is <code>einkRowPitch(style)</code> = font height + line spacing; <code>Normal</code>-vs-<code>ForceFull</code> refresh choice rides on <code>pm_eink_get_line_spacing()</code>.</li>
 <li>Named constants (<code>kFrameTextPadX</code>, <code>kOledWordBaseline</code>, <code>kOledInfoBaseline</code>, <code>kGridLabelMaxW</code>, …) are in <a href="../../api/layout/">layout</a>; use them instead of literals.</li>
 </ul>
 <h2 id="rendering-the-scroll-loop" class="docmd-heading"><a href="#rendering-the-scroll-loop" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>The scroll loop</h2>
@@ -1675,9 +1675,11 @@
 </ol>
 <p>Bind the scroll offset to <code>CLOCK().setPrevTimeMillis(millis())</code> on every touch so scrolling keeps the auto-sleep timer honest (<a href="../../api/clock/">clock</a>).</p>
 <h2 id="rendering-oled-overlay-patterns" class="docmd-heading"><a href="#rendering-oled-overlay-patterns" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>OLED overlay patterns</h2>
-<p>For transient feedback use <code>OLED().sysMessage(text, ms)</code>; it draws a framed dialog over whatever the E-Ink is showing and dismisses itself. Long text that the OLED cannot hold goes wider than the widget: pass longer strings only when they fit the panel, or use <code>OLED().oledScroll</code> for a running thumbnail of the E-Ink window.</p>
+<p>For transient feedback use <code>pm_oled_sysmsg(text, ms)</code>; it draws a framed dialog over whatever the E-Ink is showing and dismisses itself. Long text that the OLED cannot hold goes wider than the widget: pass longer strings only when they fit the panel, or refresh a region for a running thumbnail of the E-Ink window.</p>
 <h2 id="rendering-full-examples" class="docmd-heading"><a href="#rendering-full-examples" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Full examples</h2>
-<p><code>examples/hello_app</code> is the text-only skeleton. For draw-heavy apps, start from <code>examples/version_app</code>, which prints SDK version strings on</p>
+<p><code>pm new myapp</code> gives the text-only skeleton. For draw-heavy apps, start from the<br>
+same template and call the E-Ink and OLED functions directly; see<br>
+<a href="../../app-abi/">app-abi.md</a> for what the app process owns.</p>
 
                 
                   <div class="page-navigation">
@@ -1794,13 +1796,13 @@
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1790729515000">
+                <span class="git-last-updated" data-timestamp="1791164862000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1790729515000"></span>
+                  <span class="git-time" data-timestamp="1791164862000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1813,10 +1815,10 @@
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="DOCS">DOCS</div>
+                            <div class="git-commit-message" title="Massive revamp">Massive revamp</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1790729515000"></span>
+                              <span class="git-commit-date" data-timestamp="1791164862000"></span>
                             </div>
                           </div>
                         </li>
@@ -1939,13 +1941,13 @@
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mune4scf"></script>
+      <script src="../../assets/js/docmd-main.js?v=muulc20a"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mune4scf"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mune4scf" ></script>
-<script src="../../assets/js/vendor/minisearch.js?v=mune4scf" ></script>
-<script src="../../assets/js/docmd-search.js?v=mune4scf" ></script>
-<script src="../../assets/js/docmd-git.js?v=mune4scf" type="module"></script>
+      <script src="../../assets/js/docmd-git.js?v=muulc20a"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=muulc20a" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=muulc20a" ></script>
+<script src="../../assets/js/docmd-search.js?v=muulc20a" ></script>
+<script src="../../assets/js/docmd-git.js?v=muulc20a" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

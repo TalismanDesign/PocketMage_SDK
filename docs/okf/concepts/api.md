@@ -4,10 +4,10 @@ title: "API Reference"
 description: "Every component an app links against: the umbrella header, the singleton accessors, and the per-component pages."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/"
 path: /api/
-updated: 2026-09-30
+updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-30T00:52:21.251Z"
+  generated_at: "2026-10-05T01:48:20.780Z"
 ---
 ---
 title: "API Reference"

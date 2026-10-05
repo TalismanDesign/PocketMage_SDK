@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mune4scf">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mune4scf">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=muulc20a">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=muulc20a">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mune4scf" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mune4scf" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=muulc20a" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=muulc20a" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Moving a pre-ELF app to the runtime-load flow: what changed, the eight steps, and the traps that bite.">
@@ -123,9 +123,9 @@
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mune4scf" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mune4scf" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mune4scf" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=muulc20a" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=muulc20a" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=muulc20a" >
 
     
     
@@ -1554,7 +1554,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Migrating%20an%20existing%20app%22%0Adescription%3A%20%22Moving%20a%20pre-ELF%20app%20to%20the%20runtime-load%20flow%3A%20what%20changed%2C%20the%20eight%20steps%2C%20and%20the%20traps%20that%20bite.%22%0A---%0A%0A%23%20Migrating%20an%20existing%20app%0A%0AProduction%20devices%20no%20longer%20run%20apps%20built%20the%20old%20way.%20An%20app%20is%20now%20a%0Aruntime-loaded%20ELF%20shipped%20as%20%60%2Fapps%2F*.tar%60%3B%20there%20is%20no%20firmware-flashing%0Aapp%20flow%20and%20no%20OTA-style%20app%20package%20on%20production.%0A%0AThe%20short%20version%3A%20if%20you%20shipped%20an%20app%20pre-ELF%2C%20that%20package%20will%20not%20launch%0Aon%20production%20firmware.%20Rebuild%20it%20against%20the%20ELF%20contract%20and%20re-package.%0A%0A%23%23%20What%20changed%0A%0A%7C%20Aspect%20%20%20%20%20%20%20%20%20%20%7C%20Old%20flow%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20New%20flow%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------%20%7C%20------------------------------------------%20%7C%20----------------------------------------------------%20%7C%0A%7C%20Binary%20%20%20%20%20%20%20%20%20%20%7C%20monolithic%20app%20inside%20the%20firmware%20image%20%20%20%7C%20standalone%20%60ET_DYN%60%20ELF%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Delivery%20%20%20%20%20%20%20%20%7C%20firmware%20%60.bin%60%20%2F%20OTA-style%20app%20package%20%20%20%20%7C%20%60%2Fapps%2F%3Cname%3E.tar%60%20on%20the%20SD%20card%2C%20installed%20via%20APPLOADER%20%7C%0A%7C%20Instantiation%20%20%20%7C%20compiled%20in%2C%20launched%20by%20the%20OS%20%20%20%20%20%20%20%20%20%20%20%20%7C%20loaded%20in-process%20when%20launched%2C%20torn%20down%20on%20return%20%7C%0A%7C%20Dependencies%20%20%20%20%7C%20linked%20into%20the%20firmware%20build%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20resolved%20from%20the%20host%20at%20load%20time%20(%60-nostdlib%60)%20%20%20%20%7C%0A%7C%20Toolchain%20%20%20%20%20%20%20%7C%20PlatformIO%20(big-endian)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20espressif%20%60xtensa-esp-elf%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Layout%2Fnaming%20%20%20%7C%20app%20id%20%2F%20metadata%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20derived%20from%20the%20tar%20base%20name%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20OS%20keeps%20app%20code%20out%20of%20PSRAM%20by%20design%3B%20code%20runs%20from%20IRAM.%20That%20is%0Athe%20loader&#039;s%20job%2C%20not%20yours.%0A%0A%23%23%20Migration%20steps%0A%0A1.%20**Get%20the%20toolchain.**%20Install%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%0A%20%20%20into%20%60~%2F.espressif%2F...%60%20as%20shown%20in%20%5Bbuild.md%5D(build.md).%20Do%20not%20rely%20on%0A%20%20%20the%20PlatformIO%20toolchain%3B%20it%20emits%20big-endian%20ELFs%20the%20loader%20cannot%20read.%0A2.%20**Scaffold.**%20Copy%20%60examples%2Fhello_app%60%20as%20a%20starting%20point.%20Its%0A%20%20%20%60Makefile%60%20(%60include%20tools%2Fapp.mk%60)%20is%20the%20whole%20build%20system.%0A3.%20**Port%20the%20entry.**%20Wrap%20your%20start%20logic%20in%20%60extern%20%22C%22%20int%0A%20%20%20main(int%2C%20char**)%60.%20The%20build%20renames%20it%20to%20%60app_main%60.%20Fit%20the%20previous%0A%20%20%20app&#039;s%20lifetime%20to%20the%20return-from-%60main%60%20model%0A%20%20%20(%5Bapp-abi.md%5D(app-abi.md)).%0A4.%20**Replace%20dependencies.**%20Every%20call%20must%20resolve%20at%20load%20time.%20Host%0A%20%20%20exports%20are%20the%20curated%20surface%20in%20%5Bsymbols.md%5D(symbols.md)%20plus%20the%0A%20%20%20host&#039;s%20newlib%2FIDF%2FArduino%20globals.%20That%20covers%20display%2C%20keyboard%2C%20buzzer%2C%0A%20%20%20clock%2C%20IO%2C%20and%20the%20standard%20library.%20If%20you%20depended%20on%20app-side%20firmware%0A%20%20%20globals%20that%20are%20not%20exported%2C%20move%20that%20dependency%20to%20API%20calls.%0A5.%20**Move%20assets.**%20Files%20the%20app%20used%20at%20compile%20time%20become%20a%20top-level%0A%20%20%20%60assets%2F%60%20directory%20in%20the%20tar%2C%20read%20at%20runtime%20from%20%60%2Fassets%2F%3Cname%3E%60%0A%20%20%20(%5Bpublish.md%5D(publish.md)).%0A6.%20**Localize.**%20If%20the%20app%20contained%20strings%2C%20move%20them%20into%20an%20app%20catalog%0A%20%20%20(%60src%2Fi18n%2F%60%2C%20merged%20per%20%5Bi18n.md%5D(i18n.md))%20instead%20of%20hardcoding.%0A7.%20**Verify.**%20%60make%20clean%20all%20check%60%20must%20succeed%2C%20list%20a%20sane%20set%20of%0A%20%20%20undefined%20symbols%2C%20and%20the%20endianness%20check%20must%20pass.%20Then%20%60make%20pack%60%0A%20%20%20and%20%60tar%20-tvf%20build%2F%3Cname%3E.tar%60.%0A8.%20**Ship.**%20Copy%20the%20tar%20to%20%60%2Fapps%2F%60%20on%20the%20device%2C%20install%20with%20APPLOADER%0A%20%20%20into%20a%20slot%2C%20launch.%20The%20launcher%20shows%20the%20name%20and%20icon%20drawn%20from%20the%0A%20%20%20package.%0A%0A%23%23%20Gotchas%0A%0A-%20**Big-endian%20artifacts.**%20The%20classic%20failure.%20The%20loader%20does%20no%20byte%0A%20%20swapping%2C%20so%20a%20PlatformIO-built%20app%20faults%20at%20load%20with%20a%20section%20or%0A%20%20instruction%20fault.%20%60readelf%20-h%60%20shows%20%60big%20endian%60%20before%20you%20ship.%0A-%20**Statically%20linked%20runtime.**%20Symbols%20collide%20or%20bloat%3B%20keep%20%60-nostdlib%60.%0A-%20**Relying%20on%20slot%20directories.**%20After%20install%20the%20ELF%20lives%20in%20the%20slot%0A%20%20dir%2C%20but%20the%20app%20should%20treat%20%60%2Fassets%2F%3Cname%3E%60%20(copied%20at%20install)%20as%20its%0A%20%20data%20home%20and%20never%20assume%20the%20slot%20path.%0A-%20**Long-lived%20loops.**%20The%20app%20shares%20the%20device.%20Cooperative%20lifetimes%0A%20%20(render%2C%20yield%20via%20the%20SDK%20API%2C%20return)%20beat%20spin%20loops%20on%20the%2016%20KB%20run%0A%20%20stack.%0A%0A%23%23%20Announcement%0A%0AIf%20you%20maintained%20published%20apps%20pre-ELF%2C%20publish%20a%20migration%20notice%3A%20existing%0Apackages%20targeting%20production%20will%20not%20launch%20on%20the%20new%20firmware%2C%20and%20step%208%0Aabove%20is%20the%20path%20forward." style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Migrating%20an%20existing%20app%22%0Adescription%3A%20%22Moving%20a%20pre-ELF%20app%20to%20the%20runtime-load%20flow%3A%20what%20changed%2C%20the%20eight%20steps%2C%20and%20the%20traps%20that%20bite.%22%0A---%0A%0A%23%20Migrating%20an%20existing%20app%0A%0AProduction%20devices%20no%20longer%20run%20apps%20built%20the%20old%20way.%20An%20app%20is%20now%20a%0Aruntime-loaded%20ELF%20shipped%20as%20%60%2Fapps%2F*.tar%60%3B%20there%20is%20no%20firmware-flashing%0Aapp%20flow%20and%20no%20OTA-style%20app%20package%20on%20production.%0A%0AThe%20short%20version%3A%20if%20you%20shipped%20an%20app%20pre-ELF%2C%20that%20package%20will%20not%20launch%0Aon%20production%20firmware.%20Rebuild%20it%20against%20the%20ELF%20contract%20and%20re-package.%0A%0A%23%23%20What%20changed%0A%0A%7C%20Aspect%20%20%20%20%20%20%20%20%20%20%7C%20Old%20flow%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20New%20flow%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------%20%7C%20------------------------------------------%20%7C%20----------------------------------------------------%20%7C%0A%7C%20Binary%20%20%20%20%20%20%20%20%20%20%7C%20monolithic%20app%20inside%20the%20firmware%20image%20%20%20%7C%20standalone%20%60ET_DYN%60%20ELF%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Delivery%20%20%20%20%20%20%20%20%7C%20firmware%20%60.bin%60%20%2F%20OTA-style%20app%20package%20%20%20%20%7C%20%60%2Fapps%2F%3Cname%3E.tar%60%20on%20the%20SD%20card%2C%20installed%20via%20APPLOADER%20%7C%0A%7C%20Instantiation%20%20%20%7C%20compiled%20in%2C%20launched%20by%20the%20OS%20%20%20%20%20%20%20%20%20%20%20%20%7C%20loaded%20in-process%20when%20launched%2C%20torn%20down%20on%20return%20%7C%0A%7C%20Dependencies%20%20%20%20%7C%20linked%20into%20the%20firmware%20build%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20resolved%20from%20the%20host%20at%20load%20time%20(%60-nostdlib%60)%20%20%20%20%7C%0A%7C%20Toolchain%20%20%20%20%20%20%20%7C%20PlatformIO%20(big-endian)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20espressif%20%60xtensa-esp-elf%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Layout%2Fnaming%20%20%20%7C%20app%20id%20%2F%20metadata%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20derived%20from%20the%20tar%20base%20name%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20OS%20keeps%20app%20code%20out%20of%20PSRAM%20by%20design%3B%20code%20runs%20from%20IRAM.%20That%20is%0Athe%20loader&#039;s%20job%2C%20not%20yours.%0A%0A%23%23%20Migration%20steps%0A%0A1.%20**Get%20the%20toolchain.**%20Install%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%0A%20%20%20into%20%60~%2F.espressif%2F...%60%20as%20shown%20in%20%5Bbuild.md%5D(build.md).%20Do%20not%20rely%20on%0A%20%20%20the%20PlatformIO%20toolchain%3B%20it%20emits%20big-endian%20ELFs%20the%20loader%20cannot%20read.%0A2.%20**Scaffold.**%20Run%20%60pm%20new%20myapp%60.%20Its%20%60Makefile%60%0A%20%20%20(%60include%20tools%2Fapp.mk%60)%20is%20the%20whole%20build%20system.%0A3.%20**Port%20the%20entry.**%20Wrap%20your%20start%20logic%20in%20%60extern%20%22C%22%20int%0A%20%20%20main(int%2C%20char**)%60.%20The%20build%20renames%20it%20to%20%60app_main%60.%20Fit%20the%20previous%0A%20%20%20app&#039;s%20lifetime%20to%20the%20return-from-%60main%60%20model%0A%20%20%20(%5Bapp-abi.md%5D(app-abi.md)).%0A4.%20**Replace%20dependencies.**%20Every%20call%20must%20resolve%20at%20load%20time.%20Host%0A%20%20%20exports%20are%20the%20curated%20surface%20in%20%5Bsymbols.md%5D(symbols.md)%20plus%20the%0A%20%20%20host&#039;s%20newlib%2FIDF%2FArduino%20globals.%20That%20covers%20display%2C%20keyboard%2C%20buzzer%2C%0A%20%20%20clock%2C%20IO%2C%20and%20the%20standard%20library.%20If%20you%20depended%20on%20app-side%20firmware%0A%20%20%20globals%20that%20are%20not%20exported%2C%20move%20that%20dependency%20to%20API%20calls.%0A5.%20**Move%20assets.**%20Files%20the%20app%20used%20at%20compile%20time%20become%20a%20top-level%0A%20%20%20%60assets%2F%60%20directory%20in%20the%20tar%2C%20read%20at%20runtime%20from%20%60%2Fassets%2F%3Cname%3E%60%0A%20%20%20(%5Bpublish.md%5D(publish.md)).%0A6.%20**Localize.**%20If%20the%20app%20contained%20strings%2C%20move%20them%20into%20an%20app%20catalog%0A%20%20%20(%60src%2Fi18n%2F%60%2C%20merged%20per%20%5Bi18n.md%5D(i18n.md))%20instead%20of%20hardcoding.%0A7.%20**Verify.**%20%60make%20clean%20all%20check%60%20must%20succeed%2C%20list%20a%20sane%20set%20of%0A%20%20%20undefined%20symbols%2C%20and%20the%20endianness%20check%20must%20pass.%20Then%20%60make%20pack%60%0A%20%20%20and%20%60tar%20-tvf%20build%2F%3Cname%3E.tar%60.%0A8.%20**Ship.**%20Copy%20the%20tar%20to%20%60%2Fapps%2F%60%20on%20the%20device%2C%20install%20with%20APPLOADER%0A%20%20%20into%20a%20slot%2C%20launch.%20The%20launcher%20shows%20the%20name%20and%20icon%20drawn%20from%20the%0A%20%20%20package.%0A%0A%23%23%20Gotchas%0A%0A-%20**Big-endian%20artifacts.**%20The%20classic%20failure.%20The%20loader%20does%20no%20byte%0A%20%20swapping%2C%20so%20a%20PlatformIO-built%20app%20faults%20at%20load%20with%20a%20section%20or%0A%20%20instruction%20fault.%20%60readelf%20-h%60%20shows%20%60big%20endian%60%20before%20you%20ship.%0A-%20**Statically%20linked%20runtime.**%20Symbols%20collide%20or%20bloat%3B%20keep%20%60-nostdlib%60.%0A-%20**Relying%20on%20slot%20directories.**%20After%20install%20the%20ELF%20lives%20in%20the%20slot%0A%20%20dir%2C%20but%20the%20app%20should%20treat%20%60%2Fassets%2F%3Cname%3E%60%20(copied%20at%20install)%20as%20its%0A%20%20data%20home%20and%20never%20assume%20the%20slot%20path.%0A-%20**Long-lived%20loops.**%20The%20app%20shares%20the%20device.%20Cooperative%20lifetimes%0A%20%20(render%2C%20yield%20via%20the%20SDK%20API%2C%20return)%20beat%20spin%20loops%20on%20the%2016%20KB%20run%0A%20%20stack.%0A%0A%23%23%20Announcement%0A%0AIf%20you%20maintained%20published%20apps%20pre-ELF%2C%20publish%20a%20migration%20notice%3A%20existing%0Apackages%20targeting%20production%20will%20not%20launch%20on%20the%20new%20firmware%2C%20and%20step%208%0Aabove%20is%20the%20path%20forward." style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1674,8 +1674,8 @@ the loader’s job, not yours.</p>
 <li><strong>Get the toolchain.</strong> Install the espressif <code>xtensa-esp-elf</code> toolchain<br>
 into <code>~/.espressif/...</code> as shown in <a href="../build/">build.md</a>. Do not rely on<br>
 the PlatformIO toolchain; it emits big-endian ELFs the loader cannot read.</li>
-<li><strong>Scaffold.</strong> Copy <code>examples/hello_app</code> as a starting point. Its<br>
-<code>Makefile</code> (<code>include tools/app.mk</code>) is the whole build system.</li>
+<li><strong>Scaffold.</strong> Run <code>pm new myapp</code>. Its <code>Makefile</code><br>
+(<code>include tools/app.mk</code>) is the whole build system.</li>
 <li><strong>Port the entry.</strong> Wrap your start logic in <code>extern &quot;C&quot; int main(int, char**)</code>. The build renames it to <code>app_main</code>. Fit the previous<br>
 app’s lifetime to the return-from-<code>main</code> model<br>
 (<a href="../app-abi/">app-abi.md</a>).</li>
@@ -1800,13 +1800,13 @@ above is the path forward.</p>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1790729515000">
+                <span class="git-last-updated" data-timestamp="1791164862000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1790729515000"></span>
+                  <span class="git-time" data-timestamp="1791164862000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1819,10 +1819,10 @@ above is the path forward.</p>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="DOCS">DOCS</div>
+                            <div class="git-commit-message" title="Massive revamp">Massive revamp</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1790729515000"></span>
+                              <span class="git-commit-date" data-timestamp="1791164862000"></span>
                             </div>
                           </div>
                         </li>
@@ -1945,13 +1945,13 @@ above is the path forward.</p>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mune4scf"></script>
+      <script src="../assets/js/docmd-main.js?v=muulc20a"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mune4scf"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mune4scf" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mune4scf" ></script>
-<script src="../assets/js/docmd-search.js?v=mune4scf" ></script>
-<script src="../assets/js/docmd-git.js?v=mune4scf" type="module"></script>
+      <script src="../assets/js/docmd-git.js?v=muulc20a"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=muulc20a" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=muulc20a" ></script>
+<script src="../assets/js/docmd-search.js?v=muulc20a" ></script>
+<script src="../assets/js/docmd-git.js?v=muulc20a" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

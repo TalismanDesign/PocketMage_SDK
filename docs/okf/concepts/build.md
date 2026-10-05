@@ -4,10 +4,10 @@ title: "Building an app"
 description: "The toolchain, the project layout, and the make targets that produce a shippable ELF and tar."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/build/"
 path: /build/
-updated: 2026-09-30
+updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-30T00:52:21.268Z"
+  generated_at: "2026-10-05T01:48:20.787Z"
 ---
 ---
 title: "Building an app"
@@ -122,7 +122,7 @@ gate CI runs, and `--host-elf <firmware.elf>` pins the host export surface
 exactly (see [symbols.md](symbols.md)). `make pack` is the deliverable;
 verify the tar's members with `tar -tf build/<name>.tar`.
 
-The repo ships three ready-to-build examples under `examples/`:
-`hello_app` (baseline), `version_app` (reads the ABI version via
-`pocketmage_app_version.h`), and `broken_app` (CI's negative fixture: it
-references a symbol the host does not export and must fail `pm check`).
+`pm new myapp` scaffolds from the official
+[PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template.
+CI also builds a `broken_app` fixture that intentionally fails the gate:
+it references a symbol the host does not export and must fail `pm check`.

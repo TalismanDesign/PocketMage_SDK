@@ -4,10 +4,10 @@ title: Rendering
 description: "Which draw calls go where, the E-Ink buffered refresh model, and the scroll loop."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/guides/rendering/"
 path: /guides/rendering/
-updated: 2026-09-30
+updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-30T00:52:21.270Z"
+  generated_at: "2026-10-05T01:48:20.789Z"
 ---
 ---
 title: "Rendering"
@@ -20,8 +20,8 @@ PocketMage drives two panels from one shared app API. Getting pixel messages to 
 
 ## Two targets, one `FontEngine`-dominated path
 
-- The **OLED** (256x32 SSD1326) is a fast status text panel drawn with u8g2: `OLED().oledWord`, `oledScroll`, `sysMessage`, and the info line.
-- The **E-Ink** (320x240 lambda) is the big document/list panel drawn by the SDK's buffer-based drivers: `EINK()` primitives, `FontEngine` with `DisplayTarget::EINK`, the [frames engine](../api/frames.md), and the [ui helpers](../api/ui.md).
+- The **OLED** (256x32 SSD1326) is a fast status text panel. Apps reach it through `pm_oled_send`, `pm_oled_sysmsg`, and `pm_oled_set_power_save`.
+- The **E-Ink** (320x240 lambda) is the big document/list panel. Apps draw it with `pm_eink_pixel`, `pm_eink_rect`, and `pm_eink_refresh`, plus the [frames engine](../api/frames.md) and the [ui helpers](../api/ui.md).
 
 Every `FontEngine` call takes an explicit `DisplayTarget`, so the same measure/draw code works for both panels and the metrics are per-target. The OLED draw color and the E-Ink draw color are independent ([font](../api/font.md)).
 
@@ -35,15 +35,15 @@ beginEinkScreen();                    // clear buffer, set full window
 endEinkScreen("Status text");         // draw status band + refresh
 ```
 
-`beginEinkScreen(preserveBg)` optionally keeps the previous buffer background (for scrolling windows) instead of clearing. `endEinkScreen` adds the status bar for you. If you manage the window yourself, call `EINK().refresh()` directly; `EndEinkFullRefresh` exists for content that must not ghost.
+`beginEinkScreen(preserveBg)` optionally keeps the previous buffer background (for scrolling windows) instead of clearing. `endEinkScreen` adds the status bar for you. If you manage the window yourself, call `pm_eink_refresh()` directly; `PM_REFRESH_FORCE_FULL` exists for content that must not ghost.
 
 Status band ownership: the bottom `kEinkStatusH` (26) pixels belong to `drawStatusBar`. Content frames should stay within `kEinkContentH` (214) ([layout](../api/layout.md)).
 
 ## Text metrics and layout
 
 - `y` in draw calls is the **baseline**, not the top.
-- Fit text before drawing: `FontEngine::textWidth` + `sliceThatFits`, or `truncateWithEllipsis` for a single line; `wordWrap` for paragraphs ([layout](../api/layout.md)).
-- Row pitch is `einkRowPitch(style)` = font height + line spacing; `Normal`-vs-`ForceFull` refresh choice rides on `EINK().getLineSpacing()`.
+- Fit text before drawing: `pm_text_width` + `sliceThatFits`, or `truncateWithEllipsis` for a single line; `wordWrap` for paragraphs ([layout](../api/layout.md)).
+- Row pitch is `einkRowPitch(style)` = font height + line spacing; `Normal`-vs-`ForceFull` refresh choice rides on `pm_eink_get_line_spacing()`.
 - Named constants (`kFrameTextPadX`, `kOledWordBaseline`, `kOledInfoBaseline`, `kGridLabelMaxW`, ...) are in [layout](../api/layout.md); use them instead of literals.
 
 ## The scroll loop
@@ -58,8 +58,10 @@ Bind the scroll offset to `CLOCK().setPrevTimeMillis(millis())` on every touch s
 
 ## OLED overlay patterns
 
-For transient feedback use `OLED().sysMessage(text, ms)`; it draws a framed dialog over whatever the E-Ink is showing and dismisses itself. Long text that the OLED cannot hold goes wider than the widget: pass longer strings only when they fit the panel, or use `OLED().oledScroll` for a running thumbnail of the E-Ink window.
+For transient feedback use `pm_oled_sysmsg(text, ms)`; it draws a framed dialog over whatever the E-Ink is showing and dismisses itself. Long text that the OLED cannot hold goes wider than the widget: pass longer strings only when they fit the panel, or refresh a region for a running thumbnail of the E-Ink window.
 
 ## Full examples
 
-`examples/hello_app` is the text-only skeleton. For draw-heavy apps, start from `examples/version_app`, which prints SDK version strings on
+`pm new myapp` gives the text-only skeleton. For draw-heavy apps, start from the
+same template and call the E-Ink and OLED functions directly; see
+[app-abi.md](../app-abi.md) for what the app process owns.

@@ -4,10 +4,10 @@ title: "WiFi (pocketmage_wifi)"
 description: "The station radio service: enabled/scan/connect lifecycle, status queries, and saved credentials."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/wifi/"
 path: /api/wifi/
-updated: 2026-09-30
+updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-30T00:52:21.267Z"
+  generated_at: "2026-10-05T01:48:20.786Z"
 ---
 ---
 title: "WiFi (pocketmage_wifi)"

@@ -104,28 +104,28 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mune4scf">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mune4scf">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=muulc20a">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=muulc20a">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mune4scf" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mune4scf" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=muulc20a" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=muulc20a" id="hljs-dark" disabled>
     
     
-<meta name="description" content="The host-export surface apps resolve against, how to read an app&#39;s dependency list, and the rules for changing the surface.">
+<meta name="description" content="The host-export surface apps resolve against, how third-party libraries link, and the rules for changing the surface.">
 <link rel="canonical" href="https://talismandesign.github.io/PocketMage_SDK/docs/symbols/">
 <meta property="og:title" content="Symbols and the dependency contract - PocketMage SDK">
-<meta property="og:description" content="The host-export surface apps resolve against, how to read an app&#39;s dependency list, and the rules for changing the surface.">
+<meta property="og:description" content="The host-export surface apps resolve against, how third-party libraries link, and the rules for changing the surface.">
 <meta property="og:url" content="https://talismandesign.github.io/PocketMage_SDK/docs/symbols/">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Symbols and the dependency contract - PocketMage SDK">
-<meta name="twitter:description" content="The host-export surface apps resolve against, how to read an app&#39;s dependency list, and the rules for changing the surface.">
+<meta name="twitter:description" content="The host-export surface apps resolve against, how third-party libraries link, and the rules for changing the surface.">
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mune4scf" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mune4scf" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mune4scf" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=muulc20a" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=muulc20a" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=muulc20a" >
 
     
     
@@ -1554,7 +1554,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Symbols%20and%20the%20dependency%20contract%22%0Adescription%3A%20%22The%20host-export%20surface%20apps%20resolve%20against%2C%20how%20to%20read%20an%20app&#039;s%20dependency%20list%2C%20and%20the%20rules%20for%20changing%20the%20surface.%22%0A---%0A%0A%23%20Symbols%20and%20the%20dependency%20contract%0A%0AApps%20link%20%60-nostdlib%60.%20Nothing%20ships%20with%20the%20binary%20that%20satisfies%20a%0Areference%3B%20at%20load%20time%20the%20host%20resolves%20every%20undefined%20symbol%20from%20its%20own%0Alive%20memory.%20The%20app&#039;s%20undefined-symbol%20list%20is%20therefore%20its%20real%20dependency%0Acontract.%20%60make%20check%60%20prints%20it%3B%20%60pm%20check%60%20interprets%20it%20against%20the%20host%0Asurface.%0A%0A%23%23%20The%20surface%0A%0AAn%20app%20can%20call%20anything%20the%20host%20exports%20as%20a%20global%20symbol%3A%20the%0Anewlib%2FIDF%2FArduino%20runtime%20plus%20the%20curated%20PocketMage%20export%20table.%20The%0Acurated%20table%20is%20generated%20from%20%60host_exports.list%60%20(in%20PocketMageOS)%20by%0A%60tools%2Fsymbols.py%60%2C%20which%20builds%20the%20%60g_customer_elfsyms%60%20table%20the%20loader%0Asearches.%0A%0AThe%20SDK&#039;s%20%60symbols.list%60%20is%20the%20promise%20of%20what%20the%20host%20exports.%20Today%3A%0A%0A%60%60%60text%0AOLED%0AKB%0AEINK%0ABZ%0ACLOCK%0APM_SDAUTO%0Apocketmage_sdk_version%0A%60%60%60%0A%0AHost-side%2C%20%60src%2FELF_SYMS%2Fhost_exports.list%60%20tracks%20a%20superset-or-equal%2C%0Avalidated%20against%20the%20firmware%20image%3B%20a%20missing%20host%20export%20degrades%20to%20a%0Aloud%20warning%20before%20the%20generated%20table%20is%20emitted.%0A%0ARegular%20libc%20calls%20(%60printf%60%2C%20%60puts%60%2C%20%60sleep%60%2C%20%60malloc%60%2C%20...)%20resolve%20from%20the%0Ahost&#039;s%20newlib%20globals%20and%20need%20no%20entry%20in%20the%20curated%20lists.%0A%0A%23%23%20Reading%20an%20app&#039;s%20contract%0A%0A%60%60%60sh%0Amake%20check%20%20%20%23%20prints%20entry%20%2B%20every%20undefined%20symbol%0Apm%20check%20%20%20%20%20%23%20classes%20each%20symbol%20and%20exits%20non-zero%20on%20a%20broken%20contract%0A%60%60%60%0A%0AEverything%20in%20that%20list%20must%20exist%20in%20the%20host&#039;s%20global%20view%20when%20the%20app%0Aloads%2C%20or%20the%20load%20fails.%20%60pm%20check%60%20is%20the%20exact%20gate%20when%20run%0Aagainst%20a%20host%20firmware%20ELF%20(%60--host-elf%60)%3A%20every%20undefined%20symbol%20must%20resolve%0Ato%20a%20host%20global.%20Without%20a%20host%20ELF%20it%20falls%20back%20to%20the%20curated%20lists%20plus%20a%0Alibc%20allowlist%20and%20reports%20anything%20outside%20that%20set%20as%20unconfirmed.%0A%0A%23%23%20Editing%20the%20surface%0A%0ARules%20for%20SDK%20authors%3A%0A%0A-%20Additions%20only.%20Removing%20or%20renaming%20an%20exported%20symbol%20breaks%20every%20app%0A%20%20that%20references%20it%20at%20runtime.%0A-%20Every%20added%20symbol%20must%20exist%20as%20a%20%60GLOBAL%60%20in%20the%20firmware%20image%20and%20be%0A%20%20added%20to%20both%20%60symbols.list%60%20and%20the%20host&#039;s%20%60host_exports.list%60%2C%20then%0A%20%20regenerate%20the%20host%20table%20with%20%60tools%2Fsymbols.py%20--host-elf%20...%60.%0A-%20Run%20%60pm%20exports%60%20(add%20%60--all%60%20for%20extras%20too)%20before%20committing%20a%20surface%0A%20%20change%3A%20it%20reconciles%20%60symbols.list%60%20against%20the%20host&#039;s%20%60host_exports.list%60%0A%20%20and%20fails%20when%20a%20curated%20symbol%20is%20not%20exported.%20Keep%20both%20lists%20in%20sync%0A%20%20in%20the%20same%20change.%0A-%20Bump%20%60pocketmage_sdk_version%60%20when%20the%20surface%20changes.%20It%20is%20exported%2C%20and%0A%20%20stored%20so%20the%20OS%20can%20version%20apps%20against%20the%20surface.%0A-%20Keep%20the%20set%20small.%20Exporting%20a%20broad%20slice%20of%20the%20firmware%20binds%20the%20ABI%0A%20%20to%20all%20of%20it.%0A%0A%23%23%20Versioning%20and%20gating%0A%0A%60pocketmage_sdk_version%60%20is%20exported%20so%20apps%20can%20adapt%20to%20surface%20changes.%0A%60pm%20check%60%20gates%20an%20app%20against%20the%20host%20export%20set%20before%20release%3A%20the%20mirror%0Aof%20%60make%20check%60%2C%20with%20the%20curated%20lists%20as%20the%20reference%20when%20no%20host%20ELF%20is%0Aavailable.%0A%0AShip%20a%20new%20version%20with%20%60pm%20release%20%3Cmajor%7Cminor%7Cpatch%3E%60%20(add%0A%60--message%20TEXT%60%20for%20a%20CHANGELOG%20bullet).%20It%20validates%20VERSION%2C%20the%0A%60pocketmage_sdk_version%60%20literal%20in%20%60pocketmage_globals.cpp%60%2C%0A%60pocketmage_app_version.h%60%2C%20and%20%60library.json%60%20first%2C%20then%20rewrites%20all%20four%0Aand%20folds%20an%20%60%5BN.N.N%5D%60%20header%20at%20the%20top%20of%20%60CHANGELOG.md%60.%20No%20write%20happens%0Aif%20any%20file%20disagrees.%20The%20command%20stages%20nothing%20in%20git%3B%20commit%20the%20four%0Afiles%20and%20the%20changelog%20together." style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Symbols%20and%20the%20dependency%20contract%22%0Adescription%3A%20%22The%20host-export%20surface%20apps%20resolve%20against%2C%20how%20third-party%20libraries%20link%2C%20and%20the%20rules%20for%20changing%20the%20surface.%22%0A---%0A%0A%23%20Symbols%20and%20the%20dependency%20contract%0A%0AApps%20link%20%60-nostdlib%60.%20Nothing%20ships%20with%20the%20binary%20that%20satisfies%20a%0Areference%3B%20at%20load%20time%20the%20host%20resolves%20every%20undefined%20symbol%20from%20its%20own%0Alive%20memory.%20The%20app&#039;s%20undefined-symbol%20list%20is%20therefore%20its%20real%20dependency%0Acontract.%20%60make%20check%60%20prints%20it%3B%20%60pm%20check%60%20interprets%20it%20against%20the%20host%0Asurface.%0A%0A%23%23%20The%20surface%0A%0AAn%20app%20can%20call%20anything%20the%20host%20exports%20as%20a%20global%20symbol.%20The%20export%0Asurface%20has%20two%20parts.%0A%0A**The%20C%20and%20C%2B%2B%20runtime.**%20%60libc%60%2C%20%60libm%60%2C%20%60libgcc%60%2C%20%60libstdc%2B%2B%60%20and%0A%60libsupc%2B%2B%60%20symbols%20the%20firmware%20already%20links%20are%20exported%20so%20apps%20can%20use%0Athird-party%20libraries.%20%60tools%2Fsymbols.py%60%20derives%20this%20set%20by%20reading%20the%0Atoolchain%20archives%20with%20%60nm%60%20and%20keeping%20the%20symbols%20that%20are%20present%20in%20the%0Afirmware%20image%3A%0A%0A%60%60%60sh%0Apython3%20tools%2Fsymbols.py%20--list%20symbols.list%20--host-elf%20%3Cfirmware.elf%3E%20%5C%0A%20%20--print-cost%0A%60%60%60%0A%0A%60%60%60%0Alibc%20%20%20%20%20%20%20%20243%20symbols%20%20%204%2C350%20bytes%0Alibm%20%20%20%20%20%20%20%20%2015%20symbols%20%20%20%20%20262%20bytes%0Alibstdc%2B%2B%20%20%20%2087%20symbols%20%20%203%2C403%20bytes%0Alibsupc%2B%2B%20%20%20%2058%20symbols%20%20%202%2C362%20bytes%0Alibgcc%20%20%20%20%20%20%2065%20symbols%20%20%201%2C552%20bytes%0Atotal%20%20%20%20%20%20%20531%20symbols%20%2012%2C975%20bytes%20(12.7%20KB)%0A%60%60%60%0A%0AThat%20total%20includes%20the%20124%20curated%20%60pm_*%60%20entries.%20The%20runtime%20adds%20about%0A407%20symbols%2C%2012.7%20KB%20of%20flash%20in%20the%20firmware%20image%2C%20once.%20It%20is%20not%20a%20per-app%0Acost.%20Apps%20stay%20small%3A%20a%20hello%20world%20is%201.3%20KB%2C%20an%20app%20using%20%60std%3A%3Avector%60%20and%0A%60std%3A%3Astring%60%20is%202.3%20KB%2C%20an%20app%20with%20cJSON%20linked%20in%20is%205.2%20KB.%0A%60--gc-sections%60%20and%20%60--strip-all%60%20in%20%60tools%2Fapp.mk%60%20do%20that%20work.%0A%0AA%20symbol%20in%20%60symbols.list%60%20that%20the%20firmware%20does%20not%20define%20is%20reported%20as%20a%0Awarning%20but%20still%20emitted%20into%20the%20table.%20A%20newly%20added%20wrapper%20cannot%20appear%0Ain%20%60--host-elf%60%20until%20the%20host%20is%20rebuilt%2C%20so%20dropping%20it%20would%20omit%20it%20on%20the%0Aone%20run%20that%20adds%20it.%20Regenerate%20once%20more%20after%20building%20and%20the%20warning%0Ashould%20be%20gone.%0A%0ARuntime%20export%20is%20on%20by%20default.%20Pass%20%60--no-runtime%60%20to%20export%20only%20the%0Acurated%20SDK%20list%2C%20which%20restricts%20apps%20to%20the%20SDK%20surface%20and%20no%20libraries.%0A%0AMembership%20is%20decided%20by%20which%20archive%20a%20symbol%20comes%20from%2C%20not%20by%20its%20name.%0AA%20%60_ZN...%60%20prefix%20also%20matches%20the%20SDK&#039;s%20own%20C%2B%2B%20classes%2C%20so%20matching%20on%20prefix%0Ashape%20would%20export%20firmware%20internals%20by%20accident.%0A%0A**The%20curated%20SDK%20table.**%20%60symbols.list%60%20is%20the%20hand-maintained%20promise%20of%0APocketMage&#039;s%20own%20exports.%20Host-side%2C%20%60src%2FELF_SYMS%2Fhost_exports.list%60%20tracks%20a%0Asuperset%2C%20validated%20against%20the%20firmware%20image.%20Both%20lists%20feed%20the%20same%0Agenerated%20%60g_customer_elfsyms%60%20table.%0A%0A%23%23%20Linking%20a%20third-party%20library%0A%0AA%20vendored%20library&#039;s%20source%20is%20compiled%20into%20the%20app%20by%20overriding%20%60APP_SRCS%60.%0AAnything%20the%20library%20references%20that%20is%20not%20in%20the%20app%20is%20resolved%20by%20the%20host%0Aat%20load%20time.%20Two%20consequences%20are%20worth%20knowing.%0A%0ALibraries%20compiled%20at%20%60-Os%60%20need%20fewer%20symbols%20than%20the%20same%20source%20at%20%60-O0%60.%0AA%20%60std%3A%3Avector%3Cstd%3A%3Astring%3E%60%20app%20at%20%60-O0%60%20wants%2013%20symbols%20including%0A%60std%3A%3Aallocator%3Cchar%3E%60%20constructors%3B%20at%20%60-Os%60%20it%20wants%207%2C%20and%20all%207%20resolve.%0A%0A%60sscanf%60%20is%20not%20exported%20by%20default.%20It%20exists%20in%20newlib%2C%20but%20nothing%20in%20the%0Afirmware%20references%20it%2C%20so%20it%20was%20dropped%20by%20%60--gc-sections%60%2C%20and%20referencing%0Ait%20pulls%20in%20about%20190%20KB%20of%20stdio%20reentrancy.%20A%20library%20that%20needs%20it%20must%0Aeither%20avoid%20it%20or%20the%20host%20must%20export%20it%20deliberately.%0A%0A%23%23%20Reading%20an%20app&#039;s%20contract%0A%0A%60%60%60sh%0Amake%20check%20%20%20%23%20prints%20entry%20%2B%20every%20undefined%20symbol%0Apm%20check%20%20%20%20%20%23%20classes%20each%20symbol%20and%20exits%20non-zero%20on%20a%20broken%20contract%0A%60%60%60%0A%0AEverything%20in%20that%20list%20must%20exist%20in%20the%20host&#039;s%20global%20view%20when%20the%20app%0Aloads%2C%20or%20the%20load%20fails.%20%60pm%20check%60%20with%20%60--host-elf%60%20is%20the%20exact%20gate%3A%20every%0Aundefined%20symbol%20must%20resolve%20to%20a%20host%20global.%0A%0AWithout%20a%20host%20ELF%2C%20%60pm%20check%60%20reads%20the%20generated%20export%20table%20that%20the%0Afirmware%20links%2C%20which%20is%20the%20same%20file%20the%20loader%20searches.%20It%20does%20not%20keep%20a%0Aseparate%20allowlist%2C%20because%20a%20hand-written%20list%20drifts%20from%20the%20table%20and%20the%0Adrift%20shows%20up%20only%20on%20device.%20An%20earlier%20allowlist%20claimed%20%60memmove%60%20and%0A%60sprintf%60%20were%20resolvable%20when%20no%20table%20exported%20them%2C%20so%20those%20apps%20passed%20the%0Agate%20and%20failed%20at%20load%20with%20%60Can&#039;t%20find%20common%20memmove%60.%20Reading%20the%20generated%0Atable%20makes%20that%20class%20of%20bug%20impossible.%0A%0A%23%23%20Editing%20the%20surface%0A%0ARules%20for%20SDK%20authors%3A%0A%0A-%20Additions%20only.%20Removing%20or%20renaming%20an%20exported%20symbol%20breaks%20every%20app%0A%20%20that%20references%20it%20at%20runtime.%0A-%20Every%20added%20SDK%20symbol%20must%20exist%20as%20a%20%60GLOBAL%60%20in%20the%20firmware%20image%20and%20be%0A%20%20added%20to%20both%20%60symbols.list%60%20and%20the%20host&#039;s%20%60host_exports.list%60%2C%20then%0A%20%20regenerate%20the%20host%20table%20with%20%60tools%2Fsymbols.py%20--host-elf%20...%60.%0A-%20Regenerate%20the%20host%20table%20whenever%20the%20firmware&#039;s%20linked%20symbol%20set%20changes.%0A%20%20%60symbols.py%60%20only%20exports%20runtime%20symbols%20the%20firmware%20already%20links%2C%20so%20a%0A%20%20firmware%20that%20starts%20using%20a%20new%20libc%20or%20libstdc%2B%2B%20function%20makes%20it%0A%20%20available%20on%20the%20next%20regeneration.%0A-%20Run%20%60pm%20exports%60%20before%20committing%20a%20surface%20change.%20It%20reconciles%0A%20%20%60symbols.list%60%20against%20%60host_exports.list%60%20and%20fails%20when%20a%20curated%20symbol%20is%0A%20%20not%20exported.%0A-%20Bump%20%60pocketmage_sdk_version%60%20when%20the%20surface%20changes.%20It%20is%20exported%2C%20and%0A%20%20stored%20so%20the%20OS%20can%20version%20apps%20against%20the%20surface.%0A%0AExporting%20a%20broad%20slice%20of%20the%20firmware%20binds%20the%20ABI%20to%20all%20of%20it.%20That%20is%20a%0Adeliberate%20trade%20here%3A%20it%20is%20what%20lets%20apps%20use%20libraries%2C%20and%20per-app%0Arestriction%20is%20planned%20as%20an%20opt-in%20scope%20rather%20than%20a%20default.%0A%0A%23%23%20Versioning%20and%20gating%0A%0A%60pocketmage_sdk_version%60%20is%20exported%20so%20apps%20can%20adapt%20to%20surface%20changes.%0A%60pm%20check%60%20gates%20an%20app%20against%20the%20host%20export%20set%20before%20release%3A%20the%20mirror%0Aof%20%60make%20check%60%2C%20with%20the%20generated%20table%20as%20the%20reference%20when%20no%20host%20ELF%20is%0Aavailable.%0A%0AShip%20a%20new%20version%20with%20%60pm%20release%20%3Cmajor%7Cminor%7Cpatch%3E%60%20(add%0A%60--message%20TEXT%60%20for%20a%20CHANGELOG%20bullet).%20It%20validates%20VERSION%2C%20the%0A%60pocketmage_sdk_version%60%20literal%20in%20%60pocketmage_globals.cpp%60%2C%0A%60pocketmage_app_version.h%60%2C%20and%20%60library.json%60%20first%2C%20then%20rewrites%20all%20four%0Aand%20folds%20an%20%60%5BN.N.N%5D%60%20header%20at%20the%20top%20of%20%60CHANGELOG.md%60.%20No%20write%20happens%0Aif%20any%20file%20disagrees.%20The%20command%20stages%20nothing%20in%20git%3B%20commit%20the%20four%0Afiles%20and%20the%20changelog%20together.%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1626,55 +1626,92 @@ live memory. The app’s undefined-symbol list is therefore its real dependency<
 contract. <code>make check</code> prints it; <code>pm check</code> interprets it against the host<br>
 surface.</p>
 <h2 id="symbols-and-the-dependency-contract-the-surface" class="docmd-heading"><a href="#symbols-and-the-dependency-contract-the-surface" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>The surface</h2>
-<p>An app can call anything the host exports as a global symbol: the<br>
-newlib/IDF/Arduino runtime plus the curated PocketMage export table. The<br>
-curated table is generated from <code>host_exports.list</code> (in PocketMageOS) by<br>
-<code>tools/symbols.py</code>, which builds the <code>g_customer_elfsyms</code> table the loader<br>
-searches.</p>
-<p>The SDK’s <code>symbols.list</code> is the promise of what the host exports. Today:</p>
-<pre class="hljs"><code class="language-text">OLED
-KB
-EINK
-BZ
-CLOCK
-PM_SDAUTO
-pocketmage_sdk_version
+<p>An app can call anything the host exports as a global symbol. The export<br>
+surface has two parts.</p>
+<p><strong>The C and C++ runtime.</strong> <code>libc</code>, <code>libm</code>, <code>libgcc</code>, <code>libstdc++</code> and<br>
+<code>libsupc++</code> symbols the firmware already links are exported so apps can use<br>
+third-party libraries. <code>tools/symbols.py</code> derives this set by reading the<br>
+toolchain archives with <code>nm</code> and keeping the symbols that are present in the<br>
+firmware image:</p>
+<pre class="hljs"><code class="language-sh">python3 tools<span class="hljs-punctuation">/</span>symbols.<span class="hljs-attr">py</span> <span class="hljs-punctuation">--</span>list symbols.<span class="hljs-attr">list</span> <span class="hljs-punctuation">--</span>host<span class="hljs-punctuation">-</span>elf <span class="hljs-punctuation">&lt;</span>firmware.<span class="hljs-attr">elf</span><span class="hljs-punctuation">&gt;</span> \
+  <span class="hljs-punctuation">--</span>print<span class="hljs-punctuation">-</span>cost
 </code></pre>
-<p>Host-side, <code>src/ELF_SYMS/host_exports.list</code> tracks a superset-or-equal,<br>
-validated against the firmware image; a missing host export degrades to a<br>
-loud warning before the generated table is emitted.</p>
-<p>Regular libc calls (<code>printf</code>, <code>puts</code>, <code>sleep</code>, <code>malloc</code>, …) resolve from the<br>
-host’s newlib globals and need no entry in the curated lists.</p>
+<pre class="hljs"><code>libc        <span class="hljs-number">243</span> symbols   <span class="hljs-number">4</span>,<span class="hljs-number">350</span> bytes
+libm         <span class="hljs-number">15</span> symbols     <span class="hljs-number">262</span> bytes
+libstdc<span class="hljs-punctuation">++</span>    <span class="hljs-number">87</span> symbols   <span class="hljs-number">3</span>,<span class="hljs-number">403</span> bytes
+libsupc<span class="hljs-punctuation">++</span>    <span class="hljs-number">58</span> symbols   <span class="hljs-number">2</span>,<span class="hljs-number">362</span> bytes
+libgcc       <span class="hljs-number">65</span> symbols   <span class="hljs-number">1</span>,<span class="hljs-number">552</span> bytes
+total       <span class="hljs-number">531</span> symbols  <span class="hljs-number">12</span>,<span class="hljs-number">975</span> <span class="hljs-title function_">bytes</span> (<span class="hljs-number">12.7</span> KB)
+</code></pre>
+<p>That total includes the 124 curated <code>pm_*</code> entries. The runtime adds about<br>
+407 symbols, 12.7 KB of flash in the firmware image, once. It is not a per-app<br>
+cost. Apps stay small: a hello world is 1.3 KB, an app using <code>std::vector</code> and<br>
+<code>std::string</code> is 2.3 KB, an app with cJSON linked in is 5.2 KB.<br>
+<code>--gc-sections</code> and <code>--strip-all</code> in <code>tools/app.mk</code> do that work.</p>
+<p>A symbol in <code>symbols.list</code> that the firmware does not define is reported as a<br>
+warning but still emitted into the table. A newly added wrapper cannot appear<br>
+in <code>--host-elf</code> until the host is rebuilt, so dropping it would omit it on the<br>
+one run that adds it. Regenerate once more after building and the warning<br>
+should be gone.</p>
+<p>Runtime export is on by default. Pass <code>--no-runtime</code> to export only the<br>
+curated SDK list, which restricts apps to the SDK surface and no libraries.</p>
+<p>Membership is decided by which archive a symbol comes from, not by its name.<br>
+A <code>_ZN...</code> prefix also matches the SDK’s own C++ classes, so matching on prefix<br>
+shape would export firmware internals by accident.</p>
+<p><strong>The curated SDK table.</strong> <code>symbols.list</code> is the hand-maintained promise of<br>
+PocketMage’s own exports. Host-side, <code>src/ELF_SYMS/host_exports.list</code> tracks a<br>
+superset, validated against the firmware image. Both lists feed the same<br>
+generated <code>g_customer_elfsyms</code> table.</p>
+<h2 id="symbols-and-the-dependency-contract-linking-a-third-party-library" class="docmd-heading"><a href="#symbols-and-the-dependency-contract-linking-a-third-party-library" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Linking a third-party library</h2>
+<p>A vendored library’s source is compiled into the app by overriding <code>APP_SRCS</code>.<br>
+Anything the library references that is not in the app is resolved by the host<br>
+at load time. Two consequences are worth knowing.</p>
+<p>Libraries compiled at <code>-Os</code> need fewer symbols than the same source at <code>-O0</code>.<br>
+A <code>std::vector&lt;std::string&gt;</code> app at <code>-O0</code> wants 13 symbols including<br>
+<code>std::allocator&lt;char&gt;</code> constructors; at <code>-Os</code> it wants 7, and all 7 resolve.</p>
+<p><code>sscanf</code> is not exported by default. It exists in newlib, but nothing in the<br>
+firmware references it, so it was dropped by <code>--gc-sections</code>, and referencing<br>
+it pulls in about 190 KB of stdio reentrancy. A library that needs it must<br>
+either avoid it or the host must export it deliberately.</p>
 <h2 id="symbols-and-the-dependency-contract-reading-an-apps-contract" class="docmd-heading"><a href="#symbols-and-the-dependency-contract-reading-an-apps-contract" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Reading an app’s contract</h2>
 <pre class="hljs"><code class="language-sh">make check   <span class="hljs-comment"># prints entry + every undefined symbol</span>
 pm check     <span class="hljs-comment"># classes each symbol and exits non-zero on a broken contract</span>
 </code></pre>
 <p>Everything in that list must exist in the host’s global view when the app<br>
-loads, or the load fails. <code>pm check</code> is the exact gate when run<br>
-against a host firmware ELF (<code>--host-elf</code>): every undefined symbol must resolve<br>
-to a host global. Without a host ELF it falls back to the curated lists plus a<br>
-libc allowlist and reports anything outside that set as unconfirmed.</p>
+loads, or the load fails. <code>pm check</code> with <code>--host-elf</code> is the exact gate: every<br>
+undefined symbol must resolve to a host global.</p>
+<p>Without a host ELF, <code>pm check</code> reads the generated export table that the<br>
+firmware links, which is the same file the loader searches. It does not keep a<br>
+separate allowlist, because a hand-written list drifts from the table and the<br>
+drift shows up only on device. An earlier allowlist claimed <code>memmove</code> and<br>
+<code>sprintf</code> were resolvable when no table exported them, so those apps passed the<br>
+gate and failed at load with <code>Can't find common memmove</code>. Reading the generated<br>
+table makes that class of bug impossible.</p>
 <h2 id="symbols-and-the-dependency-contract-editing-the-surface" class="docmd-heading"><a href="#symbols-and-the-dependency-contract-editing-the-surface" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Editing the surface</h2>
 <p>Rules for SDK authors:</p>
 <ul>
 <li>Additions only. Removing or renaming an exported symbol breaks every app<br>
 that references it at runtime.</li>
-<li>Every added symbol must exist as a <code>GLOBAL</code> in the firmware image and be<br>
+<li>Every added SDK symbol must exist as a <code>GLOBAL</code> in the firmware image and be<br>
 added to both <code>symbols.list</code> and the host’s <code>host_exports.list</code>, then<br>
 regenerate the host table with <code>tools/symbols.py --host-elf ...</code>.</li>
-<li>Run <code>pm exports</code> (add <code>--all</code> for extras too) before committing a surface<br>
-change: it reconciles <code>symbols.list</code> against the host’s <code>host_exports.list</code><br>
-and fails when a curated symbol is not exported. Keep both lists in sync<br>
-in the same change.</li>
+<li>Regenerate the host table whenever the firmware’s linked symbol set changes.<br>
+<code>symbols.py</code> only exports runtime symbols the firmware already links, so a<br>
+firmware that starts using a new libc or libstdc++ function makes it<br>
+available on the next regeneration.</li>
+<li>Run <code>pm exports</code> before committing a surface change. It reconciles<br>
+<code>symbols.list</code> against <code>host_exports.list</code> and fails when a curated symbol is<br>
+not exported.</li>
 <li>Bump <code>pocketmage_sdk_version</code> when the surface changes. It is exported, and<br>
 stored so the OS can version apps against the surface.</li>
-<li>Keep the set small. Exporting a broad slice of the firmware binds the ABI<br>
-to all of it.</li>
 </ul>
+<p>Exporting a broad slice of the firmware binds the ABI to all of it. That is a<br>
+deliberate trade here: it is what lets apps use libraries, and per-app<br>
+restriction is planned as an opt-in scope rather than a default.</p>
 <h2 id="symbols-and-the-dependency-contract-versioning-and-gating" class="docmd-heading"><a href="#symbols-and-the-dependency-contract-versioning-and-gating" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Versioning and gating</h2>
 <p><code>pocketmage_sdk_version</code> is exported so apps can adapt to surface changes.<br>
 <code>pm check</code> gates an app against the host export set before release: the mirror<br>
-of <code>make check</code>, with the curated lists as the reference when no host ELF is<br>
+of <code>make check</code>, with the generated table as the reference when no host ELF is<br>
 available.</p>
 <p>Ship a new version with <code>pm release &lt;major|minor|patch&gt;</code> (add<br>
 <code>--message TEXT</code> for a CHANGELOG bullet). It validates VERSION, the<br>
@@ -1771,6 +1808,10 @@ files and the changelog together.</p>
         </li>
       
         <li class="toc-item toc-level-2">
+          <a href="#symbols-and-the-dependency-contract-linking-a-third-party-library" class="toc-link">Linking a third-party library</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
           <a href="#symbols-and-the-dependency-contract-reading-an-apps-contract" class="toc-link">Reading an app’s contract</a>
         </li>
       
@@ -1791,13 +1832,13 @@ files and the changelog together.</p>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1790729515000">
+                <span class="git-last-updated" data-timestamp="1791164862000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1790729515000"></span>
+                  <span class="git-time" data-timestamp="1791164862000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1810,10 +1851,10 @@ files and the changelog together.</p>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="DOCS">DOCS</div>
+                            <div class="git-commit-message" title="Massive revamp">Massive revamp</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1790729515000"></span>
+                              <span class="git-commit-date" data-timestamp="1791164862000"></span>
                             </div>
                           </div>
                         </li>
@@ -1936,13 +1977,13 @@ files and the changelog together.</p>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mune4scf"></script>
+      <script src="../assets/js/docmd-main.js?v=muulc20a"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mune4scf"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mune4scf" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mune4scf" ></script>
-<script src="../assets/js/docmd-search.js?v=mune4scf" ></script>
-<script src="../assets/js/docmd-git.js?v=mune4scf" type="module"></script>
+      <script src="../assets/js/docmd-git.js?v=muulc20a"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=muulc20a" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=muulc20a" ></script>
+<script src="../assets/js/docmd-search.js?v=muulc20a" ></script>
+<script src="../assets/js/docmd-git.js?v=muulc20a" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

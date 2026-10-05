@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="./assets/favicon.ico?v=mune4scf">
-    <link rel="stylesheet" href="./assets/css/docmd-main.css?v=mune4scf">
+    <link id="site-favicon" rel="icon" href="./assets/favicon.ico?v=muulc20a">
+    <link rel="stylesheet" href="./assets/css/docmd-main.css?v=muulc20a">
     
-    <link rel="stylesheet" href="./assets/css/docmd-highlight-light.css?v=mune4scf" id="hljs-light" >
-    <link rel="stylesheet" href="./assets/css/docmd-highlight-dark.css?v=mune4scf" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="./assets/css/docmd-highlight-light.css?v=muulc20a" id="hljs-light" >
+    <link rel="stylesheet" href="./assets/css/docmd-highlight-dark.css?v=muulc20a" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Official SDK for building PocketMage apps: guides, the full component API reference, the ELF app contract, and publishing.">
@@ -123,9 +123,9 @@
 
 
 
-<link rel="stylesheet" href="./assets/css/docmd-theme-ruby.css?v=mune4scf" >
-<link rel="stylesheet" href="./assets/css/docmd-git.css?v=mune4scf" >
-<link rel="stylesheet" href="./assets/css/docmd-openapi.css?v=mune4scf" >
+<link rel="stylesheet" href="./assets/css/docmd-theme-ruby.css?v=muulc20a" >
+<link rel="stylesheet" href="./assets/css/docmd-git.css?v=muulc20a" >
+<link rel="stylesheet" href="./assets/css/docmd-openapi.css?v=muulc20a" >
 
     
     
@@ -1554,7 +1554,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22PocketMage%20SDK%20Documentation%22%0Adescription%3A%20%22Official%20SDK%20for%20building%20PocketMage%20apps%3A%20guides%2C%20the%20full%20component%20API%20reference%2C%20the%20ELF%20app%20contract%2C%20and%20publishing.%22%0A---%0A%0A%23%20PocketMage%20SDK%20Documentation%0A%0APocketMage%20apps%20are%20ELF%20files%20the%20host%20firmware%20loads%20at%20runtime%20and%20runs%20in-process.%20These%20docs%20cover%20how%20to%20write%20an%20app%2C%20every%20component%20of%20the%20app%20API%2C%20the%20binary%20contract%2C%20the%20build%20tooling%2C%20the%20symbol%20surface%2C%20and%20packaging.%0A%0A%3A%3A%3A%20tag%20%22Guides%22%0A%3A%3A%3A%20tag%20%22API%20reference%22%0A%3A%3A%3A%20tag%20%22App%20ABI%22%0A%3A%3A%3A%20tag%20%22Build%20tooling%22%0A%3A%3A%3A%20tag%20%22Symbols%22%0A%3A%3A%3A%20tag%20%22Publishing%22%0A%0A%23%23%20Guides%0A%0AStart%20here.%20Walkthroughs%20of%20the%20whole%20app%20model.%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Making%20an%20app%22%20icon%3Acode%0AFrom%20%60pm%20new%60%20to%20a%20running%20ELF%3A%20scaffold%2C%20build%20recipe%2C%20delivery%20tar%2C%20and%20the%20host%20loader.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fguides%2Fmaking-apps.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22App%20lifecycle%22%20icon%3Aactivity%0AEntry%20points%2C%20the%20host%2Fapp%20export%20model%2C%20%60APP_INIT%60%2C%20and%20exiting%20cleanly.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fguides%2Flifecycle.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Rendering%22%20icon%3Amonitor%0AThe%20two-display%20model%2C%20the%20buffered%20E-Ink%20refresh%20rhythm%2C%20and%20the%20scroll%20loop.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fguides%2Frendering.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Guides%20overview%22%20icon%3Abook%0AGuide%20index%20and%20cross-links%20into%20the%20deep%20references.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fguides%2Findex.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20API%20reference%0A%0AEvery%20header%20the%20SDK%20publishes%2C%20with%20semantics.%20Start%20at%20the%20overview.%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22API%20overview%22%20icon%3Aboxes%0AThe%20umbrella%20header%2C%20the%20%60PM_TARGET_HOST%60%2F%60PM_TARGET_APP%60%20split%2C%20and%20how%20to%20read%20the%20per-component%20pages.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapi%2Findex.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Displays%22%20icon%3Amonitor%0AOLED%2C%20E-Ink%2C%20Font%2C%20Layout%2C%20UI%20helpers.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapi%2Foled.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Input%22%20icon%3Akeyboard%0AKeyboard%2C%20Touch.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapi%2Fkb.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22System%22%20icon%3Acpu%0ASys%20and%20globals%2C%20SD%20card%2C%20Clock%2C%20Buzzer%2C%20WiFi%2C%20i18n%20runtime.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapi%2Fsys.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20The%20binary%20contract%0A%0AHow%20the%20framework%20itself%20is%20built%20and%20shipped.%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22App%20ABI%22%20icon%3Abook%0AThe%20binary%20shape%20the%20loader%20accepts%3A%20format%2C%20entry%2C%20load%20strategy%2C%20failure%20modes.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapp-abi.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Building%20Apps%22%20icon%3Awrench%0AA%20%60Makefile%60%20including%20%60tools%2Fapp.mk%60%20is%20the%20whole%20build%20system.%20Toolchain%2C%20targets%2C%20icon.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fbuild.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Symbols%22%20icon%3Abox%0AThe%20host-export%20surface%20an%20app&#039;s%20undefined%20list%20resolves%20against%2C%20and%20how%20to%20change%20it.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fsymbols.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Publishing%22%20icon%3Apackage%0AThe%20delivery%20tar%2C%20the%2040x40%20icon%2C%20assets%2C%20and%20what%20APPLOADER%20does%20with%20them.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fpublish.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22i18n%20catalogs%22%20icon%3Aterminal%0ACatalogs%2C%20the%20generator%2C%20and%20the%20merge%20rules%20that%20keep%20string%20IDs%20stable.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fi18n.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Migration%22%20icon%3Abook-open%0AMoving%20a%20pre-ELF%20app%20to%20the%20runtime-load%20flow.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fmigration.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Start%20here%0A%0A%3A%3A%3A%20steps%0A%0A1.%20Read%20the%20%5Bguides%5D(guides%2Fmaking-apps.md)%2C%20then%20the%20%5BAPI%20overview%5D(api%2Findex.md).%0A2.%20Read%20the%20%5BApp%20ABI%5D(app-abi.md)%20contract.%0A3.%20Set%20up%20the%20%5Bbuild%20toolchain%5D(build.md).%0A4.%20Check%20what%20your%20app%20resolves%20against%3A%20%5BSymbols%5D(symbols.md).%0A5.%20Ship%20a%20tar%3A%20%5BPublishing%5D(publish.md).%0A6.%20Port%20existing%20code%3A%20%5BMigration%5D(migration.md).%0A%0A%3A%3A%3A%0A%0A%23%23%20Links%0A%0A-%20%5BReference%20example%20app%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_SDK%2Ftree%2Fmain%2Fexamples%2Fhello_app)%0A-%20%5BPocketMageOS%20documentation%5D(https%3A%2F%2Ftalismandesign.github.io%2FPocketMage_PDA%2Fdocs)%0A-%20%5BGitHub%20Repository%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_SDK)%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22PocketMage%20SDK%20Documentation%22%0Adescription%3A%20%22Official%20SDK%20for%20building%20PocketMage%20apps%3A%20guides%2C%20the%20full%20component%20API%20reference%2C%20the%20ELF%20app%20contract%2C%20and%20publishing.%22%0A---%0A%0A%23%20PocketMage%20SDK%20Documentation%0A%0APocketMage%20apps%20are%20ELF%20files%20the%20host%20firmware%20loads%20at%20runtime%20and%20runs%20in-process.%20These%20docs%20cover%20how%20to%20write%20an%20app%2C%20every%20component%20of%20the%20app%20API%2C%20the%20binary%20contract%2C%20the%20build%20tooling%2C%20the%20symbol%20surface%2C%20and%20packaging.%0A%0A%3A%3A%3A%20tag%20%22Guides%22%0A%3A%3A%3A%20tag%20%22API%20reference%22%0A%3A%3A%3A%20tag%20%22App%20ABI%22%0A%3A%3A%3A%20tag%20%22Build%20tooling%22%0A%3A%3A%3A%20tag%20%22Symbols%22%0A%3A%3A%3A%20tag%20%22Publishing%22%0A%0A%23%23%20Guides%0A%0AStart%20here.%20Walkthroughs%20of%20the%20whole%20app%20model.%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Making%20an%20app%22%20icon%3Acode%0AFrom%20%60pm%20new%60%20to%20a%20running%20ELF%3A%20scaffold%2C%20build%20recipe%2C%20delivery%20tar%2C%20and%20the%20host%20loader.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fguides%2Fmaking-apps.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22App%20lifecycle%22%20icon%3Aactivity%0AEntry%20points%2C%20the%20host%2Fapp%20export%20model%2C%20%60APP_INIT%60%2C%20and%20exiting%20cleanly.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fguides%2Flifecycle.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Rendering%22%20icon%3Amonitor%0AThe%20two-display%20model%2C%20the%20buffered%20E-Ink%20refresh%20rhythm%2C%20and%20the%20scroll%20loop.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fguides%2Frendering.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Guides%20overview%22%20icon%3Abook%0AGuide%20index%20and%20cross-links%20into%20the%20deep%20references.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fguides%2Findex.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20API%20reference%0A%0AEvery%20header%20the%20SDK%20publishes%2C%20with%20semantics.%20Start%20at%20the%20overview.%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22API%20overview%22%20icon%3Aboxes%0AThe%20umbrella%20header%2C%20the%20%60PM_TARGET_HOST%60%2F%60PM_TARGET_APP%60%20split%2C%20and%20how%20to%20read%20the%20per-component%20pages.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapi%2Findex.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Displays%22%20icon%3Amonitor%0AOLED%2C%20E-Ink%2C%20Font%2C%20Layout%2C%20UI%20helpers.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapi%2Foled.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Input%22%20icon%3Akeyboard%0AKeyboard%2C%20Touch.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapi%2Fkb.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22System%22%20icon%3Acpu%0ASys%20and%20globals%2C%20SD%20card%2C%20Clock%2C%20Buzzer%2C%20WiFi%2C%20i18n%20runtime.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapi%2Fsys.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20The%20binary%20contract%0A%0AHow%20the%20framework%20itself%20is%20built%20and%20shipped.%0A%0A%3A%3A%3A%20grids%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22App%20ABI%22%20icon%3Abook%0AThe%20binary%20shape%20the%20loader%20accepts%3A%20format%2C%20entry%2C%20load%20strategy%2C%20failure%20modes.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fapp-abi.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Building%20Apps%22%20icon%3Awrench%0AA%20%60Makefile%60%20including%20%60tools%2Fapp.mk%60%20is%20the%20whole%20build%20system.%20Toolchain%2C%20targets%2C%20icon.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fbuild.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Symbols%22%20icon%3Abox%0AThe%20host-export%20surface%20an%20app&#039;s%20undefined%20list%20resolves%20against%2C%20and%20how%20to%20change%20it.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fsymbols.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Publishing%22%20icon%3Apackage%0AThe%20delivery%20tar%2C%20the%2040x40%20icon%2C%20assets%2C%20and%20what%20APPLOADER%20does%20with%20them.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fpublish.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22i18n%20catalogs%22%20icon%3Aterminal%0ACatalogs%2C%20the%20generator%2C%20and%20the%20merge%20rules%20that%20keep%20string%20IDs%20stable.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fi18n.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%20grid%0A%3A%3A%3A%20card%20%22Migration%22%20icon%3Abook-open%0AMoving%20a%20pre-ELF%20app%20to%20the%20runtime-load%20flow.%0A%0A%3A%3A%3A%20button%20%22Open%22%20.%2Fmigration.md%20icon%3Aarrow-right%0A%3A%3A%3A%0A%3A%3A%3A%0A%3A%3A%3A%0A%0A%23%23%20Start%20here%0A%0A%3A%3A%3A%20steps%0A%0A1.%20Read%20the%20%5Bguides%5D(guides%2Fmaking-apps.md)%2C%20then%20the%20%5BAPI%20overview%5D(api%2Findex.md).%0A2.%20Read%20the%20%5BApp%20ABI%5D(app-abi.md)%20contract.%0A3.%20Set%20up%20the%20%5Bbuild%20toolchain%5D(build.md).%0A4.%20Check%20what%20your%20app%20resolves%20against%3A%20%5BSymbols%5D(symbols.md).%0A5.%20Ship%20a%20tar%3A%20%5BPublishing%5D(publish.md).%0A6.%20Port%20existing%20code%3A%20%5BMigration%5D(migration.md).%0A%0A%3A%3A%3A%0A%0A%23%23%20Links%0A%0A-%20%5BApp%20template%20repository%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_App)%0A-%20%5BPocketMageOS%20documentation%5D(https%3A%2F%2Ftalismandesign.github.io%2FPocketMage_PDA%2Fdocs)%0A-%20%5BGitHub%20Repository%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_SDK)%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -2169,7 +2169,7 @@ Open</a></div></div></div>
 </ol>
 </div><h2 id="pocketmage-sdk-documentation-links" class="docmd-heading"><a href="#pocketmage-sdk-documentation-links" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Links</h2>
 <ul>
-<li><a href="https://github.com/TalismanDesign/PocketMage_SDK/tree/main/examples/hello_app">Reference example app</a></li>
+<li><a href="https://github.com/TalismanDesign/PocketMage_App">App template repository</a></li>
 <li><a href="https://talismandesign.github.io/PocketMage_PDA/docs">PocketMageOS documentation</a></li>
 <li><a href="https://github.com/TalismanDesign/PocketMage_SDK">GitHub Repository</a></li>
 </ul>
@@ -2265,13 +2265,13 @@ Open</a></div></div></div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1790729515000">
+                <span class="git-last-updated" data-timestamp="1791164862000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1790729515000"></span>
+                  <span class="git-time" data-timestamp="1791164862000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2284,10 +2284,10 @@ Open</a></div></div></div>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="DOCS">DOCS</div>
+                            <div class="git-commit-message" title="Massive revamp">Massive revamp</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1790729515000"></span>
+                              <span class="git-commit-date" data-timestamp="1791164862000"></span>
                             </div>
                           </div>
                         </li>
@@ -2410,13 +2410,13 @@ Open</a></div></div></div>
         </div>
       </div>
       
-      <script src="./assets/js/docmd-main.js?v=mune4scf"></script>
+      <script src="./assets/js/docmd-main.js?v=muulc20a"></script>
       
-      <script src="./assets/js/docmd-git.js?v=mune4scf"></script>
-      <script src="./assets/js/docmd-image-lightbox.js?v=mune4scf" ></script>
-<script src="./assets/js/vendor/minisearch.js?v=mune4scf" ></script>
-<script src="./assets/js/docmd-search.js?v=mune4scf" ></script>
-<script src="./assets/js/docmd-git.js?v=mune4scf" type="module"></script>
+      <script src="./assets/js/docmd-git.js?v=muulc20a"></script>
+      <script src="./assets/js/docmd-image-lightbox.js?v=muulc20a" ></script>
+<script src="./assets/js/vendor/minisearch.js?v=muulc20a" ></script>
+<script src="./assets/js/docmd-search.js?v=muulc20a" ></script>
+<script src="./assets/js/docmd-git.js?v=muulc20a" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

@@ -4,10 +4,10 @@ title: "Frames (frames.h)"
 description: "The Frame data model and the e-ink text/bitmap rendering engine."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/frames/"
 path: /api/frames/
-updated: 2026-09-30
+updated: 2026-10-05
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-09-30T00:52:21.250Z"
+  generated_at: "2026-10-05T01:48:20.779Z"
 ---
 ---
 title: "Frames (frames.h)"
