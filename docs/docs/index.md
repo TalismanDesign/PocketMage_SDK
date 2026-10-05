@@ -148,6 +148,6 @@ Moving a pre-ELF app to the runtime-load flow.
 
 ## Links
 
-- [Reference example app](https://github.com/TalismanDesign/PocketMage_SDK/tree/main/examples/hello_app)
+- [App template repository](https://github.com/TalismanDesign/PocketMage_App)
 - [PocketMageOS documentation](https://talismandesign.github.io/PocketMage_PDA/docs)
 - [GitHub Repository](https://github.com/TalismanDesign/PocketMage_SDK)

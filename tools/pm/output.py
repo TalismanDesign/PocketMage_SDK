@@ -22,8 +22,6 @@ class UI:
         if _TUI is not None:
             tui = _TUI(ci_mode=ci_mode or not sys.stdout.isatty(), theme=theme)
             if ci_mode:
-                # tuiro's Colors.disable() does not reset palette fields
-                # (they copy escape strings at import time). Strip them here.
                 for attr in ("info", "success", "warning", "error", "accent", "dim", "text"):
                     setattr(tui.palette, attr, "")
             self._tui = tui

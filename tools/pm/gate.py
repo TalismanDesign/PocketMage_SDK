@@ -1,8 +1,8 @@
 """Resolve an app's undefined symbols against the host.
 
 With a host firmware ELF the check is exact: every undefined symbol must exist
-as a host global. Without one it falls back to the curated export lists plus a
-libc allowlist, and anything outside that set is unconfirmed.
+as a host global. Without one it falls back to the generated export table plus
+the curated export lists, and anything outside that set is unconfirmed.
 """
 
 from __future__ import annotations
@@ -14,23 +14,8 @@ from dataclasses import dataclass
 
 from tools import symbols as symbols_mod
 
-# libc symbols the host's newlib satisfies. Used only when no host ELF is
-# available; --host-elf is the real gate.
-LIBC_ALLOWLIST = frozenset(
-    {
-        "malloc", "calloc", "realloc", "free",
-        "memcpy", "memmove", "memset", "memcmp",
-        "strlen", "strcmp", "strncmp", "strcpy", "strncpy",
-        "strcat", "strncat", "strchr", "strrchr", "strstr",
-        "sprintf", "snprintf", "printf", "puts", "putchar",
-        "sleep", "usleep",
-        "write", "read", "open", "close", "lseek", "stat", "fstat",
-        "floor", "ceil", "abs",
-    }
-)
+_EXPORT_LINE = re.compile(r"ESP_ELFSYM_EXPORT\(\s*(\w+)\s*\)")
 
-#       Num:    Value  Size Type    Bind   Vis      Ndx Name
-# 10: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND printf
 _SYM_LINE = re.compile(
     r"^\s*\d+:\s+\S+\s+\d+\s+\S+\s+(\S+)\s+\S+\s+UND\s+(\S+)\s*$"
 )
@@ -51,7 +36,6 @@ class ElfHeader:
 
     @property
     def is_shared(self) -> bool:
-        # readelf prints the mnemonic, not the constant: "DYN (Shared object file)".
         return self.etype.split(None, 1)[0] == "DYN"
 
 
@@ -101,7 +85,7 @@ def find_app_main(stdout: str) -> str | None:
     return None
 
 
-_APP_ICON_SIZE = 200  # 40x40, 1 bit per pixel, 5 bytes per row
+_APP_ICON_SIZE = 200  
 
 
 def validate_icon(path: str) -> str | None:
@@ -121,8 +105,6 @@ def validate_icon(path: str) -> str | None:
     return None
 
 
-#     Name         Type        Address   Off    Size   EntSize Flags ...  
-#   [ 4] .init_array INIT_ARRAY 00000000 0001b4 000004 04  WA  0   0  4
 _INIT_ARRAY_RE = re.compile(
     r"^\s*\[\s*\d+\]\s+\.init_array\s+INIT_ARRAY\s+\S+\s+\S+\s+(\S+)"
 )
@@ -197,15 +179,83 @@ def host_globals(readelf: str, host_elf: str) -> set[str]:
     return symbols_mod.get_host_globals(readelf, host_elf, symbol_types=("FUNC", "OBJECT"))
 
 
+def generated_table_symbols(path: str) -> set[str]:
+    """Symbols listed in a generated export table.
+
+    Args:
+        path: Path to the generated `.cpp` table.
+
+    Returns:
+        Set of exported symbol names, empty if the file is absent or unreadable.
+    """
+    if not path or not os.path.isfile(path):
+        return set()
+    with open(path, encoding="utf-8") as handle:
+        return set(_EXPORT_LINE.findall(handle.read()))
+
+
+def find_export_table(sdk_root: str) -> str | None:
+    """Locate the generated export table that the firmware links.
+
+    Args:
+        sdk_root: Root of the PocketMage SDK.
+
+    Returns:
+        Path to the table, or None when no table is found.
+    """
+    current = os.path.abspath(sdk_root)
+    for _ in range(4):
+        candidate = os.path.join(current, 'src', 'ELF_SYMS', 'esp_all_symbol.cpp')
+        if os.path.isfile(candidate):
+            return candidate
+        current = os.path.dirname(current)
+    return None
+
+
+def resolve_available(curated: set[str], table_path: str | None) -> set[str]:
+    """The symbol set an app may reference.
+
+    Args:
+        curated: The SDK's curated export list.
+        table_path: Path to the generated export table, if known.
+
+    Returns:
+        Set of symbol names the host is known to resolve.
+    """
+    return set(curated) | generated_table_symbols(table_path or "")
+
+
+def available_symbols(curated: set[str],
+                      available_table: set[str]) -> set[str]:
+    """Union the curated SDK list with the generated export table.
+
+    Args:
+        curated: The SDK's curated export list.
+        available_table: Symbols parsed from the generated table, empty when
+            the file is absent or unreadable.
+
+    Returns:
+        Set of symbol names the host can resolve.
+    """
+    return set(curated) | set(available_table)
+
+
 def classify(und: list[str], curated: set[str], host_view: set[str] | None,
-             entry: str = "") -> GateResult:
+             entry: str = "", available_table: set[str] = frozenset()) -> GateResult:
     """Sort undefined symbols into ok / unconfirmed / broken.
 
     With host_view, anything outside the curated+host union is broken: the load
-    fails on it. Without one, anything outside the curated+libc surface is
-    unconfirmed until a host ELF says otherwise.
+    fails on it. Without one, anything outside the curated+generated-table
+    surface is unconfirmed until a host ELF says otherwise.
+
+    Args:
+        und: Undefined symbol names from the app ELF.
+        curated: The SDK's curated export list.
+        host_view: GLOBAL FUNC/OBJECT of the host ELF, or None when unavailable.
+        entry: The app's entry point name, for reporting.
+        available_table: Symbols from the generated export table.
     """
-    available = curated | LIBC_ALLOWLIST
+    available = available_symbols(curated, available_table)
     ok: list[str] = []
     unconfirmed: list[str] = []
     broken: list[str] = []
@@ -250,8 +300,6 @@ def check_app(info, readelf: str | None, host_elf: str | None) -> GateResult:
     app_main = find_app_main(syms_out)
     app_main_stripped = app_main is None
     if app_main is not None and header.entry:
-        # readelf on dash-h prefixes hex with 0x, the symtab omits it. Normalize
-        # through int() so both columns compare as addresses.
         entry_addr = int(header.entry, 16)
         app_main_addr = int(app_main, 16)
         if entry_addr != app_main_addr:
@@ -263,7 +311,9 @@ def check_app(info, readelf: str | None, host_elf: str | None) -> GateResult:
     und = parse_undefined(syms_out)
     curated = read_curated(info.sdk_root)
     host_view = host_globals(tool, host_elf) if host_elf else None
-    result = classify(und, curated, host_view, entry=header.entry)
+    table_path = find_export_table(info.sdk_root)
+    result = classify(und, curated, host_view, entry=header.entry,
+                      available_table=generated_table_symbols(table_path))
     result.app_main_stripped = app_main_stripped
     sections_out = run_readelf(tool, "-S", "-W", info.out)
     result.init_array_size = init_array_size(sections_out)

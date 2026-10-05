@@ -23,7 +23,7 @@ with `main` linked to `app_main`. `argc`/`argv` are the invocation arguments the
 - The host owns all hardware, all SDK singletons, the memory manager the app allocates from, and the thread that runs the app's entry nightly.
 - Nothing is statically linked into the app (`-nostdlib`, undefined references resolved at load). Any symbol the app uses that is not defined inside it must be in the host export table, or load fails the `pm check` surface (see [symbols](../symbols.md)).
 
-Build-time version macros (`PM_SDK_VERSION_*`) are baked into the app; the host exports the matching `pocketmage_sdk_version` string/runtime parts it was built against. An app compares its own compile-time version against the host's export to present a compatible pair (see the [version example](https://github.com/TalismanDesign/PocketMage_SDK/blob/main/examples/version_app/main.cpp)).
+Build-time version macros (`PM_SDK_VERSION_*`) are baked into the app; the host exports the matching `pocketmage_sdk_version` string/runtime parts it was built against. An app compares its own compile-time version against the host's export to present a compatible pair.
 
 ## `APP_INIT`
 
@@ -39,7 +39,7 @@ The OS/SDK host reaches `APP_INIT()` after peripheral and singleton bring-up (di
 
 While running, the app owns the loop:
 
-- Poll input: `KB().updateKeypress()`, `TOUCH().updateScroll*()`.
+- Poll input: `pm_kb_read()` for a keypress, `pm_kb_state()` for the current modifier state.
 - Draw: build the E-Ink buffer, refresh once, draw OLED text.
 - Sleep on idle: mirror the OS's `CLOCK().setPrevTimeMillis(millis())` poke or call `pocketmage::deepSleep()` explicitly.
 

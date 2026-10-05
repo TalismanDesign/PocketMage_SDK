@@ -111,7 +111,7 @@ gate CI runs, and `--host-elf <firmware.elf>` pins the host export surface
 exactly (see [symbols.md](symbols.md)). `make pack` is the deliverable;
 verify the tar's members with `tar -tf build/<name>.tar`.
 
-The repo ships three ready-to-build examples under `examples/`:
-`hello_app` (baseline), `version_app` (reads the ABI version via
-`pocketmage_app_version.h`), and `broken_app` (CI's negative fixture: it
-references a symbol the host does not export and must fail `pm check`).
+`pm new myapp` scaffolds from the official
+[PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template.
+CI also builds a `broken_app` fixture that intentionally fails the gate:
+it references a symbol the host does not export and must fail `pm check`.

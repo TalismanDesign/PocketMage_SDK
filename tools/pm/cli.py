@@ -26,13 +26,13 @@ def _ci_mode(args) -> bool:
 def cmd_new(ui: UI, args) -> int:
     path = scaffold(args.name, args.dest_dir)
     ui.success(f"scaffolded app in {path}")
-    ui.warning(
-        "hello_app_ICON.bin was copied as a placeholder; replace it with the "
-        "real 40x40 icon"
+    ui.info(
+        "replace assets/icon.png with your own 40x40 artwork to change the "
+        "APPLOADER card icon"
     )
     ui.info(
-        "next: cd into the app, run `pm build --pack`, then "
-        "`pm check --host-elf <firmware.elf>`"
+        "next: cd into the app, run `pm build --pack`, then `pm check` "
+        "(add --host-elf <firmware.elf> for an exact gate)"
     )
     return 0
 
@@ -172,7 +172,9 @@ def _build_parser() -> argparse.ArgumentParser:
 
     sub = parser.add_subparsers(dest="command", required=True)
 
-    p_new = sub.add_parser("new", help="scaffold a new app from examples/hello_app")
+    p_new = sub.add_parser(
+        "new", help="scaffold an app from the PocketMage_App template"
+    )
     p_new.add_argument("name")
     p_new.add_argument(
         "dest_dir", nargs="?", default=".",

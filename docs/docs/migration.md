@@ -31,8 +31,8 @@ the loader's job, not yours.
 1. **Get the toolchain.** Install the espressif `xtensa-esp-elf` toolchain
    into `~/.espressif/...` as shown in [build.md](build.md). Do not rely on
    the PlatformIO toolchain; it emits big-endian ELFs the loader cannot read.
-2. **Scaffold.** Copy `examples/hello_app` as a starting point. Its
-   `Makefile` (`include tools/app.mk`) is the whole build system.
+2. **Scaffold.** Run `pm new myapp`. Its `Makefile`
+   (`include tools/app.mk`) is the whole build system.
 3. **Port the entry.** Wrap your start logic in `extern "C" int
    main(int, char**)`. The build renames it to `app_main`. Fit the previous
    app's lifetime to the return-from-`main` model

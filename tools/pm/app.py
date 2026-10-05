@@ -57,7 +57,7 @@ class PmError(Exception):
 
 
 def sdk_root() -> str:
-    """Find the SDK checkout pm should operate on.
+    """The SDK checkout pm operates on.
 
     pip installs tools/ into site-packages, so the package location is not the
     source tree. Order: PM_SDK_ROOT, the checkout this file lives in, then an
@@ -120,12 +120,20 @@ def _parse_info(output: str) -> dict[str, str]:
     return info
 
 
+def _make_env() -> dict[str, str]:
+    """Environment for make: always pin the SDK root so an app Makefile's
+    `SDK_ROOT ?= $(PM_SDK_ROOT)` resolves even when the caller never set it."""
+    env = dict(os.environ)
+    env["PM_SDK_ROOT"] = sdk_root()
+    return env
+
+
 def query_app(app_dir: str) -> AppInfo:
     """Run `make -s pm-info` in the app and parse the result."""
 
     def run_make_info(path: str) -> str:
         cmd = ["make", "-C", path, "-s", "pm-info"]
-        result = subprocess.run(cmd, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True, env=_make_env())
         if result.returncode != 0:
             detail = result.stderr.strip() or result.stdout.strip()
             raise PmError(f"make pm-info failed in {path}: {detail}")
@@ -157,7 +165,7 @@ def run_make(ui: UI, app_dir: str, targets: list[str]) -> int:
     """make <targets> in the app, streaming output. Returns the exit code."""
     cmd = ["make", "-C", app_dir, *targets]
     ui.command(cmd)
-    result = subprocess.run(cmd)
+    result = subprocess.run(cmd, env=_make_env())
     return result.returncode
 
 

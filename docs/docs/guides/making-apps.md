@@ -13,13 +13,17 @@ A PocketMage app is a position-independent xtensa ELF that the host firmware loa
 pm new myapp
 ```
 
-This copies `examples/hello_app` into `./myapp`:
+This clones the official template repository into `./myapp`:
 
 - `main.cpp`, the app source.
 - `myapp_ICON.bin`, the 1-bit app icon (128x128, big-endian row-major) bundled into the delivery tar.
-- `Makefile`, a two-line file that sets an absolute `SDK_ROOT` and includes the SDK recipe.
+- `Makefile`, a file that sets `SDK_ROOT` from `PM_SDK_ROOT` and includes the SDK recipe.
 
-App names are `[A-Za-z][A-Za-z0-9_]*`; the name becomes the ELF, tar, icon, and install slot name. To start from an API walkthrough instead, open the [rendering guide](rendering.md) or the [version example](https://github.com/TalismanDesign/PocketMage_SDK/blob/main/examples/version_app/main.cpp).
+The template repository is
+[PocketMage_App](https://github.com/TalismanDesign/PocketMage_App). Set
+`PM_TEMPLATE_REPO` to scaffold from a fork.
+
+App names are `[A-Za-z][A-Za-z0-9_]*`; the name becomes the ELF, tar, icon, and install slot name. For an API walkthrough, open the [rendering guide](rendering.md).
 
 ## 2. Write code
 
@@ -40,7 +44,9 @@ extern "C" int main(int argc, char **argv) {
 }
 ```
 
-That is the whole hello app: `main` with C linkage (the ABI entry point), libc working (`printf`, `sleep`), and a plain `return` to exit. Drop in `#include <pocketmage.h>` and the `PM_SD()`/`OLED()`/etc. singletons and you have a UI app.
+That is the whole starter app: `main` with C linkage (the ABI entry point), libc working (`printf`, `sleep`), and a plain `return` to exit. Add `#include <pm_app_api.h>` and call the `pm_*` functions, such as `pm_oled_send` or `pm_eink_refresh`, and you have a UI app.
+
+Third-party C and C++ libraries work too. Compile their source into the app by overriding `APP_SRCS`; the host resolves their libc and runtime references. See [app-abi.md](../app-abi.md).
 
 The SDK umbrella headers are only ever compiled as *declarations* inside an app; the implementations live in the host. `PM_SDK_VERSION*` macros are injected by the build so an app can compare against the running host's `pocketmage_sdk_version` export.
 

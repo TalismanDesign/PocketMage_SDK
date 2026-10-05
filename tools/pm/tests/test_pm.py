@@ -76,23 +76,72 @@ class ParseSymbols(unittest.TestCase):
 
 
 class Classify(unittest.TestCase):
-    def test_curated_and_libc_ok(self):
-        curated = {"OLED", "KB", "pocketmage_sdk_version"}
-        result = gate_mod.classify(["printf", "OLED"], curated, host_view=None)
+    def test_curated_and_table_ok(self):
+        curated = {"pm_sdk_version"}
+        result = gate_mod.classify(["printf", "pm_sdk_version"], curated,
+                                   host_view=None, available_table={"printf"})
         self.assertTrue(result.passed)
-        self.assertEqual(result.ok, ["printf", "OLED"])
+        self.assertEqual(result.ok, ["printf", "pm_sdk_version"])
 
     def test_unknown_is_unconfirmed_without_host(self):
-        result = gate_mod.classify(["OLED", "mystery_api"], {"OLED"}, host_view=None)
+        result = gate_mod.classify(["pm_sdk_version", "mystery_api"], {"pm_sdk_version"},
+                                   host_view=None)
         self.assertFalse(result.passed)
         self.assertEqual(result.unconfirmed, ["mystery_api"])
         self.assertEqual(result.broken, [])
 
     def test_unknown_is_broken_with_host(self):
-        host_view = {"printf", "OLED", "KB"}
-        result = gate_mod.classify(["OLED", "mystery_api"], {"OLED"}, host_view=host_view)
-        self.assertEqual(result.ok, ["OLED"])
+        host_view = {"printf", "pm_sdk_version"}
+        result = gate_mod.classify(["pm_sdk_version", "mystery_api"],
+                                   {"pm_sdk_version"}, host_view=host_view)
+        self.assertEqual(result.ok, ["pm_sdk_version"])
         self.assertEqual(result.broken, ["mystery_api"])
+
+
+class SymbolInGeneratedTable(unittest.TestCase):
+    """The gate reads the shipped table, so it cannot pass a missing symbol."""
+
+    def test_parses_export_lines(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "table.cpp")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write(
+                    "const struct esp_elfsym g_customer_elfsyms[] = {\n"
+                    "    ESP_ELFSYM_EXPORT(memmove),\n"
+                    "    ESP_ELFSYM_EXPORT(_Znwj),\n"
+                    "    ESP_ELFSYM_END\n"
+                    "};\n"
+                )
+            self.assertEqual(
+                gate_mod.generated_table_symbols(path), {"memmove", "_Znwj"}
+            )
+
+    def test_absent_file_is_empty(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "missing.cpp")
+            self.assertEqual(gate_mod.generated_table_symbols(path), set())
+            self.assertEqual(gate_mod.generated_table_symbols(""), set())
+
+    def test_prefers_table_over_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "table.cpp")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write("    ESP_ELFSYM_EXPORT(memmove),\n")
+            available = gate_mod.resolve_available({"pm_sdk_version"}, path)
+            self.assertEqual(available, {"memmove", "pm_sdk_version"})
+
+    def test_missing_table_adds_nothing(self):
+        available = gate_mod.resolve_available({"pm_sdk_version"}, None)
+        self.assertEqual(available, {"pm_sdk_version"})
+
+    def test_former_false_pass_symbols_are_not_invented(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "table.cpp")
+            with open(path, "w", encoding="utf-8") as handle:
+                handle.write("    ESP_ELFSYM_EXPORT(memcpy),\n")
+            available = gate_mod.resolve_available({"pm_sdk_version"}, path)
+            self.assertNotIn("memmove", available)
+            self.assertNotIn("sprintf", available)
 
 
 class ReadCurated(unittest.TestCase):
@@ -164,21 +213,32 @@ class ParseInfo(unittest.TestCase):
         self.assertEqual(info["XTENSA_READELF"], "/abs/toolchain/bin/xtensa-esp32s3-elf-readelf")
 
 
+_FIXTURE_TEMPLATE = os.path.join(os.path.dirname(__file__), "fixtures", "template")
+
+
 class Scaffold(unittest.TestCase):
-    def test_creates_app_from_example(self):
+    def test_creates_app_from_template(self):
         with tempfile.TemporaryDirectory() as tmp:
-            app_path = scaffold_mod.scaffold("myapp", tmp)
+            app_path = scaffold_mod.scaffold_from_dir("myapp", tmp, _FIXTURE_TEMPLATE)
             self.assertTrue(os.path.isfile(os.path.join(app_path, "main.cpp")))
-            self.assertTrue(os.path.isfile(os.path.join(app_path, "myapp_ICON.bin")))
+            self.assertTrue(os.path.isfile(os.path.join(app_path, "assets", "icon.png")))
             with open(os.path.join(app_path, "Makefile")) as f:
                 makefile = f.read()
-            self.assertIn(f"SDK_ROOT ?= {app_mod.sdk_root()}", makefile)
+            self.assertIn("SDK_ROOT ?= $(PM_SDK_ROOT)", makefile)
             self.assertIn("include $(SDK_ROOT)/tools/app.mk", makefile)
+
+    def test_refuses_existing_nonempty_dir(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "myapp"))
+            with open(os.path.join(tmp, "myapp", "sentinel"), "w") as f:
+                f.write("occupied")
+            with self.assertRaises(app_mod.PmError):
+                scaffold_mod.scaffold_from_dir("myapp", tmp, _FIXTURE_TEMPLATE)
 
     def test_invalid_name_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(app_mod.PmError):
-                scaffold_mod.scaffold("1bad-name", tmp)
+                scaffold_mod.scaffold_from_dir("1bad-name", tmp, _FIXTURE_TEMPLATE)
 
 
 class Version(unittest.TestCase):
@@ -202,10 +262,8 @@ class SdkRoot(unittest.TestCase):
                 app_mod.sdk_root()
 
     def test_ancestor_walk_finds_checkout(self):
-        # Simulate an installed copy: the checkout pm is running out of is NOT
-        # a valid root, so resolution must climb from a deep working directory.
         sdk = app_mod.sdk_root()
-        deep = os.path.join(sdk, "examples", "hello_app", "build")
+        deep = os.path.join(sdk, "docs", "docs", "build")
         with mock.patch.dict(os.environ, {}, clear=True), \
              mock.patch.object(app_mod, "_is_sdk_root", side_effect=lambda p: p == sdk), \
              mock.patch.object(app_mod.os, "getcwd", return_value=deep):

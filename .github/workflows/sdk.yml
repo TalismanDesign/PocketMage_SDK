@@ -9,16 +9,25 @@ permissions:
   contents: read
 
 jobs:
-  example-build:
+  app-template:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout the official app template
+        uses: actions/checkout@v4
+        with:
+          repository: TalismanDesign/PocketMage_App
+          path: app-template
+
       - name: Prepare the Python Cauldron
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Install icon tooling
+        run: pip install --quiet Pillow
 
       - name: Install Xtensa Toolchain
         run: |
@@ -32,47 +41,49 @@ jobs:
           echo "$SHA  /tmp/xtensa-esp-elf.tar.xz" | sha256sum -c -
           tar -xJf /tmp/xtensa-esp-elf.tar.xz -C "$TGT"
           test -x "$TGT/xtensa-esp-elf/bin/xtensa-esp32s3-elf-g++"
+          # app.mk falls back to `command -v xtensa-esp32s3-elf-g++`, and the
+          # artifact check calls xtensa-esp-elf-readelf by bare name.
+          echo "$TGT/xtensa-esp-elf/bin" >> "$GITHUB_PATH"
           echo "toolchain installed at $TGT/xtensa-esp-elf"
 
-      - name: Build Example App
-        working-directory: examples/hello_app
-        run: make clean all check pack
+      - name: Build and pack the template app against this SDK
+        working-directory: app-template
+        run: make clean all pack
+        env:
+          PM_SDK_ROOT: ${{ github.workspace }}
 
-      - name: Assert example passes the pm gate
+      - name: Assert the app passes the pm gate
         run: |
           set -euo pipefail
           pip install .
-          pm check examples/hello_app
+          pm check "app-template"
 
-      - name: Assert artifact little-endian
-        working-directory: examples/hello_app/build
+      - name: Assert artifact little-endian and complete
+        working-directory: app-template/build
         run: |
           set -euo pipefail
-          xtensa-esp-elf-readelf -h hello_app.app.elf | grep -q 'little endian'
-          tar -tf hello_app.tar | grep -q -- 'hello_app.app.elf'
-          tar -tf hello_app.tar | grep -q -- 'hello_app_ICON.bin'
-
-      - name: Build and gate the ABI-version example
-        run: |
-          set -euo pipefail
-          make -C examples/version_app clean all
-          pm check examples/version_app
+          xtensa-esp-elf-readelf -h app-template.app.elf | grep -q 'little endian'
+          test 200 -eq "$(stat -c %s app-template_ICON.bin)"
+          tar -tf app-template.tar | grep -q -- 'app-template.app.elf'
+          tar -tf app-template.tar | grep -q -- 'app-template_ICON.bin'
 
       - name: Build and reject the negative fixture
         run: |
           set -euo pipefail
-          make -C examples/broken_app clean all
-          if pm check examples/broken_app; then
+          make -C tools/pm/tests/fixtures/broken_app clean all
+          if pm check tools/pm/tests/fixtures/broken_app; then
             echo "broken_app must fail the export gate" >&2
             exit 1
           fi
           echo "broken_app correctly rejected"
+        env:
+          PM_SDK_ROOT: ${{ github.workspace }}
 
-      - name: Golden artifact and host-table tests
+      - name: Golden artifact, generator and host-table tests
         run: |
           set -euo pipefail
           export PM_READELF="$HOME/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin/xtensa-esp32s3-elf-readelf"
-          python3 -m unittest -v tools/pm/tests/test_golden.py tools/pm/tests/test_release.py
+          python3 -m unittest discover -v -s tools/pm/tests -t tools/pm/tests
 
   version-sync:
     runs-on: ubuntu-latest
@@ -135,15 +146,14 @@ jobs:
           python -m pip install --quiet ruff
           ruff check tools/
 
-      - name: gate-scoped sources are clang-formatted
+      - name: Gate-scoped sources are clang-formatted
         run: |
           sudo apt-get install -y -qq clang-format
           clang-format --dry-run --Werror \
             pocketmage_globals.cpp \
             pocketmage_app_version.h \
-            examples/hello_app/main.cpp \
-            examples/version_app/main.cpp \
-            examples/broken_app/main.cpp
+            tools/pm/tests/fixtures/broken_app/main.cpp \
+            tools/pm/tests/fixtures/template/main.cpp
 
   pm-cli:
     runs-on: ${{ matrix.os }}

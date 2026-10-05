@@ -1,6 +1,6 @@
 ---
 title: "Symbols and the dependency contract"
-description: "The host-export surface apps resolve against, how to read an app's dependency list, and the rules for changing the surface."
+description: "The host-export surface apps resolve against, how third-party libraries link, and the rules for changing the surface."
 ---
 
 # Symbols and the dependency contract
@@ -13,30 +13,67 @@ surface.
 
 ## The surface
 
-An app can call anything the host exports as a global symbol: the
-newlib/IDF/Arduino runtime plus the curated PocketMage export table. The
-curated table is generated from `host_exports.list` (in PocketMageOS) by
-`tools/symbols.py`, which builds the `g_customer_elfsyms` table the loader
-searches.
+An app can call anything the host exports as a global symbol. The export
+surface has two parts.
 
-The SDK's `symbols.list` is the promise of what the host exports. Today:
+**The C and C++ runtime.** `libc`, `libm`, `libgcc`, `libstdc++` and
+`libsupc++` symbols the firmware already links are exported so apps can use
+third-party libraries. `tools/symbols.py` derives this set by reading the
+toolchain archives with `nm` and keeping the symbols that are present in the
+firmware image:
 
-```text
-OLED
-KB
-EINK
-BZ
-CLOCK
-PM_SDAUTO
-pocketmage_sdk_version
+```sh
+python3 tools/symbols.py --list symbols.list --host-elf <firmware.elf> \
+  --print-cost
 ```
 
-Host-side, `src/ELF_SYMS/host_exports.list` tracks a superset-or-equal,
-validated against the firmware image; a missing host export degrades to a
-loud warning before the generated table is emitted.
+```
+libc        243 symbols   4,350 bytes
+libm         15 symbols     262 bytes
+libstdc++    87 symbols   3,403 bytes
+libsupc++    58 symbols   2,362 bytes
+libgcc       65 symbols   1,552 bytes
+total       531 symbols  12,975 bytes (12.7 KB)
+```
 
-Regular libc calls (`printf`, `puts`, `sleep`, `malloc`, ...) resolve from the
-host's newlib globals and need no entry in the curated lists.
+That total includes the 124 curated `pm_*` entries. The runtime adds about
+407 symbols, 12.7 KB of flash in the firmware image, once. It is not a per-app
+cost. Apps stay small: a hello world is 1.3 KB, an app using `std::vector` and
+`std::string` is 2.3 KB, an app with cJSON linked in is 5.2 KB.
+`--gc-sections` and `--strip-all` in `tools/app.mk` do that work.
+
+A symbol in `symbols.list` that the firmware does not define is reported as a
+warning but still emitted into the table. A newly added wrapper cannot appear
+in `--host-elf` until the host is rebuilt, so dropping it would omit it on the
+one run that adds it. Regenerate once more after building and the warning
+should be gone.
+
+Runtime export is on by default. Pass `--no-runtime` to export only the
+curated SDK list, which restricts apps to the SDK surface and no libraries.
+
+Membership is decided by which archive a symbol comes from, not by its name.
+A `_ZN...` prefix also matches the SDK's own C++ classes, so matching on prefix
+shape would export firmware internals by accident.
+
+**The curated SDK table.** `symbols.list` is the hand-maintained promise of
+PocketMage's own exports. Host-side, `src/ELF_SYMS/host_exports.list` tracks a
+superset, validated against the firmware image. Both lists feed the same
+generated `g_customer_elfsyms` table.
+
+## Linking a third-party library
+
+A vendored library's source is compiled into the app by overriding `APP_SRCS`.
+Anything the library references that is not in the app is resolved by the host
+at load time. Two consequences are worth knowing.
+
+Libraries compiled at `-Os` need fewer symbols than the same source at `-O0`.
+A `std::vector<std::string>` app at `-O0` wants 13 symbols including
+`std::allocator<char>` constructors; at `-Os` it wants 7, and all 7 resolve.
+
+`sscanf` is not exported by default. It exists in newlib, but nothing in the
+firmware references it, so it was dropped by `--gc-sections`, and referencing
+it pulls in about 190 KB of stdio reentrancy. A library that needs it must
+either avoid it or the host must export it deliberately.
 
 ## Reading an app's contract
 
@@ -46,10 +83,16 @@ pm check     # classes each symbol and exits non-zero on a broken contract
 ```
 
 Everything in that list must exist in the host's global view when the app
-loads, or the load fails. `pm check` is the exact gate when run
-against a host firmware ELF (`--host-elf`): every undefined symbol must resolve
-to a host global. Without a host ELF it falls back to the curated lists plus a
-libc allowlist and reports anything outside that set as unconfirmed.
+loads, or the load fails. `pm check` with `--host-elf` is the exact gate: every
+undefined symbol must resolve to a host global.
+
+Without a host ELF, `pm check` reads the generated export table that the
+firmware links, which is the same file the loader searches. It does not keep a
+separate allowlist, because a hand-written list drifts from the table and the
+drift shows up only on device. An earlier allowlist claimed `memmove` and
+`sprintf` were resolvable when no table exported them, so those apps passed the
+gate and failed at load with `Can't find common memmove`. Reading the generated
+table makes that class of bug impossible.
 
 ## Editing the surface
 
@@ -57,23 +100,28 @@ Rules for SDK authors:
 
 - Additions only. Removing or renaming an exported symbol breaks every app
   that references it at runtime.
-- Every added symbol must exist as a `GLOBAL` in the firmware image and be
+- Every added SDK symbol must exist as a `GLOBAL` in the firmware image and be
   added to both `symbols.list` and the host's `host_exports.list`, then
   regenerate the host table with `tools/symbols.py --host-elf ...`.
-- Run `pm exports` (add `--all` for extras too) before committing a surface
-  change: it reconciles `symbols.list` against the host's `host_exports.list`
-  and fails when a curated symbol is not exported. Keep both lists in sync
-  in the same change.
+- Regenerate the host table whenever the firmware's linked symbol set changes.
+  `symbols.py` only exports runtime symbols the firmware already links, so a
+  firmware that starts using a new libc or libstdc++ function makes it
+  available on the next regeneration.
+- Run `pm exports` before committing a surface change. It reconciles
+  `symbols.list` against `host_exports.list` and fails when a curated symbol is
+  not exported.
 - Bump `pocketmage_sdk_version` when the surface changes. It is exported, and
   stored so the OS can version apps against the surface.
-- Keep the set small. Exporting a broad slice of the firmware binds the ABI
-  to all of it.
+
+Exporting a broad slice of the firmware binds the ABI to all of it. That is a
+deliberate trade here: it is what lets apps use libraries, and per-app
+restriction is planned as an opt-in scope rather than a default.
 
 ## Versioning and gating
 
 `pocketmage_sdk_version` is exported so apps can adapt to surface changes.
 `pm check` gates an app against the host export set before release: the mirror
-of `make check`, with the curated lists as the reference when no host ELF is
+of `make check`, with the generated table as the reference when no host ELF is
 available.
 
 Ship a new version with `pm release <major|minor|patch>` (add
