@@ -197,13 +197,24 @@ loader-irrelevant sections, so the delivered ELF comes down to `.text`,
 `.shstrtab`. Everything else is removed. Code that depends on other sections
 existing is unsupported. Don't write it.
 
+## App manifest (`app.properties`)
+
+When loading an app from SD, the host reads `app.properties` from the app directory (max 1024 bytes). Recognized fields:
+
+- `name` – human-readable app name
+- `version` – app version string
+- `author` – author string
+- `scope` – symbol scope gate (default: `all`)
+
+Only `pm_*` symbols are scope-gated. libc, libstdc++, and ESP-IDF symbols remain available regardless of scope. The loader installs the scoped resolver before relocation and resets it on exit. argv metadata passed to `app_main` includes `name`, `elfPath`, `version`, and `author`.
+
 ## Endianness failure modes
 
-| Symptom at load                              | Cause                             |
-| -------------------------------------------- | --------------------------------- |
-| garbage / instruction fetch fault in IRAM    | ELF fields decoded wrong (BE)     |
+| Symptom at load                              | Cause                               |
+| -------------------------------------------- | ----------------------------------- |
+| garbage / instruction fetch fault in IRAM    | ELF fields decoded wrong (BE)       |
 | `esp_elf_load_section` fault                 | misaligned / incorrect section data |
-| load "succeeds", entry behaves wildly        | wrong sizes from BE headers       |
+| load "succeeds", entry behaves wildly        | wrong sizes from BE headers         |
 
 The build-time guard catches BE before it reaches a device: if the last
 `make` line is `error: ... big-endian ...`, rebuild with the espressif

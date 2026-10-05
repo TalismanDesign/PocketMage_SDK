@@ -41,7 +41,7 @@ While running, the app owns the loop:
 
 - Poll input: `pm_kb_read()` for a keypress, `pm_kb_state()` for the current modifier state.
 - Draw: build the E-Ink buffer, refresh once, draw OLED text.
-- Sleep on idle: mirror the OS's `CLOCK().setPrevTimeMillis(millis())` poke or call `pocketmage::deepSleep()` explicitly.
+- Sleep on idle: the host skips the idle timeout while an ELF app runs. Avoid poking the host idle timer and call `pocketmage::deepSleep()` explicitly when you want to enter deep sleep.
 
 There is no cooperative yield handshake: the app either returns, sleeps, or keeps its own loop going. A CPU-heavy loop starves the WiFi and E-Ink tasks; prefer `pocketmage::ScopedCpuBoost` for short bursts and yield with `delay()` between frames.
 

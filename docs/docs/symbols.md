@@ -33,7 +33,7 @@ libm         15 symbols     262 bytes
 libstdc++    87 symbols   3,403 bytes
 libsupc++    58 symbols   2,362 bytes
 libgcc       65 symbols   1,552 bytes
-total       531 symbols  12,975 bytes (12.7 KB)
+total       475 symbols  11,687 bytes (11.4 KB)
 ```
 
 That total includes the 124 curated `pm_*` entries. The runtime adds about
