@@ -45,10 +45,16 @@ def _regenerate_icon(app_path: str, name: str) -> None:
         ["python3", gen, icon_src, icon_out], capture_output=True, text=True
     )
     if result.returncode != 0:
+        # If the script exited cleanly with a warning (e.g., missing PIL), skip noisy warning
+        stderr = result.stderr.strip()
+        stdout = result.stdout.strip()
+        msg = stderr or stdout
+        # Don't print warning if it's just about missing PIL (handled by make_icon.py gracefully)
+        if "PIL" in msg or "Pillow" in msg:
+            return
         print(
             f"pm: warning: could not pre-generate {name}_ICON.bin "
-            f"(run `make pack` to build it): "
-            f"{result.stderr.strip() or result.stdout.strip()}"
+            f"(run `make pack` to build it): {msg}"
         )
 
 

@@ -7,7 +7,7 @@ name = "pocketmage-sdk"
 dynamic = ["version"]
 description = "PocketMage SDK developer CLI"
 requires-python = ">=3.10"
-dependencies = ["tuiro~=0.1.1"]
+dependencies = ["tuiro~=0.1.1", "Pillow>=10.0.0"]
 
 [tool.setuptools.dynamic]
 version = {file = ["VERSION"]}

@@ -6,7 +6,12 @@ Usage:
 
 from pathlib import Path
 
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:
+    import sys
+    print("warning: PIL (Pillow) not installed; cannot convert icon. Run 'uv pip install Pillow' or 'pip install Pillow'", file=sys.stderr)
+    sys.exit(0)
 
 ICON_SIZE = 40
 CONFIRMATION = 200
