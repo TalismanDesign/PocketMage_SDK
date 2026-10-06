@@ -9,7 +9,7 @@
     "preview": "npx serve site"
   },
   "dependencies": {
-    "@docmd/core": "^0.8.17",
+    "@docmd/core": "^0.9.7",
     "docmd-search": "^0.1.3"
   }
 }
