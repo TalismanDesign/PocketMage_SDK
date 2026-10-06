@@ -4,10 +4,10 @@ title: Rendering
 description: "Which draw calls go where, the E-Ink buffered refresh model, and the scroll loop."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/guides/rendering/"
 path: /guides/rendering/
-updated: 2026-10-05
+updated: 2026-10-06
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-05T06:26:55.156Z"
+  generated_at: "2026-10-06T07:52:17.227Z"
 ---
 ---
 title: "Rendering"

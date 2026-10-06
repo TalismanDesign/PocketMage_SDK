@@ -4,10 +4,10 @@ title: "Text utilities (pocketmage_io)"
 description: "Small string helpers apps use for command parsing and data marshaling."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/io/"
 path: /api/io/
-updated: 2026-10-05
+updated: 2026-10-06
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-05T06:26:55.149Z"
+  generated_at: "2026-10-06T07:52:17.222Z"
 ---
 ---
 title: "Text utilities (pocketmage_io)"

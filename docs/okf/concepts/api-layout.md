@@ -4,10 +4,10 @@ title: "Layout (pocketmage_layout)"
 description: "Canonical display geometry, the row-pitch helper, and the text-fit free functions."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/"
 path: /api/layout/
-updated: 2026-10-05
+updated: 2026-10-06
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-05T06:26:55.150Z"
+  generated_at: "2026-10-06T07:52:17.223Z"
 ---
 ---
 title: "Layout (pocketmage_layout)"
