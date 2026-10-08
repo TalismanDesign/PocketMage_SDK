@@ -67,7 +67,7 @@ toolchain independently of the SDK.
 | ------------- | ------------------------------------------------------------- |
 | `make`        | Builds `build/<name>.app.elf`, stripped, endianness-asserted  |
 | `make check`  | Prints the entry point and every undefined symbol (the app's host dependency list). Informational; the enforcing gate is `pm check` |
-| `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf` and `<name>_ICON.bin` (see [publish.md](publish.md)) |
+| `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf`, `<name>_ICON.bin` and `app.properties` when present (see [publish.md](publish.md)) |
 | `make clean`  | Removes `build/`                                              |
 
 The endianness assertion runs after every link. A big-endian artifact gets

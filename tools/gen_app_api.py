@@ -196,8 +196,8 @@ OVERRIDES = {
 HOST_PRIMITIVES = {
     "pm_oled_send", "pm_eink_width", "pm_eink_height", "pm_eink_clear",
     "pm_eink_pixel", "pm_eink_rect", "pm_text", "pm_clock_epoch",
-    "pm_clock_timestamp",
-    "delay",
+    "pm_clock_timestamp", "pm_sd_write_binary_file", "pm_sd_mkdir",
+    "delay", "pm_app_abi", "pm_host_sdk_version",
 }
 
 EXTERN_DECLS = {

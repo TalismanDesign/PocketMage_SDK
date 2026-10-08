@@ -34,6 +34,12 @@ void pm_eink_rect(int x0, int y0, int x1, int y1, bool fill, bool ink);
 // ignored rather than trapping: FontEngine indexes its font tables unchecked.
 void pm_text(int target, int x, int y, const char* text, int style);
 
+// Write len bytes verbatim, truncating any existing file. True on full write.
+bool pm_sd_write_binary_file(const char* path, const uint8_t* buf, size_t len);
+
+// Create path (one level, like POSIX mkdir). True if it exists afterwards.
+bool pm_sd_mkdir(const char* path);
+
 // Clock fields. nowDT returns a DateTime by value, which has no C spelling.
 
 // UNIX epoch in seconds (UTC).

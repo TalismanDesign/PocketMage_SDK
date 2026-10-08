@@ -134,6 +134,12 @@ returning an SDK type an app cannot construct, such as `DateTime` or
 flattened into plain fields instead: `pm_clock_epoch()` and
 `pm_clock_timestamp()` rather than a `DateTime` return.
 
+Blob storage and directory creation have no SDK method to project. The text
+`writeFile` path truncates on the first NUL and the read pool is 256 bytes, so
+`pm_sd_write_binary_file()` and `pm_sd_mkdir()` are hand-written host
+primitives in `pm_app_api.h`, backed by raw `File::write` and `FS::mkdir`, and
+`pm_sd_read_binary_file()` reads back arbitrary sizes.
+
 A function returning `std::vector<String>`, such as word wrapping, becomes a
 count call and an indexed getter, matching how the SDK already hands out scan
 results:

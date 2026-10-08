@@ -16,6 +16,10 @@ from tools import symbols as symbols_mod
 
 _EXPORT_LINE = re.compile(r"ESP_ELFSYM_EXPORT\(\s*(\w+)\s*\)")
 
+# Builtin-named symbols are emitted as `{ "name", (void*)&pm_elfsym_name }`
+# because their own identifier cannot be address-taken.
+_ALIAS_LINE = re.compile(r'\{\s*"([^"]+)"\s*,\s*\(void\s*\*\)\s*&pm_elfsym_')
+
 _SYM_LINE = re.compile(
     r"^\s*\d+:\s+\S+\s+\d+\s+\S+\s+(\S+)\s+\S+\s+UND\s+(\S+)\s*$"
 )
@@ -191,7 +195,10 @@ def generated_table_symbols(path: str) -> set[str]:
     if not path or not os.path.isfile(path):
         return set()
     with open(path, encoding="utf-8") as handle:
-        return set(_EXPORT_LINE.findall(handle.read()))
+        text = handle.read()
+    names = set(_EXPORT_LINE.findall(text))
+    names.update(_ALIAS_LINE.findall(text))
+    return names
 
 
 def find_export_table(sdk_root: str) -> str | None:

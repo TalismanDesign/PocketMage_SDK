@@ -9,13 +9,14 @@ The delivery unit is a plain `.tar` file placed in `/apps/` on the device SD
 card and installed through APPLOADER on the device. Not gzipped, not a
 directory of loose files: one tar.
 
-`make pack` produces it. The tar's top level must hold the two members the
+`make pack` produces it. The tar's top level must hold the members the
 installer keys off:
 
 | Member            | Required | Meaning                                 |
 | ----------------- | -------- | --------------------------------------- |
 | `<name>.app.elf`  | yes      | the app binary (`*.app.elf` suffix is detected) |
 | `<name>_ICON.bin` | no       | 40x40 1-bit icon, 200 bytes             |
+| `app.properties`  | no       | name/version/author/scope manifest, copied to the slot (see [app-abi.md](app-abi.md)) |
 
 `<name>` is the base of the ELF filename and becomes the app's display name.
 Keep it short and unique; it is also the `assets/` subdir name and the slot
@@ -29,8 +30,9 @@ subdirectory.
    A missing icon is non-fatal; the default is shown instead.
 4. If an `assets/` directory is present, copy it into `/assets/<base>`
    (flattened, best effort).
-5. Install ELF + icon into the selected slot (`/apps/slot<n>`, 4 slots) and
-   record metadata for the launcher and app switcher.
+5. Install ELF + icon + `app.properties` (when present) into the selected slot
+   (`/apps/slot<n>`, 4 slots) and record metadata for the launcher and app
+   switcher.
 
 Slots are swapped wholesale: installing over a slot replaces its content and
 clears stale legacy metadata for that slot. After a successful install, delete

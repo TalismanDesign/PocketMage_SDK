@@ -81,6 +81,11 @@ APP_STRIP_FLAGS += --remove-section=.xtensa.info
 
 APP_OBJS := $(patsubst %,$(APP_BUILD_DIR)/%.o,$(basename $(APP_SRCS)))
 
+# App Makefiles may define targets before including this file (icon rules,
+# convenience wrappers), so pin the default goal instead of relying on the
+# first target being `all`.
+.DEFAULT_GOAL := all
+
 .PHONY: all elf check clean pack pm-info
 all: $(APP_OUT)
 
@@ -119,6 +124,11 @@ check: $(APP_OUT)
 pack: $(APP_OUT) $(APP_ICON)
 	@tar -cf $(APP_TAR) -C $(APP_BUILD_DIR) $(APP_NAME).app.elf
 	@tar -uf $(APP_TAR) -C $(CURDIR) $(APP_NAME)_ICON.bin
+	@if [ -f $(CURDIR)/app.properties ]; then \
+	  tar -uf $(APP_TAR) -C $(CURDIR) app.properties; \
+	else \
+	  echo "note: no app.properties; the install gets no manifest" >&2; \
+	fi
 	@echo "packed $(APP_TAR) ($$(wc -c < $(APP_TAR)) bytes)"
 	@tar -tvf $(APP_TAR)
 

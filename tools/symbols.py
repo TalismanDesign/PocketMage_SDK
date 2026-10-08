@@ -49,6 +49,22 @@ FRAMEWORK_ARCHIVES = ('libnewlib',)
 
 ESLSYM_ENTRY_BYTES = 8
 
+# GCC treats these as language builtins: taking their address directly is a
+# hard error, so they are declared under a private identifier with an asm label.
+BUILTIN_PREFIXES = ('__atomic', '__sync', '__builtin')
+
+
+def is_gcc_builtin(name):
+    """Whether the compiler reserves the name as a builtin function.
+
+    Args:
+        name: Symbol name.
+
+    Returns:
+        True when the name must be exported through an asm-labelled alias.
+    """
+    return name.startswith(BUILTIN_PREFIXES)
+
 
 def read_archive_symbols(nm, archive):
     """Text symbols a toolchain archive defines, from `nm -g --defined-only`.
@@ -236,7 +252,9 @@ def save_c_file(symbols, output, symbol_table, exclude_symbols=None,
             buf += '\n'
         runtime = [name for name in filtered_symbols
                    if name in runtime_symbols or name in extra_externs]
-        if runtime:
+        builtins = [name for name in runtime if is_gcc_builtin(name)]
+        plain_runtime = [name for name in runtime if not is_gcc_builtin(name)]
+        if plain_runtime:
             buf += '/* Runtime symbols: unmangled prototypes so the emitted reference is\n'
             buf += ' * the literal archive symbol, whatever its real C++ type. The\n'
             buf += ' * builtin mismatch warning is expected and harmless, since only the\n'
@@ -244,17 +262,31 @@ def save_c_file(symbols, output, symbol_table, exclude_symbols=None,
             buf += '#pragma GCC diagnostic push\n'
             buf += '#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"\n'
             buf += 'extern "C" {\n'
-            for symbol_name in runtime:
+            for symbol_name in plain_runtime:
                 buf += f'int {symbol_name}();\n'
             buf += '}\n'
             buf += '#pragma GCC diagnostic pop\n\n'
+        if builtins:
+            buf += '/* Builtin-named symbols: a private identifier keeps the address\n'
+            buf += ' * takeable while the asm label emits the real symbol name. */\n'
+            buf += 'extern "C" {\n'
+            for symbol_name in builtins:
+                buf += f'int pm_elfsym_{symbol_name}() asm("{symbol_name}");\n'
+            buf += '}\n\n'
     elif filtered_symbols:
         buf += '/* Extern declarations from curated export list */\n\n'
         buf += '#pragma GCC diagnostic push\n'
         buf += '#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"\n'
         for symbol_name in filtered_symbols:
+            if is_gcc_builtin(symbol_name):
+                continue
             buf += f'extern int {symbol_name};\n'
         buf += '#pragma GCC diagnostic pop\n\n'
+        builtins = [name for name in filtered_symbols if is_gcc_builtin(name)]
+        if builtins:
+            for symbol_name in builtins:
+                buf += f'int pm_elfsym_{symbol_name}() __asm__("{symbol_name}");\n'
+            buf += '\n'
 
     symbol_table_var = f'g_{symbol_table}_elfsyms'
     buf += f'/* Available ELF symbols table: {symbol_table_var} */\n'
@@ -268,7 +300,10 @@ def save_c_file(symbols, output, symbol_table, exclude_symbols=None,
         buf += f'\nconst struct esp_elfsym {symbol_table_var}[] = {{\n'
 
     for symbol_name in filtered_symbols:
-        buf += f'    ESP_ELFSYM_EXPORT({symbol_name}),\n'
+        if is_gcc_builtin(symbol_name):
+            buf += f'    {{ "{symbol_name}", (void*)&pm_elfsym_{symbol_name} }},\n'
+        else:
+            buf += f'    ESP_ELFSYM_EXPORT({symbol_name}),\n'
 
     buf += '    ESP_ELFSYM_END\n'
     buf += '};\n'

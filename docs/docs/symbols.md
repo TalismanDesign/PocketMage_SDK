@@ -28,19 +28,20 @@ python3 tools/symbols.py --list symbols.list --host-elf <firmware.elf> \
 ```
 
 ```
-libc        243 symbols   4,350 bytes
+libc        250 symbols   4,467 bytes
 libm         15 symbols     262 bytes
 libstdc++    87 symbols   3,403 bytes
 libsupc++    58 symbols   2,362 bytes
 libgcc       65 symbols   1,552 bytes
-total       475 symbols  11,687 bytes (11.4 KB)
+libnewlib    94 symbols   2,478 bytes
+total       602 symbols  15,009 bytes (14.7 KB)
 ```
 
-That total includes the 124 curated `pm_*` entries. The runtime adds about
-407 symbols, 12.7 KB of flash in the firmware image, once. It is not a per-app
-cost. Apps stay small: a hello world is 1.3 KB, an app using `std::vector` and
-`std::string` is 2.3 KB, an app with cJSON linked in is 5.2 KB.
-`--gc-sections` and `--strip-all` in `tools/app.mk` do that work.
+That total includes the curated `pm_*` entries. The runtime adds about 11.2 KB
+of flash in the firmware image, once. It is not a per-app cost. Apps stay
+small: a hello world is 1.3 KB, an app using `std::vector` and `std::string`
+is 2.3 KB, an app with cJSON linked in is 5.2 KB. `--gc-sections` and
+`--strip-all` in `tools/app.mk` do that work.
 
 A symbol in `symbols.list` that the firmware does not define is reported as a
 warning but still emitted into the table. A newly added wrapper cannot appear
@@ -54,6 +55,11 @@ curated SDK list, which restricts apps to the SDK surface and no libraries.
 Membership is decided by which archive a symbol comes from, not by its name.
 A `_ZN...` prefix also matches the SDK's own C++ classes, so matching on prefix
 shape would export firmware internals by accident.
+
+GCC reserves `__atomic_*`, `__sync_*` and `__builtin_*` names as builtins and
+rejects taking their address. Those exports are declared under a private
+`pm_elfsym_` identifier with an asm label, then listed by their literal name in
+the table.
 
 **The curated SDK table.** `symbols.list` is the hand-maintained promise of
 PocketMage's own exports. Host-side, `src/ELF_SYMS/host_exports.list` tracks a
