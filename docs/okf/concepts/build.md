@@ -4,10 +4,10 @@ title: "Building an app"
 description: "The toolchain, the project layout, and the make targets that produce a shippable ELF and tar."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/build/"
 path: /build/
-updated: 2026-10-06
+updated: 2026-10-08
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-06T07:52:17.226Z"
+  generated_at: "2026-10-08T10:14:20.972Z"
 ---
 ---
 title: "Building an app"
@@ -78,7 +78,7 @@ toolchain independently of the SDK.
 | ------------- | ------------------------------------------------------------- |
 | `make`        | Builds `build/<name>.app.elf`, stripped, endianness-asserted  |
 | `make check`  | Prints the entry point and every undefined symbol (the app's host dependency list). Informational; the enforcing gate is `pm check` |
-| `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf` and `<name>_ICON.bin` (see [publish.md](publish.md)) |
+| `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf`, `<name>_ICON.bin` and `app.properties` when present (see [publish.md](publish.md)) |
 | `make clean`  | Removes `build/`                                              |
 
 The endianness assertion runs after every link. A big-endian artifact gets

@@ -104,11 +104,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=muwdrxxi">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=muwdrxxi">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=muzdqc8z">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=muzdqc8z">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=muwdrxxi" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=muwdrxxi" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=muzdqc8z" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=muzdqc8z" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device.">
@@ -123,9 +123,9 @@
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=muwdrxxi" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=muwdrxxi" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=muwdrxxi" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=muzdqc8z" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=muzdqc8z" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=muzdqc8z" >
 
     
     
@@ -1554,7 +1554,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Publishing%20an%20app%22%0Adescription%3A%20%22The%20delivery%20tar%2C%20the%2040x40%20icon%2C%20asset%20sharing%2C%20and%20what%20APPLOADER%20does%20with%20them%20on%20the%20device.%22%0A---%0A%0A%23%20Publishing%20an%20app%0A%0AThe%20delivery%20unit%20is%20a%20plain%20%60.tar%60%20file%20placed%20in%20%60%2Fapps%2F%60%20on%20the%20device%20SD%0Acard%20and%20installed%20through%20APPLOADER%20on%20the%20device.%20Not%20gzipped%2C%20not%20a%0Adirectory%20of%20loose%20files%3A%20one%20tar.%0A%0A%60make%20pack%60%20produces%20it.%20The%20tar&#039;s%20top%20level%20must%20hold%20the%20two%20members%20the%0Ainstaller%20keys%20off%3A%0A%0A%7C%20Member%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Required%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------------%20%7C%20--------%20%7C%20---------------------------------------%20%7C%0A%7C%20%60%3Cname%3E.app.elf%60%20%20%7C%20yes%20%20%20%20%20%20%7C%20the%20app%20binary%20(%60*.app.elf%60%20suffix%20is%20detected)%20%7C%0A%7C%20%60%3Cname%3E_ICON.bin%60%20%7C%20no%20%20%20%20%20%20%20%7C%2040x40%201-bit%20icon%2C%20200%20bytes%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0A%60%3Cname%3E%60%20is%20the%20base%20of%20the%20ELF%20filename%20and%20becomes%20the%20app&#039;s%20display%20name.%0AKeep%20it%20short%20and%20unique%3B%20it%20is%20also%20the%20%60assets%2F%60%20subdir%20name%20and%20the%20slot%0Asubdirectory.%0A%0A%23%23%20Install%20behavior%20(APPLOADER)%0A%0A1.%20Extract%20%60%2Fapps%2F%3Cname%3E.tar%60%20into%20%60%2Fapps%2Ftemp%60%2C%20skipping%20macOS%20%60._*%60%20junk.%0A2.%20Find%20the%20first%20%60*.app.elf%60%2C%20derive%20%60base%60%20by%20stripping%20%60.app.elf%60.%0A3.%20Find%20%60%3Cbase%3E_ICON.bin%60%20anywhere%20in%20the%20extracted%20tree%20(case-insensitive).%0A%20%20%20A%20missing%20icon%20is%20non-fatal%3B%20the%20default%20is%20shown%20instead.%0A4.%20If%20an%20%60assets%2F%60%20directory%20is%20present%2C%20copy%20it%20into%20%60%2Fassets%2F%3Cbase%3E%60%0A%20%20%20(flattened%2C%20best%20effort).%0A5.%20Install%20ELF%20%2B%20icon%20into%20the%20selected%20slot%20(%60%2Fapps%2Fslot%3Cn%3E%60%2C%204%20slots)%20and%0A%20%20%20record%20metadata%20for%20the%20launcher%20and%20app%20switcher.%0A%0ASlots%20are%20swapped%20wholesale%3A%20installing%20over%20a%20slot%20replaces%20its%20content%20and%0Aclears%20stale%20legacy%20metadata%20for%20that%20slot.%20After%20a%20successful%20install%2C%20delete%0Athe%20tar%20from%20%60%2Fapps%60%20to%20free%20space%20on%20the%20card.%0A%0A%23%23%20Icon%0A%0A%60%3Cname%3E_ICON.bin%60%20is%20200%20bytes%3A%20a%2040x40%2C%201-bit-per-pixel%20bitmap%2C%205%20bytes%20per%0Arow%2C%208%20pixels%20per%20byte%2C%20MSB%20first.%20A%20set%20bit%20is%20black%20ink%20on%20the%20e-ink%0Adisplay.%20An%20absent%20icon%20shows%20the%20OS%20default%3B%20build%20with%20one%20so%20the%20launcher%0Alooks%20right.%0A%0A%23%23%20Assets%0A%0AAn%20optional%20top-level%20%60assets%2F%60%20directory%20in%20the%20tar%20is%20copied%20flat%20into%0A%60%2Fassets%2F%3Cname%3E%60%20at%20install.%20Apps%20read%20their%20files%20from%20there%20at%20runtime.%0ANested%20directories%20and%20macOS%20metadata%20files%20inside%20%60assets%2F%60%20are%20tolerated%0A(metadata%20is%20skipped)%2C%20but%20a%20flat%20layout%20is%20the%20reliable%20path.%0A%0A%23%23%20Before%20you%20ship%0A%0A-%20Build%20from%20a%20clean%20checkout%20with%20the%20pinned%20toolchain%3A%0A%20%20%60make%20--no-print-directory%20-C%20%3Capp%3E%20clean%20all%20check%20pack%60.%0A-%20Inspect%20the%20artifact%20before%20shipping%3A%20%60tar%20-tvf%20build%2F%3Cname%3E.tar%60%20and%0A%20%20%60readelf%20-h%60%20on%20the%20ELF.%0A-%20Don&#039;t%20create%20the%20tar%20from%20your%20mac&#039;s%20Finder%20copies%3A%20%60._*%60%20files%20get%20skipped%0A%20%20by%20the%20installer%2C%20but%20they%20bloat%20the%20package.%20%60make%20pack%60%20avoids%20it.%0A-%20Don&#039;t%20ship%20a%20%60.bin%60%20or%20the%20old%20OTA-style%20package.%20Production%20devices%20only%0A%20%20install%20%60%2Fapps%2F*.tar%60." style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Publishing%20an%20app%22%0Adescription%3A%20%22The%20delivery%20tar%2C%20the%2040x40%20icon%2C%20asset%20sharing%2C%20and%20what%20APPLOADER%20does%20with%20them%20on%20the%20device.%22%0A---%0A%0A%23%20Publishing%20an%20app%0A%0AThe%20delivery%20unit%20is%20a%20plain%20%60.tar%60%20file%20placed%20in%20%60%2Fapps%2F%60%20on%20the%20device%20SD%0Acard%20and%20installed%20through%20APPLOADER%20on%20the%20device.%20Not%20gzipped%2C%20not%20a%0Adirectory%20of%20loose%20files%3A%20one%20tar.%0A%0A%60make%20pack%60%20produces%20it.%20The%20tar&#039;s%20top%20level%20must%20hold%20the%20members%20the%0Ainstaller%20keys%20off%3A%0A%0A%7C%20Member%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Required%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------------%20%7C%20--------%20%7C%20---------------------------------------%20%7C%0A%7C%20%60%3Cname%3E.app.elf%60%20%20%7C%20yes%20%20%20%20%20%20%7C%20the%20app%20binary%20(%60*.app.elf%60%20suffix%20is%20detected)%20%7C%0A%7C%20%60%3Cname%3E_ICON.bin%60%20%7C%20no%20%20%20%20%20%20%20%7C%2040x40%201-bit%20icon%2C%20200%20bytes%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60app.properties%60%20%20%7C%20no%20%20%20%20%20%20%20%7C%20name%2Fversion%2Fauthor%2Fscope%20manifest%2C%20copied%20to%20the%20slot%20(see%20%5Bapp-abi.md%5D(app-abi.md))%20%7C%0A%0A%60%3Cname%3E%60%20is%20the%20base%20of%20the%20ELF%20filename%20and%20becomes%20the%20app&#039;s%20display%20name.%0AKeep%20it%20short%20and%20unique%3B%20it%20is%20also%20the%20%60assets%2F%60%20subdir%20name%20and%20the%20slot%0Asubdirectory.%0A%0A%23%23%20Install%20behavior%20(APPLOADER)%0A%0A1.%20Extract%20%60%2Fapps%2F%3Cname%3E.tar%60%20into%20%60%2Fapps%2Ftemp%60%2C%20skipping%20macOS%20%60._*%60%20junk.%0A2.%20Find%20the%20first%20%60*.app.elf%60%2C%20derive%20%60base%60%20by%20stripping%20%60.app.elf%60.%0A3.%20Find%20%60%3Cbase%3E_ICON.bin%60%20anywhere%20in%20the%20extracted%20tree%20(case-insensitive).%0A%20%20%20A%20missing%20icon%20is%20non-fatal%3B%20the%20default%20is%20shown%20instead.%0A4.%20If%20an%20%60assets%2F%60%20directory%20is%20present%2C%20copy%20it%20into%20%60%2Fassets%2F%3Cbase%3E%60%0A%20%20%20(flattened%2C%20best%20effort).%0A5.%20Install%20ELF%20%2B%20icon%20%2B%20%60app.properties%60%20(when%20present)%20into%20the%20selected%20slot%0A%20%20%20(%60%2Fapps%2Fslot%3Cn%3E%60%2C%204%20slots)%20and%20record%20metadata%20for%20the%20launcher%20and%20app%0A%20%20%20switcher.%0A%0ASlots%20are%20swapped%20wholesale%3A%20installing%20over%20a%20slot%20replaces%20its%20content%20and%0Aclears%20stale%20legacy%20metadata%20for%20that%20slot.%20After%20a%20successful%20install%2C%20delete%0Athe%20tar%20from%20%60%2Fapps%60%20to%20free%20space%20on%20the%20card.%0A%0A%23%23%20Icon%0A%0A%60%3Cname%3E_ICON.bin%60%20is%20200%20bytes%3A%20a%2040x40%2C%201-bit-per-pixel%20bitmap%2C%205%20bytes%20per%0Arow%2C%208%20pixels%20per%20byte%2C%20MSB%20first.%20A%20set%20bit%20is%20black%20ink%20on%20the%20e-ink%0Adisplay.%20An%20absent%20icon%20shows%20the%20OS%20default%3B%20build%20with%20one%20so%20the%20launcher%0Alooks%20right.%0A%0A%23%23%20Assets%0A%0AAn%20optional%20top-level%20%60assets%2F%60%20directory%20in%20the%20tar%20is%20copied%20flat%20into%0A%60%2Fassets%2F%3Cname%3E%60%20at%20install.%20Apps%20read%20their%20files%20from%20there%20at%20runtime.%0ANested%20directories%20and%20macOS%20metadata%20files%20inside%20%60assets%2F%60%20are%20tolerated%0A(metadata%20is%20skipped)%2C%20but%20a%20flat%20layout%20is%20the%20reliable%20path.%0A%0A%23%23%20Before%20you%20ship%0A%0A-%20Build%20from%20a%20clean%20checkout%20with%20the%20pinned%20toolchain%3A%0A%20%20%60make%20--no-print-directory%20-C%20%3Capp%3E%20clean%20all%20check%20pack%60.%0A-%20Inspect%20the%20artifact%20before%20shipping%3A%20%60tar%20-tvf%20build%2F%3Cname%3E.tar%60%20and%0A%20%20%60readelf%20-h%60%20on%20the%20ELF.%0A-%20Don&#039;t%20create%20the%20tar%20from%20your%20mac&#039;s%20Finder%20copies%3A%20%60._*%60%20files%20get%20skipped%0A%20%20by%20the%20installer%2C%20but%20they%20bloat%20the%20package.%20%60make%20pack%60%20avoids%20it.%0A-%20Don&#039;t%20ship%20a%20%60.bin%60%20or%20the%20old%20OTA-style%20package.%20Production%20devices%20only%0A%20%20install%20%60%2Fapps%2F*.tar%60." style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1623,7 +1623,7 @@
 <p>The delivery unit is a plain <code>.tar</code> file placed in <code>/apps/</code> on the device SD<br>
 card and installed through APPLOADER on the device. Not gzipped, not a<br>
 directory of loose files: one tar.</p>
-<p><code>make pack</code> produces it. The tar’s top level must hold the two members the<br>
+<p><code>make pack</code> produces it. The tar’s top level must hold the members the<br>
 installer keys off:</p>
 <div class="table-wrapper"><table>
 <thead>
@@ -1644,6 +1644,11 @@ installer keys off:</p>
 <td>no</td>
 <td>40x40 1-bit icon, 200 bytes</td>
 </tr>
+<tr>
+<td><code>app.properties</code></td>
+<td>no</td>
+<td>name/version/author/scope manifest, copied to the slot (see <a href="../app-abi/">app-abi.md</a>)</td>
+</tr>
 </tbody>
 </table>
 </div><p><code>&lt;name&gt;</code> is the base of the ELF filename and becomes the app’s display name.<br>
@@ -1657,8 +1662,9 @@ subdirectory.</p>
 A missing icon is non-fatal; the default is shown instead.</li>
 <li>If an <code>assets/</code> directory is present, copy it into <code>/assets/&lt;base&gt;</code><br>
 (flattened, best effort).</li>
-<li>Install ELF + icon into the selected slot (<code>/apps/slot&lt;n&gt;</code>, 4 slots) and<br>
-record metadata for the launcher and app switcher.</li>
+<li>Install ELF + icon + <code>app.properties</code> (when present) into the selected slot<br>
+(<code>/apps/slot&lt;n&gt;</code>, 4 slots) and record metadata for the launcher and app<br>
+switcher.</li>
 </ol>
 <p>Slots are swapped wholesale: installing over a slot replaces its content and<br>
 clears stale legacy metadata for that slot. After a successful install, delete<br>
@@ -1792,13 +1798,13 @@ install <code>/apps/*.tar</code>.</li>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1791273117000">
+                <span class="git-last-updated" data-timestamp="1791454363000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1791273117000"></span>
+                  <span class="git-time" data-timestamp="1791454363000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1811,10 +1817,10 @@ install <code>/apps/*.tar</code>.</li>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Pillow">Pillow</div>
+                            <div class="git-commit-message" title="SDK improvements">SDK improvements</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1791273117000"></span>
+                              <span class="git-commit-date" data-timestamp="1791454363000"></span>
                             </div>
                           </div>
                         </li>
@@ -1937,13 +1943,13 @@ install <code>/apps/*.tar</code>.</li>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=muwdrxxi"></script>
+      <script src="../assets/js/docmd-main.js?v=muzdqc8z"></script>
       
-      <script src="../assets/js/docmd-git.js?v=muwdrxxi"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=muwdrxxi" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=muwdrxxi" ></script>
-<script src="../assets/js/docmd-search.js?v=muwdrxxi" ></script>
-<script src="../assets/js/docmd-git.js?v=muwdrxxi" type="module"></script>
+      <script src="../assets/js/docmd-git.js?v=muzdqc8z"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=muzdqc8z" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=muzdqc8z" ></script>
+<script src="../assets/js/docmd-search.js?v=muzdqc8z" ></script>
+<script src="../assets/js/docmd-git.js?v=muzdqc8z" type="module"></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"

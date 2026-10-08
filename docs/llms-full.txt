@@ -1897,6 +1897,12 @@ returning an SDK type an app cannot construct, such as `DateTime` or
 flattened into plain fields instead: `pm_clock_epoch()` and
 `pm_clock_timestamp()` rather than a `DateTime` return.
 
+Blob storage and directory creation have no SDK method to project. The text
+`writeFile` path truncates on the first NUL and the read pool is 256 bytes, so
+`pm_sd_write_binary_file()` and `pm_sd_mkdir()` are hand-written host
+primitives in `pm_app_api.h`, backed by raw `File::write` and `FS::mkdir`, and
+`pm_sd_read_binary_file()` reads back arbitrary sizes.
+
 A function returning `std::vector<String>`, such as word wrapping, becomes a
 count call and an indexed getter, matching how the SDK already hands out scan
 results:
@@ -2065,7 +2071,7 @@ toolchain independently of the SDK.
 | ------------- | ------------------------------------------------------------- |
 | `make`        | Builds `build/<name>.app.elf`, stripped, endianness-asserted  |
 | `make check`  | Prints the entry point and every undefined symbol (the app's host dependency list). Informational; the enforcing gate is `pm check` |
-| `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf` and `<name>_ICON.bin` (see [publish.md](publish.md)) |
+| `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf`, `<name>_ICON.bin` and `app.properties` when present (see [publish.md](publish.md)) |
 | `make clean`  | Removes `build/`                                              |
 
 The endianness assertion runs after every link. A big-endian artifact gets
@@ -2809,13 +2815,14 @@ The delivery unit is a plain `.tar` file placed in `/apps/` on the device SD
 card and installed through APPLOADER on the device. Not gzipped, not a
 directory of loose files: one tar.
 
-`make pack` produces it. The tar's top level must hold the two members the
+`make pack` produces it. The tar's top level must hold the members the
 installer keys off:
 
 | Member            | Required | Meaning                                 |
 | ----------------- | -------- | --------------------------------------- |
 | `<name>.app.elf`  | yes      | the app binary (`*.app.elf` suffix is detected) |
 | `<name>_ICON.bin` | no       | 40x40 1-bit icon, 200 bytes             |
+| `app.properties`  | no       | name/version/author/scope manifest, copied to the slot (see [app-abi.md](app-abi.md)) |
 
 `<name>` is the base of the ELF filename and becomes the app's display name.
 Keep it short and unique; it is also the `assets/` subdir name and the slot
@@ -2829,8 +2836,9 @@ subdirectory.
    A missing icon is non-fatal; the default is shown instead.
 4. If an `assets/` directory is present, copy it into `/assets/<base>`
    (flattened, best effort).
-5. Install ELF + icon into the selected slot (`/apps/slot<n>`, 4 slots) and
-   record metadata for the launcher and app switcher.
+5. Install ELF + icon + `app.properties` (when present) into the selected slot
+   (`/apps/slot<n>`, 4 slots) and record metadata for the launcher and app
+   switcher.
 
 Slots are swapped wholesale: installing over a slot replaces its content and
 clears stale legacy metadata for that slot. After a successful install, delete
@@ -2895,19 +2903,20 @@ python3 tools/symbols.py --list symbols.list --host-elf <firmware.elf> \
 ```
 
 ```
-libc        243 symbols   4,350 bytes
+libc        250 symbols   4,467 bytes
 libm         15 symbols     262 bytes
 libstdc++    87 symbols   3,403 bytes
 libsupc++    58 symbols   2,362 bytes
 libgcc       65 symbols   1,552 bytes
-total       475 symbols  11,687 bytes (11.4 KB)
+libnewlib    94 symbols   2,478 bytes
+total       602 symbols  15,009 bytes (14.7 KB)
 ```
 
-That total includes the 124 curated `pm_*` entries. The runtime adds about
-407 symbols, 12.7 KB of flash in the firmware image, once. It is not a per-app
-cost. Apps stay small: a hello world is 1.3 KB, an app using `std::vector` and
-`std::string` is 2.3 KB, an app with cJSON linked in is 5.2 KB.
-`--gc-sections` and `--strip-all` in `tools/app.mk` do that work.
+That total includes the curated `pm_*` entries. The runtime adds about 11.2 KB
+of flash in the firmware image, once. It is not a per-app cost. Apps stay
+small: a hello world is 1.3 KB, an app using `std::vector` and `std::string`
+is 2.3 KB, an app with cJSON linked in is 5.2 KB. `--gc-sections` and
+`--strip-all` in `tools/app.mk` do that work.
 
 A symbol in `symbols.list` that the firmware does not define is reported as a
 warning but still emitted into the table. A newly added wrapper cannot appear
@@ -2921,6 +2930,11 @@ curated SDK list, which restricts apps to the SDK surface and no libraries.
 Membership is decided by which archive a symbol comes from, not by its name.
 A `_ZN...` prefix also matches the SDK's own C++ classes, so matching on prefix
 shape would export firmware internals by accident.
+
+GCC reserves `__atomic_*`, `__sync_*` and `__builtin_*` names as builtins and
+rejects taking their address. Those exports are declared under a private
+`pm_elfsym_` identifier with an asm label, then listed by their literal name in
+the table.
 
 **The curated SDK table.** `symbols.list` is the hand-maintained promise of
 PocketMage's own exports. Host-side, `src/ELF_SYMS/host_exports.list` tracks a

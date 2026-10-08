@@ -4,10 +4,10 @@ title: "App binary contract (ABI)"
 description: "The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/"
 path: /app-abi/
-updated: 2026-10-06
+updated: 2026-10-08
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-06T07:52:17.225Z"
+  generated_at: "2026-10-08T10:14:20.971Z"
 ---
 ---
 title: "App binary contract (ABI)"
@@ -144,6 +144,12 @@ returning an SDK type an app cannot construct, such as `DateTime` or
 `WifiApInfo`, have no wrapper. Where the value matters, the accessor is
 flattened into plain fields instead: `pm_clock_epoch()` and
 `pm_clock_timestamp()` rather than a `DateTime` return.
+
+Blob storage and directory creation have no SDK method to project. The text
+`writeFile` path truncates on the first NUL and the read pool is 256 bytes, so
+`pm_sd_write_binary_file()` and `pm_sd_mkdir()` are hand-written host
+primitives in `pm_app_api.h`, backed by raw `File::write` and `FS::mkdir`, and
+`pm_sd_read_binary_file()` reads back arbitrary sizes.
 
 A function returning `std::vector<String>`, such as word wrapping, becomes a
 count call and an indexed getter, matching how the SDK already hands out scan
