@@ -4,10 +4,10 @@ title: Configuration
 description: "Compile-time pins and knobs in config.h, persistent preference globals, and how an app sees the SDK version."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/configuration/"
 path: /api/configuration/
-updated: 2026-10-08
+updated: 2026-10-09
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-08T10:14:20.966Z"
+  generated_at: "2026-10-09T11:27:10.770Z"
 ---
 ---
 title: "Configuration"

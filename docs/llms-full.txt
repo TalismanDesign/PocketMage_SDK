@@ -1957,6 +1957,10 @@ rewrites all four together.
   speed, no IPC.
 - Stack is not heap. The run task gives 16 KB; deep recursion or fat frames
   blow it. Move working sets to the heap.
+- E-ink refreshes use the differential partial waveform while an app runs,
+  regardless of the device's FAST_REFRESH setting; the setting is restored
+  when the app exits. Redraw on change, not on a timer: even partial
+  updates are visible, and a periodic slow clean still flashes the panel.
 
 ## Sections and strip
 
@@ -1972,7 +1976,8 @@ When loading an app from SD, the host reads `app.properties` from the app direct
 
 - `name` – human-readable app name
 - `version` – app version string
-- `author` – author string
+- `author` – author string, free form; multiple authors may be comma
+  separated (spaces are kept, up to 31 bytes)
 - `scope` – symbol scope gate (default: `all`)
 
 Only `pm_*` symbols are scope-gated. libc, libstdc++, and ESP-IDF symbols remain available regardless of scope. The loader installs the scoped resolver before relocation and resets it on exit. argv metadata passed to `app_main` includes `name`, `elfPath`, `version`, and `author`.

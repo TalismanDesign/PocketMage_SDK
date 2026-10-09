@@ -4,10 +4,10 @@ title: "Building an app"
 description: "The toolchain, the project layout, and the make targets that produce a shippable ELF and tar."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/build/"
 path: /build/
-updated: 2026-10-08
+updated: 2026-10-09
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-08T10:14:20.972Z"
+  generated_at: "2026-10-09T11:27:10.777Z"
 ---
 ---
 title: "Building an app"

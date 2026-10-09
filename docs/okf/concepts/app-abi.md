@@ -4,10 +4,10 @@ title: "App binary contract (ABI)"
 description: "The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/"
 path: /app-abi/
-updated: 2026-10-08
+updated: 2026-10-09
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-08T10:14:20.971Z"
+  generated_at: "2026-10-09T11:27:10.776Z"
 ---
 ---
 title: "App binary contract (ABI)"
@@ -205,6 +205,10 @@ rewrites all four together.
   speed, no IPC.
 - Stack is not heap. The run task gives 16 KB; deep recursion or fat frames
   blow it. Move working sets to the heap.
+- E-ink refreshes use the differential partial waveform while an app runs,
+  regardless of the device's FAST_REFRESH setting; the setting is restored
+  when the app exits. Redraw on change, not on a timer: even partial
+  updates are visible, and a periodic slow clean still flashes the panel.
 
 ## Sections and strip
 
@@ -220,7 +224,8 @@ When loading an app from SD, the host reads `app.properties` from the app direct
 
 - `name` – human-readable app name
 - `version` – app version string
-- `author` – author string
+- `author` – author string, free form; multiple authors may be comma
+  separated (spaces are kept, up to 31 bytes)
 - `scope` – symbol scope gate (default: `all`)
 
 Only `pm_*` symbols are scope-gated. libc, libstdc++, and ESP-IDF symbols remain available regardless of scope. The loader installs the scoped resolver before relocation and resets it on exit. argv metadata passed to `app_main` includes `name`, `elfPath`, `version`, and `author`.
