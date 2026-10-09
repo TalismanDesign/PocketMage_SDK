@@ -114,6 +114,16 @@ class ManifestParsing(unittest.TestCase):
         self.assertEqual(h.scope_text, "all")
         self.assertEqual(h.fields, 4)
 
+    def test_author_keeps_spaces_and_commas(self):
+        h = ManifestHarness("author=NellowTCS, Mr.3utter\n")
+        self.assertEqual(h.author, "NellowTCS, Mr.3utter")
+        self.assertEqual(h.fields, 1)
+
+    def test_author_stops_at_end_of_line(self):
+        h = ManifestHarness("author=Ada\r\nname=Notes\n")
+        self.assertEqual(h.author, "Ada")
+        self.assertEqual(h.name, "Notes")
+
     def test_missing_manifest_yields_empty_fields(self):
         h = ManifestHarness("")
         self.assertEqual(h.fields, 0)
