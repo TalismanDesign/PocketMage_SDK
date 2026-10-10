@@ -4,10 +4,10 @@ title: "Clock (pocketmage_clock)"
 description: "The PCF8563 RTC: reading, setting, validity, and the auto-sleep timer bookkeeping."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/clock/"
 path: /api/clock/
-updated: 2026-10-09
+updated: 2026-10-10
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T11:27:10.770Z"
+  generated_at: "2026-10-10T16:00:43.158Z"
 ---
 ---
 title: "Clock (pocketmage_clock)"

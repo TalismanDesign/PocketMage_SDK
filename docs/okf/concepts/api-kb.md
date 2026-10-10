@@ -4,10 +4,10 @@ title: "Keyboard (pocketmage_kb)"
 description: "The TCA8418 matrix keyboard and USB HID stack: modifiers, key events, and scanning."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/kb/"
 path: /api/kb/
-updated: 2026-10-09
+updated: 2026-10-10
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-09T11:27:10.773Z"
+  generated_at: "2026-10-10T16:00:43.161Z"
 ---
 ---
 title: "Keyboard (pocketmage_kb)"

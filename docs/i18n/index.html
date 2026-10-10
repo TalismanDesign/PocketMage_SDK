@@ -10,7 +10,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.8.17">
+    <meta name="generator" content="docmd v0.9.7">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <script>
@@ -98,17 +98,15 @@
         visibility: hidden;
       }
     </style>
-    <title>
-      Internationalization (i18n) : PocketMage SDK
-    </title>
+    <title>Internationalization (i18n) - PocketMage SDK</title>
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mv0vruo4">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mv0vruo4">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mv2kzgx2">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mv2kzgx2">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mv0vruo4" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mv0vruo4" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mv2kzgx2" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mv2kzgx2" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Translation catalogs, the gen_i18n.py generator, ownership rules, and what the merge validates.">
@@ -120,12 +118,17 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Internationalization (i18n) - PocketMage SDK">
 <meta name="twitter:description" content="Translation catalogs, the gen_i18n.py generator, ownership rules, and what the merge validates.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"i18n catalogs","item":"https://talismandesign.github.io/PocketMage_SDK/docs/i18n/"}]}
+</script>
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mv0vruo4" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mv0vruo4" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mv0vruo4" >
+
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mv2kzgx2" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mv2kzgx2" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mv2kzgx2" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mv2kzgx2" >
 
     
     
@@ -139,10 +142,15 @@
 
     
     
+
+    
+
+    
+    
       <aside class="sidebar">
         <div class="sidebar-header">
           
-<h1><a href="../">
+            <h1><a href="../">
                 PocketMage SDK
               </a></h1>
           
@@ -168,6 +176,7 @@
           </span>
         </div>
         <div class="sidebar-top-group">
+          
           
           
           
@@ -1290,8 +1299,8 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M12 7v14" />
-  <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+  <path d="M12 5v16" />
+  <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" />
 </svg>
 
           
@@ -1309,7 +1318,7 @@
       <li class="" >
       
         <a href="https://talismandesign.github.io/PocketMage_PDA/docs" class=" "
-          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+          target="_blank" rel="noopener">
            
 <svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-cpu"
@@ -1372,24 +1381,8 @@
       <li class="" >
       
         <a href="https://github.com/TalismanDesign/PocketMage_SDK" class=" "
-          target=&quot;_blank&quot; rel=&quot;noopener&quot;>
+          target="_blank" rel="noopener">
            
-<svg class="lucide-icon icon-github " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-github"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-  <path d="M9 18c-4.51 2-5-2-7-2" />
-</svg>
-
           
           <span class="nav-item-title">
             GitHub
@@ -1427,12 +1420,12 @@
           
           
           
+          
         </div>
       </aside>
       
-      
-      
       <div class="main-content-wrapper">
+        
         
         
           <header class="page-header">
@@ -1499,7 +1492,7 @@
     
 
     
-    <button class="theme-toggle-button" aria-label="Toggle theme">
+    <button class="theme-toggle-button" aria-label="Toggle theme" title="Toggle theme">
         
 <svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-sun"
@@ -1543,6 +1536,8 @@
     
 
     
+
+    
 </div>
 
               
@@ -1571,6 +1566,7 @@
                     </nav>
                   
 
+                  
                   
                     <div class="docmd-copy-widgets">
                       
@@ -1615,9 +1611,14 @@
                           <span class="docmd-btn-text">Copy Context</span>
                         </button>
                       
+                      
                     </div>
                   
                 </div>
+                
+                  <h1 class="docmd-focus-title">
+                    Internationalization (i18n)
+                  </h1>
                 
                 <h1 id="internationalization-i18n" class="docmd-heading"><a href="#internationalization-i18n" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Internationalization (i18n)</h1>
 <p>The SDK carries the translation engine, the generator tooling, and the base<br>
@@ -1625,24 +1626,24 @@ catalog of SDK-owned strings. An app brings its own catalog. At build time<br>
 the catalogs merge into a single enum and one set of string tables per<br>
 firmware image.</p>
 <h2 id="internationalization-i18n-layout" class="docmd-heading"><a href="#internationalization-i18n-layout" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Layout</h2>
-<pre class="hljs"><code class="language-text">PocketMage_SDK<span class="hljs-punctuation">/</span>
-  pocketmage_i18n<span class="hljs-punctuation">/</span>
-    pocketmage_i18n.<span class="hljs-attr">h</span> <span class="hljs-punctuation">/</span> .<span class="hljs-attr">cpp</span>          <span class="hljs-comment"># runtime engine (I18n class)</span>
-    languages<span class="hljs-punctuation">/</span>                        <span class="hljs-comment"># base catalog (SDK-owned strings)</span>
-      en<span class="hljs-punctuation">/</span>pocketmage_i18n.<span class="hljs-attr">po</span>
-      fr<span class="hljs-punctuation">/</span>pocketmage_i18n.<span class="hljs-attr">po</span>
-      fr<span class="hljs-punctuation">/</span>pocketmage_i18n.<span class="hljs-attr">aliases</span>
-      es<span class="hljs-punctuation">/</span>...  de<span class="hljs-punctuation">/</span>...
-    tools<span class="hljs-punctuation">/</span>
+<pre class="hljs"><code class="language-text">PocketMage_SDK<span class="hljs-operator">/</span>
+  pocketmage_i18n<span class="hljs-operator">/</span>
+    pocketmage_i18n.<span class="hljs-attr">h</span> <span class="hljs-operator">/</span> .<span class="hljs-attr">cpp</span>          <span class="hljs-comment"># runtime engine (I18n class)</span>
+    languages<span class="hljs-operator">/</span>                        <span class="hljs-comment"># base catalog (SDK-owned strings)</span>
+      en<span class="hljs-operator">/</span>pocketmage_i18n.<span class="hljs-attr">po</span>
+      fr<span class="hljs-operator">/</span>pocketmage_i18n.<span class="hljs-attr">po</span>
+      fr<span class="hljs-operator">/</span>pocketmage_i18n.<span class="hljs-attr">aliases</span>
+      es<span class="hljs-operator">/</span>...  de<span class="hljs-operator">/</span>...
+    tools<span class="hljs-operator">/</span>
       gen_i18n.<span class="hljs-attr">py</span>                     <span class="hljs-comment"># merger, generator, and build hook</span>
-    tests<span class="hljs-punctuation">/</span>
+    tests<span class="hljs-operator">/</span>
       test_gen_i18n.<span class="hljs-attr">py</span>
 </code></pre>
 <p>An app adds one catalog directory of its own:</p>
-<pre class="hljs"><code class="language-text"><span class="hljs-punctuation">&lt;</span>app<span class="hljs-punctuation">&gt;/</span>src<span class="hljs-punctuation">/</span>i18n<span class="hljs-punctuation">/</span>
-  en<span class="hljs-punctuation">/</span>pocketmage_i18n.<span class="hljs-attr">po</span>
-  fr<span class="hljs-punctuation">/</span>pocketmage_i18n.<span class="hljs-attr">po</span>
-  fr<span class="hljs-punctuation">/</span>pocketmage_i18n.<span class="hljs-attr">aliases</span>
+<pre class="hljs"><code class="language-text"><span class="hljs-operator">&lt;</span>app<span class="hljs-operator">&gt;/</span>src<span class="hljs-operator">/</span>i18n<span class="hljs-operator">/</span>
+  en<span class="hljs-operator">/</span>pocketmage_i18n.<span class="hljs-attr">po</span>
+  fr<span class="hljs-operator">/</span>pocketmage_i18n.<span class="hljs-attr">po</span>
+  fr<span class="hljs-operator">/</span>pocketmage_i18n.<span class="hljs-attr">aliases</span>
   ...
 </code></pre>
 <p>A catalog directory has one subdirectory per language, named by the language<br>
@@ -1667,7 +1668,7 @@ so an English-only app catalog is valid without translating anything.</p>
 <h3 id="internationalization-i18n-catalog-format-aliases" class="docmd-heading"><a href="#internationalization-i18n-catalog-format-aliases" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Aliases</h3>
 <p><code>pocketmage_i18n.aliases</code> maps folded, lowercase user input to a <code>StringID</code>.<br>
 Optional, only defined for non-English languages:</p>
-<pre class="hljs"><code class="language-text">annuler <span class="hljs-punctuation">-&gt;</span> STR_KB_APP_CANCEL
+<pre class="hljs"><code class="language-text">annuler <span class="hljs-operator">-&gt;</span> STR_KB_APP_CANCEL
 </code></pre>
 <p>Folding strips diacritics (<code>Paramètres -&gt; parametres</code>). Aliases from all<br>
 catalogs concatenate per language; a key that folds to the same value twice<br>
@@ -1703,10 +1704,10 @@ never perturbed by an app catalog.</p>
 <h2 id="internationalization-i18n-generator" class="docmd-heading"><a href="#internationalization-i18n-generator" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Generator</h2>
 <p><code>tools/gen_i18n.py</code> merges the catalogs in command-line order and writes<br>
 <code>pocketmage_i18n_gen.h</code> and <code>pocketmage_i18n_gen.cpp</code>:</p>
-<pre class="hljs"><code class="language-sh">python3 pocketmage_i18n<span class="hljs-punctuation">/</span>tools<span class="hljs-punctuation">/</span>gen_i18n.<span class="hljs-attr">py</span> \
-    <span class="hljs-punctuation">--</span>catalog pocketmage_i18n<span class="hljs-punctuation">/</span>languages \
-    <span class="hljs-punctuation">--</span>catalog ..<span class="hljs-punctuation">/</span>app<span class="hljs-punctuation">/</span>src<span class="hljs-punctuation">/</span>i18n \
-    <span class="hljs-punctuation">--</span>out<span class="hljs-punctuation">-</span>dir <span class="hljs-punctuation">&lt;</span>build<span class="hljs-punctuation">-</span>dir<span class="hljs-punctuation">&gt;</span>
+<pre class="hljs"><code class="language-sh">python3 pocketmage_i18n<span class="hljs-operator">/</span>tools<span class="hljs-operator">/</span>gen_i18n.<span class="hljs-attr">py</span> \
+    <span class="hljs-operator">--</span>catalog pocketmage_i18n<span class="hljs-operator">/</span>languages \
+    <span class="hljs-operator">--</span>catalog ..<span class="hljs-operator">/</span>app<span class="hljs-operator">/</span>src<span class="hljs-operator">/</span>i18n \
+    <span class="hljs-operator">--</span>out<span class="hljs-operator">-</span>dir <span class="hljs-operator">&lt;</span>build<span class="hljs-operator">-</span>dir<span class="hljs-operator">&gt;</span>
 </code></pre>
 <p><code>--catalog</code> is repeatable; the first catalog is the base. With no arguments,<br>
 the tool generates the SDK’s own base catalog into <code>pocketmage_i18n/</code>, so a<br>
@@ -1762,12 +1763,12 @@ intent; the values always equal the index in the merged order.</p>
 app’s <code>platformio.ini</code>; it reads its settings from project options (or<br>
 <code>POCKETMAGE_I18N_CATALOGS</code> / <code>POCKETMAGE_I18N_OUT_DIR</code>, or the SDK base<br>
 catalog as a last resort):</p>
-<pre class="hljs"><code class="language-ini">extra_scripts <span class="hljs-punctuation">=</span> pre<span class="hljs-punctuation">:</span>lib<span class="hljs-punctuation">/</span>PocketMage_SDK<span class="hljs-punctuation">/</span>pocketmage_i18n<span class="hljs-punctuation">/</span>tools<span class="hljs-punctuation">/</span>gen_i18n.<span class="hljs-attr">py</span>
+<pre class="hljs"><code class="language-ini">extra_scripts <span class="hljs-operator">=</span> pre<span class="hljs-operator">:</span>lib<span class="hljs-operator">/</span>PocketMage_SDK<span class="hljs-operator">/</span>pocketmage_i18n<span class="hljs-operator">/</span>tools<span class="hljs-operator">/</span>gen_i18n.<span class="hljs-attr">py</span>
 
-custom_i18n_catalogs <span class="hljs-punctuation">=</span>
-    lib<span class="hljs-punctuation">/</span>PocketMage_SDK<span class="hljs-punctuation">/</span>pocketmage_i18n<span class="hljs-punctuation">/</span>languages
-    src<span class="hljs-punctuation">/</span>i18n
-custom_i18n_out_dir <span class="hljs-punctuation">=</span> .<span class="hljs-attr">pio</span><span class="hljs-punctuation">/</span>build<span class="hljs-punctuation">/</span><span class="hljs-variable">${PIOENV}</span><span class="hljs-punctuation">/</span>i18n
+custom_i18n_catalogs <span class="hljs-operator">=</span>
+    lib<span class="hljs-operator">/</span>PocketMage_SDK<span class="hljs-operator">/</span>pocketmage_i18n<span class="hljs-operator">/</span>languages
+    src<span class="hljs-operator">/</span>i18n
+custom_i18n_out_dir <span class="hljs-operator">=</span> .<span class="hljs-attr">pio</span><span class="hljs-operator">/</span>build<span class="hljs-operator">/</span><span class="hljs-variable">${PIOENV}</span><span class="hljs-operator">/</span>i18n
 </code></pre>
 <p>As a hook it regenerates only when a <code>.po</code>/<code>.aliases</code> file is newer than the<br>
 generated tables, so incremental builds stay cheap.</p>
@@ -1784,7 +1785,7 @@ directive and add that language’s directory to each catalog that translates<br
 it. Never reorder existing languages: the index is the value stored in NVS.</li>
 </ul>
 <h2 id="internationalization-i18n-testing" class="docmd-heading"><a href="#internationalization-i18n-testing" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Testing</h2>
-<pre class="hljs"><code class="language-sh">python3 <span class="hljs-punctuation">-</span>m unittest discover <span class="hljs-punctuation">-</span>s pocketmage_i18n<span class="hljs-punctuation">/</span>tests
+<pre class="hljs"><code class="language-sh">python3 <span class="hljs-operator">-</span>m unittest discover <span class="hljs-operator">-</span>s pocketmage_i18n<span class="hljs-operator">/</span>tests
 </code></pre>
 <p>The suite covers catalog merging, language fallback, alias merging, and every<br>
 validation failure above, using small in-test catalogs.</p>
@@ -1844,8 +1845,11 @@ validation failure above, using small in-test catalogs.</p>
                 
               </div>
               
+              
               <div class="toc-sidebar">
                 
+                
+                  
 
 
   <div class="toc-container">
@@ -1914,19 +1918,21 @@ validation failure above, using small in-test catalogs.</p>
     </ul>
   </div>
 
+                
+                
               </div>
               
             </div>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1791545210000">
+                <span class="git-last-updated" data-timestamp="1791648026000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1791545210000"></span>
+                  <span class="git-time" data-timestamp="1791648026000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1939,10 +1945,10 @@ validation failure above, using small in-test catalogs.</p>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Improvements">Improvements</div>
+                            <div class="git-commit-message" title="Merge pull request #1 from TalismanDesign/dependabot/npm_and_yarn/docs/multi-01248f261d">Merge pull request #1 from TalismanDe...</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1791545210000"></span>
+                              <span class="git-commit-date" data-timestamp="1791648026000"></span>
                             </div>
                           </div>
                         </li>
@@ -2065,13 +2071,14 @@ validation failure above, using small in-test catalogs.</p>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mv0vruo4"></script>
+      <script src="../assets/js/docmd-main.js?v=mv2kzgx2"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mv0vruo4"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mv0vruo4" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mv0vruo4" ></script>
-<script src="../assets/js/docmd-search.js?v=mv0vruo4" ></script>
-<script src="../assets/js/docmd-git.js?v=mv0vruo4" type="module"></script>
+      <script src="../assets/js/docmd-git.js?v=mv2kzgx2"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mv2kzgx2" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mv2kzgx2" ></script>
+<script src="../assets/js/docmd-search.js?v=mv2kzgx2" ></script>
+<script src="../assets/js/docmd-git.js?v=mv2kzgx2" ></script>
+<script src="../assets/js/docmd-ai.js?v=mv2kzgx2" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
@@ -2147,6 +2154,7 @@ validation failure above, using small in-test catalogs.</p>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Guides","icon":"book","collapsible":true,"children":[{"title":"Guide index","path":"/guides/","icon":"book"},{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"children":[{"title":"API overview","path":"/api/","icon":"boxes"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Building Apps","path":"/build/","icon":"code"},{"title":"Symbols","path":"/symbols/","icon":"box"},{"title":"Publishing","path":"/publish/","icon":"package"},{"title":"i18n catalogs","path":"/i18n/","icon":"terminal"},{"title":"Migration","path":"/migration/","icon":"book-open"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
       
       
       
