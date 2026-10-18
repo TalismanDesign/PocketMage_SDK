@@ -54,10 +54,13 @@ class OverlayBlob:
 class AddressResolver(Protocol):
 
     def function(self, canonical: int) -> int:
+        ...
 
     def data(self, address: int) -> int:
+        ...
 
     def host(self, symbol: str) -> int:
+        ...
 
 
 def parse_relocations(stdout: str) -> list[Relocation]:
@@ -117,7 +120,7 @@ def l32r_sites(code: bytes, base_pc: int) -> list[L32rSite]:
     return sites
 
 
-def _align_up(value: int, alignment: int) -> int:
+def align_up(value: int, alignment: int) -> int:
     return (value + alignment - 1) & ~(alignment - 1)
 
 
@@ -157,7 +160,7 @@ def build_blob(image: Image, analysis: Analysis, plan: OverlayPlan,
         bodies.append((func, placement, bytearray(raw)))
         offset += func.size
 
-    literal_offset = _align_up(offset, _POOL_ALIGNMENT)
+    literal_offset = align_up(offset, _POOL_ALIGNMENT)
     pool: dict[int, int] = {}
     pool_bytes = bytearray()
     for func, placement, code in bodies:

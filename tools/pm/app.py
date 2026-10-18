@@ -45,6 +45,7 @@ class AppInfo:
 
 
 class PmError(Exception):
+    pass
 
 
 def sdk_root() -> str:

@@ -18,6 +18,7 @@ _HEX_TOKEN_RE = re.compile(r"^([0-9a-f]+)\s*(?:<([^>]+)>)?")
 
 
 class OverlayError(Exception):
+    pass
 
 
 @dataclass(frozen=True)
