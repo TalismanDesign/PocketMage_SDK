@@ -7,7 +7,7 @@ path: /api/assets/
 updated: 2026-10-18
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-18T15:56:12.693Z"
+  generated_at: "2026-10-18T18:49:46.656Z"
 ---
 ---
 title: "Built-in asset bitmaps (libAssets.h)"

@@ -7,7 +7,7 @@ path: /api/oled/
 updated: 2026-10-18
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-18T15:56:12.697Z"
+  generated_at: "2026-10-18T18:49:46.663Z"
 ---
 ---
 title: "OLED (pocketmage_oled)"

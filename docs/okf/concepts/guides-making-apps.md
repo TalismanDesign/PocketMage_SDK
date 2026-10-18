@@ -7,7 +7,7 @@ path: /guides/making-apps/
 updated: 2026-10-18
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-18T15:56:12.700Z"
+  generated_at: "2026-10-18T18:49:46.670Z"
 ---
 ---
 title: "Making an app"

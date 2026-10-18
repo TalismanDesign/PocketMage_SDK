@@ -7,7 +7,7 @@ path: /api/kb/
 updated: 2026-10-18
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-18T15:56:12.697Z"
+  generated_at: "2026-10-18T18:49:46.662Z"
 ---
 ---
 title: "Keyboard (pocketmage_kb)"

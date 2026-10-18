@@ -7,7 +7,7 @@ path: /symbols/
 updated: 2026-10-18
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-18T15:56:12.702Z"
+  generated_at: "2026-10-18T18:49:46.674Z"
 ---
 ---
 title: "Symbols and the dependency contract"
