@@ -4,10 +4,10 @@ title: "App lifecycle"
 description: "Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/"
 path: /guides/lifecycle/
-updated: 2026-10-10
+updated: 2026-10-18
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-10T16:00:43.166Z"
+  generated_at: "2026-10-18T15:56:12.700Z"
 ---
 ---
 title: "App lifecycle"
