@@ -1,8 +1,3 @@
-"""App project and make interop.
-
-pm is a wrapper around make. The build logic lives in tools/app.mk; pm asks
-make for the app's pm-info, then runs make for the actual targets.
-"""
 
 from __future__ import annotations
 
@@ -37,11 +32,6 @@ def _parent_chain(path: str) -> list[str]:
 
 @dataclass
 class AppInfo:
-    """The app's own configuration, parsed from `make -s pm-info`.
-
-    Paths come back relative to the app directory; resolve() anchors them to
-    the app path so pm never depends on the caller's cwd.
-    """
 
     path: str
     name: str
@@ -50,19 +40,14 @@ class AppInfo:
     icon: str
     sdk_root: str
     readelf: str
+    tool: str = ""
+    map: str = ""
 
 
 class PmError(Exception):
-    """Expected failure with a message safe to show the user."""
 
 
 def sdk_root() -> str:
-    """The SDK checkout pm operates on.
-
-    pip installs tools/ into site-packages, so the package location is not the
-    source tree. Order: PM_SDK_ROOT, the checkout this file lives in, then an
-    ancestor of the current directory.
-    """
     env = os.environ.get("PM_SDK_ROOT")
     if env:
         candidate = os.path.abspath(env)
@@ -85,11 +70,6 @@ def sdk_root() -> str:
 
 
 def sdk_version() -> str:
-    """SDK release version from VERSION.
-
-    pip and pm read this file; pocketmage_globals.cpp carries the same string
-    at runtime and abi_version() guards it from drifting.
-    """
     path = os.path.join(sdk_root(), "VERSION")
     with open(path, encoding="utf-8") as f:
         version = f.read().strip()
@@ -99,7 +79,6 @@ def sdk_version() -> str:
 
 
 def abi_version() -> str:
-    """The pocketmage_sdk_version literal exported to the host at runtime."""
     path = os.path.join(sdk_root(), "pocketmage_globals.cpp")
     with open(path, encoding="utf-8") as f:
         content = f.read()
@@ -121,15 +100,12 @@ def _parse_info(output: str) -> dict[str, str]:
 
 
 def _make_env() -> dict[str, str]:
-    """Environment for make: always pin the SDK root so an app Makefile's
-    `SDK_ROOT ?= $(PM_SDK_ROOT)` resolves even when the caller never set it."""
     env = dict(os.environ)
     env["PM_SDK_ROOT"] = sdk_root()
     return env
 
 
 def query_app(app_dir: str) -> AppInfo:
-    """Run `make -s pm-info` in the app and parse the result."""
 
     def run_make_info(path: str) -> str:
         cmd = ["make", "-C", path, "-s", "pm-info"]
@@ -157,12 +133,13 @@ def query_app(app_dir: str) -> AppInfo:
         tar=resolve(info["APP_TAR"]),
         icon=resolve(info["APP_ICON"]),
         sdk_root=info["SDK_ROOT"],
-        readelf=info.get("XTENSA_READELF") or "",
+        readelf=info.get("XTENSA_READELF", ""),
+        tool=resolve(info["APP_TOOL"]) if info.get("APP_TOOL") else "",
+        map=resolve(info["APP_MAP"]) if info.get("APP_MAP") else "",
     )
 
 
 def run_make(ui: UI, app_dir: str, targets: list[str]) -> int:
-    """make <targets> in the app, streaming output. Returns the exit code."""
     cmd = ["make", "-C", app_dir, *targets]
     ui.command(cmd)
     result = subprocess.run(cmd, env=_make_env())
@@ -170,7 +147,6 @@ def run_make(ui: UI, app_dir: str, targets: list[str]) -> int:
 
 
 def find_makefile(app_dir: str) -> str | None:
-    """Path to the app's Makefile, or None."""
     for candidate in ("Makefile", "makefile", "GNUmakefile"):
         path = os.path.join(app_dir, candidate)
         if os.path.isfile(path):
@@ -179,7 +155,6 @@ def find_makefile(app_dir: str) -> str | None:
 
 
 def require_toolchain(readelf: str) -> None:
-    """Fail fast when no toolchain is resolvable for a build."""
     if readelf:
         return
     probe = shutil.which("xtensa-esp32s3-elf-readelf")

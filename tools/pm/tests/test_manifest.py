@@ -1,8 +1,3 @@
-"""Unit tests for app.properties parsing and SDK scope gating.
-
-The module under test is plain C with no Arduino dependency, so the build host
-compiles it directly and runs the real parser rather than a copy of its logic.
-"""
 
 import os
 import subprocess
@@ -50,14 +45,12 @@ int main(void) {
 
 
 def c_string_literal(text):
-    """Renders text as a C string literal, escaping quotes and newlines."""
     escaped = (text.replace("\\", "\\\\").replace('"', '\\"')
                .replace("\n", "\\n").replace("\r", "\\r"))
     return '"%s"' % escaped
 
 
 class ManifestHarness:
-    """Compiles the real parser once per test and runs a manifest through it."""
 
     def __init__(self, manifest, probes=()):
         with tempfile.TemporaryDirectory() as tmp:

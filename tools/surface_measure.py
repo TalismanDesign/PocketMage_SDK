@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""Measure the cost of generating surface over the PocketMage SDK.
-
-Run from the SDK root:
-    python3 tools/surface_measure.py [--json out.json]
-"""
 
 from __future__ import annotations
 
@@ -46,7 +41,6 @@ def strip_comments(text: str) -> str:
 
 
 def split_args(args: str) -> list[str]:
-    """Split an argument list on top-level commas."""
     out, depth, current = [], 0, []
     for ch in args:
         if ch in "<([":
@@ -65,7 +59,6 @@ def split_args(args: str) -> list[str]:
 
 
 def classify_param(arg: str) -> dict:
-    """Describe one parameter's translation cost."""
     arg = arg.strip()
     info = {
         "text": arg,
@@ -100,7 +93,6 @@ def classify_param(arg: str) -> dict:
 
 
 def parse_header(path: str) -> tuple[list[dict], str]:
-    """Return (methods, class_name) for one header."""
     with open(path, encoding="utf-8") as f:
         raw = f.read()
     text = strip_comments(raw)
@@ -179,7 +171,6 @@ def parse_header(path: str) -> tuple[list[dict], str]:
     return methods, class_name
 
 def prefix_text(m) -> str:
-    """Return just the declaration prefix (explicit/static/inline/virtual)."""
     return " ".join(m.group("prefix").split())
 
 

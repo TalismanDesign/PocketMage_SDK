@@ -1,5 +1,3 @@
-"""Compile a real app against the generated API and check it can resolve.
-"""
 
 import os
 import re
@@ -49,7 +47,6 @@ int probe(void) {{
 
 
 def find_compiler():
-    """Target C++ compiler, or None when the toolchain is not installed."""
     override = os.environ.get('PM_APP_CXX')
     if override and os.path.exists(override):
         return override

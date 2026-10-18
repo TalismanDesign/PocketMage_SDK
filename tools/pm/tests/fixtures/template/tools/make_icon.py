@@ -1,8 +1,3 @@
-"""Render a 40x40 1-bit PocketMage app icon from an image.
-
-Usage:
-    python3 make_icon.py input.png output.bin
-"""
 
 from pathlib import Path
 

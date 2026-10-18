@@ -49,33 +49,14 @@ FRAMEWORK_ARCHIVES = ('libnewlib',)
 
 ESLSYM_ENTRY_BYTES = 8
 
-# GCC treats these as language builtins: taking their address directly is a
-# hard error, so they are declared under a private identifier with an asm label.
 BUILTIN_PREFIXES = ('__atomic', '__sync', '__builtin')
 
 
 def is_gcc_builtin(name):
-    """Whether the compiler reserves the name as a builtin function.
-
-    Args:
-        name: Symbol name.
-
-    Returns:
-        True when the name must be exported through an asm-labelled alias.
-    """
     return name.startswith(BUILTIN_PREFIXES)
 
 
 def read_archive_symbols(nm, archive):
-    """Text symbols a toolchain archive defines, from `nm -g --defined-only`.
-
-    Args:
-        nm: Path to the target `nm`.
-        archive: Path to the `.a` to inspect.
-
-    Returns:
-        Sorted list of symbol names, or empty if the archive is unreadable.
-    """
     if not os.path.isfile(archive):
         print(f'warning: archive not found, skipping: {archive}', file=sys.stderr)
         return []
@@ -93,16 +74,6 @@ def read_archive_symbols(nm, archive):
 
 
 def find_gcc_archive(lib_dir, name):
-    """GCC runtime archive: `<toolchain>/lib/gcc` on older toolchains,
-    `<toolchain>/picolibc/lib/gcc` on newer ones.
-
-    Args:
-        lib_dir: The toolchain `lib/no-rtti` directory.
-        name: Archive base name, e.g. `libgcc`.
-
-    Returns:
-        Path to the archive, or None when it cannot be found.
-    """
     toolchain_root = os.path.normpath(
         os.path.join(lib_dir, os.pardir, os.pardir))
     roots = [os.path.join(toolchain_root, prefix, 'lib', 'gcc')
@@ -121,16 +92,6 @@ def find_gcc_archive(lib_dir, name):
 
 
 def toolchain_lib_dir(readelf, explicit=None):
-    """Runtime archive directory, defaulting to `<toolchain>/lib/no-rtti`
-    derived from the readelf path.
-
-    Args:
-        readelf: Path to the target `readelf`.
-        explicit: User-supplied override.
-
-    Returns:
-        Path to the archive directory, or None when it cannot be located.
-    """
     if explicit:
         return explicit
     bin_dir = os.path.dirname(os.path.abspath(readelf))
@@ -146,15 +107,6 @@ def toolchain_lib_dir(readelf, explicit=None):
 
 
 def framework_lib_dir(readelf, explicit=None):
-    """Arduino-ESP32 framework archive directory for the readelf's target.
-
-    Args:
-        readelf: Path to the target `readelf`.
-        explicit: User-supplied override.
-
-    Returns:
-        Path to the directory holding `libnewlib.a`, or None when absent.
-    """
     if explicit:
         return explicit if os.path.isdir(explicit) else None
     triple = os.path.basename(readelf).replace('-readelf', '')
@@ -172,17 +124,6 @@ def framework_lib_dir(readelf, explicit=None):
 
 
 def classify_runtime_symbols(nm, lib_dir, host_globals, framework_dir=None):
-    """Symbols an app can link, grouped by supplying archive.
-
-    Args:
-        nm: Path to the target `nm`.
-        lib_dir: Directory holding the runtime archives.
-        host_globals: Symbols the firmware already exports as GLOBAL FUNC/OBJECT.
-        framework_dir: Directory holding the Arduino-ESP32 archives, or None.
-
-    Returns:
-        Dict of archive name to sorted list of exportable symbols.
-    """
     result = {}
     for name in RUNTIME_ARCHIVES:
         archive = os.path.join(lib_dir, f'{name}.a')
@@ -208,14 +149,6 @@ def classify_runtime_symbols(nm, lib_dir, host_globals, framework_dir=None):
 
 
 def table_cost_bytes(symbols):
-    """Flash a generated export table adds: entry bytes plus the name strings.
-
-    Args:
-        symbols: Names in the table.
-
-    Returns:
-        Entry bytes plus the total length of the NUL-terminated names.
-    """
     entries = len(symbols) * ESLSYM_ENTRY_BYTES
     names = sum(len(name) + 1 for name in symbols)
     return entries + names

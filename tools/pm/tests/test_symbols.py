@@ -1,4 +1,3 @@
-"""Tests for the export-table generator, tools/symbols.py."""
 
 import os
 import tempfile

@@ -1,10 +1,3 @@
-"""Gate checks against a real built artifact, the golden fixture.
-
-The fixture is a built sample app ELF committed under fixtures/ (see
-CONTRIBUTING for how to regenerate it). Running the gate against it proves the
-parse paths and the libc allowlist agree with a real toolchain output, not
-just canned strings.
-"""
 
 import os
 import shutil
@@ -75,7 +68,6 @@ class GoldenArtifact(unittest.TestCase):
 
 @unittest.skipUnless(READELF, "no xtensa readelf on this machine (set PM_READELF)")
 class RuntimeExports(unittest.TestCase):
-    """Runtime symbols must resolve for real library-linked apps."""
 
     def setUp(self):
         sdk_root = os.path.normpath(

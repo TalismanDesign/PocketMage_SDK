@@ -24,7 +24,6 @@ _CANONICAL_PART = re.compile(r"0|[1-9]\d*")
 
 
 def bump_version(version: str, part: str) -> str:
-    """Next semver for major/minor/patch; rejects leading-zero components."""
     m = _VERSION_RE.match(version)
     if not m or any(not _CANONICAL_PART.fullmatch(g) for g in m.groups()):
         raise PmError(f"VERSION is not a plain semver triple: {version!r}")
@@ -67,11 +66,6 @@ def _write_changelog(root: str, lines: list[str]) -> None:
 
 def _fold_unreleased(lines: list[str], version: str, message: str | None,
                      today: str) -> list[str]:
-    """Move Unreleased bullets under the new version heading.
-
-    The Unreleased section stays on top so contributors keep adding to it; the
-    bullets that accumulated there become the new version's body.
-    """
     title: list[str] = []
     rest = list(lines)
     if rest and rest[0].startswith("# ") and not rest[0].startswith("## "):
@@ -102,11 +96,6 @@ def _fold_unreleased(lines: list[str], version: str, message: str | None,
 
 
 def release(root: str, part: str, message: str | None) -> str:
-    """Bump the version everywhere. Returns the new version string.
-
-    Every source is validated before the first write so a halfway release never
-    leaves VERSION and the generated files disagreeing.
-    """
     version_file = os.path.join(root, "VERSION")
     with open(version_file, encoding="utf-8") as f:
         version = f.read().strip()

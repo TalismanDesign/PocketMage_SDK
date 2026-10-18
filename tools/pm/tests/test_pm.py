@@ -1,5 +1,3 @@
-"""Tests for PocketMageOS SDK tools, including app and gate modules.
-"""
 
 import os
 import tempfile
@@ -99,7 +97,6 @@ class Classify(unittest.TestCase):
 
 
 class SymbolInGeneratedTable(unittest.TestCase):
-    """The gate reads the shipped table, so it cannot pass a missing symbol."""
 
     def test_parses_export_lines(self):
         with tempfile.TemporaryDirectory() as tmp:

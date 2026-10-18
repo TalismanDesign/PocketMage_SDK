@@ -1,5 +1,3 @@
-"""Tests for the app-facing API generator.
-"""
 
 import os
 import sys
@@ -14,7 +12,6 @@ import gen_app_api as gen  # noqa: E402  path must be set first
 
 
 class TypeProjection(unittest.TestCase):
-    """One SDK parameter or return type in, one C type out."""
 
     def param(self, raw):
         return gen.project_param(raw, 0)
@@ -103,7 +100,6 @@ class Naming(unittest.TestCase):
 
 
 class EnumParsing(unittest.TestCase):
-    """Enum values come from the headers, never a transcribed copy."""
 
     def test_values_are_read_from_the_header(self):
         tables = gen.load_enums(SDK_ROOT)
@@ -139,7 +135,6 @@ class EnumParsing(unittest.TestCase):
 
 
 class NamespaceConstParsing(unittest.TestCase):
-    """Jingles are `const Jingle` objects, not enum values, but index the same."""
 
     def setUp(self):
         self.sdk_root = SDK_ROOT
@@ -172,7 +167,6 @@ class NamespaceConstParsing(unittest.TestCase):
 
 
 class FreeFunctionParsing(unittest.TestCase):
-    """File-scope declarations become wrappers; class members must not."""
 
     def names(self, header):
         return {e["name"] for e in gen.parse_free_functions(

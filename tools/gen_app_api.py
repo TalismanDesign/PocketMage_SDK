@@ -1,19 +1,4 @@
 #!/usr/bin/env python3
-"""Generate the app-facing C ABI over the PocketMage SDK surface.
-
-Run from the SDK root:
-
-    python3 tools/gen_app_api.py --check
-
-Parsing comes from `surface_measure`; this tool projects it onto C. `String`
-becomes `const char*`, enums become `int` plus C constants, `fs::FS&` is
-dropped (the host picks the filesystem from the SD mode), constructors go away
-since an app cannot build one.
-
-Anything the projection cannot express is skipped and reported, not guessed.
-Host knowledge the parser cannot infer, such as which accessor reaches each
-singleton, lives in ACCESSORS and OVERRIDES below.
-"""
 
 from __future__ import annotations
 
@@ -67,8 +52,6 @@ ENUM_BODY_RE = re.compile(
 
 
 def parse_enum_text(text, enum_name):
-    """Enumerator names of one enum in `text`, in declaration order.
-    """
     for m in ENUM_BODY_RE.finditer(text):
         if m.group("name") != enum_name:
             continue
@@ -84,7 +67,6 @@ def parse_enum_text(text, enum_name):
 
 
 def read_source(path, rel_path):
-    """Read a header, or fail with the path the caller used."""
     if not os.path.exists(path):
         raise SystemExit(f'source not found: {rel_path}')
     with open(path, encoding='utf-8') as handle:
@@ -92,7 +74,6 @@ def read_source(path, rel_path):
 
 
 def parse_namespace_consts(text, namespace, type_name):
-    """Names of `const <type> <Name> =` bindings declared inside a namespace."""
     match = re.search(
         r'namespace\s+' + re.escape(namespace) + r'\s*\{', text)
     if not match:
@@ -117,7 +98,6 @@ def parse_namespace_consts(text, namespace, type_name):
 
 
 def load_namespace_const_tables(root):
-    """C enum tables built from namespace constant lists, in declaration order."""
     tables = []
     for c_name, prefix, rel_path, namespace, type_name in NAMESPACE_CONST_SOURCES:
         text = read_source(os.path.join(root, rel_path), rel_path)
@@ -130,13 +110,11 @@ def load_namespace_const_tables(root):
 
 
 def parse_enum(root, rel_path, enum_name):
-    """Read one enum's enumerator names out of a header."""
     return parse_enum_text(read_source(os.path.join(root, rel_path), rel_path),
                            enum_name)
 
 
 def load_enums(root):
-    """C enum tables, read straight from the headers."""
     tables = []
     for c_name, prefix, rel_path, host_name in ENUM_SOURCES:
         values = []
@@ -236,16 +214,10 @@ TEMPLATE_ARG_RE = re.compile(r'<[A-Za-z_][^<>]*>')
 
 
 def strip_template_args(text: str) -> str:
-    """Blank out template argument lists so `<` no longer looks comparative."""
     return TEMPLATE_ARG_RE.sub('T', text)
 
 
 def parse_free_functions(path: str) -> list[dict]:
-    """File-scope function declarations, excluding anything inside a class.
-
-    Returns the same entry shape as `surface_measure.parse_header` so both feed
-    one projection path.
-    """
     text = read_source(path, os.path.basename(path))
     out = []
     skip_depth = None
@@ -315,7 +287,6 @@ def parse_free_functions(path: str) -> list[dict]:
 
 
 def snake(name: str) -> str:
-    """CamelCase or PascalCase to snake_case, leaving underscores alone."""
     out = name
     for pattern, repl in PASCAL_TO_SNAKE:
         out = pattern.sub(repl, out)
@@ -323,14 +294,11 @@ def snake(name: str) -> str:
 
 
 def module_prefix(class_name: str) -> str:
-    """The pm_ module prefix for an SDK class, dropping the vendor word so
-    names stay short: `PocketmageSD` becomes `pm_sd`."""
     name = re.sub(r"^Pocket[Mm]age", "", class_name)
     return "pm_" + snake(name)
 
 
 class Param:
-    """One projected C parameter."""
 
     def __init__(self, c_type: str, name: str, passthrough: bool):
         self.c_type = c_type
@@ -339,7 +307,6 @@ class Param:
 
 
 class Method:
-    """One projected C function plus the host call that implements it."""
 
     def __init__(self, name, ret, params, call, borrowed=False, statement=None):
         self.name = name
@@ -352,7 +319,6 @@ class Method:
 
 
 class Skipped:
-    """A method the projection declined to surface, with the reason."""
 
     def __init__(self, class_name, method, reason):
         self.class_name = class_name
@@ -361,7 +327,6 @@ class Skipped:
 
 
 def normalize_type(raw: str) -> str:
-    """Collapse whitespace and pointer spacing so rules match one spelling."""
     text = re.sub(r"\s+", " ", raw.strip())
     text = text.replace(" *", "*").replace("* ", "*")
     text = text.replace("long int", "long").replace("long long int", "long long")
@@ -372,9 +337,6 @@ def normalize_type(raw: str) -> str:
 
 
 def project_param(raw: str, index: int):
-    """Map one SDK parameter type onto its C form.
-
-    Returns (c_type, passthrough, arg_expression, skip_reason)."""
     t = normalize_type(raw)
     is_ref = t.endswith("&")
     is_ptr = "*" in t
@@ -411,14 +373,10 @@ def project_param(raw: str, index: int):
 
 
 def n(index: int) -> str:
-    """Parameter name for an unnamed SDK parameter."""
     return f"a{index}"
 
 
 def project_ret(raw: str):
-    """Map an SDK return type onto its C form.
-
-    Returns (c_type, is_string, wrap_kind, skip_reason)."""
     t = normalize_type(raw)
     is_ref = t.endswith("&")
     is_ptr = "*" in t
@@ -444,17 +402,14 @@ def project_ret(raw: str):
 
 
 def build_free_call(module, name, args):
-    """Host expression that calls one free SDK function."""
     return f"{name}({', '.join(args)})"
 
 
 def vector_from_c(items: str, count: str) -> str:
-    """Rebuild a std::vector<String> from the C array and length the app passed."""
     return f"std::vector<String>({items}, {items} + {count})"
 
 
 def build_call(class_name, method, args):
-    """Host expression that calls one SDK method."""
     kind, accessor = ACCESSORS[class_name]
     joined = ", ".join(args)
     if kind == "object":
@@ -463,13 +418,6 @@ def build_call(class_name, method, args):
 
 
 def build_free_module(basename, module, entries):
-    """Project one free-function header onto the C surface.
-
-    Returns (methods, skipped). A `std::vector<String>` return becomes a count
-    call plus an indexed getter that writes into a caller buffer, because C
-    cannot carry a counted sequence and a shared string pool would overflow on
-    anything like word wrapping.
-    """
     prefix = f"pm_{module}"
     methods, skipped = [], []
     for entry in entries:
@@ -521,7 +469,6 @@ def build_free_module(basename, module, entries):
 
 
 def vector_get_body(call: str) -> str:
-    """Body for the indexed getter half of a vector return."""
     lines = [
         '  { const auto& v = ' + call + ';',
         '    if (index < 0 || static_cast<size_t>(index) >= v.size()) return -1;',
@@ -537,7 +484,6 @@ def vector_get_body(call: str) -> str:
 
 
 def build(headers, seen_pairs):
-    """Project every parsed method onto the C surface."""
     methods, skipped = [], []
     for path in headers:
         base = os.path.basename(path)
@@ -612,7 +558,6 @@ def build(headers, seen_pairs):
 
 
 def emit_header(methods, path, root):
-    """The generated app-facing header, as C."""
     out = []
     out.append("// App-facing C ABI for external ELF apps. Regenerate, do not edit.")
     out.append("// String returns stay valid for the next POOL_SLOTS string-returning calls.")
@@ -696,7 +641,6 @@ def emit_header(methods, path, root):
 
 
 def module_prefix_of(method):
-    """Recover the module prefix from a generated function name."""
     for c_name in ACCESSORS:
         prefix = module_prefix(c_name)
         if method.name.startswith(prefix + "_"):
@@ -705,7 +649,6 @@ def module_prefix_of(method):
 
 
 def emit_source(methods, path, header_basename, root):
-    """The generated host wrapper functions, as C++."""
     out = []
     out.append("// Host wrappers backing pm_sdk_app.h. Regenerate, do not edit.")
     out.append("// Each wrapper is extern \"C\", so SDK mangling stays local to this file.")
@@ -815,8 +758,6 @@ pocketmage_sdk_version
 
 
 def emit_exports(methods, path, title, pair_note):
-    """Rewrite the pm_* block of a host export list. Both copies come from one
-    list so they cannot drift and fail the gate but still load on device."""
     out = [LIST_HEADER.format(title=title, pair_note=pair_note)]
     out.append("")
     out.append("# app-facing C ABI (pm_sdk_app.h)")

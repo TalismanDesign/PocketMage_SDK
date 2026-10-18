@@ -1,9 +1,3 @@
-"""Resolve an app's undefined symbols against the host.
-
-With a host firmware ELF the check is exact: every undefined symbol must exist
-as a host global. Without one it falls back to the generated export table plus
-the curated export lists, and anything outside that set is unconfirmed.
-"""
 
 from __future__ import annotations
 
@@ -16,8 +10,6 @@ from tools import symbols as symbols_mod
 
 _EXPORT_LINE = re.compile(r"ESP_ELFSYM_EXPORT\(\s*(\w+)\s*\)")
 
-# Builtin-named symbols are emitted as `{ "name", (void*)&pm_elfsym_name }`
-# because their own identifier cannot be address-taken.
 _ALIAS_LINE = re.compile(r'\{\s*"([^"]+)"\s*,\s*\(void\s*\*\)\s*&pm_elfsym_')
 
 _SYM_LINE = re.compile(
@@ -27,7 +19,6 @@ _SYM_LINE = re.compile(
 
 @dataclass(frozen=True)
 class ElfHeader:
-    """The bits of `readelf -h` we care about."""
 
     data: str
     etype: str
@@ -45,7 +36,6 @@ class ElfHeader:
 
 @dataclass
 class GateResult:
-    """How the undefined symbols came out."""
 
     ok: list[str]
     unconfirmed: list[str]
@@ -60,7 +50,6 @@ class GateResult:
 
 
 def parse_readelf_h(stdout: str) -> ElfHeader:
-    """Pull the fields we check out of `readelf -h -W` output."""
     data = ""
     etype = ""
     machine = ""
@@ -78,7 +67,6 @@ def parse_readelf_h(stdout: str) -> ElfHeader:
 
 
 def find_app_main(stdout: str) -> str | None:
-    """Symbol-table value of `app_main`, or None if stripped from the binary."""
     pattern = re.compile(
         r"^\s*\d+:\s+(\S+)\s+\d+\s+FUNC\s+GLOBAL\s+DEFAULT\s+\S+\s+app_main.*$"
     )
@@ -93,11 +81,6 @@ _APP_ICON_SIZE = 200
 
 
 def validate_icon(path: str) -> str | None:
-    """Error message for a malformed app icon, or None when it is fine.
-
-    A missing icon is legal (the host falls back to its default). A present
-    icon must be exactly the 40x40 1-bpp payload the loader expects.
-    """
     if not os.path.isfile(path):
         return None
     size = os.path.getsize(path)
@@ -115,7 +98,6 @@ _INIT_ARRAY_RE = re.compile(
 
 
 def init_array_size(section_stdout: str) -> str:
-    """Hex size of .init_array, or "" when the app runs no static constructors."""
     for line in section_stdout.splitlines():
         m = _INIT_ARRAY_RE.match(line)
         if m and int(m.group(1), 16) > 0:
@@ -124,7 +106,6 @@ def init_array_size(section_stdout: str) -> str:
 
 
 def parse_undefined(stdout: str) -> list[str]:
-    """Ordered unique GLOBAL/WEAK undefined names from `readelf -s -W`."""
     seen: list[str] = []
     for line in stdout.splitlines():
         m = _SYM_LINE.match(line)
@@ -139,11 +120,6 @@ def parse_undefined(stdout: str) -> list[str]:
 
 
 def host_exports_candidates(sdk_root: str) -> list[str]:
-    """Where the OS repo's host_exports.list might live.
-
-    The SDK is vendored at Code/PocketMageOS/lib/PocketMage_SDK, so the OS src
-    is two parents up; a standalone copy may only be one parent away.
-    """
     return [
         os.path.abspath(os.path.join(sdk_root, "..", "src", "ELF_SYMS", "host_exports.list")),
         os.path.abspath(os.path.join(sdk_root, "..", "..", "src", "ELF_SYMS", "host_exports.list")),
@@ -151,7 +127,6 @@ def host_exports_candidates(sdk_root: str) -> list[str]:
 
 
 def read_curated(sdk_root: str) -> set[str]:
-    """Union of the SDK's symbols.list and the OS host_exports.list when present."""
     paths = [os.path.join(sdk_root, "symbols.list")]
     for candidate in host_exports_candidates(sdk_root):
         if os.path.isfile(candidate):
@@ -167,31 +142,16 @@ def read_curated(sdk_root: str) -> set[str]:
 
 def reconcile_exports(sdk_symbols: str, host_exports: str,
                       ) -> tuple[list[str], list[str]]:
-    """Diff the curated surface against the host's export table.
-
-    Returns (missing, extra): symbols in the SDK curated list that no host
-    export covers, then host exports outside the curated list. missing must be
-    empty for a release; extra is advisory (host-only symbols are normal).
-    """
     curated = set(symbols_mod.read_curated_list(sdk_symbols))
     host = set(symbols_mod.read_curated_list(host_exports))
     return sorted(curated - host), sorted(host - curated)
 
 
 def host_globals(readelf: str, host_elf: str) -> set[str]:
-    """GLOBAL FUNC/OBJECT exports of the host firmware ELF."""
     return symbols_mod.get_host_globals(readelf, host_elf, symbol_types=("FUNC", "OBJECT"))
 
 
 def generated_table_symbols(path: str) -> set[str]:
-    """Symbols listed in a generated export table.
-
-    Args:
-        path: Path to the generated `.cpp` table.
-
-    Returns:
-        Set of exported symbol names, empty if the file is absent or unreadable.
-    """
     if not path or not os.path.isfile(path):
         return set()
     with open(path, encoding="utf-8") as handle:
@@ -202,14 +162,6 @@ def generated_table_symbols(path: str) -> set[str]:
 
 
 def find_export_table(sdk_root: str) -> str | None:
-    """Locate the generated export table that the firmware links.
-
-    Args:
-        sdk_root: Root of the PocketMage SDK.
-
-    Returns:
-        Path to the table, or None when no table is found.
-    """
     current = os.path.abspath(sdk_root)
     for _ in range(4):
         candidate = os.path.join(current, 'src', 'ELF_SYMS', 'esp_all_symbol.cpp')
@@ -220,48 +172,16 @@ def find_export_table(sdk_root: str) -> str | None:
 
 
 def resolve_available(curated: set[str], table_path: str | None) -> set[str]:
-    """The symbol set an app may reference.
-
-    Args:
-        curated: The SDK's curated export list.
-        table_path: Path to the generated export table, if known.
-
-    Returns:
-        Set of symbol names the host is known to resolve.
-    """
     return set(curated) | generated_table_symbols(table_path or "")
 
 
 def available_symbols(curated: set[str],
                       available_table: set[str]) -> set[str]:
-    """Union the curated SDK list with the generated export table.
-
-    Args:
-        curated: The SDK's curated export list.
-        available_table: Symbols parsed from the generated table, empty when
-            the file is absent or unreadable.
-
-    Returns:
-        Set of symbol names the host can resolve.
-    """
     return set(curated) | set(available_table)
 
 
 def classify(und: list[str], curated: set[str], host_view: set[str] | None,
              entry: str = "", available_table: set[str] = frozenset()) -> GateResult:
-    """Sort undefined symbols into ok / unconfirmed / broken.
-
-    With host_view, anything outside the curated+host union is broken: the load
-    fails on it. Without one, anything outside the curated+generated-table
-    surface is unconfirmed until a host ELF says otherwise.
-
-    Args:
-        und: Undefined symbol names from the app ELF.
-        curated: The SDK's curated export list.
-        host_view: GLOBAL FUNC/OBJECT of the host ELF, or None when unavailable.
-        entry: The app's entry point name, for reporting.
-        available_table: Symbols from the generated export table.
-    """
     available = available_symbols(curated, available_table)
     ok: list[str] = []
     unconfirmed: list[str] = []
@@ -278,7 +198,6 @@ def classify(und: list[str], curated: set[str], host_view: set[str] | None,
 
 
 def run_readelf(readelf: str, *args: str) -> str:
-    """readelf stdout; raises with the tool's own error when it exits non-zero."""
     cmd = [readelf, *args]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
@@ -288,7 +207,6 @@ def run_readelf(readelf: str, *args: str) -> str:
 
 
 def check_app(info, readelf: str | None, host_elf: str | None) -> GateResult:
-    """Gate a built app; raises when the artifact itself is invalid."""
     tool = readelf or info.readelf or "xtensa-esp32s3-elf-readelf"
 
     header_out = run_readelf(tool, "-h", "-W", info.out)

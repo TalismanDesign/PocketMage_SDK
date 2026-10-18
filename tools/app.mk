@@ -25,6 +25,8 @@ APP_SRCS    ?= main.cpp
 APP_NAME    ?= $(notdir $(CURDIR))
 APP_BUILD_DIR ?= build
 APP_OUT     := $(APP_BUILD_DIR)/$(APP_NAME).app.elf
+APP_TOOL    ?= $(APP_BUILD_DIR)/$(APP_NAME).app.tool
+APP_MAP     ?= $(APP_BUILD_DIR)/$(APP_NAME).map
 APP_ICON    ?= $(CURDIR)/$(APP_NAME)_ICON.bin
 APP_TAR     := $(APP_BUILD_DIR)/$(APP_NAME).tar
 
@@ -70,6 +72,7 @@ APP_CPPFLAGS += -DPM_SDK_VERSION_PATCH=$(PM_SDK_VERSION_PATCH)
 APP_LDFLAGS  := -nostartfiles -nostdlib -fPIC -shared -e app_main
 APP_LDFLAGS  += -fdata-sections -ffunction-sections -Wl,--gc-sections
 APP_LDFLAGS  += -fvisibility=hidden
+APP_LDFLAGS  += -Wl,-Map=$(APP_MAP)
 APP_LDFLAGS  += -Wl,--strip-all -Wl,--strip-debug -Wl,--strip-discarded
 APP_LDFLAGS  += -Dmain=app_main
 
@@ -87,7 +90,7 @@ APP_OBJS := $(patsubst %,$(APP_BUILD_DIR)/%.o,$(basename $(APP_SRCS)))
 .DEFAULT_GOAL := all
 
 .PHONY: all elf check clean pack pm-info
-all: $(APP_OUT)
+all: $(APP_OUT) $(APP_TOOL)
 
 elf: $(APP_OUT)
 
@@ -95,15 +98,18 @@ elf: $(APP_OUT)
 pm-info:
 	@echo "APP_NAME=$(APP_NAME)"
 	@echo "APP_OUT=$(APP_OUT)"
+	@echo "APP_TOOL=$(APP_TOOL)"
+	@echo "APP_MAP=$(APP_MAP)"
 	@echo "APP_TAR=$(APP_TAR)"
 	@echo "APP_ICON=$(APP_ICON)"
 	@echo "SDK_ROOT=$(SDK_ROOT)"
 	@echo "XTENSA_READELF=$(XTENSA_READELF)"
 
-$(APP_OUT): $(APP_SRCS) | $(APP_BUILD_DIR)
-	$(XTENSA_CXX) $(APP_CPPFLAGS) $(APP_CXXFLAGS) $(APP_SRCS) $(APP_LDFLAGS) -o $@.raw
-	$(XTENSA_STRIP) $(APP_STRIP_FLAGS) $@.raw -o $@
-	rm -f $@.raw
+$(APP_TOOL): $(APP_SRCS) | $(APP_BUILD_DIR)
+	$(XTENSA_CXX) $(APP_CPPFLAGS) $(APP_CXXFLAGS) $(APP_SRCS) $(APP_LDFLAGS) -o $@
+
+$(APP_OUT): $(APP_TOOL)
+	$(XTENSA_STRIP) $(APP_STRIP_FLAGS) $< -o $@
 	@if ! $(XTENSA_READELF) -h $@ 2>/dev/null | grep -q 'little endian'; then \
 	  echo "error: $(APP_NAME).app.elf is big-endian; the loader requires a little-endian ELF (use the xtensa-esp-elf toolchain)" >&2; \
 	  rm -f $@; exit 1; \

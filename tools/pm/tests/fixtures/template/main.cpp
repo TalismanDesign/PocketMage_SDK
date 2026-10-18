@@ -1,4 +1,3 @@
-// PocketMage app starter.
 
 #include <stdio.h>
 #include <string.h>
@@ -6,7 +5,6 @@
 
 #include "pm_app_api.h"
 
-// ms to wait for a keypress before exiting on its own.
 #define K_QUIT_TIMEOUT_MS 20000
 
 static int center_x(int width, const char *text, int style) {

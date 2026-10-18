@@ -1,4 +1,3 @@
-"""`pm new`: scaffold an app from the official PocketMage_App template."""
 
 from __future__ import annotations
 
@@ -34,8 +33,6 @@ def _copy_tree(src: str, dst: str) -> None:
 
 
 def _regenerate_icon(app_path: str, name: str) -> None:
-    """Pre-generate <name>_ICON.bin from the template artwork. Needs Pillow;
-    when it is missing the build-time Makefile rule regenerates it."""
     icon_src = os.path.join(app_path, "assets", "icon.png")
     icon_out = os.path.join(app_path, f"{name}_ICON.bin")
     gen = os.path.join(app_path, "tools", "make_icon.py")
@@ -45,11 +42,9 @@ def _regenerate_icon(app_path: str, name: str) -> None:
         ["python3", gen, icon_src, icon_out], capture_output=True, text=True
     )
     if result.returncode != 0:
-        # If the script exited cleanly with a warning (e.g., missing PIL), skip noisy warning
         stderr = result.stderr.strip()
         stdout = result.stdout.strip()
         msg = stderr or stdout
-        # Don't print warning if it's just about missing PIL (handled by make_icon.py gracefully)
         if "PIL" in msg or "Pillow" in msg:
             return
         print(
@@ -59,9 +54,6 @@ def _regenerate_icon(app_path: str, name: str) -> None:
 
 
 def scaffold_from_dir(name: str, dest_dir: str, template_dir: str) -> str:
-    """Copy a template directory to <dest_dir>/<name>; returns the app path.
-    Separated from scaffold() so tests exercise a local fixture and the clone
-    stays a thin network wrapper."""
     if not _NAME_RE.match(name):
         raise PmError(
             f"invalid app name {name!r}: use [A-Za-z][A-Za-z0-9_]* "
@@ -79,9 +71,6 @@ def scaffold_from_dir(name: str, dest_dir: str, template_dir: str) -> str:
 
 
 def scaffold(name: str, dest_dir: str = ".") -> str:
-    """Scaffold an app called <name> from the official template repo; returns
-    the app path. The app name matches _NAME_RE; it becomes the ELF, tar, and
-    icon name via the Makefile's APP_NAME default."""
     with tempfile.TemporaryDirectory(prefix="pm-new-") as work_dir:
         clone_dir = os.path.join(work_dir, "template")
         result = subprocess.run(

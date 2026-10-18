@@ -1,7 +1,3 @@
-"""Terminal output for pm.
-
-Backed by tuiro when installed, plain text otherwise.
-"""
 
 from __future__ import annotations
 
@@ -14,7 +10,6 @@ except ImportError:
 
 
 class UI:
-    """Minimal output surface used by pm, delegating to tuiro when available."""
 
     def __init__(self, ci_mode: bool = False, theme: str = "default") -> None:
         self.ci_mode = ci_mode
