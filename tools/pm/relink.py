@@ -1,10 +1,11 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Protocol
 
-from tools.pm.overlay import Analysis, Clustering, Image, OverlayError, OverlayPlan, run_tool
+from tools.pm.overlay import Analysis, Clustering, FunctionSymbol, Image, OverlayError, OverlayPlan, run_tool
 
 R_RELATIVE = "R_XTENSA_RELATIVE"
 R_JMP_SLOT = "R_XTENSA_JMP_SLOT"
@@ -49,6 +50,7 @@ class OverlayBlob:
     placements: list[BodyPlacement] = field(default_factory=list)
     literal_offset: int = 0
     literal_count: int = 0
+    patches: list[int] = field(default_factory=list)
 
 
 class AddressResolver(Protocol):
@@ -61,6 +63,61 @@ class AddressResolver(Protocol):
 
     def host(self, symbol: str) -> int:
         ...
+
+
+_HOST_SYM_RE = re.compile(
+    r"^\s*\d+:\s+([0-9a-fA-F]+)\s+\d+\s+(?:FUNC|OBJECT)\s+"
+    r"(?:GLOBAL|WEAK)\s+\S+\s+(?!UND\b)\S+\s+(\S+)\s*$"
+)
+
+
+def parse_host_symbols(stdout: str) -> dict[str, int]:
+    symbols: dict[str, int] = {}
+    for line in stdout.splitlines():
+        m = _HOST_SYM_RE.match(line)
+        if m:
+            value, name = m.groups()
+            symbols[name] = int(value, 16)
+    return symbols
+
+
+def read_host_symbols(host_elf: str, readelf: str) -> dict[str, int]:
+    return parse_host_symbols(run_tool(readelf, ["-s", "-W", host_elf]))
+
+
+class Resolver:
+    """AddressResolver built from explicit bases.
+
+    app_base=None selects deferred mode: app-relative words keep their
+    canonical offsets and build_blob records them in the blob's patch table,
+    so the loader rebases them once it knows the real load base.
+    host_symbols=None means no --host-elf was given; a host call in paged
+    code is then an error rather than a silently unresolved address.
+    """
+
+    def __init__(self, app_base: int | None = None,
+                 host_symbols: dict[str, int] | None = None):
+        self.app_base = app_base
+        self.host_symbols = host_symbols
+
+    @property
+    def deferred(self) -> bool:
+        return self.app_base is None
+
+    def function(self, canonical: int) -> int:
+        return canonical if self.app_base is None else self.app_base + canonical
+
+    def data(self, address: int) -> int:
+        return address if self.app_base is None else self.app_base + address
+
+    def host(self, symbol: str) -> int:
+        if self.host_symbols is None:
+            raise OverlayError(
+                f"{symbol} is a host call but no --host-elf was given to resolve it")
+        if symbol not in self.host_symbols:
+            raise OverlayError(
+                f"host export {symbol} is not in the --host-elf symbol table")
+        return self.host_symbols[symbol]
 
 
 def parse_relocations(stdout: str) -> list[Relocation]:
@@ -143,24 +200,31 @@ def _resolve_word(slot: int, reloc: Relocation | None, word: int,
 def build_blob(image: Image, analysis: Analysis, plan: OverlayPlan,
                relocations: list[Relocation],
                resolver: AddressResolver) -> OverlayBlob:
+    if not plan.functions:
+        raise OverlayError(f"overlay {plan.overlay_id} has no functions to emit")
     by_address = analysis.by_address()
     reloc_by_offset: dict[int, Relocation] = {}
     for reloc in relocations:
         reloc_by_offset.setdefault(reloc.offset, reloc)
 
-    bodies: list[tuple[OverlayPlan, BodyPlacement, bytearray]] = []
-    offset = 0
+    # Bodies keep their canonical relative layout inside the blob so
+    # PC-relative direct calls within the overlay stay valid at any frame base.
+    base = min(func.address for func in plan.functions)
+    bodies: list[tuple[FunctionSymbol, BodyPlacement, bytearray]] = []
+    code_end = 0
     for func in plan.functions:
         raw = image.bytes_at(func.address, func.size)
         if raw is None or len(raw) != func.size:
             raise OverlayError(
                 f"cannot read {func.size} bytes of {func.name} at {func.address:#x}")
         placement = BodyPlacement(name=func.name, address=func.address,
-                                  size=func.size, offset=offset)
+                                  size=func.size, offset=func.address - base)
         bodies.append((func, placement, bytearray(raw)))
-        offset += func.size
+        code_end = max(code_end, placement.offset + func.size)
 
-    literal_offset = align_up(offset, _POOL_ALIGNMENT)
+    deferred = getattr(resolver, "deferred", False)
+    patches: list[int] = []
+    literal_offset = align_up(code_end, _POOL_ALIGNMENT)
     pool: dict[int, int] = {}
     pool_bytes = bytearray()
     for func, placement, code in bodies:
@@ -170,23 +234,52 @@ def build_blob(image: Image, analysis: Analysis, plan: OverlayPlan,
                 if word is None:
                     raise OverlayError(
                         f"{func.name} reads unmapped literal {site.literal:#x}")
-                resolved = _resolve_word(site.literal, reloc_by_offset.get(site.literal),
+                reloc = reloc_by_offset.get(site.literal)
+                resolved = _resolve_word(site.literal, reloc,
                                          word, by_address, resolver)
                 pool[site.literal] = literal_offset + len(pool_bytes)
+                if (deferred and reloc is not None
+                        and reloc.type == R_RELATIVE and word not in by_address):
+                    patches.append(pool[site.literal])
                 pool_bytes += resolved.to_bytes(4, "little")
             pc = placement.offset + site.offset
             code[site.offset:site.offset + _L32R_LENGTH] = encode_l32r(
                 pc, site.register, pool[site.literal])
 
-    padding = bytes(literal_offset - offset)
-    data = b"".join(bytes(code) for _, _, code in bodies) + padding + bytes(pool_bytes)
+    code_area = bytearray(code_end)
+    for _func, placement, code in bodies:
+        code_area[placement.offset:placement.offset + placement.size] = code
+    padding = bytes(literal_offset - code_end)
+    data = bytes(code_area) + padding + bytes(pool_bytes)
     return OverlayBlob(
         overlay_id=plan.overlay_id,
         data=data,
         placements=[placement for _, placement, _ in bodies],
         literal_offset=literal_offset,
         literal_count=len(pool),
+        patches=patches,
     )
+
+
+def _guard_direct_calls(analysis: Analysis, plans: list[OverlayPlan]) -> None:
+    plan_of_name: dict[str, int] = {}
+    plan_of_address: dict[int, int] = {}
+    for plan in plans:
+        for func in plan.functions:
+            plan_of_name[func.name] = plan.overlay_id
+            plan_of_address[func.address] = plan.overlay_id
+    for call in analysis.calls:
+        if call.via != "direct" or call.target is None:
+            continue
+        caller_plan = plan_of_name.get(call.func)
+        callee_plan = plan_of_address.get(call.target)
+        if caller_plan == callee_plan:
+            continue
+        callee = call.symbol or f"{call.target:#x}"
+        raise OverlayError(
+            f"direct call in {call.func or '?'} to {callee} crosses the "
+            "paged/resident boundary; PC-relative calls cannot be retargeted "
+            "to a stub (cluster them together or call through a pointer)")
 
 
 def build_blobs(image: Image, analysis: Analysis, clustering: Clustering,
@@ -196,5 +289,6 @@ def build_blobs(image: Image, analysis: Analysis, clustering: Clustering,
         raise OverlayError(
             "cannot page oversized units: " + ", ".join(
                 "(" + ", ".join(group) + ")" for group in clustering.oversized))
+    _guard_direct_calls(analysis, clustering.overlays)
     return [build_blob(image, analysis, plan, relocations, resolver)
             for plan in clustering.overlays]

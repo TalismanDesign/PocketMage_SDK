@@ -10,7 +10,9 @@ from unittest import mock
 
 from tools.pm import app as app_mod
 from tools.pm import cli as cli_mod
+from tools.pm import emit as emit_mod
 from tools.pm import overlay as overlay_mod
+from tools.pm import relink as relink_mod
 
 _TEMPLATE = os.path.join(os.path.dirname(__file__), "fixtures", "template")
 _CALLGRAPH = os.path.join(os.path.dirname(__file__), "fixtures", "callgraph")
@@ -185,7 +187,9 @@ class OverlayCommand(unittest.TestCase):
     def _run(self, app_info, analysis=None, frame_size=overlay_mod.DEFAULT_FRAME_SIZE,
              frame_count=3):
         args = type("Args", (), {"app_dir": ".", "frame_size": frame_size,
-                                 "frame_count": frame_count})()
+                                 "frame_count": frame_count, "emit": False,
+                                 "stub_base": None, "slot_base": None,
+                                 "app_base": None, "host_elf": None})()
         ui = cli_mod.UI(ci_mode=True)
         buffer = io.StringIO()
         with mock.patch.object(cli_mod.app_mod, "query_app", return_value=app_info), \
@@ -226,6 +230,122 @@ class OverlayCommand(unittest.TestCase):
             code, out = self._run(info, analysis, frame_size=256)
         self.assertEqual(code, 1)
         self.assertIn("huge", out)
+
+
+class OverlayArgParsing(unittest.TestCase):
+
+    def test_emit_flags_parse_hex_and_decimal_bases(self):
+        args = cli_mod._build_parser().parse_args(
+            ["overlay", "--emit", "--stub-base", "0x40000000",
+             "--slot-base", "16384"])
+        self.assertTrue(args.emit)
+        self.assertEqual(args.stub_base, 0x40000000)
+        self.assertEqual(args.slot_base, 16384)
+        self.assertIsNone(args.app_base)
+        self.assertIsNone(args.host_elf)
+
+    def test_defaults_leave_emit_off(self):
+        args = cli_mod._build_parser().parse_args(["overlay"])
+        self.assertFalse(args.emit)
+
+
+class OverlayEmitCommand(unittest.TestCase):
+
+    def _info(self, directory):
+        tool = os.path.join(directory, "app.app.tool")
+        with open(tool, "wb") as handle:
+            handle.write(b"\x7fELF fake tool artifact")
+        return app_mod.AppInfo(path=directory, name="app", out="x", tar="x",
+                               icon="x", sdk_root=".", readelf="readelf", tool=tool)
+
+    def _args(self, info, **overrides):
+        values = {"app_dir": info.path, "frame_size": overlay_mod.DEFAULT_FRAME_SIZE,
+                  "frame_count": 3, "emit": True, "stub_base": 0x40000000,
+                  "slot_base": 0x40002000, "app_base": None, "host_elf": None}
+        values.update(overrides)
+        return type("Args", (), values)()
+
+    def _run_emit(self, info, analysis, **overrides):
+        emission = emit_mod.Emission(manifest=emit_mod.Manifest(app=info.name),
+                                     blob=b"", stubs_asm="", header="")
+        written = {key: os.path.join(info.path, "build", f"app.overlay{suffix}")
+                   for key, suffix in (("bin", ".bin"), ("stubs", "_stubs.S"),
+                                       ("header", "_manifest.h"))}
+        buffer = io.StringIO()
+        with mock.patch.object(cli_mod.app_mod, "query_app", return_value=info), \
+             mock.patch.object(cli_mod.app_mod, "require_toolchain"), \
+             mock.patch.object(cli_mod.overlay_mod, "analyze", return_value=analysis), \
+             mock.patch.object(cli_mod.overlay_mod, "run_tool", return_value=""), \
+             mock.patch.object(cli_mod.relink_mod, "read_relocations", return_value=[]), \
+             mock.patch.object(cli_mod.relink_mod, "read_host_symbols",
+                               return_value={"pm_text_width": 0x40001234}) as hosts, \
+             mock.patch.object(cli_mod.emit_mod, "emit", return_value=emission) as emit, \
+             mock.patch.object(cli_mod.emit_mod, "write_emission",
+                               return_value=written) as write, \
+             contextlib.redirect_stdout(buffer):
+            code = cli_mod.cmd_overlay(cli_mod.UI(ci_mode=True), self._args(info, **overrides))
+        return code, buffer.getvalue(), emit, write, hosts
+
+    def _analysis(self):
+        return overlay_mod.Analysis(
+            functions=[overlay_mod.FunctionSymbol("f", 0x10, 4, ".text")])
+
+    def test_emit_writes_the_three_artifacts(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            info = self._info(tmp)
+            code, out, emit, write, _ = self._run_emit(info, self._analysis())
+            self.assertEqual(code, 0)
+            emit.assert_called_once()
+            _, kwargs = emit.call_args
+            self.assertEqual(kwargs["stub_base"], 0x40000000)
+            self.assertEqual(kwargs["slot_base"], 0x40002000)
+            write.assert_called_once()
+            self.assertIn("app.overlay.bin", out)
+
+    def test_emit_requires_both_bases(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            info = self._info(tmp)
+            code, out, emit, write, _ = self._run_emit(
+                info, self._analysis(), stub_base=None)
+            self.assertEqual(code, 1)
+            self.assertIn("--stub-base", out)
+            emit.assert_not_called()
+            write.assert_not_called()
+
+    def test_misaligned_bases_are_rejected_before_emit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            info = self._info(tmp)
+            code, out, emit, _, _ = self._run_emit(
+                info, self._analysis(), stub_base=0x40000002)
+            self.assertEqual(code, 1)
+            self.assertIn("aligned", out)
+            emit.assert_not_called()
+
+    def test_host_elf_symbols_feed_the_resolver(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            info = self._info(tmp)
+            host_elf = os.path.join(tmp, "firmware.elf")
+            with open(host_elf, "wb") as handle:
+                handle.write(b"fake host elf; read_host_symbols is mocked")
+            code, _, emit, _, hosts = self._run_emit(
+                info, self._analysis(), host_elf=host_elf,
+                app_base=0x42000000)
+            self.assertEqual(code, 0)
+            hosts.assert_called_once_with(host_elf, "readelf")
+            resolver = emit.call_args.args[4]
+            self.assertEqual(resolver.host("pm_text_width"), 0x40001234)
+            self.assertEqual(resolver.function(0x10), 0x42000010)
+
+    def test_deferred_mode_passes_canonical_offsets_through(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            info = self._info(tmp)
+            code, out, emit, _, hosts = self._run_emit(info, self._analysis())
+            self.assertEqual(code, 0)
+            hosts.assert_not_called()
+            resolver = emit.call_args.args[4]
+            self.assertTrue(resolver.deferred)
+            self.assertEqual(resolver.function(0x10), 0x10)
+            self.assertIn("deferr", out.lower())
 
 
 class Clustering(unittest.TestCase):

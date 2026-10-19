@@ -2,6 +2,7 @@
 import os
 import re
 import shutil
+import struct
 import subprocess
 import tempfile
 import unittest
@@ -14,6 +15,7 @@ from tools.pm.emit import (
     FunctionStub,
     Manifest,
     OverlayImage,
+    PoolPatch,
     Redirect,
     StubLayout,
     StubSlot,
@@ -252,6 +254,119 @@ class EmitRejectsBadLayout(unittest.TestCase):
             self._emit(_STUB_BASE, _SLOT_BASE + 2)
 
 
+class RenderBlobHeader(unittest.TestCase):
+
+    def _manifest(self):
+        return Manifest(app="callgraph",
+                        stubs=(_stub("f", 0x110, 0, 0, 0),),
+                        overlays=(OverlayImage(0, 0, 0x20),),
+                        slots=StubSlot(_SLOT_BASE, _SLOT_BASE + 4),
+                        redirects=(Redirect(0x200, _STUB_BASE),),
+                        patches=(PoolPatch(0, 0x24),))
+
+    def test_fixed_layout(self):
+        header = emit_mod.render_blob_header(self._manifest(), app_base=0x42000000)
+        self.assertEqual(header[:4], emit_mod.BLOB_MAGIC)
+        version, flags = struct.unpack_from("<HH", header, 4)
+        self.assertEqual(version, emit_mod.BLOB_VERSION)
+        self.assertEqual(flags, emit_mod.BLOB_FLAG_APP_BASE)
+        app_base, enter, leave = struct.unpack_from("<III", header, 8)
+        self.assertEqual((app_base, enter, leave), (0x42000000, _SLOT_BASE, _SLOT_BASE + 4))
+        self.assertEqual(struct.unpack_from("<HHHH", header, 20), (1, 1, 1, 1))
+        self.assertEqual(struct.unpack_from("<HHII", header, 28), (0, 0, 0, 0x20))
+        self.assertEqual(struct.unpack_from("<IHHI", header, 40), (0x110, 0, 0, _STUB_BASE))
+        self.assertEqual(struct.unpack_from("<II", header, 52), (0x200, _STUB_BASE))
+        self.assertEqual(struct.unpack_from("<HH", header, 60), (0, 0x24))
+        self.assertEqual(len(header), 64)
+
+    def test_deferred_mode_marks_no_app_base(self):
+        header = emit_mod.render_blob_header(self._manifest(), app_base=None)
+        _version, flags = struct.unpack_from("<HH", header, 4)
+        self.assertEqual(flags, 0)
+        app_base, = struct.unpack_from("<I", header, 8)
+        self.assertEqual(app_base, 0)
+
+    def test_empty_manifest_still_has_the_fixed_header(self):
+        header = emit_mod.render_blob_header(Manifest(app="x"))
+        self.assertEqual(len(header), 28)
+        self.assertEqual(struct.unpack_from("<HHHH", header, 20), (0, 0, 0, 0))
+
+
+class BuildOverlayBlob(unittest.TestCase):
+
+    def test_header_then_bodies(self):
+        emission = emit_mod.emit(
+            _redirect_image(),
+            Analysis(functions=[FunctionSymbol("_Z1Av", 0x110, 0x10, ".text")]),
+            _redirect_clustering(), [Relocation(0x200, R_RELATIVE)],
+            FakeResolver(hosts=_HOSTS),
+            app="x", stub_base=_STUB_BASE, slot_base=_SLOT_BASE)
+        blob = emit_mod.build_overlay_blob(emission, app_base=0x42000000)
+        self.assertTrue(blob.startswith(emit_mod.BLOB_MAGIC))
+        header_size = 28 + 12 + 12 + 8  # fixed + 1 overlay + 1 stub + 1 redirect
+        self.assertEqual(len(blob), header_size + len(emission.blob))
+        self.assertEqual(blob[header_size:], emission.blob)
+
+
+def _pool_patch_image(slot_word):
+    sections = [Section(6, ".text", 0x100, 0x100, 0x20),
+                Section(7, ".got.loc", 0x200, 0x200, 0x10)]
+    data = bytearray(0x300)
+    data[0x204:0x208] = slot_word.to_bytes(4, "little")
+    data[0x110:0x113] = relink_mod.encode_l32r(0x110, 8, 0x204)
+    return Image(sections=sections, data=bytes(data))
+
+
+def _pool_patch_emit(slot_word):
+    func = FunctionSymbol("_Z1Av", 0x110, 3, ".text")
+    return emit_mod.emit(
+        _pool_patch_image(slot_word),
+        Analysis(functions=[func]),
+        Clustering(overlays=[OverlayPlan(overlay_id=0, functions=(func,), size=3)]),
+        [Relocation(0x204, R_RELATIVE)],
+        relink_mod.Resolver(app_base=None, host_symbols={}),
+        app="x", stub_base=_STUB_BASE, slot_base=_SLOT_BASE)
+
+
+class PoolPatches(unittest.TestCase):
+
+    def test_deferred_mode_records_data_words_for_rebasing(self):
+        emission = _pool_patch_emit(slot_word=0x2A0)
+        self.assertEqual(emission.manifest.patches, (PoolPatch(0, 4),))
+        self.assertEqual(int.from_bytes(emission.blob[4:8], "little"), 0x2A0)
+
+    def test_stubbed_function_words_are_absolute_and_not_patched(self):
+        emission = _pool_patch_emit(slot_word=0x110)
+        self.assertEqual(emission.manifest.patches, ())
+        self.assertEqual(int.from_bytes(emission.blob[4:8], "little"), _STUB_BASE)
+
+
+class WriteEmission(unittest.TestCase):
+
+    def _emission(self):
+        return emit_mod.emit(
+            _redirect_image(),
+            Analysis(functions=[FunctionSymbol("_Z1Av", 0x110, 0x10, ".text")]),
+            _redirect_clustering(), [Relocation(0x200, R_RELATIVE)],
+            FakeResolver(hosts=_HOSTS),
+            app="callgraph", stub_base=_STUB_BASE, slot_base=_SLOT_BASE)
+
+    def test_writes_the_three_artifacts(self):
+        emission = self._emission()
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = emit_mod.write_emission(emission, tmp, app_base=0x42000000)
+            self.assertEqual({os.path.basename(p) for p in paths.values()},
+                             {"callgraph.overlay.bin", "callgraph.overlay_stubs.S",
+                              "callgraph.overlay_manifest.h"})
+            with open(paths["bin"], "rb") as handle:
+                self.assertEqual(handle.read(),
+                                 emit_mod.build_overlay_blob(emission, app_base=0x42000000))
+            with open(paths["stubs"], encoding="utf-8") as handle:
+                self.assertEqual(handle.read(), emission.stubs_asm)
+            with open(paths["header"], encoding="utf-8") as handle:
+                self.assertEqual(handle.read(), emission.header)
+
+
 class _CallGraphFixture:
 
     def _build(self):
@@ -306,11 +421,20 @@ class CallGraphEmission(_CallGraphFixture, unittest.TestCase):
 
     def test_blob_covers_the_overlays(self):
         manifest = self.emission.manifest
-        self.assertEqual(len(self.emission.blob), 308)
         for overlay in manifest.overlays:
             self.assertEqual(overlay.offset % 4, 0)
         last = manifest.overlays[-1]
         self.assertEqual(last.offset + last.length, len(self.emission.blob))
+
+    def test_bodies_keep_their_canonical_layout_within_an_overlay(self):
+        by_overlay: dict[int, list] = {}
+        for stub in self.emission.manifest.stubs:
+            by_overlay.setdefault(stub.overlay_id, []).append(stub)
+        for stubs in by_overlay.values():
+            stubs.sort(key=lambda s: s.canonical)
+            for earlier, later in zip(stubs, stubs[1:]):
+                self.assertEqual(later.body_offset - earlier.body_offset,
+                                 later.canonical - earlier.canonical)
 
     def test_emitted_stubs_assemble(self):
         if not os.path.isfile(self.as_bin):
@@ -342,6 +466,30 @@ class CallGraphEmission(_CallGraphFixture, unittest.TestCase):
                 [self.gcc_bin, "-std=gnu11", "-fsyntax-only", path],
                 capture_output=True, text=True)
             self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_write_emission_round_trips_to_disk(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = emit_mod.write_emission(self.emission, tmp)
+            with open(paths["bin"], "rb") as handle:
+                blob = handle.read()
+            self.assertTrue(blob.startswith(emit_mod.BLOB_MAGIC))
+            header_size = 28 + 12 * 3 + 12 * 8  # fixed + overlays + stubs
+            self.assertEqual(len(blob), header_size + len(self.emission.blob))
+            with open(paths["stubs"], encoding="utf-8") as handle:
+                self.assertEqual(handle.read(), self.emission.stubs_asm)
+            with open(paths["header"], encoding="utf-8") as handle:
+                self.assertEqual(handle.read(), self.emission.header)
+            self.assertEqual(os.path.basename(paths["bin"]), "callgraph.overlay.bin")
+
+    def test_binary_and_c_manifests_agree(self):
+        manifest = self.emission.manifest
+        header = emit_mod.render_blob_header(manifest)
+        counts = struct.unpack_from("<HHHH", header, 20)
+        self.assertEqual(counts, (len(manifest.overlays), len(manifest.stubs),
+                                  len(manifest.redirects), len(manifest.patches)))
+        for macro, count in (("OVERLAY_COUNT", counts[0]), ("STUB_COUNT", counts[1]),
+                             ("REDIRECT_COUNT", counts[2]), ("PATCH_COUNT", counts[3])):
+            self.assertIn(f"#define CALLGRAPH_{macro} {count}", self.emission.header)
 
     def _symbols(self, obj):
         out = overlay_mod.run_tool(self.objdump_bin, ["-t", obj])

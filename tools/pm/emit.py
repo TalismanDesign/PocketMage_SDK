@@ -1,7 +1,9 @@
 
 from __future__ import annotations
 
+import os
 import re
+import struct
 from dataclasses import dataclass, field
 
 from tools.pm.overlay import Analysis, Clustering, Image, OverlayError
@@ -89,6 +91,13 @@ class Redirect:
     stub: int
 
 
+@dataclass(frozen=True)
+class PoolPatch:
+
+    overlay_id: int
+    blob_offset: int
+
+
 @dataclass
 class Manifest:
 
@@ -97,6 +106,7 @@ class Manifest:
     overlays: tuple[OverlayImage, ...] = ()
     slots: StubSlot = StubSlot(0, 0)
     redirects: tuple[Redirect, ...] = ()
+    patches: tuple[PoolPatch, ...] = ()
 
 
 @dataclass
@@ -113,6 +123,10 @@ class _StubResolver:
     def __init__(self, inner: AddressResolver, addresses: dict[int, int]):
         self._inner = inner
         self._addresses = addresses
+
+    @property
+    def deferred(self) -> bool:
+        return getattr(self._inner, "deferred", False)
 
     def function(self, canonical: int) -> int:
         stub = self._addresses.get(canonical)
@@ -282,6 +296,7 @@ def render_header(manifest: Manifest) -> str:
         f"#define {macro}_OVERLAY_COUNT {len(manifest.overlays)}",
         f"#define {macro}_STUB_COUNT {len(manifest.stubs)}",
         f"#define {macro}_REDIRECT_COUNT {len(manifest.redirects)}",
+        f"#define {macro}_PATCH_COUNT {len(manifest.patches)}",
         "",
     ]
     lines += _struct(f"{ident}_overlay_t", [
@@ -293,6 +308,9 @@ def render_header(manifest: Manifest) -> str:
     lines.append("")
     lines += _struct(f"{ident}_redirect_t", [
         ("uint32_t", "site"), ("uint32_t", "stub")])
+    lines.append("")
+    lines += _struct(f"{ident}_patch_t", [
+        ("uint16_t", "overlay"), ("uint16_t", "offset")])
     lines.append("")
 
     lines += _array(f"{ident}_overlay_t", f"{ident}_overlays",
@@ -307,6 +325,10 @@ def render_header(manifest: Manifest) -> str:
     lines += _array(f"{ident}_redirect_t", f"{ident}_redirects",
                     f"{macro}_REDIRECT_COUNT", [
                         (f"{r.site:#010x}", f"{r.stub:#010x}") for r in manifest.redirects])
+    lines += _array(f"{ident}_patch_t", f"{ident}_patches",
+                    f"{macro}_PATCH_COUNT", [
+                        (f"{p.overlay_id}", f"{p.blob_offset:#06x}")
+                        for p in manifest.patches])
 
     text = "\n".join(lines).rstrip() + "\n"
     return text
@@ -352,6 +374,8 @@ def emit(image: Image, analysis: Analysis, clustering: Clustering,
         overlays=tuple(build_overlays(blobs)),
         slots=StubSlot(enter=slot_base, leave=slot_base + 4),
         redirects=tuple(resolve_redirects(image, clustering, relocations, stubs)),
+        patches=tuple(PoolPatch(blob.overlay_id, offset)
+                      for blob in blobs for offset in blob.patches),
     )
     return Emission(
         manifest=manifest,
@@ -359,3 +383,55 @@ def emit(image: Image, analysis: Analysis, clustering: Clustering,
         stubs_asm=render_stubs(stubs),
         header=render_header(manifest),
     )
+
+
+BLOB_MAGIC = b"PMOV"
+BLOB_VERSION = 1
+BLOB_FLAG_APP_BASE = 0x1
+
+_BLOB_HEADER = struct.Struct("<4sHHIIIHHHH")
+_BLOB_OVERLAY = struct.Struct("<HHII")
+_BLOB_STUB = struct.Struct("<IHHI")
+_BLOB_REDIRECT = struct.Struct("<II")
+_BLOB_PATCH = struct.Struct("<HH")
+
+
+def render_blob_header(manifest: Manifest, app_base: int | None = None) -> bytes:
+    flags = 0 if app_base is None else BLOB_FLAG_APP_BASE
+    out = bytearray(_BLOB_HEADER.pack(
+        BLOB_MAGIC, BLOB_VERSION, flags, app_base or 0,
+        manifest.slots.enter, manifest.slots.leave,
+        len(manifest.overlays), len(manifest.stubs),
+        len(manifest.redirects), len(manifest.patches)))
+    for overlay in manifest.overlays:
+        out += _BLOB_OVERLAY.pack(overlay.overlay_id, 0,
+                                  overlay.offset, overlay.length)
+    for stub in manifest.stubs:
+        out += _BLOB_STUB.pack(stub.canonical, stub.overlay_id,
+                               stub.body_offset, stub.address)
+    for redirect in manifest.redirects:
+        out += _BLOB_REDIRECT.pack(redirect.site, redirect.stub)
+    for patch in manifest.patches:
+        out += _BLOB_PATCH.pack(patch.overlay_id, patch.blob_offset)
+    return bytes(out)
+
+
+def build_overlay_blob(emission: Emission, app_base: int | None = None) -> bytes:
+    return render_blob_header(emission.manifest, app_base=app_base) + emission.blob
+
+
+def write_emission(emission: Emission, out_dir: str,
+                   app_base: int | None = None) -> dict[str, str]:
+    ident = _app_ident(emission.manifest.app)
+    paths = {
+        "bin": os.path.join(out_dir, f"{ident}.overlay.bin"),
+        "stubs": os.path.join(out_dir, f"{ident}.overlay_stubs.S"),
+        "header": os.path.join(out_dir, f"{ident}.overlay_manifest.h"),
+    }
+    with open(paths["bin"], "wb") as handle:
+        handle.write(build_overlay_blob(emission, app_base=app_base))
+    with open(paths["stubs"], "w", encoding="utf-8") as handle:
+        handle.write(emission.stubs_asm)
+    with open(paths["header"], "w", encoding="utf-8") as handle:
+        handle.write(emission.header)
+    return paths

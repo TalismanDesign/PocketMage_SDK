@@ -7,9 +7,11 @@ import sys
 
 from tools import symbols as symbols_mod
 from tools.pm import app as app_mod
+from tools.pm import emit as emit_mod
 from tools.pm import gate as gate_mod
 from tools.pm import overlay as overlay_mod
 from tools.pm import release as release_mod
+from tools.pm import relink as relink_mod
 from tools.pm.app import PmError, sdk_version
 from tools.pm.output import UI
 from tools.pm.scaffold import scaffold
@@ -168,6 +170,52 @@ def cmd_overlay(ui: UI, args) -> int:
     if plan.max_call_depth > args.frame_count:
         ui.warning(f"pool depth {plan.max_call_depth} exceeds --frame-count "
                    f"{args.frame_count}; raise the pool to avoid evicting live frames")
+
+    if args.emit:
+        return _emit_overlays(ui, args, app_info, analysis, plan)
+    return 0
+
+
+def _emit_overlays(ui: UI, args, app_info, analysis, plan) -> int:
+    missing = [flag for flag, value in (("--stub-base", args.stub_base),
+                                        ("--slot-base", args.slot_base))
+               if value is None]
+    if missing:
+        ui.error(f"--emit requires {' and '.join(missing)}: the runtime address "
+                 "where the generated resident section will be linked")
+        return 1
+    if args.stub_base % 4 or args.slot_base % 4:
+        ui.error("--stub-base and --slot-base must be 4-byte aligned")
+        return 1
+    if args.host_elf is not None and not os.path.isfile(args.host_elf):
+        ui.error(f"--host-elf {args.host_elf} does not exist")
+        return 1
+
+    host_symbols = (relink_mod.read_host_symbols(args.host_elf, app_info.readelf)
+                    if args.host_elf else None)
+    resolver = relink_mod.Resolver(app_base=args.app_base, host_symbols=host_symbols)
+    relocations = relink_mod.read_relocations(app_info.tool, app_info.readelf)
+    with open(app_info.tool, "rb") as handle:
+        data = handle.read()
+    image = overlay_mod.Image(
+        sections=overlay_mod.parse_sections(
+            overlay_mod.run_tool(app_info.readelf, ["-S", "-W", app_info.tool])),
+        data=data)
+    try:
+        emission = emit_mod.emit(image, analysis, plan, relocations, resolver,
+                                 app=app_info.name, stub_base=args.stub_base,
+                                 slot_base=args.slot_base)
+    except overlay_mod.OverlayError as exc:
+        ui.error(str(exc))
+        return 1
+    out_dir = os.path.dirname(app_info.tool) or "."
+    paths = emit_mod.write_emission(emission, out_dir, app_base=args.app_base)
+    ui.section(f"emitted overlay artifacts for {app_info.name}")
+    for key in ("bin", "stubs", "header"):
+        ui.result(key, paths[key])
+    if resolver.deferred:
+        ui.info("no --app-base: addresses deferred to load time; the blob "
+                "carries canonical offsets plus a patch table for the loader")
     return 0
 
 
@@ -208,6 +256,10 @@ def cmd_release(ui: UI, args) -> int:
     ui.info("updated VERSION, pocketmage_globals.cpp, library.json, and CHANGELOG.md")
     ui.info("commit the bump and tag the release when ready")
     return 0
+
+
+def _auto_int(text: str) -> int:
+    return int(text, 0)
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -260,6 +312,31 @@ def _build_parser() -> argparse.ArgumentParser:
         "--frame-count", type=int, default=3,
         help="number of frames in the pool; used to warn when the call depth "
         "exceeds it",
+    )
+    p_overlay.add_argument(
+        "--emit", action="store_true",
+        help="write the overlay artifacts (.overlay.bin with embedded manifest, "
+        ".overlay_stubs.S, .overlay_manifest.h) to the build dir",
+    )
+    p_overlay.add_argument(
+        "--stub-base", type=_auto_int, default=None, metavar="ADDR",
+        help="runtime address of the generated .overlay.stubs section "
+        "(required with --emit; hex ok)",
+    )
+    p_overlay.add_argument(
+        "--slot-base", type=_auto_int, default=None, metavar="ADDR",
+        help="runtime address of the generated .overlay.slots section "
+        "(required with --emit; hex ok)",
+    )
+    p_overlay.add_argument(
+        "--app-base", type=_auto_int, default=None, metavar="ADDR",
+        help="runtime load base of the app image; omit to defer addressing to "
+        "the loader (blob carries canonical offsets plus a patch table)",
+    )
+    p_overlay.add_argument(
+        "--host-elf", default=None, metavar="ELF",
+        help="host firmware ELF; lets --emit resolve host calls to their "
+        "addresses",
     )
 
     p_exports = sub.add_parser("exports", help="diff symbols.list against the host export table")

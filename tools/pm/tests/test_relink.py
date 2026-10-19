@@ -8,7 +8,7 @@ import unittest
 from tools.pm import app as app_mod
 from tools.pm import overlay as overlay_mod
 from tools.pm import relink as relink_mod
-from tools.pm.overlay import Analysis, FunctionSymbol, Image, Section
+from tools.pm.overlay import Analysis, CallSite, FunctionSymbol, Image, Section
 
 _CALLGRAPH = os.path.join(os.path.dirname(__file__), "fixtures", "callgraph")
 
@@ -238,6 +238,100 @@ class CallGraphFixture(unittest.TestCase):
     @staticmethod
     def _high_byte(blob, at):
         return blob.data[at + 3]
+
+
+_HOST_SYMTAB = """\
+Symbol table '.symtab' contains 4 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND
+     1: 40001234    27 FUNC    GLOBAL DEFAULT    6 pm_text_width
+     2: 3f400100   128 OBJECT  GLOBAL DEFAULT   10 pm_display_buffer
+     3: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND printf
+"""
+
+
+class ParseHostSymbols(unittest.TestCase):
+
+    def test_defined_globals_carry_their_addresses(self):
+        symbols = relink_mod.parse_host_symbols(_HOST_SYMTAB)
+        self.assertEqual(symbols, {"pm_text_width": 0x40001234,
+                                   "pm_display_buffer": 0x3F400100})
+
+
+class AppBaseResolver(unittest.TestCase):
+
+    def test_resolved_mode_offsets_functions_and_data(self):
+        resolver = relink_mod.Resolver(app_base=0x42000000, host_symbols={})
+        self.assertFalse(resolver.deferred)
+        self.assertEqual(resolver.function(0x110), 0x42000110)
+        self.assertEqual(resolver.data(0x200), 0x42000200)
+
+    def test_deferred_mode_passes_canonical_offsets_through(self):
+        resolver = relink_mod.Resolver(app_base=None, host_symbols={})
+        self.assertTrue(resolver.deferred)
+        self.assertEqual(resolver.function(0x110), 0x110)
+        self.assertEqual(resolver.data(0x200), 0x200)
+
+    def test_host_symbols_resolve_from_the_table(self):
+        resolver = relink_mod.Resolver(app_base=None,
+                                       host_symbols={"pm_text_width": 0x40001234})
+        self.assertEqual(resolver.host("pm_text_width"), 0x40001234)
+
+    def test_unknown_host_symbol_is_rejected_with_its_name(self):
+        resolver = relink_mod.Resolver(app_base=None, host_symbols={})
+        with self.assertRaises(overlay_mod.OverlayError) as caught:
+            resolver.host("pm_mystery")
+        self.assertIn("pm_mystery", str(caught.exception))
+
+    def test_host_call_without_a_host_elf_is_rejected(self):
+        resolver = relink_mod.Resolver(app_base=0x42000000, host_symbols=None)
+        with self.assertRaises(overlay_mod.OverlayError) as caught:
+            resolver.host("pm_text_width")
+        self.assertIn("--host-elf", str(caught.exception))
+
+
+def _direct_call_image():
+    sections = [Section(6, ".text", 0x100, 0x100, 0x40)]
+    data = bytearray(0x200)
+    # caller at 0x100: call8 0x120 (delta 0x20 -> imm18 0x8), then retw.n
+    data[0x100:0x103] = (0x5 | (((0x120 - 0x100) >> 2) << 4)).to_bytes(3, "little")
+    data[0x103:0x105] = (0xF01D).to_bytes(2, "little")
+    data[0x120:0x122] = (0xF01D).to_bytes(2, "little")  # callee: retw.n
+    return Image(sections=sections, data=bytes(data))
+
+
+def _direct_call_analysis():
+    return Analysis(
+        functions=[FunctionSymbol("caller", 0x100, 5, ".text"),
+                   FunctionSymbol("callee", 0x120, 2, ".text")],
+        calls=[CallSite("caller", 0x100, "direct", target=0x120, symbol="callee")],
+    )
+
+
+class DirectCalls(unittest.TestCase):
+
+    def test_cross_overlay_direct_call_is_rejected(self):
+        analysis = _direct_call_analysis()
+        plans = [overlay_mod.OverlayPlan(0, (analysis.functions[0],), 5),
+                 overlay_mod.OverlayPlan(1, (analysis.functions[1],), 2)]
+        clustering = overlay_mod.Clustering(overlays=plans)
+        with self.assertRaises(overlay_mod.OverlayError) as caught:
+            relink_mod.build_blobs(_direct_call_image(), analysis, clustering,
+                                   [], FakeResolver())
+        message = str(caught.exception)
+        self.assertIn("caller", message)
+        self.assertIn("callee", message)
+
+    def test_same_overlay_direct_call_keeps_canonical_layout(self):
+        analysis = _direct_call_analysis()
+        plan = overlay_mod.OverlayPlan(0, tuple(analysis.functions), 7)
+        blob = relink_mod.build_blob(_direct_call_image(), analysis, plan,
+                                     [], FakeResolver())
+        # the callee keeps its canonical delta from the caller, so the
+        # PC-relative call8 displacement stays valid at any frame base
+        self.assertEqual(blob.placements[0].offset, 0)
+        self.assertEqual(blob.placements[1].offset, 0x20)
+        self.assertEqual(blob.data[0:3], bytes.fromhex("850000"))
 
 
 if __name__ == "__main__":
