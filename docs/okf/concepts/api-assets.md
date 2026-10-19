@@ -4,10 +4,10 @@ title: "Built-in asset bitmaps (libAssets.h)"
 description: "Compiled-in PROGMEM bitmaps for the status bar, screensavers, and battery gauge."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/assets/"
 path: /api/assets/
-updated: 2026-10-18
+updated: 2026-10-19
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-18T18:49:46.656Z"
+  generated_at: "2026-10-19T05:48:31.596Z"
 ---
 ---
 title: "Built-in asset bitmaps (libAssets.h)"

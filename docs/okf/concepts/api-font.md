@@ -4,10 +4,10 @@ title: "Fonts & Text (pocketmage_font)"
 description: "FontStyle roles, DisplayTarget, the FontEngine static API, and the default font table."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/font/"
 path: /api/font/
-updated: 2026-10-18
+updated: 2026-10-19
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-18T18:49:46.659Z"
+  generated_at: "2026-10-19T05:48:31.599Z"
 ---
 ---
 title: "Fonts & Text (pocketmage_font)"
