@@ -4,10 +4,10 @@ title: "UI helpers (pocketmage_ui)"
 description: "Screen scaffolding, scrollbars, list rows, inverted chips, and the OLED cycle picker."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/ui/"
 path: /api/ui/
-updated: 2026-10-19
+updated: 2026-10-21
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-19T05:48:31.603Z"
+  generated_at: "2026-10-21T04:53:22.452Z"
 ---
 ---
 title: "UI helpers (pocketmage_ui)"

@@ -4,10 +4,10 @@ title: "Symbols and the dependency contract"
 description: "The host-export surface apps resolve against, how third-party libraries link, and the rules for changing the surface."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/symbols/"
 path: /symbols/
-updated: 2026-10-19
+updated: 2026-10-21
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-19T05:48:31.607Z"
+  generated_at: "2026-10-21T04:53:22.459Z"
 ---
 ---
 title: "Symbols and the dependency contract"
