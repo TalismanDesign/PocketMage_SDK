@@ -4,7 +4,9 @@ from __future__ import annotations
 import os
 import re
 import struct
-from dataclasses import dataclass, field
+import subprocess
+import tempfile
+from dataclasses import dataclass
 
 from tools.pm.overlay import Analysis, Clustering, Image, OverlayError
 from tools.pm.relink import (
@@ -50,12 +52,25 @@ _KEY_MAX = 0xFFFF
 @dataclass(frozen=True)
 class StubLayout:
 
-    stub_base: int
-    slot_base: int
-    stride: int = STUB_STRIDE
+    count: int
 
-    def address(self, index: int) -> int:
-        return self.stub_base + index * self.stride
+    @property
+    def slots(self) -> "StubSlot":
+        return StubSlot(enter=0, leave=4)
+
+    @property
+    def keys_offset(self) -> int:
+        return 8
+
+    def key_offset(self, index: int) -> int:
+        return self.keys_offset + index * 4
+
+    def stub_offset(self, index: int) -> int:
+        return self.keys_offset + self.count * 4 + index * STUB_STRIDE
+
+    @property
+    def size(self) -> int:
+        return self.keys_offset + self.count * 4 + self.count * STUB_STRIDE
 
 
 @dataclass(frozen=True)
@@ -72,7 +87,7 @@ class FunctionStub:
     canonical: int
     overlay_id: int
     body_offset: int
-    address: int
+    offset: int  
     key: int
 
 
@@ -80,22 +95,30 @@ class FunctionStub:
 class OverlayImage:
 
     overlay_id: int
-    offset: int
+    offset: int  
     length: int
 
 
 @dataclass(frozen=True)
 class Redirect:
 
-    site: int
-    stub: int
+    site: int      
+    stub: int      
 
 
 @dataclass(frozen=True)
 class PoolPatch:
 
     overlay_id: int
-    blob_offset: int
+    blob_offset: int  
+
+
+@dataclass(frozen=True)
+class HostRef:
+
+    overlay_id: int
+    blob_offset: int  
+    name: str
 
 
 @dataclass
@@ -104,9 +127,12 @@ class Manifest:
     app: str
     stubs: tuple[FunctionStub, ...] = ()
     overlays: tuple[OverlayImage, ...] = ()
-    slots: StubSlot = StubSlot(0, 0)
+    slots: StubSlot = StubSlot(0, 4)
     redirects: tuple[Redirect, ...] = ()
     patches: tuple[PoolPatch, ...] = ()
+    stub_patches: tuple[PoolPatch, ...] = ()
+    host_refs: tuple[HostRef, ...] = ()
+    stub_block_size: int = 0
 
 
 @dataclass
@@ -120,23 +146,20 @@ class Emission:
 
 class _StubResolver:
 
-    def __init__(self, inner: AddressResolver, addresses: dict[int, int]):
-        self._inner = inner
+    def __init__(self, addresses: dict[int, int]):
         self._addresses = addresses
-
-    @property
-    def deferred(self) -> bool:
-        return getattr(self._inner, "deferred", False)
+        self.host_names: list[str] = []
 
     def function(self, canonical: int) -> int:
         stub = self._addresses.get(canonical)
-        return stub if stub is not None else self._inner.function(canonical)
+        return stub if stub is not None else canonical
 
     def data(self, address: int) -> int:
-        return self._inner.data(address)
+        return address
 
     def host(self, symbol: str) -> int:
-        return self._inner.host(symbol)
+        self.host_names.append(symbol)
+        return 0
 
 
 def pack_key(overlay_id: int, body_offset: int) -> int:
@@ -151,7 +174,7 @@ def pack_key(overlay_id: int, body_offset: int) -> int:
 
 def _stub_addresses(clustering: Clustering, layout: StubLayout) -> dict[int, int]:
     return {
-        func.address: layout.address(index)
+        func.address: layout.stub_offset(index)
         for index, func in enumerate(
             func for plan in clustering.overlays for func in plan.functions)
     }
@@ -167,33 +190,31 @@ def place_stubs(blobs: list[OverlayBlob], layout: StubLayout) -> list[FunctionSt
                 canonical=placement.address,
                 overlay_id=blob.overlay_id,
                 body_offset=placement.offset,
-                address=layout.address(index),
+                offset=layout.stub_offset(index),
                 key=pack_key(blob.overlay_id, placement.offset),
             ))
             index += 1
     return stubs
 
 
-def build_overlays(blobs: list[OverlayBlob]) -> list[OverlayImage]:
+def build_overlays(blobs: list[OverlayBlob], first_offset: int) -> list[OverlayImage]:
     overlays: list[OverlayImage] = []
-    offset = 0
+    offset = first_offset
     for blob in blobs:
+        length = align_up(len(blob.data), STUB_ALIGNMENT)
         overlays.append(OverlayImage(
-            overlay_id=blob.overlay_id, offset=offset, length=len(blob.data)))
-        offset = align_up(offset + len(blob.data), STUB_ALIGNMENT)
+            overlay_id=blob.overlay_id, offset=offset, length=length))
+        offset += length
     return overlays
 
 
 def concat_blobs(blobs: list[OverlayBlob]) -> bytes:
     chunks: list[bytes] = []
-    emitted = 0
-    for index, blob in enumerate(blobs):
+    for blob in blobs:
         chunks.append(blob.data)
-        emitted += len(blob.data)
-        if index + 1 < len(blobs):
-            pad = align_up(emitted, STUB_ALIGNMENT) - emitted
+        pad = align_up(len(blob.data), STUB_ALIGNMENT) - len(blob.data)
+        if pad:
             chunks.append(bytes(pad))
-            emitted += pad
     return b"".join(chunks)
 
 
@@ -208,7 +229,7 @@ def resolve_redirects(image: Image, clustering: Clustering,
                       relocations: list[Relocation],
                       stubs: list[FunctionStub]) -> list[Redirect]:
     paged = {func.section for plan in clustering.overlays for func in plan.functions}
-    stub_by_address = {stub.canonical: stub.address for stub in stubs}
+    stub_by_address = {stub.canonical: stub.offset for stub in stubs}
 
     redirects: dict[int, Redirect] = {}
     for reloc in relocations:
@@ -234,14 +255,12 @@ def render_stubs(stubs: list[FunctionStub]) -> str:
     lines = [
         "/* generated by tools/pm/emit.py -- do not edit */",
         "",
-        "    .section .overlay.slots, \"aw\", @progbits",
+        '    .section .overlay.stubblock, "awx", @progbits',
         "    .p2align 2",
-        f"    .globl {_ENTER_SLOT}",
         f"    .type {_ENTER_SLOT}, @object",
         f"    .size {_ENTER_SLOT}, 4",
         f"{_ENTER_SLOT}:",
         "    .word 0",
-        f"    .globl {_LEAVE_SLOT}",
         f"    .type {_LEAVE_SLOT}, @object",
         f"    .size {_LEAVE_SLOT}, 4",
         f"{_LEAVE_SLOT}:",
@@ -255,7 +274,6 @@ def render_stubs(stubs: list[FunctionStub]) -> str:
             f"    .word {stub.key:#010x}    /* {stub.name} */",
         ]
 
-    lines += ["", "    .section .overlay.stubs, \"ax\", @progbits", "    .p2align 2"]
     for index, stub in enumerate(stubs):
         name = f"ov_stub_{index}"
         lines += [
@@ -270,7 +288,42 @@ def render_stubs(stubs: list[FunctionStub]) -> str:
             for template, _ in _STUB_SEQUENCE
         ]
         lines.append(f"    .size {name}, . - {name}")
+    lines.append("    .p2align 2")
     return "\n".join(lines) + "\n"
+
+
+def _tool_sibling(readelf: str, name: str) -> str:
+    if readelf.endswith("readelf"):
+        return readelf[: -len("readelf")] + name
+    return name
+
+
+def assemble_stub_block(asm: str, readelf: str) -> bytes:
+    assembler = _tool_sibling(readelf, "as")
+    objcopy = _tool_sibling(readelf, "objcopy")
+    if not os.path.isfile(assembler) or not os.path.isfile(objcopy):
+        raise OverlayError(
+            f"no xtensa assembler/objcopy next to {readelf}; cannot build the "
+            "stub block")
+    with tempfile.TemporaryDirectory() as tmp:
+        src = os.path.join(tmp, "stubs.S")
+        obj = os.path.join(tmp, "stubs.o")
+        with open(src, "w", encoding="utf-8") as handle:
+            handle.write(asm)
+        result = subprocess.run([assembler, "-o", obj, src],
+                                capture_output=True, text=True)
+        if result.returncode != 0:
+            raise OverlayError(
+                f"assembling the generated stubs failed: {result.stderr.strip()}")
+        out = os.path.join(tmp, "stubs.bin")
+        result = subprocess.run(
+            [objcopy, "-O", "binary", "--only-section=.overlay.stubblock", obj, out],
+            capture_output=True, text=True)
+        if result.returncode != 0:
+            raise OverlayError(
+                f"extracting .overlay.stubblock failed: {result.stderr.strip()}")
+        with open(out, "rb") as handle:
+            return handle.read()
 
 
 def _struct(name: str, fields: list[tuple[str, str]]) -> list[str]:
@@ -280,23 +333,31 @@ def _struct(name: str, fields: list[tuple[str, str]]) -> list[str]:
     return lines
 
 
+def _c_escape(text: str) -> str:
+    return text.replace("\\", "\\\\").replace('"', '\\"')
+
+
 def render_header(manifest: Manifest) -> str:
     macro = _app_ident(manifest.app).upper()
     ident = _app_ident(manifest.app)
 
     lines = [
         "/* generated by tools/pm/emit.py -- do not edit */",
+        "/* all addresses are relative: the loader adds the stub-block base",
+        "   to stub offsets and the app load base to patch/redirect sites */",
         "#pragma once",
         "",
         "#include <stdint.h>",
         "",
-        f"#define {macro}_ENTER_SLOT 0x{manifest.slots.enter:08x}u",
-        f"#define {macro}_LEAVE_SLOT 0x{manifest.slots.leave:08x}u",
+        f"#define {macro}_ENTER_SLOT_OFF 0x{manifest.slots.enter:08x}u",
+        f"#define {macro}_LEAVE_SLOT_OFF 0x{manifest.slots.leave:08x}u",
         "",
         f"#define {macro}_OVERLAY_COUNT {len(manifest.overlays)}",
         f"#define {macro}_STUB_COUNT {len(manifest.stubs)}",
         f"#define {macro}_REDIRECT_COUNT {len(manifest.redirects)}",
         f"#define {macro}_PATCH_COUNT {len(manifest.patches)}",
+        f"#define {macro}_STUB_PATCH_COUNT {len(manifest.stub_patches)}",
+        f"#define {macro}_HOST_COUNT {len(manifest.host_refs)}",
         "",
     ]
     lines += _struct(f"{ident}_overlay_t", [
@@ -304,13 +365,17 @@ def render_header(manifest: Manifest) -> str:
     lines.append("")
     lines += _struct(f"{ident}_stub_t", [
         ("uint32_t", "entry"), ("uint16_t", "overlay"),
-        ("uint16_t", "body"), ("uint32_t", "stub")])
+        ("uint16_t", "body"), ("uint32_t", "stub_off")])
     lines.append("")
     lines += _struct(f"{ident}_redirect_t", [
-        ("uint32_t", "site"), ("uint32_t", "stub")])
+        ("uint32_t", "site"), ("uint32_t", "stub_off")])
     lines.append("")
     lines += _struct(f"{ident}_patch_t", [
         ("uint16_t", "overlay"), ("uint16_t", "offset")])
+    lines.append("")
+    lines += _struct(f"{ident}_host_t", [
+        ("uint16_t", "overlay"), ("uint16_t", "offset"),
+        ("uint32_t", "name_off")])
     lines.append("")
 
     lines += _array(f"{ident}_overlay_t", f"{ident}_overlays",
@@ -320,15 +385,39 @@ def render_header(manifest: Manifest) -> str:
     lines += _array(f"{ident}_stub_t", f"{ident}_stubs",
                     f"{macro}_STUB_COUNT", [
                         (f"{s.canonical:#010x}", f"{s.overlay_id}", f"{s.body_offset:#06x}",
-                         f"{s.address:#010x}") + (f"/* {s.name} */",)
+                         f"{s.offset:#010x}") + (f"/* {s.name} */",)
                         for s in manifest.stubs])
     lines += _array(f"{ident}_redirect_t", f"{ident}_redirects",
                     f"{macro}_REDIRECT_COUNT", [
-                        (f"{r.site:#010x}", f"{r.stub:#010x}") for r in manifest.redirects])
+                        (f"{r.site:#010x}", f"{r.stub:#010x}")
+                        for r in manifest.redirects])
     lines += _array(f"{ident}_patch_t", f"{ident}_patches",
                     f"{macro}_PATCH_COUNT", [
                         (f"{p.overlay_id}", f"{p.blob_offset:#06x}")
                         for p in manifest.patches])
+    lines += _array(f"{ident}_patch_t", f"{ident}_stub_patches",
+                    f"{macro}_STUB_PATCH_COUNT", [
+                        (f"{p.overlay_id}", f"{p.blob_offset:#06x}")
+                        for p in manifest.stub_patches])
+
+    names: dict[str, int] = {}
+    strtab = b""
+    for ref in manifest.host_refs:
+        if ref.name not in names:
+            names[ref.name] = len(strtab)
+            strtab += ref.name.encode() + b"\x00"
+    lines += _array(f"{ident}_host_t", f"{ident}_host_refs",
+                    f"{macro}_HOST_COUNT", [
+                        (f"{h.overlay_id}", f"{h.blob_offset:#06x}",
+                         f"{names[h.name]:#010x}") + (f"/* {h.name} */",)
+                        for h in manifest.host_refs])
+    if strtab:
+        c_text = "".join(f"{_c_escape(part)}\\0" for part in
+                         strtab.rstrip(b"\x00").decode().split("\x00"))
+        lines.append(f'static const char {ident}_strtab[] = "{c_text}";')
+    else:
+        lines.append(f"static const char {ident}_strtab[1] = {{ 0 }};")
+    lines.append("")
 
     text = "\n".join(lines).rstrip() + "\n"
     return text
@@ -351,32 +440,40 @@ def _array(ctype: str, name: str, count_macro: str,
 
 
 def emit(image: Image, analysis: Analysis, clustering: Clustering,
-         relocations: list[Relocation], resolver: AddressResolver,
-         *, app: str, stub_base: int, slot_base: int) -> Emission:
-    layout = StubLayout(stub_base=stub_base, slot_base=slot_base)
-    if stub_base % STUB_ALIGNMENT or slot_base % STUB_ALIGNMENT:
-        raise OverlayError("stub_base and slot_base must be 4-byte aligned")
-    if layout.stride < STUB_CODE_SIZE or layout.stride % STUB_ALIGNMENT:
-        raise OverlayError(
-            f"stub stride {layout.stride} cannot hold {STUB_CODE_SIZE} bytes")
+         relocations: list[Relocation], *, app: str) -> Emission:
+    layout = StubLayout(sum(len(plan.functions) for plan in clustering.overlays))
 
-    predicted = _stub_addresses(clustering, layout)
-    blobs = build_blobs(image, analysis, clustering, relocations,
-                        _StubResolver(resolver, predicted))
+    resolver = _StubResolver(_stub_addresses(clustering, layout))
+    blobs = build_blobs(image, analysis, clustering, relocations, resolver)
     stubs = place_stubs(blobs, layout)
-    for stub in stubs:
-        if predicted.get(stub.canonical) != stub.address:
+    for index, stub in enumerate(stubs):
+        expected = layout.stub_offset(index)
+        if stub.offset != expected:
             raise OverlayError(f"stub placement for {stub.name} is inconsistent")
+
+    addresses = set(resolver._addresses.values())
+    stub_patches: list[PoolPatch] = []
+    patches: list[PoolPatch] = []
+    for blob in blobs:
+        for offset in blob.patches:
+            word = int.from_bytes(blob.data[offset:offset + 4], "little")
+            entry = PoolPatch(blob.overlay_id, offset)
+            (stub_patches if word in addresses else patches).append(entry)
 
     manifest = Manifest(
         app=app,
         stubs=tuple(stubs),
-        overlays=tuple(build_overlays(blobs)),
-        slots=StubSlot(enter=slot_base, leave=slot_base + 4),
+        overlays=tuple(OverlayImage(b.overlay_id, 0, len(b.data))
+                       for b in blobs),
+        slots=layout.slots,
         redirects=tuple(resolve_redirects(image, clustering, relocations, stubs)),
-        patches=tuple(PoolPatch(blob.overlay_id, offset)
-                      for blob in blobs for offset in blob.patches),
+        patches=tuple(patches),
+        stub_patches=tuple(stub_patches),
+        host_refs=tuple(HostRef(blob.overlay_id, offset, name)
+                        for blob in blobs for offset, name in blob.host_refs),
+        stub_block_size=layout.size,
     )
+    manifest.overlays = tuple(build_overlays(blobs, _first_overlay_offset(manifest)))
     return Emission(
         manifest=manifest,
         blob=concat_blobs(blobs),
@@ -386,42 +483,71 @@ def emit(image: Image, analysis: Analysis, clustering: Clustering,
 
 
 BLOB_MAGIC = b"PMOV"
-BLOB_VERSION = 1
-BLOB_FLAG_APP_BASE = 0x1
+BLOB_VERSION = 2
 
-_BLOB_HEADER = struct.Struct("<4sHHIIIHHHH")
+_BLOB_HEADER = struct.Struct("<4sHH6H6I")
 _BLOB_OVERLAY = struct.Struct("<HHII")
 _BLOB_STUB = struct.Struct("<IHHI")
 _BLOB_REDIRECT = struct.Struct("<II")
 _BLOB_PATCH = struct.Struct("<HH")
+_BLOB_HOST = struct.Struct("<HHI")
 
 
-def render_blob_header(manifest: Manifest, app_base: int | None = None) -> bytes:
-    flags = 0 if app_base is None else BLOB_FLAG_APP_BASE
+def render_blob_header(manifest: Manifest) -> bytes:
+    names: dict[str, int] = {}
+    strtab = b""
+    for ref in manifest.host_refs:
+        if ref.name not in names:
+            names[ref.name] = len(strtab)
+            strtab += ref.name.encode() + b"\x00"
+
+    fixed = _BLOB_HEADER.size
+    strtab_off = (fixed + 12 * len(manifest.overlays) + 12 * len(manifest.stubs)
+                  + 8 * len(manifest.redirects) + 4 * len(manifest.patches)
+                  + 4 * len(manifest.stub_patches) + 8 * len(manifest.host_refs))
+    stub_block_off = align_up(strtab_off + len(strtab), STUB_ALIGNMENT)
+
     out = bytearray(_BLOB_HEADER.pack(
-        BLOB_MAGIC, BLOB_VERSION, flags, app_base or 0,
+        BLOB_MAGIC, BLOB_VERSION, 0,
+        len(manifest.overlays), len(manifest.stubs), len(manifest.redirects),
+        len(manifest.patches), len(manifest.stub_patches), len(manifest.host_refs),
+        stub_block_off, manifest.stub_block_size,
         manifest.slots.enter, manifest.slots.leave,
-        len(manifest.overlays), len(manifest.stubs),
-        len(manifest.redirects), len(manifest.patches)))
+        strtab_off, len(strtab)))
     for overlay in manifest.overlays:
         out += _BLOB_OVERLAY.pack(overlay.overlay_id, 0,
                                   overlay.offset, overlay.length)
     for stub in manifest.stubs:
         out += _BLOB_STUB.pack(stub.canonical, stub.overlay_id,
-                               stub.body_offset, stub.address)
+                               stub.body_offset, stub.offset)
     for redirect in manifest.redirects:
         out += _BLOB_REDIRECT.pack(redirect.site, redirect.stub)
     for patch in manifest.patches:
         out += _BLOB_PATCH.pack(patch.overlay_id, patch.blob_offset)
+    for patch in manifest.stub_patches:
+        out += _BLOB_PATCH.pack(patch.overlay_id, patch.blob_offset)
+    for ref in manifest.host_refs:
+        out += _BLOB_HOST.pack(ref.overlay_id, ref.blob_offset, names[ref.name])
+    out += strtab
+    out += bytes(stub_block_off - len(out))
     return bytes(out)
 
 
-def build_overlay_blob(emission: Emission, app_base: int | None = None) -> bytes:
-    return render_blob_header(emission.manifest, app_base=app_base) + emission.blob
+def _first_overlay_offset(manifest: Manifest) -> int:
+    return align_up(len(render_blob_header(manifest)) + manifest.stub_block_size,
+                    STUB_ALIGNMENT)
+
+
+def build_overlay_blob(emission: Emission, stub_block: bytes) -> bytes:
+    if len(stub_block) != emission.manifest.stub_block_size:
+        raise OverlayError(
+            f"stub block is {len(stub_block)} bytes but the manifest expects "
+            f"{emission.manifest.stub_block_size}")
+    return render_blob_header(emission.manifest) + stub_block + emission.blob
 
 
 def write_emission(emission: Emission, out_dir: str,
-                   app_base: int | None = None) -> dict[str, str]:
+                   stub_block: bytes) -> dict[str, str]:
     ident = _app_ident(emission.manifest.app)
     paths = {
         "bin": os.path.join(out_dir, f"{ident}.overlay.bin"),
@@ -429,7 +555,7 @@ def write_emission(emission: Emission, out_dir: str,
         "header": os.path.join(out_dir, f"{ident}.overlay_manifest.h"),
     }
     with open(paths["bin"], "wb") as handle:
-        handle.write(build_overlay_blob(emission, app_base=app_base))
+        handle.write(build_overlay_blob(emission, stub_block))
     with open(paths["stubs"], "w", encoding="utf-8") as handle:
         handle.write(emission.stubs_asm)
     with open(paths["header"], "w", encoding="utf-8") as handle:

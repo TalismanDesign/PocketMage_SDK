@@ -13,23 +13,6 @@ from tools.pm.overlay import Analysis, CallSite, FunctionSymbol, Image, Section
 _CALLGRAPH = os.path.join(os.path.dirname(__file__), "fixtures", "callgraph")
 
 
-class FakeResolver:
-
-    def __init__(self, function_base=0x3F000000, data_base=0x3E000000, hosts=None):
-        self.function_base = function_base
-        self.data_base = data_base
-        self.hosts = hosts or {}
-
-    def function(self, canonical):
-        return self.function_base + canonical
-
-    def data(self, address):
-        return self.data_base + address
-
-    def host(self, symbol):
-        return self.hosts[symbol]
-
-
 def _image():
     sections = [
         Section(6, ".text", 0x100, 0x100, 0x18),
@@ -118,7 +101,7 @@ class BuildBlob(unittest.TestCase):
     def setUp(self):
         self.image = _image()
         self.analysis = _analysis()
-        self.resolver = FakeResolver(hosts={"pm_text_width": 0x40001234})
+        self.resolver = relink_mod.DeferredResolver()
         self.blob = relink_mod.build_blob(
             self.image, self.analysis, _plan(self.analysis),
             _relocations(), self.resolver)
@@ -133,10 +116,12 @@ class BuildBlob(unittest.TestCase):
         at = self.blob.literal_offset + 4 * index
         return int.from_bytes(self.blob.data[at:at + 4], "little")
 
-    def test_pool_holds_resolved_values(self):
-        self.assertEqual(self._pool_word(0), 0x3F000100)  
-        self.assertEqual(self._pool_word(1), 0x40001234)  
+    def test_pool_holds_deferred_words(self):
+        self.assertEqual(self._pool_word(0), 0x100)       
+        self.assertEqual(self._pool_word(1), 0)           
         self.assertEqual(self._pool_word(2), 0x12345678)  
+        self.assertEqual(self.blob.host_refs, [(28, "pm_text_width")])
+        self.assertEqual(self.blob.patches, [24])
 
     def test_relative_slot_holding_non_function_is_data(self):
         data = bytearray(0x300)
@@ -153,7 +138,8 @@ class BuildBlob(unittest.TestCase):
             image, analysis, plan,
             [relink_mod.Relocation(0x200, relink_mod.R_RELATIVE)], self.resolver)
         at = blob.literal_offset
-        self.assertEqual(int.from_bytes(blob.data[at:at + 4], "little"), 0x3E0002A0)
+        self.assertEqual(int.from_bytes(blob.data[at:at + 4], "little"), 0x2A0)
+        self.assertEqual(blob.patches, [8])
 
     def test_every_l32r_in_the_blob_reads_the_pool(self):
         pool = range(self.blob.literal_offset,
@@ -206,7 +192,7 @@ class CallGraphFixture(unittest.TestCase):
         if not os.path.isfile(self.info.tool):
             self.skipTest("app.mk produced no .app.tool")
 
-    def test_every_overlay_relocates_cleanly_into_its_pool(self):
+    def test_every_overlay_blob_is_position_independent(self):
         readelf = self.info.readelf
         analysis = overlay_mod.analyze(self.info.tool, readelf)
         relocs = relink_mod.read_relocations(self.info.tool, readelf)
@@ -218,85 +204,32 @@ class CallGraphFixture(unittest.TestCase):
             data=data)
         blobs = relink_mod.build_blobs(
             image, analysis, overlay_mod.cluster(analysis, frame_size=120), relocs,
-            FakeResolver(hosts={"pm_text_width": 0x40001234}))
+            relink_mod.DeferredResolver())
         self.assertEqual(len(blobs), 3)
         self.assertTrue(all(blob.data for blob in blobs))
 
-        spaces = set()
+        host_refs = [ref for blob in blobs for ref in blob.host_refs]
+        self.assertEqual([name for _off, name in host_refs], ["pm_text_width"])
         for blob in blobs:
             pool = range(blob.literal_offset,
                          blob.literal_offset + 4 * blob.literal_count, 4)
             self.assertGreater(blob.literal_count, 0)
             for at in pool:
-                spaces.add(self._high_byte(blob, at))
+                word = int.from_bytes(blob.data[at:at + 4], "little")
+                self.assertTrue(word == 0 or word < 0x10000,
+                                f"pool word {word:#x} is not deferred")
             for placement in blob.placements:
                 code = blob.data[placement.offset:placement.offset + placement.size]
                 for site in relink_mod.l32r_sites(code, placement.offset):
                     self.assertIn(site.literal, pool)
-        self.assertLessEqual({0x3E, 0x3F, 0x40}, spaces)
-
-    @staticmethod
-    def _high_byte(blob, at):
-        return blob.data[at + 3]
-
-
-_HOST_SYMTAB = """\
-Symbol table '.symtab' contains 4 entries:
-   Num:    Value  Size Type    Bind   Vis      Ndx Name
-     0: 00000000     0 NOTYPE  LOCAL  DEFAULT  UND
-     1: 40001234    27 FUNC    GLOBAL DEFAULT    6 pm_text_width
-     2: 3f400100   128 OBJECT  GLOBAL DEFAULT   10 pm_display_buffer
-     3: 00000000     0 NOTYPE  GLOBAL DEFAULT  UND printf
-"""
-
-
-class ParseHostSymbols(unittest.TestCase):
-
-    def test_defined_globals_carry_their_addresses(self):
-        symbols = relink_mod.parse_host_symbols(_HOST_SYMTAB)
-        self.assertEqual(symbols, {"pm_text_width": 0x40001234,
-                                   "pm_display_buffer": 0x3F400100})
-
-
-class AppBaseResolver(unittest.TestCase):
-
-    def test_resolved_mode_offsets_functions_and_data(self):
-        resolver = relink_mod.Resolver(app_base=0x42000000, host_symbols={})
-        self.assertFalse(resolver.deferred)
-        self.assertEqual(resolver.function(0x110), 0x42000110)
-        self.assertEqual(resolver.data(0x200), 0x42000200)
-
-    def test_deferred_mode_passes_canonical_offsets_through(self):
-        resolver = relink_mod.Resolver(app_base=None, host_symbols={})
-        self.assertTrue(resolver.deferred)
-        self.assertEqual(resolver.function(0x110), 0x110)
-        self.assertEqual(resolver.data(0x200), 0x200)
-
-    def test_host_symbols_resolve_from_the_table(self):
-        resolver = relink_mod.Resolver(app_base=None,
-                                       host_symbols={"pm_text_width": 0x40001234})
-        self.assertEqual(resolver.host("pm_text_width"), 0x40001234)
-
-    def test_unknown_host_symbol_is_rejected_with_its_name(self):
-        resolver = relink_mod.Resolver(app_base=None, host_symbols={})
-        with self.assertRaises(overlay_mod.OverlayError) as caught:
-            resolver.host("pm_mystery")
-        self.assertIn("pm_mystery", str(caught.exception))
-
-    def test_host_call_without_a_host_elf_is_rejected(self):
-        resolver = relink_mod.Resolver(app_base=0x42000000, host_symbols=None)
-        with self.assertRaises(overlay_mod.OverlayError) as caught:
-            resolver.host("pm_text_width")
-        self.assertIn("--host-elf", str(caught.exception))
 
 
 def _direct_call_image():
     sections = [Section(6, ".text", 0x100, 0x100, 0x40)]
     data = bytearray(0x200)
-    # caller at 0x100: call8 0x120 (delta 0x20 -> imm18 0x8), then retw.n
     data[0x100:0x103] = (0x5 | (((0x120 - 0x100) >> 2) << 4)).to_bytes(3, "little")
     data[0x103:0x105] = (0xF01D).to_bytes(2, "little")
-    data[0x120:0x122] = (0xF01D).to_bytes(2, "little")  # callee: retw.n
+    data[0x120:0x122] = (0xF01D).to_bytes(2, "little")  
     return Image(sections=sections, data=bytes(data))
 
 
@@ -317,7 +250,7 @@ class DirectCalls(unittest.TestCase):
         clustering = overlay_mod.Clustering(overlays=plans)
         with self.assertRaises(overlay_mod.OverlayError) as caught:
             relink_mod.build_blobs(_direct_call_image(), analysis, clustering,
-                                   [], FakeResolver())
+                                   [], relink_mod.DeferredResolver())
         message = str(caught.exception)
         self.assertIn("caller", message)
         self.assertIn("callee", message)
@@ -326,9 +259,7 @@ class DirectCalls(unittest.TestCase):
         analysis = _direct_call_analysis()
         plan = overlay_mod.OverlayPlan(0, tuple(analysis.functions), 7)
         blob = relink_mod.build_blob(_direct_call_image(), analysis, plan,
-                                     [], FakeResolver())
-        # the callee keeps its canonical delta from the caller, so the
-        # PC-relative call8 displacement stays valid at any frame base
+                                     [], relink_mod.DeferredResolver())
         self.assertEqual(blob.placements[0].offset, 0)
         self.assertEqual(blob.placements[1].offset, 0x20)
         self.assertEqual(blob.data[0:3], bytes.fromhex("850000"))

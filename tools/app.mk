@@ -62,15 +62,6 @@ PM ?= pm
 APP_OVERLAY_BIN ?= $(APP_BUILD_DIR)/$(APP_NAME).overlay.bin
 APP_OVERLAY_STUBS ?= $(APP_BUILD_DIR)/$(APP_NAME).overlay_stubs.S
 APP_OVERLAY_MANIFEST ?= $(APP_BUILD_DIR)/$(APP_NAME).overlay_manifest.h
-# Runtime addresses the generated resident stub/slot sections will be linked
-# at. There is no safe default: set them for your target before `make overlay`.
-PM_OVERLAY_STUB_BASE ?=
-PM_OVERLAY_SLOT_BASE ?=
-# Runtime load base of the app image. Leave empty to defer addressing to the
-# loader; the blob then carries canonical offsets plus a patch table.
-PM_OVERLAY_APP_BASE ?=
-# Host firmware ELF; lets the emitter resolve host calls to their addresses.
-PM_OVERLAY_HOST_ELF ?=
 
 # compile / link
 
@@ -145,18 +136,8 @@ check: $(APP_OUT)
 	@echo "undefined symbols (resolved by host at load time):"
 	@$(XTENSA_READELF) -s -W $< | awk '$$5 ~ /GLOBAL/ && $$7 == "UND" {print $$8}' | sort -u
 
-# Overlay emission: plan the frames and write .overlay.bin (with the embedded
-# binary manifest), .overlay_stubs.S and .overlay_manifest.h next to the app.
-# Requires PM_OVERLAY_STUB_BASE and PM_OVERLAY_SLOT_BASE; see above.
 overlay: $(APP_TOOL)
-	@if [ -z "$(PM_OVERLAY_STUB_BASE)" ] || [ -z "$(PM_OVERLAY_SLOT_BASE)" ]; then \
-	  echo "error: set PM_OVERLAY_STUB_BASE and PM_OVERLAY_SLOT_BASE (see app.mk)" >&2; exit 1; \
-	fi
-	$(PM) overlay --emit \
-	  --stub-base $(PM_OVERLAY_STUB_BASE) --slot-base $(PM_OVERLAY_SLOT_BASE) \
-	  $(if $(PM_OVERLAY_APP_BASE),--app-base $(PM_OVERLAY_APP_BASE),) \
-	  $(if $(PM_OVERLAY_HOST_ELF),--host-elf $(PM_OVERLAY_HOST_ELF),) \
-	  $(CURDIR)
+	$(PM) overlay --emit $(CURDIR)
 
 pack: $(APP_OUT) $(APP_ICON)
 	@tar -cf $(APP_TAR) -C $(APP_BUILD_DIR) $(APP_NAME).app.elf

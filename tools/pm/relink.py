@@ -1,7 +1,6 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -51,6 +50,7 @@ class OverlayBlob:
     literal_offset: int = 0
     literal_count: int = 0
     patches: list[int] = field(default_factory=list)
+    host_refs: list[tuple[int, str]] = field(default_factory=list)
 
 
 class AddressResolver(Protocol):
@@ -65,59 +65,16 @@ class AddressResolver(Protocol):
         ...
 
 
-_HOST_SYM_RE = re.compile(
-    r"^\s*\d+:\s+([0-9a-fA-F]+)\s+\d+\s+(?:FUNC|OBJECT)\s+"
-    r"(?:GLOBAL|WEAK)\s+\S+\s+(?!UND\b)\S+\s+(\S+)\s*$"
-)
-
-
-def parse_host_symbols(stdout: str) -> dict[str, int]:
-    symbols: dict[str, int] = {}
-    for line in stdout.splitlines():
-        m = _HOST_SYM_RE.match(line)
-        if m:
-            value, name = m.groups()
-            symbols[name] = int(value, 16)
-    return symbols
-
-
-def read_host_symbols(host_elf: str, readelf: str) -> dict[str, int]:
-    return parse_host_symbols(run_tool(readelf, ["-s", "-W", host_elf]))
-
-
-class Resolver:
-    """AddressResolver built from explicit bases.
-
-    app_base=None selects deferred mode: app-relative words keep their
-    canonical offsets and build_blob records them in the blob's patch table,
-    so the loader rebases them once it knows the real load base.
-    host_symbols=None means no --host-elf was given; a host call in paged
-    code is then an error rather than a silently unresolved address.
-    """
-
-    def __init__(self, app_base: int | None = None,
-                 host_symbols: dict[str, int] | None = None):
-        self.app_base = app_base
-        self.host_symbols = host_symbols
-
-    @property
-    def deferred(self) -> bool:
-        return self.app_base is None
+class DeferredResolver:
 
     def function(self, canonical: int) -> int:
-        return canonical if self.app_base is None else self.app_base + canonical
+        return canonical
 
     def data(self, address: int) -> int:
-        return address if self.app_base is None else self.app_base + address
+        return address
 
     def host(self, symbol: str) -> int:
-        if self.host_symbols is None:
-            raise OverlayError(
-                f"{symbol} is a host call but no --host-elf was given to resolve it")
-        if symbol not in self.host_symbols:
-            raise OverlayError(
-                f"host export {symbol} is not in the --host-elf symbol table")
-        return self.host_symbols[symbol]
+        return 0
 
 
 def parse_relocations(stdout: str) -> list[Relocation]:
@@ -181,22 +138,6 @@ def align_up(value: int, alignment: int) -> int:
     return (value + alignment - 1) & ~(alignment - 1)
 
 
-def _resolve_word(slot: int, reloc: Relocation | None, word: int,
-                  by_address: dict[int, object], resolver: AddressResolver) -> int:
-    if reloc is None:
-        return word
-    if reloc.type == R_RELATIVE:
-        func = by_address.get(word)
-        return resolver.function(word) if func is not None else resolver.data(word)
-    if reloc.type == R_JMP_SLOT:
-        if reloc.symbol is None:
-            raise OverlayError(
-                f"literal slot {slot:#x} is a host call with no symbol")
-        return resolver.host(reloc.symbol)
-    raise OverlayError(
-        f"literal slot {slot:#x} has unsupported relocation {reloc.type}")
-
-
 def build_blob(image: Image, analysis: Analysis, plan: OverlayPlan,
                relocations: list[Relocation],
                resolver: AddressResolver) -> OverlayBlob:
@@ -207,8 +148,6 @@ def build_blob(image: Image, analysis: Analysis, plan: OverlayPlan,
     for reloc in relocations:
         reloc_by_offset.setdefault(reloc.offset, reloc)
 
-    # Bodies keep their canonical relative layout inside the blob so
-    # PC-relative direct calls within the overlay stay valid at any frame base.
     base = min(func.address for func in plan.functions)
     bodies: list[tuple[FunctionSymbol, BodyPlacement, bytearray]] = []
     code_end = 0
@@ -222,8 +161,8 @@ def build_blob(image: Image, analysis: Analysis, plan: OverlayPlan,
         bodies.append((func, placement, bytearray(raw)))
         code_end = max(code_end, placement.offset + func.size)
 
-    deferred = getattr(resolver, "deferred", False)
     patches: list[int] = []
+    host_refs: list[tuple[int, str]] = []
     literal_offset = align_up(code_end, _POOL_ALIGNMENT)
     pool: dict[int, int] = {}
     pool_bytes = bytearray()
@@ -235,12 +174,25 @@ def build_blob(image: Image, analysis: Analysis, plan: OverlayPlan,
                     raise OverlayError(
                         f"{func.name} reads unmapped literal {site.literal:#x}")
                 reloc = reloc_by_offset.get(site.literal)
-                resolved = _resolve_word(site.literal, reloc,
-                                         word, by_address, resolver)
-                pool[site.literal] = literal_offset + len(pool_bytes)
-                if (deferred and reloc is not None
-                        and reloc.type == R_RELATIVE and word not in by_address):
-                    patches.append(pool[site.literal])
+                pool_offset = literal_offset + len(pool_bytes)
+                pool[site.literal] = pool_offset
+                if reloc is None:
+                    resolved = word
+                elif reloc.type == R_RELATIVE:
+                    resolved = (resolver.function(word) if word in by_address
+                                else resolver.data(word))
+                    patches.append(pool_offset)
+                elif reloc.type == R_JMP_SLOT:
+                    if reloc.symbol is None:
+                        raise OverlayError(
+                            f"literal slot {site.literal:#x} is a host call "
+                            "with no symbol")
+                    resolved = resolver.host(reloc.symbol)
+                    host_refs.append((pool_offset, reloc.symbol))
+                else:
+                    raise OverlayError(
+                        f"literal slot {site.literal:#x} has unsupported "
+                        f"relocation {reloc.type}")
                 pool_bytes += resolved.to_bytes(4, "little")
             pc = placement.offset + site.offset
             code[site.offset:site.offset + _L32R_LENGTH] = encode_l32r(
@@ -258,6 +210,7 @@ def build_blob(image: Image, analysis: Analysis, plan: OverlayPlan,
         literal_offset=literal_offset,
         literal_count=len(pool),
         patches=patches,
+        host_refs=host_refs,
     )
 
 
