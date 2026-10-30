@@ -7,11 +7,8 @@ import sys
 
 from tools import symbols as symbols_mod
 from tools.pm import app as app_mod
-from tools.pm import emit as emit_mod
 from tools.pm import gate as gate_mod
-from tools.pm import overlay as overlay_mod
 from tools.pm import release as release_mod
-from tools.pm import relink as relink_mod
 from tools.pm.app import PmError, sdk_version
 from tools.pm.output import UI
 from tools.pm.scaffold import scaffold
@@ -124,84 +121,6 @@ def cmd_version(ui: UI, args) -> int:
     return 0
 
 
-def cmd_overlay(ui: UI, args) -> int:
-    app_info = app_mod.query_app(args.app_dir)
-    if not os.path.isfile(app_info.tool):
-        ui.error(f"{app_info.tool or 'the .app.tool artifact'} does not exist; "
-                 "run `pm build` first")
-        return 1
-    app_mod.require_toolchain(app_info.readelf)
-
-    try:
-        analysis = overlay_mod.analyze(app_info.tool, app_info.readelf)
-    except overlay_mod.OverlayError as exc:
-        ui.error(str(exc))
-        return 1
-
-    ui.section(f"{app_info.name}: {len(analysis.functions)} functions")
-    for func in analysis.functions:
-        ui.result(func.name, f"0x{func.address:x} ({func.size} bytes, {func.section})")
-
-    edges = analysis.edges()
-    if edges:
-        ui.section(f"{len(edges)} in-app calls")
-        for caller, callee in edges:
-            ui.result(caller, f"-> {callee}")
-
-    unresolved = [c for c in analysis.calls
-                  if c.via == "indirect" and c.target is None and c.symbol is None]
-    if unresolved:
-        ui.warning(f"{len(unresolved)} indirect call(s) with no recoverable target")
-
-    plan = overlay_mod.cluster(analysis, frame_size=args.frame_size)
-    ui.section(f"{len(plan.overlays)} overlay(s), frame {args.frame_size} B, "
-               f"depth {plan.max_call_depth} (pool needs >= {plan.max_call_depth})")
-    for overlay in plan.overlays:
-        names = ", ".join(f.name for f in overlay.functions)
-        ui.result(f"overlay {overlay.overlay_id}",
-                  f"{overlay.size} B: {names}")
-
-    if plan.oversized:
-        ui.error(f"{len(plan.oversized)} unit(s) larger than one frame cannot be paged:")
-        for unit in plan.oversized:
-            ui.result("too big", ", ".join(unit))
-        return 1
-
-    if plan.max_call_depth > args.frame_count:
-        ui.warning(f"pool depth {plan.max_call_depth} exceeds --frame-count "
-                   f"{args.frame_count}; raise the pool to avoid evicting live frames")
-
-    if args.emit:
-        return _emit_overlays(ui, app_info, analysis, plan)
-    return 0
-
-
-def _emit_overlays(ui: UI, app_info, analysis, plan) -> int:
-    relocations = relink_mod.read_relocations(app_info.tool, app_info.readelf)
-    with open(app_info.tool, "rb") as handle:
-        data = handle.read()
-    image = overlay_mod.Image(
-        sections=overlay_mod.parse_sections(
-            overlay_mod.run_tool(app_info.readelf, ["-S", "-W", app_info.tool])),
-        data=data)
-    try:
-        emission = emit_mod.emit(image, analysis, plan, relocations,
-                                 app=app_info.name)
-        stub_block = emit_mod.assemble_stub_block(emission.stubs_asm,
-                                                  app_info.readelf)
-    except overlay_mod.OverlayError as exc:
-        ui.error(str(exc))
-        return 1
-    out_dir = os.path.dirname(app_info.tool) or "."
-    paths = emit_mod.write_emission(emission, out_dir, stub_block)
-    ui.section(f"emitted overlay artifacts for {app_info.name}")
-    for key in ("bin", "stubs", "header"):
-        ui.result(key, paths[key])
-    ui.info("position-independent blob: the loader resolves host symbols and "
-            "patches app and stub addresses at load time")
-    return 0
-
-
 def cmd_exports(ui: UI, args) -> int:
     root = app_mod.sdk_root()
     sdk_symbols = os.path.join(root, "symbols.list")
@@ -283,27 +202,6 @@ def _build_parser() -> argparse.ArgumentParser:
     p_pack = sub.add_parser("pack", help="build the delivery tar via make pack")
     p_pack.add_argument("app_dir", nargs="?", default=".", help="app directory (default: cwd)")
 
-    p_overlay = sub.add_parser(
-        "overlay", help="plan the app's overlays (function set, call graph, frames)"
-    )
-    p_overlay.add_argument("app_dir", nargs="?", default=".", help="app directory (default: cwd)")
-    p_overlay.add_argument(
-        "--frame-size", type=int, default=overlay_mod.DEFAULT_FRAME_SIZE,
-        help=f"overlay frame size in bytes (default: {overlay_mod.DEFAULT_FRAME_SIZE})",
-    )
-    p_overlay.add_argument(
-        "--frame-count", type=int, default=3,
-        help="number of frames in the pool; used to warn when the call depth "
-        "exceeds it",
-    )
-    p_overlay.add_argument(
-        "--emit", action="store_true",
-        help="write the overlay artifacts (.overlay.bin with the embedded "
-        "manifest and position-independent stub block, .overlay_stubs.S, "
-        ".overlay_manifest.h) to the build dir; no addresses needed, the "
-        "loader patches everything at load time",
-    )
-
     p_exports = sub.add_parser("exports", help="diff symbols.list against the host export table")
     p_exports.add_argument(
         "--host", default=None,
@@ -340,8 +238,6 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_check(ui, args)
         if args.command == "pack":
             return cmd_pack(ui, args)
-        if args.command == "overlay":
-            return cmd_overlay(ui, args)
         if args.command == "exports":
             return cmd_exports(ui, args)
         if args.command == "release":

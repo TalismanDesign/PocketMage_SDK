@@ -57,11 +57,13 @@ XTENSA_CXX ?= $(if $(ESP_TOOLCHAIN_BIN),$(ESP_TOOLCHAIN_BIN)/xtensa-esp32s3-elf-
 XTENSA_STRIP   ?= $(XTENSA_CXX:-g++=-strip)
 XTENSA_READELF ?= $(XTENSA_CXX:-g++=-readelf)
 
-# overlay emission (pm overlay --emit)
-PM ?= pm
-APP_OVERLAY_BIN ?= $(APP_BUILD_DIR)/$(APP_NAME).overlay.bin
-APP_OVERLAY_STUBS ?= $(APP_BUILD_DIR)/$(APP_NAME).overlay_stubs.S
-APP_OVERLAY_MANIFEST ?= $(APP_BUILD_DIR)/$(APP_NAME).overlay_manifest.h
+# overlay emission (elf_overlay_relink + elf_overlay_emit)
+# Produces a single .elfo blob containing stub block + overlay bodies.
+# No separate .S stub assembly or .h manifest needed anymore.
+ELF_OVERLAY_RELINK ?= elf_overlay_relink
+ELF_OVERLAY_EMIT ?= elf_overlay_emit
+APP_OVERLAY_BIN ?= $(APP_BUILD_DIR)/$(APP_NAME).elfo
+APP_OVERLAY_RELK ?= $(APP_BUILD_DIR)/$(APP_NAME).relk
 
 # compile / link
 
@@ -111,8 +113,7 @@ pm-info:
 	@echo "SDK_ROOT=$(SDK_ROOT)"
 	@echo "XTENSA_READELF=$(XTENSA_READELF)"
 	@echo "APP_OVERLAY_BIN=$(APP_OVERLAY_BIN)"
-	@echo "APP_OVERLAY_STUBS=$(APP_OVERLAY_STUBS)"
-	@echo "APP_OVERLAY_MANIFEST=$(APP_OVERLAY_MANIFEST)"
+	@echo "APP_OVERLAY_RELK=$(APP_OVERLAY_RELK)"
 
 $(APP_TOOL): $(APP_SRCS) | $(APP_BUILD_DIR)
 	$(XTENSA_CXX) $(APP_CPPFLAGS) $(APP_CXXFLAGS) $(APP_SRCS) $(APP_LDFLAGS) -o $@
@@ -137,7 +138,8 @@ check: $(APP_OUT)
 	@$(XTENSA_READELF) -s -W $< | awk '$$5 ~ /GLOBAL/ && $$7 == "UND" {print $$8}' | sort -u
 
 overlay: $(APP_TOOL)
-	$(PM) overlay --emit $(CURDIR)
+	$(ELF_OVERLAY_RELINK) $(APP_TOOL) $(APP_OVERLAY_RELK)
+	$(ELF_OVERLAY_EMIT) $(APP_OVERLAY_RELK) $(APP_OVERLAY_BIN)
 
 pack: $(APP_OUT) $(APP_ICON)
 	@tar -cf $(APP_TAR) -C $(APP_BUILD_DIR) $(APP_NAME).app.elf
