@@ -103,6 +103,10 @@ def _parse_info(output: str) -> dict[str, str]:
 def _make_env() -> dict[str, str]:
     env = dict(os.environ)
     env["PM_SDK_ROOT"] = sdk_root()
+    sdk_root_path = sdk_root()
+    elf_overlay_bin = os.path.join(sdk_root_path, "..", "elf_overlay", "build")
+    if os.path.isdir(elf_overlay_bin):
+        env["PATH"] = elf_overlay_bin + os.pathsep + env.get("PATH", "")
     return env
 
 
