@@ -4,10 +4,10 @@ title: "Touch (pocketmage_touch)"
 description: "The MPR121 capacitive slider: scroll offsets, line scrolling, and gesture vectors."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/"
 path: /api/touch/
-updated: 2026-10-21
+updated: 2026-10-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-21T04:53:22.452Z"
+  generated_at: "2026-10-30T04:38:44.605Z"
 ---
 ---
 title: "Touch (pocketmage_touch)"

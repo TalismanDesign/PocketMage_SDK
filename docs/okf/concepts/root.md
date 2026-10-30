@@ -4,10 +4,10 @@ title: "PocketMage SDK Documentation"
 description: "Official SDK for building PocketMage apps: guides, the full component API reference, the ELF app contract, and publishing."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/"
 path: /
-updated: 2026-10-21
+updated: 2026-10-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-21T04:53:22.457Z"
+  generated_at: "2026-10-30T04:38:44.609Z"
 ---
 ---
 title: "PocketMage SDK Documentation"

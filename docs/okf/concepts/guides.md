@@ -4,10 +4,10 @@ title: "PocketMage SDK guides"
 description: "How to build apps, understand their lifecycle, and draw to both displays."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/guides/"
 path: /guides/
-updated: 2026-10-21
+updated: 2026-10-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-21T04:53:22.455Z"
+  generated_at: "2026-10-30T04:38:44.607Z"
 ---
 ---
 title: "PocketMage SDK guides"
