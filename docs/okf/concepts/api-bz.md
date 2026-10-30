@@ -7,7 +7,7 @@ path: /api/bz/
 updated: 2026-10-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-30T04:38:44.599Z"
+  generated_at: "2026-10-30T06:52:57.266Z"
 ---
 ---
 title: "Buzzer (pocketmage_bz)"

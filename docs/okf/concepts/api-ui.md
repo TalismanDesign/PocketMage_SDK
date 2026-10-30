@@ -7,7 +7,7 @@ path: /api/ui/
 updated: 2026-10-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-30T04:38:44.605Z"
+  generated_at: "2026-10-30T06:52:57.274Z"
 ---
 ---
 title: "UI helpers (pocketmage_ui)"

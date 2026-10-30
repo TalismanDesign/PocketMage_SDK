@@ -7,7 +7,7 @@ path: /api/sys/
 updated: 2026-10-30
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-30T04:38:44.604Z"
+  generated_at: "2026-10-30T06:52:57.273Z"
 ---
 ---
 title: "System (pocketmage_sys, pocketmage_globals)"
