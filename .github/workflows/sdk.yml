@@ -93,6 +93,12 @@ jobs:
         env:
           PM_SDK_ROOT: ${{ github.workspace }}
 
+      - name: Generate i18n tables
+        run: |
+          set -euo pipefail
+          python3 pocketmage_i18n/tools/gen_i18n.py --force \
+            --catalog pocketmage_i18n/languages --out-dir pocketmage_i18n
+
       - name: Golden artifact, generator and host-table tests
         run: |
           set -euo pipefail
