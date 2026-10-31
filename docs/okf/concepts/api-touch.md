@@ -7,7 +7,7 @@ path: /api/touch/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T05:39:42.002Z"
+  generated_at: "2026-10-31T06:05:39.586Z"
 ---
 ---
 title: "Touch (pocketmage_touch)"
