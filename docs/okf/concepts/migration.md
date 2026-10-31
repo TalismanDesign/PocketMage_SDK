@@ -4,10 +4,10 @@ title: "Migrating an existing app"
 description: "Moving a pre-ELF app to the runtime-load flow: what changed, the eight steps, and the traps that bite."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/migration/"
 path: /migration/
-updated: 2026-10-30
+updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-30T06:52:57.278Z"
+  generated_at: "2026-10-31T05:13:24.177Z"
 ---
 ---
 title: "Migrating an existing app"
