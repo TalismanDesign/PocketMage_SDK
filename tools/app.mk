@@ -27,7 +27,7 @@ APP_BUILD_DIR ?= build
 APP_OUT     := $(APP_BUILD_DIR)/$(APP_NAME).app.elf
 APP_TOOL    ?= $(APP_BUILD_DIR)/$(APP_NAME).app.tool
 APP_MAP     ?= $(APP_BUILD_DIR)/$(APP_NAME).map
-APP_ICON    ?= $(CURDIR)/$(APP_NAME)_ICON.bin
+APP_ICON    ?= $(APP_NAME)_ICON.bin
 APP_TAR     := $(APP_BUILD_DIR)/$(APP_NAME).tar
 
 SDK_ROOT    ?= $(error SDK_ROOT must be set)
@@ -146,7 +146,6 @@ overlay: $(APP_OVERLAY_ELFO)
 pack: $(APP_OUT) $(APP_OVERLAY_ELFO) $(APP_ICON)
 	@tar -cf $(APP_TAR) -C $(APP_BUILD_DIR) $(APP_NAME).app.elf
 	@tar -uf $(APP_TAR) -C $(APP_BUILD_DIR) $(APP_NAME).elfo
-	@tar -uf $(APP_TAR) -C $(CURDIR) $(APP_NAME)_ICON.bin
 	@tar -uf $(APP_TAR) -C $(CURDIR) $(APP_NAME)_ICON.bin
 	@if [ -f $(CURDIR)/app.properties ]; then \
 	  tar -uf $(APP_TAR) -C $(CURDIR) app.properties; \

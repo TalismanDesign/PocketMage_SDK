@@ -21,6 +21,12 @@ jobs:
           repository: TalismanDesign/PocketMage_App
           path: app-template
 
+      - name: Checkout the elf_overlay host tools
+        uses: actions/checkout@v4
+        with:
+          repository: TalismanDesign/elf_overlay
+          path: elf_overlay
+
       - name: Prepare the Python Cauldron
         uses: actions/setup-python@v5
         with:
@@ -28,6 +34,14 @@ jobs:
 
       - name: Install icon tooling
         run: pip install --quiet Pillow
+
+      - name: Build the elf_overlay host tools
+        working-directory: elf_overlay
+        run: |
+          set -euo pipefail
+          cmake -S . -B build
+          cmake --build build --target elf_overlay_relink elf_overlay_emit
+          echo "$PWD/build" >> "$GITHUB_PATH"
 
       - name: Install Xtensa Toolchain
         run: |
