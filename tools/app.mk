@@ -131,7 +131,7 @@ $(APP_BUILD_DIR):
 
 # Inspect the artifact: entry point and the host dependency list. Informational
 # only; `pm check` enforces, validated against the export surface (see
-# docs/docs/symbols.md).
+# Docs/docs/symbols.md).
 check: $(APP_OUT)
 	@echo "entry: $$($(XTENSA_READELF) -h $< | awk '/Entry point/ {print $$4}')"
 	@echo "undefined symbols (resolved by host at load time):"

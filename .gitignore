@@ -9,3 +9,4 @@ build/
 __pycache__/
 pocketmage_i18n/pocketmage_i18n_gen.h
 pocketmage_i18n/pocketmage_i18n_gen.cpp
+_docmd-search/

@@ -18,7 +18,7 @@ jobs:
           node-version: "20.19.0"
 
       - name: Build Docs
-        working-directory: docs
+        working-directory: Docs
         run: |
           set -euo pipefail
           npm ci
@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p gh-pages-root/docs
-          cp -r docs/site/* gh-pages-root/docs/
+          cp -r Docs/site/* gh-pages-root/docs/
 
       - name: Deploy all assets to gh-pages
         uses: peaceiris/actions-gh-pages@v3

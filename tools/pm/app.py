@@ -167,5 +167,5 @@ def require_toolchain(readelf: str) -> None:
         return
     raise PmError(
         "no xtensa toolchain on PATH. Install the espressif xtensa-esp-elf release "
-        "(see docs/docs/build.md) so app.mk's probe resolves it."
+        "(see Docs/docs/build.md) so app.mk's probe resolves it."
     )
