@@ -10,7 +10,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.9.7">
+    <meta name="generator" content="docmd v0.9.8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <script>
@@ -102,11 +102,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../../assets/favicon.ico?v=mvw00s0r">
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mvw00s0r">
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.png?v=mvwzpk2z">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mvwzpk2z">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mvw00s0r" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mvw00s0r" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mvwzpk2z" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mvwzpk2z" id="hljs-dark" disabled>
     
     
 <meta name="description" content="FontStyle roles, DisplayTarget, the FontEngine static API, and the default font table.">
@@ -119,17 +119,19 @@
 <meta name="twitter:title" content="Fonts &amp; Text (pocketmage_font) - PocketMage SDK">
 <meta name="twitter:description" content="FontStyle roles, DisplayTarget, the FontEngine static API, and the default font table.">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"API Reference"},{"@type":"ListItem","position":3,"name":"Fonts & text","item":"https://talismandesign.github.io/PocketMage_SDK/docs/api/font/"}]}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"API Reference","item":"https://talismandesign.github.io/PocketMage_SDK/docs/api/"},{"@type":"ListItem","position":3,"name":"Fonts & text","item":"https://talismandesign.github.io/PocketMage_SDK/docs/api/font/"}]}
 </script>
 
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mvw00s0r" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mvwzpk2z" >
 
+    
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mvwzpk2z">
     
     
   </head>
@@ -222,10 +224,11 @@
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
+        <a href="../../get-started/" class=" nav-group"
+          >
            
-<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-book"
+<svg class="lucide-icon icon-rocket " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-rocket"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -236,13 +239,16 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
+  <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
+  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05" />
 </svg>
 
           
           <span class="nav-item-title">
-            Guides
-          </span>
+            Get Started
+            </span>
           
             <span class="collapse-icon-wrapper">
 <svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -261,7 +267,8 @@
 </svg>
 </span>
           
-        </span>
+          
+        </a>
         
 
         
@@ -269,7 +276,76 @@
             
       <li class="" >
       
-        <a href="../../guides/" class=" "
+        <a href="../../get-started/toolchain/" class=" "
+          >
+           
+<svg class="lucide-icon icon-settings " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Install the toolchain
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../get-started/first-app/" class=" "
+          >
+           
+<svg class="lucide-icon icon-play " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-play"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Your first app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <a href="../../guides/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -289,16 +365,33 @@
 
           
           <span class="nav-item-title">
-            Guide index
+            Guides
             </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
           
           
         </a>
         
 
         
-      </li>
-    
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../../guides/making-apps/" class=" "
@@ -398,71 +491,85 @@
         
       </li>
     
+      <li class="" >
+      
+        <a href="../../guides/i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Internationalization
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../guides/publishing/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
           </ul>
         
       </li>
     
       <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
       
-        <span class="nav-label nav-group">
-           
-<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-boxes"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
-  <path d="m7 16.5-4.74-2.85" />
-  <path d="m7 16.5 5-3" />
-  <path d="M7 16.5v5.17" />
-  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
-  <path d="m17 16.5-5-3" />
-  <path d="m17 16.5 4.74-2.85" />
-  <path d="M17 16.5v5.17" />
-  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
-  <path d="M12 8 7.26 5.15" />
-  <path d="m12 8 4.74-2.85" />
-  <path d="M12 13.5V8" />
-</svg>
-
-          
-          <span class="nav-item-title">
-            API Reference
-          </span>
-          
-            <span class="collapse-icon-wrapper">
-<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-chevron-right"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m9 18 6-6-6-6" />
-</svg>
-</span>
-          
-        </span>
-        
-
-        
-          <ul class="submenu">
-            
-      <li class="" >
-      
-        <a href="../../api/" class=" "
+        <a href="../../api/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -493,7 +600,61 @@
 
           
           <span class="nav-item-title">
-            API overview
+            API Reference
+            </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../api/functions/" class=" "
+          >
+           
+<svg class="lucide-icon icon-list " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-list"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 5h.01" />
+  <path d="M3 12h.01" />
+  <path d="M3 19h.01" />
+  <path d="M8 5h13" />
+  <path d="M8 12h13" />
+  <path d="M8 19h13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Function index
             </span>
           
           
@@ -1115,6 +1276,56 @@
         
       </li>
     
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-file-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-file-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 12.5 8 15l2 2.5" />
+  <path d="m14 12.5 2 2.5-2 2.5" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Binary Contract
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../../app-abi/" class=" "
@@ -1149,11 +1360,11 @@
     
       <li class="" >
       
-        <a href="../../build/" class=" "
+        <a href="../../overlay/" class=" "
           >
            
-<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-code"
+<svg class="lucide-icon icon-layers " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layers"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1164,13 +1375,14 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m16 18 6-6-6-6" />
-  <path d="m8 6-6 6 6 6" />
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
 </svg>
 
           
           <span class="nav-item-title">
-            Building Apps
+            Overlay format (.elfo)
             </span>
           
           
@@ -1204,7 +1416,7 @@
 
           
           <span class="nav-item-title">
-            Symbols
+            Symbol surface
             </span>
           
           
@@ -1214,13 +1426,16 @@
         
       </li>
     
-      <li class="" >
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <a href="../../publish/" class=" "
-          >
+        <span class="nav-label nav-group">
            
-<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-package"
+<svg class="lucide-icon icon-wrench " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wrench"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1231,15 +1446,61 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
-  <path d="M12 22V12" />
-  <polyline points="3.29 7 12 12 20.71 7" />
-  <path d="m7.5 4.27 9 5.15" />
+  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" />
 </svg>
 
           
           <span class="nav-item-title">
-            Publishing
+            Tooling
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../../build/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building apps
             </span>
           
           
@@ -1251,7 +1512,7 @@
     
       <li class="" >
       
-        <a href="../../i18n/" class=" "
+        <a href="../../cli/" class=" "
           >
            
 <svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1272,7 +1533,7 @@
 
           
           <span class="nav-item-title">
-            i18n catalogs
+            pm CLI
             </span>
           
           
@@ -1284,7 +1545,85 @@
     
       <li class="" >
       
-        <a href="../../migration/" class=" "
+        <a href="../../i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n catalogs
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../troubleshooting/" class=" "
+          >
+           
+<svg class="lucide-icon icon-life-buoy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-life-buoy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="m4.93 4.93 4.24 4.24" />
+  <path d="m14.83 9.17 4.24-4.24" />
+  <path d="m14.83 14.83 4.24 4.24" />
+  <path d="m9.17 14.83-4.24 4.24" />
+  <circle cx="12" cy="12" r="4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../glossary/" class=" "
           >
            
 <svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1301,6 +1640,40 @@
 >
   <path d="M12 5v16" />
   <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../migration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-git-branch " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-git-branch"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 6a9 9 0 0 0-9 9V3" />
+  <circle cx="18" cy="6" r="3" />
+  <circle cx="6" cy="18" r="3" />
 </svg>
 
           
@@ -1549,7 +1922,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Fonts%20%26%20Text%20(pocketmage_font)%22%0Adescription%3A%20%22FontStyle%20roles%2C%20DisplayTarget%2C%20the%20FontEngine%20static%20API%2C%20and%20the%20default%20font%20table.%22%0A---%0A%0A%23%20Font%20API%0A%0A%60FontEngine%60%20is%20the%20single%20text%20path%20for%20both%20displays.%20Apps%20pick%20a%20logical%20%60FontStyle%60%20(a%20role%2C%20not%20a%20font%20file)%20and%20a%20%60DisplayTarget%60%20(OLED%20or%20E-Ink)%3B%20the%20engine%20resolves%20the%20concrete%20u8g2%20font%2C%20measures%20widths%2C%20caches%20metrics%2C%20and%20sets%20draw%20colors%20per%20target.%0A%0A%23%23%20Access%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%60%60%60%0A%0A%60FontEngine%60%20is%20a%20static-only%20class%3B%20there%20is%20no%20instance.%20The%20default%20table%20is%20%60kDefaultFontTable%60.%20%60FontEngine%3A%3Ainit()%60%20runs%20inside%20%60PocketMage_INIT()%60%20and%20must%20precede%20any%20draw%20or%20measure%20call.%0A%0A%23%23%20Roles%20and%20targets%0A%0A%60%60%60cpp%0Aenum%20class%20FontStyle%20%3A%20uint8_t%20%7B%0A%20%20Tiny%2C%20Body%2C%20BodyBold%2C%20BodyItalic%2C%20BodyBoldItalic%2C%20Medium%2C%20Small%2C%0A%20%20BodyNarrow%2C%20Mono%2C%20MonoBold%2C%20MonoItalic%2C%20MonoBoldItalic%2C%0A%20%20Sans%2C%20SansBold%2C%20SansItalic%2C%20SansBoldItalic%2C%0A%20%20Caption%2C%20Heading3%2C%20Heading2%2C%20Heading1%2C%20Large%2C%20OledWord%2C%0A%20%20Terminal%2C%20TerminalBig%2C%20ClockDigit%2C%0A%20%20_StyleCount%20%20%20%2F%2F%20sentinel%2C%20must%20be%20last%0A%7D%3B%0A%0Aenum%20class%20DisplayTarget%20%3A%20uint8_t%20%7B%0A%20%20OLED%2C%20%20%20%2F%2F%20u8g2%20SSD1326%0A%20%20EINK%2C%20%20%20%2F%2F%20u8g2f%20bridge%20on%20the%20GxEPD2%20buffer%0A%7D%3B%0A%60%60%60%0A%0AEach%20role%20maps%20to%20a%20differ%20fonte%20per%20target.%20The%20comment%20on%20each%20member%20in%20the%20header%20names%20the%20concrete%20font%20(for%20example%20%60Body%60%20is%20%60ncenR10_tf%60%2C%20%60Heading1%60%20is%20%60ncenB24_tf%60).%20%60Tiny%60%20is%20%60u8g2_font_5x7_tf%60%2C%20the%20size%20used%20for%20the%20OLED%20status%20line.%0A%0A%23%23%20Structs%0A%0A%23%23%23%20%60FontEntry%60%0A%0A%60%60%60cpp%0Astruct%20FontEntry%20%7B%0A%20%20const%20uint8_t*%20oled%3B%20%20%20%2F%2F%20u8g2%20font%20for%20the%20OLED%0A%20%20const%20uint8_t*%20eink%3B%20%20%20%2F%2F%20u8g2%20font%20for%20the%20E-Ink%0A%20%20uint8_t%20%20%20%20%20%20%20%20height%3B%20%2F%2F%20full%20cell%20height%20in%20pixels%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%20%60FontTable%60%0A%0AA%20complete%20per-language%2Fregion%20table%3A%20one%20%60FontEntry%60%20per%20role%20plus%20the%20TXT%20markdown-editor%20matrix%20%60txt%5B3%5D%5B4%5D%5B4%5D%60%20indexed%20by%20family%20x%20size%20x%20variant.%20Applied%20with%20%60FontEngine%3A%3Ainit(%26table)%60%3B%20%60nullptr%60%20re-applies%20the%20built-in%20default.%0A%0AThe%20TXT%20matrix%20indices%20are%20named%20constants%3A%0A%0A%60%60%60cpp%0Aenum%20%3A%20uint8_t%20%7B%0A%20%20TxtFamilySerif%20%3D%200%2C%20TxtFamilySans%20%3D%201%2C%20TxtFamilyMono%20%3D%202%2C%0A%20%20TxtSizeBody%20%20%20%20%3D%200%2C%20TxtSizeH3%20%20%20%20%3D%201%2C%20TxtSizeH2%20%3D%202%2C%20TxtSizeH1%20%3D%203%2C%0A%20%20TxtVariantN%20%20%20%20%3D%200%2C%20TxtVariantB%20%20%3D%201%2C%20TxtVariantI%20%3D%202%2C%20TxtVariantBI%20%3D%203%2C%0A%7D%3B%0A%60%60%60%0A%0AHeading%20regular%20variants%20alias%20to%20their%20bold%20font%3B%20headings%20are%20always%20bold.%20%60kDefaultFontTable%60%20is%20the%20English%2Fglobal%20table.%0A%0A%23%23%20%60FontEngine%60%20reference%0A%0A%60%60%60cpp%0Aclass%20FontEngine%20%7B%0Apublic%3A%0A%20%20static%20void%20init(const%20FontTable*%20table%20%3D%20nullptr)%3B%0A%0A%20%20static%20void%20drawText(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20char*%20text%2C%20FontStyle%20style)%3B%0A%20%20static%20void%20drawText(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20String%26%20text%2C%20FontStyle%20style)%3B%0A%20%20static%20void%20drawGlyph(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint16_t%20unicode%2C%20FontStyle%20style)%3B%0A%0A%20%20static%20int%20textWidth(DisplayTarget%20target%2C%20const%20char*%20text%2C%20FontStyle%20style)%3B%0A%20%20static%20int%20textWidth(DisplayTarget%20target%2C%20const%20String%26%20text%2C%20FontStyle%20style)%3B%0A%20%20static%20FontStyle%20fitStyle(DisplayTarget%20target%2C%20const%20char*%20text%2C%20int%20maxWidth%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20FontStyle*%20cascade%2C%20int%20count)%3B%0A%20%20static%20int%20charWidth(DisplayTarget%20target%2C%20uint16_t%20unicode%2C%20FontStyle%20style)%3B%0A%20%20static%20int%20fontHeight(DisplayTarget%20target%2C%20FontStyle%20style)%3B%0A%20%20static%20int%20fontAscent(DisplayTarget%20target%2C%20FontStyle%20style)%3B%0A%20%20static%20int%20fontDescent(DisplayTarget%20target%2C%20FontStyle%20style)%3B%0A%20%20static%20void%20setTextColor(DisplayTarget%20target%2C%20uint16_t%20color)%3B%0A%0A%20%20static%20void%20drawTextTxt(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%20const%20char*%20text%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%20%20static%20void%20drawGlyphTxt(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%20uint16_t%20unicode%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%20%20static%20int%20textWidthTxt(DisplayTarget%20target%2C%20const%20char*%20text%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%20%20static%20int%20charWidthTxt(DisplayTarget%20target%2C%20uint16_t%20unicode%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%20%20static%20int%20fontHeightTxt(uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%20Drawing%0A%0A-%20%60drawText%60%20%2F%20%60drawGlyph%60%20render%20UTF-8%20text%20or%20a%20single%20codepoint%20at%20%60(x%2C%20y)%60%3B%20%60y%60%20is%20the%20baseline%2C%20not%20the%20top%20(U8g2%20convention).%0A-%20Out-of-range%20%60family%60%2F%60sizeIdx%60%2F%60variant%60%20in%20the%20%60Txt%60%20variants%20clamp%20to%20the%20body%20entry%20rather%20than%20fault.%0A%0A%23%23%23%20Measuring%0A%0A-%20%60textWidth%60%20measures%20without%20changing%20the%20currently%20applied%20font%2C%20so%20layout%20code%20can%20interleave%20measure%2Fdraw%20freely.%0A-%20%60charWidth%60%20uses%20a%20per-style%20cache%20for%20codepoints%2032%20through%20255%20on%20the%20OLED%20target%3B%20other%20codepoints%20and%20the%20E-Ink%20target%20are%20measured%20live.%0A-%20%60fontHeight%60%20%2F%20%60fontAscent%60%20%2F%20%60fontDescent%60%20are%20measured%20lazily%20on%20first%20per%20(target%2C%20style)%20call%20and%20cached%3B%20layout%20code%20never%20switches%20fonts%20merely%20to%20measure.%0A%0A%23%23%23%20%60fitStyle%60%0A%0AThe%20width-aware%20selection%20used%20by%20the%20HOME%2FAPPLOADER%20grid%20to%20keep%20localized%20app%20names%20inside%20the%2060px%20cell%20pitch%3A%20picks%20the%20largest%20cascade%20entry%20(ordered%20largest%20first)%20whose%20%60textWidth%60%20fits%20%60maxWidth%60%2C%20or%20the%20smallest%20when%20none%20fit.%20Typical%20cascade%3A%20%60kLabelCascade%60%20(%60Body%60%2C%20%60BodyNarrow%60%2C%20%60Small%60).%0A%0A%23%23%23%20%60setTextColor%60%0A%0AValue%20semantics%20match%20u8g2%20draw%20color%3A%200%20%3D%20black%2C%201%20%3D%20white.%20Only%20the%20requested%20target&#039;s%20color%20is%20touched%2C%20so%20an%20E-Ink%20status-bar%20draw%20never%20changes%20the%20OLED%20draw%20color%20and%20vice%20versa.%20Set%20the%20E-Ink%20color%20before%20the%20first%20draw%20of%20a%20screen%3B%20the%20bridge%20defaults%20are%20black-on-white%20from%20%60setupEink()%60.%0A%0A%23%23%20Example%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0Avoid%20drawTitle()%20%7B%0A%20%20FontEngine%3A%3AsetTextColor(DisplayTarget%3A%3AEINK%2C%20GxEPD_BLACK)%3B%0A%20%20FontEngine%3A%3AdrawText(DisplayTarget%3A%3AEINK%2C%208%2C%2060%2C%20%22PocketMage%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20FontStyle%3A%3AHeading1)%3B%0A%0A%20%20int%20w%20%3D%20FontEngine%3A%3AtextWidth(DisplayTarget%3A%3AOLED%2C%20%22Files%22%2C%20FontStyle%3A%3ABody)%3B%0A%20%20%2F%2F%20center%20on%20the%20OLED%0A%20%20FontEngine%3A%3AdrawText(DisplayTarget%3A%3AOLED%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(kOledWidth%20-%20w)%20%2F%202%2C%20kOledWordBaseline%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22Files%22%2C%20FontStyle%3A%3ABody)%3B%0A%7D%0A%60%60%60%0A%0ARemember%20%60y%60%20is%20the%20baseline.%20%60kOledWordBaseline%60%20(16)%20and%20the%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Fonts%20%26%20Text%20(pocketmage_font)%22%0Adescription%3A%20%22FontStyle%20roles%2C%20DisplayTarget%2C%20the%20FontEngine%20static%20API%2C%20and%20the%20default%20font%20table.%22%0A---%0A%0A%23%20Font%20API%0A%0A%60FontEngine%60%20is%20the%20single%20text%20path%20for%20both%20displays.%20Apps%20pick%20a%20logical%20%60FontStyle%60%20(a%20role%2C%20not%20a%20font%20file)%20and%20a%20%60DisplayTarget%60%20(OLED%20or%20E-Ink)%3B%20the%20engine%20resolves%20the%20concrete%20u8g2%20font%2C%20measures%20widths%2C%20caches%20metrics%2C%20and%20sets%20draw%20colors%20per%20target.%0A%0A%23%23%20Access%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%60%60%60%0A%0A%60FontEngine%60%20is%20a%20static-only%20class%3B%20there%20is%20no%20instance.%20The%20default%20table%20is%20%60kDefaultFontTable%60.%20%60FontEngine%3A%3Ainit()%60%20runs%20inside%20%60PocketMage_INIT()%60%20and%20must%20precede%20any%20draw%20or%20measure%20call.%0A%0A%23%23%20Roles%20and%20targets%0A%0A%60%60%60cpp%0Aenum%20class%20FontStyle%20%3A%20uint8_t%20%7B%0A%20%20Tiny%2C%20Body%2C%20BodyBold%2C%20BodyItalic%2C%20BodyBoldItalic%2C%20Medium%2C%20Small%2C%0A%20%20BodyNarrow%2C%20Mono%2C%20MonoBold%2C%20MonoItalic%2C%20MonoBoldItalic%2C%0A%20%20Sans%2C%20SansBold%2C%20SansItalic%2C%20SansBoldItalic%2C%0A%20%20Caption%2C%20Heading3%2C%20Heading2%2C%20Heading1%2C%20Large%2C%20OledWord%2C%0A%20%20Terminal%2C%20TerminalBig%2C%20ClockDigit%2C%0A%20%20_StyleCount%20%20%20%2F%2F%20sentinel%2C%20must%20be%20last%0A%7D%3B%0A%0Aenum%20class%20DisplayTarget%20%3A%20uint8_t%20%7B%0A%20%20OLED%2C%20%20%20%2F%2F%20u8g2%20SSD1326%0A%20%20EINK%2C%20%20%20%2F%2F%20u8g2f%20bridge%20on%20the%20GxEPD2%20buffer%0A%7D%3B%0A%60%60%60%0A%0AEach%20role%20maps%20to%20a%20differ%20fonte%20per%20target.%20The%20comment%20on%20each%20member%20in%20the%20header%20names%20the%20concrete%20font%20(for%20example%20%60Body%60%20is%20%60ncenR10_tf%60%2C%20%60Heading1%60%20is%20%60ncenB24_tf%60).%20%60Tiny%60%20is%20%60u8g2_font_5x7_tf%60%2C%20the%20size%20used%20for%20the%20OLED%20status%20line.%0A%0A%23%23%20Structs%0A%0A%23%23%23%20%60FontEntry%60%0A%0A%60%60%60cpp%0Astruct%20FontEntry%20%7B%0A%20%20const%20uint8_t*%20oled%3B%20%20%20%2F%2F%20u8g2%20font%20for%20the%20OLED%0A%20%20const%20uint8_t*%20eink%3B%20%20%20%2F%2F%20u8g2%20font%20for%20the%20E-Ink%0A%20%20uint8_t%20%20%20%20%20%20%20%20height%3B%20%2F%2F%20full%20cell%20height%20in%20pixels%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%20%60FontTable%60%0A%0AA%20complete%20per-language%2Fregion%20table%3A%20one%20%60FontEntry%60%20per%20role%20plus%20the%20TXT%20markdown-editor%20matrix%20%60txt%5B3%5D%5B4%5D%5B4%5D%60%20indexed%20by%20family%20x%20size%20x%20variant.%20Applied%20with%20%60FontEngine%3A%3Ainit(%26table)%60%3B%20%60nullptr%60%20re-applies%20the%20built-in%20default.%0A%0AThe%20TXT%20matrix%20indices%20are%20named%20constants%3A%0A%0A%60%60%60cpp%0Aenum%20%3A%20uint8_t%20%7B%0A%20%20TxtFamilySerif%20%3D%200%2C%20TxtFamilySans%20%3D%201%2C%20TxtFamilyMono%20%3D%202%2C%0A%20%20TxtSizeBody%20%20%20%20%3D%200%2C%20TxtSizeH3%20%20%20%20%3D%201%2C%20TxtSizeH2%20%3D%202%2C%20TxtSizeH1%20%3D%203%2C%0A%20%20TxtVariantN%20%20%20%20%3D%200%2C%20TxtVariantB%20%20%3D%201%2C%20TxtVariantI%20%3D%202%2C%20TxtVariantBI%20%3D%203%2C%0A%7D%3B%0A%60%60%60%0A%0AHeading%20regular%20variants%20alias%20to%20their%20bold%20font%3B%20headings%20are%20always%20bold.%20%60kDefaultFontTable%60%20is%20the%20English%2Fglobal%20table.%0A%0A%23%23%20%60FontEngine%60%20reference%0A%0A%60%60%60cpp%0Aclass%20FontEngine%20%7B%0Apublic%3A%0A%20%20static%20void%20init(const%20FontTable*%20table%20%3D%20nullptr)%3B%0A%0A%20%20static%20void%20drawText(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20char*%20text%2C%20FontStyle%20style)%3B%0A%20%20static%20void%20drawText(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20String%26%20text%2C%20FontStyle%20style)%3B%0A%20%20static%20void%20drawGlyph(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint16_t%20unicode%2C%20FontStyle%20style)%3B%0A%0A%20%20static%20int%20textWidth(DisplayTarget%20target%2C%20const%20char*%20text%2C%20FontStyle%20style)%3B%0A%20%20static%20int%20textWidth(DisplayTarget%20target%2C%20const%20String%26%20text%2C%20FontStyle%20style)%3B%0A%20%20static%20FontStyle%20fitStyle(DisplayTarget%20target%2C%20const%20char*%20text%2C%20int%20maxWidth%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20const%20FontStyle*%20cascade%2C%20int%20count)%3B%0A%20%20static%20int%20charWidth(DisplayTarget%20target%2C%20uint16_t%20unicode%2C%20FontStyle%20style)%3B%0A%20%20static%20int%20fontHeight(DisplayTarget%20target%2C%20FontStyle%20style)%3B%0A%20%20static%20int%20fontAscent(DisplayTarget%20target%2C%20FontStyle%20style)%3B%0A%20%20static%20int%20fontDescent(DisplayTarget%20target%2C%20FontStyle%20style)%3B%0A%20%20static%20void%20setTextColor(DisplayTarget%20target%2C%20uint16_t%20color)%3B%0A%0A%20%20static%20void%20drawTextTxt(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%20const%20char*%20text%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%20%20static%20void%20drawGlyphTxt(DisplayTarget%20target%2C%20int%20x%2C%20int%20y%2C%20uint16_t%20unicode%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%20%20static%20int%20textWidthTxt(DisplayTarget%20target%2C%20const%20char*%20text%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%20%20static%20int%20charWidthTxt(DisplayTarget%20target%2C%20uint16_t%20unicode%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%20%20static%20int%20fontHeightTxt(uint8_t%20family%2C%20uint8_t%20sizeIdx%2C%20uint8_t%20variant)%3B%0A%7D%3B%0A%60%60%60%0A%0A%23%23%23%20Drawing%0A%0A-%20%60drawText%60%20%2F%20%60drawGlyph%60%20render%20UTF-8%20text%20or%20a%20single%20codepoint%20at%20%60(x%2C%20y)%60%3B%20%60y%60%20is%20the%20baseline%2C%20not%20the%20top%20(U8g2%20convention).%0A-%20Out-of-range%20%60family%60%2F%60sizeIdx%60%2F%60variant%60%20in%20the%20%60Txt%60%20variants%20clamp%20to%20the%20body%20entry%20rather%20than%20fault.%0A%0A%23%23%23%20Measuring%0A%0A-%20%60textWidth%60%20measures%20without%20changing%20the%20currently%20applied%20font%2C%20so%20layout%20code%20can%20interleave%20measure%2Fdraw%20freely.%0A-%20%60charWidth%60%20uses%20a%20per-style%20cache%20for%20codepoints%2032%20through%20255%20on%20the%20OLED%20target%3B%20other%20codepoints%20and%20the%20E-Ink%20target%20are%20measured%20live.%0A-%20%60fontHeight%60%20%2F%20%60fontAscent%60%20%2F%20%60fontDescent%60%20are%20measured%20lazily%20on%20first%20per%20(target%2C%20style)%20call%20and%20cached%3B%20layout%20code%20never%20switches%20fonts%20merely%20to%20measure.%0A%0A%23%23%23%20%60fitStyle%60%0A%0AThe%20width-aware%20selection%20used%20by%20the%20HOME%2FAPPLOADER%20grid%20to%20keep%20localized%20app%20names%20inside%20the%2060px%20cell%20pitch%3A%20picks%20the%20largest%20cascade%20entry%20(ordered%20largest%20first)%20whose%20%60textWidth%60%20fits%20%60maxWidth%60%2C%20or%20the%20smallest%20when%20none%20fit.%20Typical%20cascade%3A%20%60kLabelCascade%60%20(%60Body%60%2C%20%60BodyNarrow%60%2C%20%60Small%60).%0A%0A%23%23%23%20%60setTextColor%60%0A%0AValue%20semantics%20match%20u8g2%20draw%20color%3A%200%20%3D%20black%2C%201%20%3D%20white.%20Only%20the%20requested%20target&#039;s%20color%20is%20touched%2C%20so%20an%20E-Ink%20status-bar%20draw%20never%20changes%20the%20OLED%20draw%20color%20and%20vice%20versa.%20Set%20the%20E-Ink%20color%20before%20the%20first%20draw%20of%20a%20screen%3B%20the%20bridge%20defaults%20are%20black-on-white%20from%20%60setupEink()%60.%0A%0A%23%23%20Example%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0Avoid%20drawTitle()%20%7B%0A%20%20FontEngine%3A%3AsetTextColor(DisplayTarget%3A%3AEINK%2C%20GxEPD_BLACK)%3B%0A%20%20FontEngine%3A%3AdrawText(DisplayTarget%3A%3AEINK%2C%208%2C%2060%2C%20%22PocketMage%22%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20FontStyle%3A%3AHeading1)%3B%0A%0A%20%20int%20w%20%3D%20FontEngine%3A%3AtextWidth(DisplayTarget%3A%3AOLED%2C%20%22Files%22%2C%20FontStyle%3A%3ABody)%3B%0A%20%20%2F%2F%20center%20on%20the%20OLED%0A%20%20FontEngine%3A%3AdrawText(DisplayTarget%3A%3AOLED%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20(kOledWidth%20-%20w)%20%2F%202%2C%20kOledWordBaseline%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%22Files%22%2C%20FontStyle%3A%3ABody)%3B%0A%7D%0A%60%60%60%0A%0ARemember%20%60y%60%20is%20the%20baseline%2C%20not%20the%20top%20of%20the%20glyph.%20The%20layout%20constants%20give%20the%20standard%20baselines%3A%20%60kOledWordBaseline%60%20(16)%20for%20the%20%60oledWord%60%2F%60sysMessage%60%20cascade%2C%20%60kOledWordLargeBaseline%60%20(21)%20for%20the%20%60allowLarge%60%20(%60Heading2%60)%20variant%2C%20and%20%60kOledEditBaseline%60%20(20)%20for%20the%20%60oledLine%60%20input%20row.%20They%20are%20defined%20in%20%60pocketmage_layout.h%60%3B%20see%20%5Blayout%5D(layout.md).%0A%0A%23%23%20C%20ABI%20(%60pm_*%60)%0A%0AExternal%20ELF%20apps%20call%20these%20C%20wrappers%20rather%20than%20the%20C%2B%2B%20class%20above%3B%20they%20are%20generated%20from%20it%20by%20%60gen_app_api.py%60%20and%20declared%20in%20%60pm_sdk_app.h%60%20(pulled%20in%20via%20%60pm_app_api.h%60).%20See%20the%20%5Bfunction%20index%5D(functions.md)%20and%20the%20%5Bprojection%20model%5D(index.md%23api-reference-the-c-abi-pm)%20for%20the%20general%20rules.%0A%0A%60%60%60c%0Aint%20pm_font_engine_char_width(int%20a0%2C%20uint16_t%20a1%2C%20int%20a2)%3B%0Aint%20pm_font_engine_font_ascent(int%20a0%2C%20int%20a1)%3B%0Aint%20pm_font_engine_font_descent(int%20a0%2C%20int%20a1)%3B%0Aint%20pm_font_engine_font_height_txt(uint8_t%20a0%2C%20uint8_t%20a1%2C%20uint8_t%20a2)%3B%0Aint%20pm_text_width(int%20a0%2C%20const%20char*%20a1%2C%20int%20a2)%3B%0Aint%20pm_font_height(int%20a0%2C%20int%20a1)%3B%0Avoid%20pm_text_color(int%20a0%2C%20uint16_t%20a1)%3B%0A%60%60%60%0A%0AThese%20project%20the%20static%20%60FontEngine%60%20methods.%20In%20every%20signature%20%60a0%60%20(the%20first%20%60int%60)%20is%20a%20%60pm_target%60%20value%20as%20int%20(%60PM_TARGET_OLED%60%20or%20%60PM_TARGET_EINK%60)%20except%20for%20%60pm_font_engine_font_height_txt%60%2C%20which%20takes%20no%20target.%20A%20trailing%20%60int%60%20carrying%20a%20style%20is%20a%20%60pm_style%60%20value%20as%20int.%0A%0A-%20%60pm_font_engine_char_width(a0%2C%20a1%2C%20a2)%60%20is%20%60charWidth(target%2C%20unicode%2C%20style)%60%3B%20%60a1%60%20is%20the%20codepoint%2C%20%60a2%60%20is%20a%20%60pm_style%60.%20Returns%20the%20advance%20width%20in%20pixels.%0A-%20%60pm_font_engine_font_ascent(a0%2C%20a1)%60%20is%20%60fontAscent(target%2C%20style)%60%3B%20%60a1%60%20is%20a%20%60pm_style%60.%0A-%20%60pm_font_engine_font_descent(a0%2C%20a1)%60%20is%20%60fontDescent(target%2C%20style)%60%3B%20%60a1%60%20is%20a%20%60pm_style%60.%0A-%20%60pm_font_engine_font_height_txt(a0%2C%20a1%2C%20a2)%60%20is%20%60fontHeightTxt(family%2C%20sizeIdx%2C%20variant)%60%20with%20the%20TXT%20matrix%20indices%3B%20no%20target%20argument.%0A-%20%60pm_text_width(a0%2C%20a1%2C%20a2)%60%20is%20%60textWidth(target%2C%20text%2C%20style)%60%3B%20%60a1%60%20is%20the%20UTF-8%20text%2C%20%60a2%60%20is%20a%20%60pm_style%60.%20Returns%20the%20measured%20pixel%20width.%0A-%20%60pm_font_height(a0%2C%20a1)%60%20is%20%60fontHeight(target%2C%20style)%60%3B%20%60a1%60%20is%20a%20%60pm_style%60.%0A-%20%60pm_text_color(a0%2C%20a1)%60%20is%20%60setTextColor(target%2C%20color)%60%3B%20%60a1%60%20is%20the%2016-bit%20color%20(0%20%3D%20black%2C%201%20%3D%20white)%2C%20touching%20only%20the%20given%20target.%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1557,7 +1930,7 @@
                         
                           <li class="breadcrumb-item " >
                             
-                              <span>API Reference</span>
+                              <a href="../../api/">API Reference</a>
                             
                             
                               <span class="breadcrumb-separator">
@@ -1747,7 +2120,27 @@
                        <span class="hljs-string">&quot;Files&quot;</span>, FontStyle<span class="hljs-operator">::</span>Body);
 }
 </code></pre>
-<p>Remember <code>y</code> is the baseline. <code>kOledWordBaseline</code> (16) and the</p>
+<p>Remember <code>y</code> is the baseline, not the top of the glyph. The layout constants give the standard baselines: <code>kOledWordBaseline</code> (16) for the <code>oledWord</code>/<code>sysMessage</code> cascade, <code>kOledWordLargeBaseline</code> (21) for the <code>allowLarge</code> (<code>Heading2</code>) variant, and <code>kOledEditBaseline</code> (20) for the <code>oledLine</code> input row. They are defined in <code>pocketmage_layout.h</code>; see <a href="../layout/">layout</a>.</p>
+<h2 id="font-api-c-abi-pm" class="docmd-heading"><a href="#font-api-c-abi-pm" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>C ABI (<code>pm_*</code>)</h2>
+<p>External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by <code>gen_app_api.py</code> and declared in <code>pm_sdk_app.h</code> (pulled in via <code>pm_app_api.h</code>). See the <a href="../functions/">function index</a> and the <a href="#api-reference-the-c-abi-pm">projection model</a> for the general rules.</p>
+<pre class="hljs"><code class="language-c"><span class="hljs-keyword">int</span> <span class="hljs-title function_">pm_font_engine_char_width</span>(<span class="hljs-keyword">int</span> a0, uint16_t a1, <span class="hljs-keyword">int</span> a2);
+<span class="hljs-keyword">int</span> <span class="hljs-title function_">pm_font_engine_font_ascent</span>(<span class="hljs-keyword">int</span> a0, <span class="hljs-keyword">int</span> a1);
+<span class="hljs-keyword">int</span> <span class="hljs-title function_">pm_font_engine_font_descent</span>(<span class="hljs-keyword">int</span> a0, <span class="hljs-keyword">int</span> a1);
+<span class="hljs-keyword">int</span> <span class="hljs-title function_">pm_font_engine_font_height_txt</span>(uint8_t a0, uint8_t a1, uint8_t a2);
+<span class="hljs-keyword">int</span> <span class="hljs-title function_">pm_text_width</span>(<span class="hljs-keyword">int</span> a0, <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span><span class="hljs-operator">*</span> a1, <span class="hljs-keyword">int</span> a2);
+<span class="hljs-keyword">int</span> <span class="hljs-title function_">pm_font_height</span>(<span class="hljs-keyword">int</span> a0, <span class="hljs-keyword">int</span> a1);
+<span class="hljs-keyword">void</span> <span class="hljs-title function_">pm_text_color</span>(<span class="hljs-keyword">int</span> a0, uint16_t a1);
+</code></pre>
+<p>These project the static <code>FontEngine</code> methods. In every signature <code>a0</code> (the first <code>int</code>) is a <code>pm_target</code> value as int (<code>PM_TARGET_OLED</code> or <code>PM_TARGET_EINK</code>) except for <code>pm_font_engine_font_height_txt</code>, which takes no target. A trailing <code>int</code> carrying a style is a <code>pm_style</code> value as int.</p>
+<ul>
+<li><code>pm_font_engine_char_width(a0, a1, a2)</code> is <code>charWidth(target, unicode, style)</code>; <code>a1</code> is the codepoint, <code>a2</code> is a <code>pm_style</code>. Returns the advance width in pixels.</li>
+<li><code>pm_font_engine_font_ascent(a0, a1)</code> is <code>fontAscent(target, style)</code>; <code>a1</code> is a <code>pm_style</code>.</li>
+<li><code>pm_font_engine_font_descent(a0, a1)</code> is <code>fontDescent(target, style)</code>; <code>a1</code> is a <code>pm_style</code>.</li>
+<li><code>pm_font_engine_font_height_txt(a0, a1, a2)</code> is <code>fontHeightTxt(family, sizeIdx, variant)</code> with the TXT matrix indices; no target argument.</li>
+<li><code>pm_text_width(a0, a1, a2)</code> is <code>textWidth(target, text, style)</code>; <code>a1</code> is the UTF-8 text, <code>a2</code> is a <code>pm_style</code>. Returns the measured pixel width.</li>
+<li><code>pm_font_height(a0, a1)</code> is <code>fontHeight(target, style)</code>; <code>a1</code> is a <code>pm_style</code>.</li>
+<li><code>pm_text_color(a0, a1)</code> is <code>setTextColor(target, color)</code>; <code>a1</code> is the 16-bit color (0 = black, 1 = white), touching only the given target.</li>
+</ul>
 
                 
                   <div class="page-navigation">
@@ -1878,6 +2271,10 @@
           <a href="#font-api-example" class="toc-link">Example</a>
         </li>
       
+        <li class="toc-item toc-level-2">
+          <a href="#font-api-c-abi-pm" class="toc-link">C ABI (pm_*)</a>
+        </li>
+      
     </ul>
   </div>
 
@@ -1889,13 +2286,13 @@
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1793426792000">
+                <span class="git-last-updated" data-timestamp="1793486742000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1793426792000"></span>
+                  <span class="git-time" data-timestamp="1793486742000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1908,10 +2305,10 @@
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Fix">Fix</div>
+                            <div class="git-commit-message" title="Docs">Docs</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1793426792000"></span>
+                              <span class="git-commit-date" data-timestamp="1793486742000"></span>
                             </div>
                           </div>
                         </li>
@@ -1923,7 +2320,7 @@
               
               <span class="git-spacer"></span>
               
-                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/docs/docs/api/font.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/Docs/docs/api/font.md" target="_blank" rel="noopener noreferrer" class="edit-link">
                   
 <svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-pencil"
@@ -1963,44 +2360,42 @@
           <div class="footer-columns">
             
               <div class="footer-column">
-                <span class="footer-column-title">Guides</span>
+                <span class="footer-column-title">Get Started</span>
                 <ul>
                   
-                    <li><a href="guides/making-apps/" >Making an app</a></li>
+                    <li><a href="get-started/" >Overview</a></li>
                   
-                    <li><a href="guides/lifecycle/" >App lifecycle</a></li>
+                    <li><a href="get-started/toolchain/" >Install the toolchain</a></li>
                   
-                    <li><a href="guides/rendering/" >Rendering</a></li>
+                    <li><a href="get-started/first-app/" >Your first app</a></li>
                   
                 </ul>
               </div>
             
               <div class="footer-column">
-                <span class="footer-column-title">API Reference</span>
+                <span class="footer-column-title">Reference</span>
                 <ul>
                   
-                    <li><a href="api/" >Overview</a></li>
-                  
-                    <li><a href="api/oled/" >OLED</a></li>
-                  
-                    <li><a href="api/eink/" >E-Ink</a></li>
-                  
-                    <li><a href="api/sys/" >System</a></li>
-                  
-                </ul>
-              </div>
-            
-              <div class="footer-column">
-                <span class="footer-column-title">Platform</span>
-                <ul>
+                    <li><a href="api/functions/" >Function index</a></li>
                   
                     <li><a href="app-abi/" >App ABI</a></li>
                   
-                    <li><a href="build/" >Building Apps</a></li>
+                    <li><a href="overlay/" >Overlay format</a></li>
                   
-                    <li><a href="symbols/" >Symbols</a></li>
+                    <li><a href="symbols/" >Symbol surface</a></li>
                   
-                    <li><a href="publish/" >Publishing</a></li>
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Tooling</span>
+                <ul>
+                  
+                    <li><a href="build/" >Building apps</a></li>
+                  
+                    <li><a href="cli/" >pm CLI</a></li>
+                  
+                    <li><a href="guides/publishing/" >Publishing</a></li>
                   
                 </ul>
               </div>
@@ -2034,14 +2429,14 @@
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mvw00s0r"></script>
+      <script src="../../assets/js/docmd-main.js?v=mvwzpk2z"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mvw00s0r"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mvw00s0r" ></script>
-<script src="../../assets/js/vendor/minisearch.js?v=mvw00s0r" ></script>
-<script src="../../assets/js/docmd-search.js?v=mvw00s0r" ></script>
-<script src="../../assets/js/docmd-git.js?v=mvw00s0r" ></script>
-<script src="../../assets/js/docmd-ai.js?v=mvw00s0r" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mvwzpk2z"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mvwzpk2z" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mvwzpk2z" ></script>
+<script src="../../assets/js/docmd-search.js?v=mvwzpk2z" ></script>
+<script src="../../assets/js/docmd-git.js?v=mvwzpk2z" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mvwzpk2z" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
@@ -2117,7 +2512,7 @@
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
-<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Guides","icon":"book","collapsible":true,"children":[{"title":"Guide index","path":"/guides/","icon":"book"},{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"children":[{"title":"API overview","path":"/api/","icon":"boxes"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Building Apps","path":"/build/","icon":"code"},{"title":"Symbols","path":"/symbols/","icon":"box"},{"title":"Publishing","path":"/publish/","icon":"package"},{"title":"i18n catalogs","path":"/i18n/","icon":"terminal"},{"title":"Migration","path":"/migration/","icon":"book-open"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
       
       
       

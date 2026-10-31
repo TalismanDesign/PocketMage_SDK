@@ -7,7 +7,7 @@ path: /guides/rendering/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.509Z"
+  generated_at: "2026-10-31T22:45:59.837Z"
 ---
 ---
 title: "Rendering"
@@ -60,6 +60,4 @@ For transient feedback use `pm_oled_sysmsg(text, ms)`; it draws a framed dialog 
 
 ## Full examples
 
-`pm new myapp` gives the text-only skeleton. For draw-heavy apps, start from the
-same template and call the E-Ink and OLED functions directly; see
-[app-abi.md](../app-abi.md) for what the app process owns.
+`pm new myapp` gives the text-only skeleton. For draw-heavy apps, start from the same template and call the E-Ink and OLED functions directly; see [app-abi.md](../app-abi.md) for what the app process owns.

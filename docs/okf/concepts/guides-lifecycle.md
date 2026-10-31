@@ -7,7 +7,7 @@ path: /guides/lifecycle/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.508Z"
+  generated_at: "2026-10-31T22:45:59.836Z"
 ---
 ---
 title: "App lifecycle"
@@ -16,7 +16,7 @@ description: "Entry points, build-time vs host symbols, the APP_INIT hook, and h
 
 # App lifecycle
 
-A PocketMage app is a plugin that runs *inside* the host firmware's address space. Understanding where the app boundaries are is the whole battle: the app is a normal `main`, everything it touches comes from the host, and "exiting" is just `return`.
+A PocketMage app is a plugin that runs *inside* the host firmware's address space. Understanding where the app boundaries are is the whole battle: the app is a normal `main`, everything it touches comes from the host, and "exiting" is a `return`.
 
 ## The entry point
 
@@ -62,7 +62,7 @@ There is no cooperative yield handshake: the app either returns, sleeps, or keep
 return 0;   // plain exit; control returns to the OS cleanly
 ```
 
-Exiting is just `return` from `main`. There is no reboot handoff and no exit API. The loader tears down the app context, restores `HOME`, and repaints. A crashing app (fault, uncaught aborts) follows the same OS recovery path as the built-in apps ([`recoverFromCrash`](../api/sys.md)); the device boots back to HOME rather than leaving the app stuck.
+Exiting is a `return` from `main`. There is no reboot handoff and no exit API. The loader tears down the app context, restores `HOME`, and repaints. A crashing app (fault, uncaught aborts) follows the same OS recovery path as the built-in apps ([`recoverFromCrash`](../api/sys.md)); the device boots back to HOME rather than leaving the app stuck.
 
 ## Built-in vs third-party
 

@@ -1,0 +1,2489 @@
+<!--
+  ---------------------------------------------------------------
+  docmd : the zero-config documentation engine.
+  @website https://docmd.io
+  [docmd-source] - Please do not remove this header.
+  ---------------------------------------------------------------
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="docmd v0.9.8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <script>
+      var root = "../";
+      if (root && !root.endsWith('/')) root += '/';
+      if (root === '') root = './';
+      window.DOCMD_ROOT = root;
+
+      window.DOCMD_SITE_ROOT = "/PocketMage_SDK/docs/";
+
+      window.DOCMD_APPEARANCE = "system";
+      window.DOCMD_VERSION_ROOT = "/";
+      window.DOCMD_BASE = "/PocketMage_SDK/docs/";
+      window.DOCMD_LOCALE = "";
+      window.DOCMD_DEFAULT_LOCALE = "";
+    </script>
+    <script>/**
+ * --------------------------------------------------------------------
+ * docmd : the zero-config documentation engine.
+ *
+ * @package     @docmd/core (and ecosystem)
+ * @website     https://docmd.io
+ * @repository  https://github.com/docmd-io/docmd
+ * @license     MIT
+ * @copyright   Copyright (c) 2025-present docmd.io
+ *
+ * [docmd-source] - Please do not remove this header.
+ * --------------------------------------------------------------------
+ */
+
+(function () {
+  try {
+    // 1. Determine Theme
+    //
+    // Resolve from three sources, in priority order:
+    //   1. localStorage explicit user choice (light / dark)
+    //   2. window.DOCMD_APPEARANCE  (current canonical name, set by EJS templates)
+    //   3. window.DOCMD_DEFAULT_MODE (legacy alias kept for pre-0.8.7 outputs)
+    //   4. 'light' as the final fallback
+    //
+    // Note: localStorage is only honoured when it holds an explicit
+    // 'light' or 'dark' value. A stored 'system' value (from a prior
+    // session where the user picked "follow system") must NOT win over
+    // a freshly resolved config value — the resolved value will itself
+    // be 'system' in that case and the OS preference check below takes
+    // over, so this is a no-op for the in-session behaviour but keeps
+    // any future storage migration simple.
+    var localValue = localStorage.getItem('docmd-theme');
+    var configValue = window.DOCMD_APPEARANCE
+      || window.DOCMD_DEFAULT_MODE
+      || 'light';
+    var theme = (localValue === 'light' || localValue === 'dark')
+      ? localValue
+      : configValue;
+
+    if (theme === 'system') {
+      theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // 2. Apply to Root
+    document.documentElement.setAttribute('data-theme', theme);
+
+    // 3. Highlight.js Toggle Strategy
+    var lightLink = document.getElementById('hljs-light');
+    var darkLink = document.getElementById('hljs-dark');
+
+    if (lightLink && darkLink) {
+      if (theme === 'dark') {
+        lightLink.disabled = true;
+        darkLink.disabled = false;
+      } else {
+        lightLink.disabled = false;
+        darkLink.disabled = true;
+      }
+    }
+
+    document.documentElement.style.visibility = "visible";
+  } catch (e) {
+    document.documentElement.style.visibility = "visible";
+    console.error('Theme init failed', e);
+  }
+})();</script>
+    <style>
+      html {
+        visibility: hidden;
+      }
+    </style>
+    <title>Overlay format (.elfo) - PocketMage SDK</title>
+    
+    
+
+    <link id="site-favicon" rel="icon" href="../assets/favicon.png?v=mvwzpk2z">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvwzpk2z">
+    
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvwzpk2z" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvwzpk2z" id="hljs-dark" disabled>
+    
+    
+<meta name="description" content="The ELFO overlay blob that ships beside every app ELF: why it exists, its on-disk layout, and how the host pages overlay bodies into executable RAM.">
+<link rel="canonical" href="https://talismandesign.github.io/PocketMage_SDK/docs/overlay/">
+<meta property="og:title" content="Overlay format (.elfo) - PocketMage SDK">
+<meta property="og:description" content="The ELFO overlay blob that ships beside every app ELF: why it exists, its on-disk layout, and how the host pages overlay bodies into executable RAM.">
+<meta property="og:url" content="https://talismandesign.github.io/PocketMage_SDK/docs/overlay/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Overlay format (.elfo) - PocketMage SDK">
+<meta name="twitter:description" content="The ELFO overlay blob that ships beside every app ELF: why it exists, its on-disk layout, and how the host pages overlay bodies into executable RAM.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"Binary Contract"},{"@type":"ListItem","position":3,"name":"Overlay format (.elfo)","item":"https://talismandesign.github.io/PocketMage_SDK/docs/overlay/"}]}
+</script>
+
+
+
+
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvwzpk2z" >
+
+    
+      <link rel="stylesheet" href="../assets/css/theme.css?v=mvwzpk2z">
+    
+    
+  </head>
+  <body
+    class="sidebar-collapsible"
+    data-default-collapsed="false"
+    data-copy-code-enabled="true" data-spa-enabled="true" data-source-file="docs/overlay.md">
+
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    
+    
+
+    
+
+    
+    
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          
+            <h1><a href="../">
+                PocketMage SDK
+              </a></h1>
+          
+          <span class="mobile-view sidebar-menu-button float-right">
+            
+<svg class="lucide-icon icon-menu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-menu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 5h16" />
+  <path d="M4 12h16" />
+  <path d="M4 19h16" />
+</svg>
+
+          </span>
+        </div>
+        <div class="sidebar-top-group">
+          
+          
+          
+          
+          
+        </div>
+        
+
+<nav class="sidebar-nav" aria-label="Main Navigation">
+  <ul>
+    
+      <li class="" >
+      
+        <a href="../" class=" "
+          >
+           
+<svg class="lucide-icon icon-home " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-house"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+  <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Home
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <a href="../get-started/" class=" nav-group"
+          >
+           
+<svg class="lucide-icon icon-rocket " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-rocket"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
+  <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
+  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Get Started
+            </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../get-started/toolchain/" class=" "
+          >
+           
+<svg class="lucide-icon icon-settings " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Install the toolchain
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../get-started/first-app/" class=" "
+          >
+           
+<svg class="lucide-icon icon-play " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-play"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Your first app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <a href="../guides/" class=" nav-group"
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Guides
+            </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../guides/making-apps/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Making an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../guides/lifecycle/" class=" "
+          >
+           
+<svg class="lucide-icon icon-activity " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-activity"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            App lifecycle
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../guides/rendering/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Rendering
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../guides/i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Internationalization
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../guides/publishing/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <a href="../api/" class=" nav-group"
+          >
+           
+<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-boxes"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
+  <path d="m7 16.5-4.74-2.85" />
+  <path d="m7 16.5 5-3" />
+  <path d="M7 16.5v5.17" />
+  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
+  <path d="m17 16.5-5-3" />
+  <path d="m17 16.5 4.74-2.85" />
+  <path d="M17 16.5v5.17" />
+  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
+  <path d="M12 8 7.26 5.15" />
+  <path d="m12 8 4.74-2.85" />
+  <path d="M12 13.5V8" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            API Reference
+            </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../api/functions/" class=" "
+          >
+           
+<svg class="lucide-icon icon-list " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-list"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 5h.01" />
+  <path d="M3 12h.01" />
+  <path d="M3 19h.01" />
+  <path d="M8 5h13" />
+  <path d="M8 12h13" />
+  <path d="M8 19h13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Function index
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/configuration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-sliders " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sliders-vertical"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 8h4" />
+  <path d="M12 21v-9" />
+  <path d="M12 8V3" />
+  <path d="M17 16h4" />
+  <path d="M19 12V3" />
+  <path d="M19 21v-5" />
+  <path d="M3 14h4" />
+  <path d="M5 10V3" />
+  <path d="M5 21v-7" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Configuration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/oled/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            OLED
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/eink/" class=" "
+          >
+           
+<svg class="lucide-icon icon-monitor " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-monitor"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="20" height="14" x="2" y="3" rx="2" />
+  <line x1="8" x2="16" y1="21" y2="21" />
+  <line x1="12" x2="12" y1="17" y2="21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            E-Ink
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/font/" class=" "
+          >
+           
+<svg class="lucide-icon icon-text " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-text-align-start"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 5H3" />
+  <path d="M15 12H3" />
+  <path d="M17 19H3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Fonts &amp; text
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/layout/" class=" "
+          >
+           
+<svg class="lucide-icon icon-ruler " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Layout
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/ui/" class=" "
+          >
+           
+<svg class="lucide-icon icon-layout-grid " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layout-grid"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="7" height="7" x="3" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="3" rx="1" />
+  <rect width="7" height="7" x="14" y="14" rx="1" />
+  <rect width="7" height="7" x="3" y="14" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            UI helpers
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/sd/" class=" "
+          >
+           
+<svg class="lucide-icon icon-hard-drive " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-hard-drive"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 16h.01" />
+  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+  <path d="M21.946 12.013H2.054" />
+  <path d="M6 16h.01" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            SD card
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/kb/" class=" "
+          >
+           
+<svg class="lucide-icon icon-keyboard " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-keyboard"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M10 8h.01" />
+  <path d="M12 12h.01" />
+  <path d="M14 8h.01" />
+  <path d="M16 12h.01" />
+  <path d="M18 8h.01" />
+  <path d="M6 8h.01" />
+  <path d="M7 16h10" />
+  <path d="M8 12h.01" />
+  <rect width="20" height="16" x="2" y="4" rx="2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Keyboard
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/touch/" class=" "
+          >
+           
+<svg class="lucide-icon icon-hand " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-hand"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2" />
+  <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2" />
+  <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8" />
+  <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Touch
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/bz/" class=" "
+          >
+           
+<svg class="lucide-icon icon-volume " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-volume"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Buzzer
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/clock/" class=" "
+          >
+           
+<svg class="lucide-icon icon-clock " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-clock"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="M12 6v6l4 2" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Clock
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/wifi/" class=" "
+          >
+           
+<svg class="lucide-icon icon-wifi " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wifi"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20h.01" />
+  <path d="M2 8.82a15 15 0 0 1 20 0" />
+  <path d="M5 12.859a10 10 0 0 1 14 0" />
+  <path d="M8.5 16.429a5 5 0 0 1 7 0" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            WiFi
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/sys/" class=" "
+          >
+           
+<svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cpu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v2" />
+  <path d="M12 2v2" />
+  <path d="M17 20v2" />
+  <path d="M17 2v2" />
+  <path d="M2 12h2" />
+  <path d="M2 17h2" />
+  <path d="M2 7h2" />
+  <path d="M20 12h2" />
+  <path d="M20 17h2" />
+  <path d="M20 7h2" />
+  <path d="M7 20v2" />
+  <path d="M7 2v2" />
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="8" y="8" width="8" height="8" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            System
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/i18n-runtime/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n (runtime)
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/io/" class=" "
+          >
+           
+<svg class="lucide-icon icon-type " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-type"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 4v16" />
+  <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
+  <path d="M9 20h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Text utilities
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/frames/" class=" "
+          >
+           
+<svg class="lucide-icon icon-frame " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-frame"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="22" x2="2" y1="6" y2="6" />
+  <line x1="22" x2="2" y1="18" y2="18" />
+  <line x1="6" x2="6" y1="2" y2="22" />
+  <line x1="18" x2="18" y1="2" y2="22" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Frames
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/assets/" class=" "
+          >
+           
+<svg class="lucide-icon icon-image " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-image"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+  <circle cx="9" cy="9" r="2" />
+  <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Built-in assets
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-file-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-file-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 12.5 8 15l2 2.5" />
+  <path d="m14 12.5 2 2.5-2 2.5" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Binary Contract
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../app-abi/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            App ABI
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../overlay/" class="active "
+          >
+           
+<svg class="lucide-icon icon-layers " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Overlay format (.elfo)
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../symbols/" class=" "
+          >
+           
+<svg class="lucide-icon icon-box " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-box"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z" />
+  <path d="m3.3 7 8.7 5 8.7-5" />
+  <path d="M12 22V12" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Symbol surface
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-wrench " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wrench"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Tooling
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../build/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building apps
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../cli/" class=" "
+          >
+           
+<svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-terminal"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 19h8" />
+  <path d="m4 17 6-6-6-6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            pm CLI
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n catalogs
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../troubleshooting/" class=" "
+          >
+           
+<svg class="lucide-icon icon-life-buoy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-life-buoy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="m4.93 4.93 4.24 4.24" />
+  <path d="m14.83 9.17 4.24-4.24" />
+  <path d="m14.83 14.83 4.24 4.24" />
+  <path d="m9.17 14.83-4.24 4.24" />
+  <circle cx="12" cy="12" r="4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../glossary/" class=" "
+          >
+           
+<svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-book-open"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 5v16" />
+  <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../migration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-git-branch " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-git-branch"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 6a9 9 0 0 0-9 9V3" />
+  <circle cx="18" cy="6" r="3" />
+  <circle cx="6" cy="18" r="3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Migration
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://talismandesign.github.io/PocketMage_PDA/docs" class=" "
+          target="_blank" rel="noopener">
+           
+<svg class="lucide-icon icon-cpu " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-cpu"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 20v2" />
+  <path d="M12 2v2" />
+  <path d="M17 20v2" />
+  <path d="M17 2v2" />
+  <path d="M2 12h2" />
+  <path d="M2 17h2" />
+  <path d="M2 7h2" />
+  <path d="M20 12h2" />
+  <path d="M20 17h2" />
+  <path d="M20 7h2" />
+  <path d="M7 20v2" />
+  <path d="M7 2v2" />
+  <rect x="4" y="4" width="16" height="16" rx="2" />
+  <rect x="8" y="8" width="8" height="8" rx="1" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            PocketMageOS docs
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="https://github.com/TalismanDesign/PocketMage_SDK" class=" "
+          target="_blank" rel="noopener">
+           
+          
+          <span class="nav-item-title">
+            GitHub
+            </span>
+          
+           
+<svg class="lucide-icon icon-external-link nav-external-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-external-link"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 3h6v6" />
+  <path d="M10 14 21 3" />
+  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+</svg>
+
+          
+        </a>
+        
+
+        
+      </li>
+    
+  </ul>
+</nav>
+        <div class="sidebar-bottom-group mt-auto">
+          
+          
+          
+          
+          
+        </div>
+      </aside>
+      
+      <div class="main-content-wrapper">
+        
+        
+        
+          <header class="page-header">
+            <div class="header-left">
+              
+                <button id="sidebar-toggle-button" class="sidebar-toggle-button"
+                  aria-label="Toggle Sidebar">
+                  
+<svg class="lucide-icon icon-chevron-left " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m15 18-6-6 6-6" />
+</svg>
+
+                </button>
+              
+              <div class="header-titles-wrapper">
+                <span class="header-title">
+                  Overlay format (.elfo)
+                </span>
+              </div>
+            </div>
+            <div class="header-right">
+              
+                
+
+
+<div class="docmd-options-menu">
+    
+    <button class="docmd-search-trigger" aria-label="Search">
+        
+<svg class="lucide-icon icon-search " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-search"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21 21-4.34-4.34" />
+  <circle cx="11" cy="11" r="8" />
+</svg>
+
+        <span class="search-label">Search</span>
+        <span class="search-keys"><kbd class="docmd-kbd">⌘</kbd><kbd class="docmd-kbd">K</kbd></span>
+    </button>
+    
+
+    
+
+    
+
+    
+    <button class="theme-toggle-button" aria-label="Toggle theme" title="Toggle theme">
+        
+<svg class="lucide-icon icon-sun icon-sun" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-sun"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="4" />
+  <path d="M12 2v2" />
+  <path d="M12 20v2" />
+  <path d="m4.93 4.93 1.41 1.41" />
+  <path d="m17.66 17.66 1.41 1.41" />
+  <path d="M2 12h2" />
+  <path d="M20 12h2" />
+  <path d="m6.34 17.66-1.41 1.41" />
+  <path d="m19.07 4.93-1.41 1.41" />
+</svg>
+ 
+<svg class="lucide-icon icon-moon icon-moon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-moon"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />
+</svg>
+
+    </button>
+    
+
+    
+
+    
+</div>
+
+              
+            </div>
+          </header>
+        
+        <div class="content-theme-cover">
+          <main class="content-area" id="main-content">
+            <div class="content-layout">
+              <div class="main-content">
+                <div class="docmd-breadcrumbs-row">
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Overlay%20format%20(.elfo)%22%0Adescription%3A%20%22The%20ELFO%20overlay%20blob%20that%20ships%20beside%20every%20app%20ELF%3A%20why%20it%20exists%2C%20its%20on-disk%20layout%2C%20and%20how%20the%20host%20pages%20overlay%20bodies%20into%20executable%20RAM.%22%0A---%0A%0A%23%20Overlay%20format%20(%60.elfo%60)%0A%0AEvery%20packed%20app%20carries%20two%20artifacts%3A%20the%20relocatable%20%60%3Cname%3E.app.elf%60%20and%20a%20sidecar%20%60%3Cname%3E.elfo%60.%20The%20ELF%20is%20the%20program%3B%20the%20ELFO%20blob%20is%20the%20overlay%20image%20the%20host%20pages%20into%20executable%20RAM%20at%20load%20time.%20The%20build%20produces%20the%20%60.elfo%60%20automatically%20(see%20%5Bbuild.md%5D(build.md))%3B%20this%20page%20documents%20what%20it%20contains%20and%20how%20the%20loader%20consumes%20it%2C%20so%20the%20format%20is%20pinned%20contract%20rather%20than%20an%20implementation%20detail.%0A%0AThe%20overlay%20runtime%20lives%20in%20the%20%60elf_overlay%60%20component%2C%20an%20ISA-abstracted%20overlay%20loader%20that%20sits%20next%20to%20the%20ELF%20loader%20(%60esp_elf%60)%20and%20handles%20the%20parts%20of%20loading%20that%20a%20plain%20relocating%20loader%20cannot%3A%20paging%20%60.text%60%20bodies%20into%20a%20fixed%20pool%20of%20executable%20frames%20and%20patching%20ISA-specific%20PC-relative%20literal%20loads%20once%20the%20resident%20addresses%20are%20known.%0A%0A%23%23%20Why%20it%20exists%0A%0AAn%20ELF%20app%20links%20%60-nostdlib%20-shared%60%20and%20resolves%20every%20symbol%20from%20the%20host%20at%20load%20time%20(see%20%5Bapp-abi.md%5D(app-abi.md)%20and%20%5Bsymbols.md%5D(symbols.md)).%20On%20the%20ESP32-S3%20the%20loader%20must%20place%20executable%20code%20in%20memory%20that%20the%20instruction%20bus%20can%20fetch%20(%60MALLOC_CAP_EXEC%60)%2C%20which%20is%20scarce.%20Mapping%20an%20entire%20app%20image%20into%20exec%20RAM%20wastes%20that%20budget%20on%20code%20paths%20that%20may%20never%20run.%0A%0AThe%20overlay%20model%20solves%20this.%20Instead%20of%20loading%20all%20%60.text%60%20up%20front%2C%20the%20host%20relocates%20the%20base%20image%20with%20%60esp_elf%60%2C%20then%20pages%20individual%20overlay%20bodies%20into%20a%20small%20pool%20of%20exec-RAM%20frames%20on%20demand.%20A%20function%20that%20is%20never%20called%20is%20never%20paged%20in.%20The%20%60.elfo%60%20blob%20is%20the%20pre-chewed%20form%20the%20device%20needs%20for%20that%3A%20the%20overlay%20bodies%2C%20the%20stub%20block%20that%20enters%20and%20leaves%20them%2C%20and%20the%20relocation%20patch%20tables%20the%20host%20applies%20once%20it%20knows%20where%20each%20frame%20landed.%0A%0APC-relative%20literal%20loads%20(%60l32r%60%20on%20Xtensa%2C%20%60auipc%60%20on%20RISC-V)%20cannot%20be%20left%20to%20the%20base%20relocator%2C%20because%20the%20literal&#039;s%20absolute%20address%20is%20not%20known%20until%20the%20overlay%20body%20is%20resident.%20%60elf_overlay%60%20patches%20those%20in%20place%20at%20page-in.%20The%20base%20relocator%20never%20touches%20them.%0A%0A%23%23%20On-disk%20layout%0A%0AThe%20blob%20begins%20with%20the%20four-byte%20magic%20%60ELFO%60%2C%20format%20version%201%2C%20and%20an%20ISA%20tag.%20All%20multi-byte%20fields%20are%20little-endian%2C%20matching%20the%20app%20ELF.%20The%20header%20is%20followed%20by%20fixed-shape%20tables%20and%20two%20data%20regions%3A%0A%0A%60%60%60mermaid%0Aflowchart%20TB%0A%20%20%20%20H%5B%22elf_overlay_header_t%3Cbr%3Emagic%20ELFO%2C%20version%2C%20ISA%20tag%2C%20table%20counts%22%5D%0A%20%20%20%20O%5B%22overlay%20entries%3Cbr%3Eid%2C%20offset%2C%20length%20(one%20per%20overlay%20body)%22%5D%0A%20%20%20%20S%5B%22stub%20entries%3Cbr%3Ecanonical%20vaddr%2C%20overlay_id%2C%20body_offset%2C%20stub_off%22%5D%0A%20%20%20%20R%5B%22redirect%20entries%3Cbr%3Ecall%20site%2C%20stub_off%22%5D%0A%20%20%20%20P%5B%22patch%20entries%3Cbr%3Eoverlay_id%2C%20blob_offset%2C%20insn_offset%22%5D%0A%20%20%20%20SP%5B%22stub_patch%20entries%3Cbr%3Eoverlay_id%2C%20blob_offset%2C%20insn_offset%22%5D%0A%20%20%20%20HR%5B%22host_ref%20entries%3Cbr%3Eoverlay_id%2C%20blob_offset%2C%20insn_offset%2C%20name_off%22%5D%0A%20%20%20%20ST%5B%22string%20table%3Cbr%3Enull-terminated%20host%20symbol%20names%22%5D%0A%20%20%20%20SB%5B%22stub%20block%3Cbr%3Eenter%2Fleave%20slots%20plus%20stub%20code%22%5D%0A%20%20%20%20B%5B%22overlay%20bodies%3Cbr%3Everbatim%20.text%20images%22%5D%0A%20%20%20%20H%20--%3E%20O%20--%3E%20S%20--%3E%20R%20--%3E%20P%20--%3E%20SP%20--%3E%20HR%20--%3E%20ST%20--%3E%20SB%20--%3E%20B%0A%60%60%60%0A%0A%7C%20Table%20%20%20%20%20%20%20%20%7C%20What%20it%20records%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20------------%20%7C%20-----------------------------------------------------------------------%20%7C%0A%7C%20overlay%20%20%20%20%20%20%7C%20Each%20overlay%20body&#039;s%20id%2C%20its%20offset%20into%20the%20bodies%20region%2C%20and%20length.%20%20%7C%0A%7C%20stub%20%20%20%20%20%20%20%20%20%7C%20Maps%20a%20canonical%20%60.text%60%20virtual%20address%20to%20the%20stub%20that%20enters%20it.%20%20%20%20%7C%0A%7C%20redirect%20%20%20%20%20%7C%20Resident%20call%20sites%20that%20must%20be%20patched%20to%20jump%20through%20a%20stub.%20%20%20%20%20%20%20%20%7C%0A%7C%20patch%20%20%20%20%20%20%20%20%7C%20ISA%20literal-load%20sites%20inside%20overlay%20bodies%2C%20patched%20at%20page-in.%20%20%20%20%20%20%20%7C%0A%7C%20stub_patch%20%20%20%7C%20ISA%20literal-load%20sites%20inside%20the%20stub%20block.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20host_ref%20%20%20%20%20%7C%20Overlay%20references%20to%20host%20symbols%2C%20resolved%20by%20name%20via%20the%20resolver.%20%20%7C%0A%7C%20string%20table%20%7C%20The%20host%20symbol%20names%20the%20%60host_ref%60%20entries%20point%20into.%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AAll%20tables%20are%20fixed-size%20records%2C%20so%20parsing%20and%20page-in%20do%20no%20heap%20allocation%20beyond%20the%20frame%20pool%20itself.%0A%0A%23%23%20ISA%20abstraction%0A%0AISA-specific%20patching%20lives%20behind%20%60elf_overlay_isa_ops_t%60.%20Two%20backends%20are%20registered%3A%0A%0A-%20%60xtensa%60%20-%20%60l32r%60%20PC-relative%20literal%20patching%2C%20validated%20against%20the%20Xtensa%20ISA%20reference.%20This%20is%20the%20backend%20PocketMage%20uses%20on%20the%20S3.%0A-%20%60riscv%60%20-%20%60auipc%60%20PC-relative%20literal%20patching.%0A%0AThe%20ISA%20tag%20in%20the%20header%20selects%20the%20backend%20at%20load%20time.%20A%20blob%20built%20for%20one%20ISA%20will%20not%20load%20on%20another.%0A%0A%23%23%20How%20the%20host%20consumes%20it%0A%0AThe%20in-process%20runner%20(%60src%2Felf_runner.cpp%60)%20loads%20an%20app%20in%20two%20stages%3A%20the%20base%20relocation%20with%20%60esp_elf%60%2C%20then%20the%20overlay%20with%20%60elf_overlay%60.%20The%20exact%20sequence%2C%20matching%20the%20code%3A%0A%0A1.%20Install%20the%20scoped%20symbol%20resolver%20(see%20%5Bsymbols.md%5D(symbols.md))%2C%20then%20%60esp_elf_init%60%20and%20%60esp_elf_relocate_source%60%20relocate%20the%20base%20image.%20The%20image%20is%20streamed%20by%20offset%20from%20the%20SD%20file%20rather%20than%20held%20whole%20in%20RAM.%0A2.%20Locate%20the%20%60.elfo%60%20sidecar%20next%20to%20the%20ELF%20and%20%60elf_overlay_load%60%20it.%0A3.%20%60elf_overlay_set_active%60%20makes%20it%20the%20active%20overlay%20for%20the%20run.%0A4.%20%60elf_overlay_esp_elf_set_section_map%60%20copies%20the%20relocated%20section%20table%20(canonical%20virtual%20address%20to%20resident%20address)%20from%20the%20%60esp_elf_t%60%20into%20the%20overlay&#039;s%20section%20map.%0A5.%20%60elf_overlay_apply_redirects%60%20patches%20the%20resident%20call%20sites%20so%20calls%20into%20paged%20functions%20go%20through%20their%20stubs.%0A6.%20%60elf_overlay_set_symbol_resolver%60%20wires%20host-reference%20resolution%20back%20through%20the%20scoped%20resolver%2C%20so%20an%20overlay%20body%20calling%20a%20%60pm_*%60%20or%20runtime%20symbol%20resolves%20against%20the%20host%20export%20table.%0A7.%20The%20entry%20point%20is%20redirected%3A%20the%20runner%20finds%20the%20stub%20for%20the%20entry&#039;s%20canonical%20virtual%20address%20and%20rewrites%20%60elf.entry%60%20to%20the%20stub%20address%2C%20so%20even%20the%20first%20call%20pages%20the%20entry%20body%20in.%0A8.%20%60esp_elf_request%60%20runs%20the%20entry.%20On%20return%2C%20the%20overlay%20is%20unloaded%20and%20the%20base%20image%20deinitialized.%0A%0A%60%60%60mermaid%0AsequenceDiagram%0A%20%20%20%20participant%20R%20as%20elf_runner%0A%20%20%20%20participant%20E%20as%20esp_elf%0A%20%20%20%20participant%20O%20as%20elf_overlay%0A%20%20%20%20participant%20SD%20as%20SD%20card%0A%20%20%20%20R-%3E%3ER%3A%20install%20scoped%20symbol%20resolver%0A%20%20%20%20R-%3E%3EE%3A%20esp_elf_init%0A%20%20%20%20E-%3E%3ESD%3A%20esp_elf_relocate_source%20(stream%20by%20offset)%0A%20%20%20%20R-%3E%3ESD%3A%20locate%20name.elfo%20sidecar%0A%20%20%20%20R-%3E%3EO%3A%20elf_overlay_load%0A%20%20%20%20R-%3E%3EO%3A%20elf_overlay_set_active%0A%20%20%20%20E--%3E%3EO%3A%20elf_overlay_esp_elf_set_section_map%20(section%20table)%0A%20%20%20%20R-%3E%3EO%3A%20elf_overlay_apply_redirects%20(patch%20call%20sites)%0A%20%20%20%20R-%3E%3EO%3A%20elf_overlay_set_symbol_resolver%20(host%20refs)%0A%20%20%20%20R-%3E%3EO%3A%20redirect%20elf.entry%20to%20entry%20stub%0A%20%20%20%20R-%3E%3EE%3A%20esp_elf_request%20(run%20entry)%0A%20%20%20%20E--%3E%3ER%3A%20entry%20returns%0A%20%20%20%20R-%3E%3EO%3A%20elf_overlay%20unload%0A%20%20%20%20R-%3E%3EE%3A%20esp_elf%20deinit%0A%60%60%60%0A%0AIf%20the%20sidecar%20is%20absent%2C%20the%20app%20runs%20unredirected%20from%20the%20base%20relocation%20alone.%20Apps%20packed%20with%20%60make%20pack%60%20always%20ship%20the%20sidecar%3B%20see%20the%20pack%20contract%20in%20%5Bpublishing%5D(guides%2Fpublishing.md).%0A%0A%23%23%23%20The%20frame%20pool%0A%0AA%20fixed%20pool%20of%20executable-RAM%20frames%20holds%20overlay%20bodies%2C%20paged%20in%20on%20demand.%20A%20stub&#039;s%20%60enter%60%20bumps%20the%20target%20frame&#039;s%20refcount%20and%20%60leave%60%20drops%20it%3B%20a%20frame%20stays%20resident%20while%20its%20refcount%20is%20above%20zero.%20Literals%20are%20patched%20in%20place%20inside%20the%20%60.text%60%20image%20at%20page-in%2C%20once%20resident%20addresses%20are%20known.%20The%20PC-relative%20instructions%20themselves%20(%60l32r%60%20%2F%20%60auipc%60)%20are%20never%20rewritten.%0A%0AThe%20pool%20is%20sized%20by%20compile-time%20constants%20in%20the%20overlay%20component%20(%60ELF_OVERLAY_MAX_FRAMES%60%2C%20default%204%3B%20%60ELF_OVERLAY_DEFAULT_FRAME_SIZE%60%2C%20default%2016384%20bytes).%20A%20single%20overlay%20body%20must%20fit%20in%20one%20frame.%0A%0A%23%23%20Building%20the%20blob%0A%0A%60tools%2Fapp.mk%60%20emits%20the%20%60.elfo%60%20in%20two%20steps%20from%20the%20unstripped%20link%20output%20(%60%3Cname%3E.app.tool%60)%3A%0A%0A%60%60%60text%0Aelf_overlay_relink%20%3Cname%3E.app.tool%20%3Cname%3E.relk%20%20%20%23%20scan%20.text%2C%20classify%20relocs%0Aelf_overlay_emit%20%20%20%3Cname%3E.relk%20%20%20%20%20%3Cname%3E.elfo%20%20%20%23%20pack%20into%20the%20ELFO%20blob%0A%60%60%60%0A%0A%60elf_overlay_relink%60%20reads%20the%20ELF32%20executable%2C%20scans%20%60.text%60%20for%20ISA%20patch%20sites%2C%20builds%20a%20literal%20pool%2C%20classifies%20relocations%2C%20and%20writes%20a%20%60.relk%60%20intermediate.%20%60elf_overlay_emit%60%20packs%20that%20into%20the%20final%20ELFO%20blob.%20Both%20tools%20must%20be%20on%20%60PATH%60%3B%20the%20SDK%20build%20expects%20them%20from%20an%20%60elf_overlay%60%20checkout%20(CI%20builds%20them%20with%20CMake%20and%20prepends%20the%20build%20dir%20to%20%60PATH%60).%20Override%20%60ELF_OVERLAY_RELINK%60%20and%20%60ELF_OVERLAY_EMIT%60%20to%20point%20at%20specific%20binaries.%0A%0A%23%23%20Stability%0A%0AThe%20ELFO%20magic%2C%20version%2C%20and%20table%20layout%20are%20load%20contract.%20A%20format%20change%20takes%20a%20version%20bump%20in%20the%20header%20and%20a%20matching%20host%20loader%20that%20accepts%20the%20new%20version.%20The%20%60elf_overlay%60%20component%20is%20the%20single%20source%20of%20truth%20for%20the%20format%3B%20see%20its%20%60README.md%60%20and%20%60include%2Felf_overlay%2F%60%20headers%20for%20the%20exact%20record%20definitions.%0A" style="display: none;"></div>
+                  
+                    <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
+                      <ol>
+                        
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Binary Contract</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
+                          <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
+                            
+                              <span>Overlay format (.elfo)</span>
+                            
+                            
+                          </li>
+                        
+                      </ol>
+                    </nav>
+                  
+
+                  
+                  
+                    <div class="docmd-copy-widgets">
+                      
+                        <button class="docmd-copy-btn docmd-copy-raw-btn" data-copied="Copied!" title="Copy Markdown" aria-label="Copy Markdown">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-copy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-copy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+</svg>
+</span>
+                        </button>
+                      
+                      
+                        <button class="docmd-copy-btn docmd-copy-context-btn" data-copied="Copied!" title="Copy Context">
+                          <span class="docmd-btn-icon">
+<svg class="lucide-icon icon-message-square " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-message-square"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" />
+</svg>
+</span>
+                          <span class="docmd-btn-text">Copy Context</span>
+                        </button>
+                      
+                      
+                    </div>
+                  
+                </div>
+                
+                  <h1 class="docmd-focus-title">
+                    Overlay format (.elfo)
+                  </h1>
+                
+                <h1 id="overlay-format-elfo" class="docmd-heading"><a href="#overlay-format-elfo" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Overlay format (<code>.elfo</code>)</h1>
+<p>Every packed app carries two artifacts: the relocatable <code>&lt;name&gt;.app.elf</code> and a sidecar <code>&lt;name&gt;.elfo</code>. The ELF is the program; the ELFO blob is the overlay image the host pages into executable RAM at load time. The build produces the <code>.elfo</code> automatically (see <a href="../build/">build.md</a>); this page documents what it contains and how the loader consumes it, so the format is pinned contract rather than an implementation detail.</p>
+<p>The overlay runtime lives in the <code>elf_overlay</code> component, an ISA-abstracted overlay loader that sits next to the ELF loader (<code>esp_elf</code>) and handles the parts of loading that a plain relocating loader cannot: paging <code>.text</code> bodies into a fixed pool of executable frames and patching ISA-specific PC-relative literal loads once the resident addresses are known.</p>
+<h2 id="overlay-format-elfo-why-it-exists" class="docmd-heading"><a href="#overlay-format-elfo-why-it-exists" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Why it exists</h2>
+<p>An ELF app links <code>-nostdlib -shared</code> and resolves every symbol from the host at load time (see <a href="../app-abi/">app-abi.md</a> and <a href="../symbols/">symbols.md</a>). On the ESP32-S3 the loader must place executable code in memory that the instruction bus can fetch (<code>MALLOC_CAP_EXEC</code>), which is scarce. Mapping an entire app image into exec RAM wastes that budget on code paths that may never run.</p>
+<p>The overlay model solves this. Instead of loading all <code>.text</code> up front, the host relocates the base image with <code>esp_elf</code>, then pages individual overlay bodies into a small pool of exec-RAM frames on demand. A function that is never called is never paged in. The <code>.elfo</code> blob is the pre-chewed form the device needs for that: the overlay bodies, the stub block that enters and leaves them, and the relocation patch tables the host applies once it knows where each frame landed.</p>
+<p>PC-relative literal loads (<code>l32r</code> on Xtensa, <code>auipc</code> on RISC-V) cannot be left to the base relocator, because the literal’s absolute address is not known until the overlay body is resident. <code>elf_overlay</code> patches those in place at page-in. The base relocator never touches them.</p>
+<h2 id="overlay-format-elfo-on-disk-layout" class="docmd-heading"><a href="#overlay-format-elfo-on-disk-layout" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>On-disk layout</h2>
+<p>The blob begins with the four-byte magic <code>ELFO</code>, format version 1, and an ISA tag. All multi-byte fields are little-endian, matching the app ELF. The header is followed by fixed-shape tables and two data regions:</p>
+<div class="mermaid">flowchart TB
+    H[&quot;elf_overlay_header_t&lt;br&gt;magic ELFO, version, ISA tag, table counts&quot;]
+    O[&quot;overlay entries&lt;br&gt;id, offset, length (one per overlay body)&quot;]
+    S[&quot;stub entries&lt;br&gt;canonical vaddr, overlay_id, body_offset, stub_off&quot;]
+    R[&quot;redirect entries&lt;br&gt;call site, stub_off&quot;]
+    P[&quot;patch entries&lt;br&gt;overlay_id, blob_offset, insn_offset&quot;]
+    SP[&quot;stub_patch entries&lt;br&gt;overlay_id, blob_offset, insn_offset&quot;]
+    HR[&quot;host_ref entries&lt;br&gt;overlay_id, blob_offset, insn_offset, name_off&quot;]
+    ST[&quot;string table&lt;br&gt;null-terminated host symbol names&quot;]
+    SB[&quot;stub block&lt;br&gt;enter/leave slots plus stub code&quot;]
+    B[&quot;overlay bodies&lt;br&gt;verbatim .text images&quot;]
+    H --&gt; O --&gt; S --&gt; R --&gt; P --&gt; SP --&gt; HR --&gt; ST --&gt; SB --&gt; B
+</div>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Table</th>
+<th>What it records</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>overlay</td>
+<td>Each overlay body’s id, its offset into the bodies region, and length.</td>
+</tr>
+<tr>
+<td>stub</td>
+<td>Maps a canonical <code>.text</code> virtual address to the stub that enters it.</td>
+</tr>
+<tr>
+<td>redirect</td>
+<td>Resident call sites that must be patched to jump through a stub.</td>
+</tr>
+<tr>
+<td>patch</td>
+<td>ISA literal-load sites inside overlay bodies, patched at page-in.</td>
+</tr>
+<tr>
+<td>stub_patch</td>
+<td>ISA literal-load sites inside the stub block.</td>
+</tr>
+<tr>
+<td>host_ref</td>
+<td>Overlay references to host symbols, resolved by name via the resolver.</td>
+</tr>
+<tr>
+<td>string table</td>
+<td>The host symbol names the <code>host_ref</code> entries point into.</td>
+</tr>
+</tbody>
+</table>
+</div><p>All tables are fixed-size records, so parsing and page-in do no heap allocation beyond the frame pool itself.</p>
+<h2 id="overlay-format-elfo-isa-abstraction" class="docmd-heading"><a href="#overlay-format-elfo-isa-abstraction" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>ISA abstraction</h2>
+<p>ISA-specific patching lives behind <code>elf_overlay_isa_ops_t</code>. Two backends are registered:</p>
+<ul>
+<li><code>xtensa</code> - <code>l32r</code> PC-relative literal patching, validated against the Xtensa ISA reference. This is the backend PocketMage uses on the S3.</li>
+<li><code>riscv</code> - <code>auipc</code> PC-relative literal patching.</li>
+</ul>
+<p>The ISA tag in the header selects the backend at load time. A blob built for one ISA will not load on another.</p>
+<h2 id="overlay-format-elfo-how-the-host-consumes-it" class="docmd-heading"><a href="#overlay-format-elfo-how-the-host-consumes-it" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How the host consumes it</h2>
+<p>The in-process runner (<code>src/elf_runner.cpp</code>) loads an app in two stages: the base relocation with <code>esp_elf</code>, then the overlay with <code>elf_overlay</code>. The exact sequence, matching the code:</p>
+<ol>
+<li>Install the scoped symbol resolver (see <a href="../symbols/">symbols.md</a>), then <code>esp_elf_init</code> and <code>esp_elf_relocate_source</code> relocate the base image. The image is streamed by offset from the SD file rather than held whole in RAM.</li>
+<li>Locate the <code>.elfo</code> sidecar next to the ELF and <code>elf_overlay_load</code> it.</li>
+<li><code>elf_overlay_set_active</code> makes it the active overlay for the run.</li>
+<li><code>elf_overlay_esp_elf_set_section_map</code> copies the relocated section table (canonical virtual address to resident address) from the <code>esp_elf_t</code> into the overlay’s section map.</li>
+<li><code>elf_overlay_apply_redirects</code> patches the resident call sites so calls into paged functions go through their stubs.</li>
+<li><code>elf_overlay_set_symbol_resolver</code> wires host-reference resolution back through the scoped resolver, so an overlay body calling a <code>pm_*</code> or runtime symbol resolves against the host export table.</li>
+<li>The entry point is redirected: the runner finds the stub for the entry’s canonical virtual address and rewrites <code>elf.entry</code> to the stub address, so even the first call pages the entry body in.</li>
+<li><code>esp_elf_request</code> runs the entry. On return, the overlay is unloaded and the base image deinitialized.</li>
+</ol>
+<div class="mermaid">sequenceDiagram
+    participant R as elf_runner
+    participant E as esp_elf
+    participant O as elf_overlay
+    participant SD as SD card
+    R-&gt;&gt;R: install scoped symbol resolver
+    R-&gt;&gt;E: esp_elf_init
+    E-&gt;&gt;SD: esp_elf_relocate_source (stream by offset)
+    R-&gt;&gt;SD: locate name.elfo sidecar
+    R-&gt;&gt;O: elf_overlay_load
+    R-&gt;&gt;O: elf_overlay_set_active
+    E--&gt;&gt;O: elf_overlay_esp_elf_set_section_map (section table)
+    R-&gt;&gt;O: elf_overlay_apply_redirects (patch call sites)
+    R-&gt;&gt;O: elf_overlay_set_symbol_resolver (host refs)
+    R-&gt;&gt;O: redirect elf.entry to entry stub
+    R-&gt;&gt;E: esp_elf_request (run entry)
+    E--&gt;&gt;R: entry returns
+    R-&gt;&gt;O: elf_overlay unload
+    R-&gt;&gt;E: esp_elf deinit
+</div>
+<p>If the sidecar is absent, the app runs unredirected from the base relocation alone. Apps packed with <code>make pack</code> always ship the sidecar; see the pack contract in <a href="../guides/publishing/">publishing</a>.</p>
+<h3 id="overlay-format-elfo-how-the-host-consumes-it-the-frame-pool" class="docmd-heading"><a href="#overlay-format-elfo-how-the-host-consumes-it-the-frame-pool" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>The frame pool</h3>
+<p>A fixed pool of executable-RAM frames holds overlay bodies, paged in on demand. A stub’s <code>enter</code> bumps the target frame’s refcount and <code>leave</code> drops it; a frame stays resident while its refcount is above zero. Literals are patched in place inside the <code>.text</code> image at page-in, once resident addresses are known. The PC-relative instructions themselves (<code>l32r</code> / <code>auipc</code>) are never rewritten.</p>
+<p>The pool is sized by compile-time constants in the overlay component (<code>ELF_OVERLAY_MAX_FRAMES</code>, default 4; <code>ELF_OVERLAY_DEFAULT_FRAME_SIZE</code>, default 16384 bytes). A single overlay body must fit in one frame.</p>
+<h2 id="overlay-format-elfo-building-the-blob" class="docmd-heading"><a href="#overlay-format-elfo-building-the-blob" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Building the blob</h2>
+<p><code>tools/app.mk</code> emits the <code>.elfo</code> in two steps from the unstripped link output (<code>&lt;name&gt;.app.tool</code>):</p>
+<pre class="hljs"><code class="language-text">elf_overlay_relink <span class="hljs-operator">&lt;</span>name<span class="hljs-operator">&gt;</span>.<span class="hljs-attr">app</span>.<span class="hljs-attr">tool</span> <span class="hljs-operator">&lt;</span>name<span class="hljs-operator">&gt;</span>.<span class="hljs-attr">relk</span>   <span class="hljs-comment"># scan .text, classify relocs</span>
+elf_overlay_emit   <span class="hljs-operator">&lt;</span>name<span class="hljs-operator">&gt;</span>.<span class="hljs-attr">relk</span>     <span class="hljs-operator">&lt;</span>name<span class="hljs-operator">&gt;</span>.<span class="hljs-attr">elfo</span>   <span class="hljs-comment"># pack into the ELFO blob</span>
+</code></pre>
+<p><code>elf_overlay_relink</code> reads the ELF32 executable, scans <code>.text</code> for ISA patch sites, builds a literal pool, classifies relocations, and writes a <code>.relk</code> intermediate. <code>elf_overlay_emit</code> packs that into the final ELFO blob. Both tools must be on <code>PATH</code>; the SDK build expects them from an <code>elf_overlay</code> checkout (CI builds them with CMake and prepends the build dir to <code>PATH</code>). Override <code>ELF_OVERLAY_RELINK</code> and <code>ELF_OVERLAY_EMIT</code> to point at specific binaries.</p>
+<h2 id="overlay-format-elfo-stability" class="docmd-heading"><a href="#overlay-format-elfo-stability" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Stability</h2>
+<p>The ELFO magic, version, and table layout are load contract. A format change takes a version bump in the header and a matching host loader that accepts the new version. The <code>elf_overlay</code> component is the single source of truth for the format; see its <code>README.md</code> and <code>include/elf_overlay/</code> headers for the exact record definitions.</p>
+
+                
+                  <div class="page-navigation">
+                    
+                      <a href="../app-abi/" class="prev-page">
+                        
+<svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-left"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m12 19-7-7 7-7" />
+  <path d="M19 12H5" />
+</svg>
+
+                        <span><small>Previous</small><strong>
+                            App ABI
+                          </strong></span>
+                      </a>
+                    
+                    
+                      <a href="../symbols/" class="next-page">
+                        <span><small>Next</small>
+                          <strong>
+                            Symbol surface
+                          </strong></span>
+                        
+<svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-arrow-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 12h14" />
+  <path d="m12 5 7 7-7 7" />
+</svg>
+
+                      </a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+              <div class="toc-sidebar">
+                
+                
+                  
+
+
+  <div class="toc-container">
+    <h2 class="toc-title">On This Page<span class="mobile-view toc-menu-button float-right">
+<svg class="lucide-icon icon-chevron-down " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-down"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m6 9 6 6 6-6" />
+</svg>
+</span></h2>
+    <ul class="toc-list">
+      
+        <li class="toc-item toc-level-1">
+          <a href="#overlay-format-elfo" class="toc-link">Overlay format (.elfo)</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#overlay-format-elfo-why-it-exists" class="toc-link">Why it exists</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#overlay-format-elfo-on-disk-layout" class="toc-link">On-disk layout</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#overlay-format-elfo-isa-abstraction" class="toc-link">ISA abstraction</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#overlay-format-elfo-how-the-host-consumes-it" class="toc-link">How the host consumes it</a>
+        </li>
+      
+        <li class="toc-item toc-level-3">
+          <a href="#overlay-format-elfo-how-the-host-consumes-it-the-frame-pool" class="toc-link">The frame pool</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#overlay-format-elfo-building-the-blob" class="toc-link">Building the blob</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
+          <a href="#overlay-format-elfo-stability" class="toc-link">Stability</a>
+        </li>
+      
+    </ul>
+  </div>
+
+                
+                
+              </div>
+              
+            </div>
+            <div class="page-footer-actions">
+              
+              
+                <span class="git-last-updated" data-timestamp="1793486742000">
+                  <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <span class="git-label">Last updated:</span>
+                  <span class="git-time" data-timestamp="1793486742000"></span>
+                  
+                  <div class="git-commit-tooltip" role="tooltip">
+                    <div class="git-tooltip-title">Recent commits</div>
+                    <ul class="git-commit-list">
+                      
+                        <li class="git-commit-item">
+                          <div class="git-commit-avatar" title="NellowTCS">
+                            
+                              <img src="https://www.gravatar.com/avatar/baecf29c7bedbb00a8d5bd5984799c55?d=mp&amp;s=64" alt="NellowTCS">
+                            
+                          </div>
+                          <div class="git-commit-details">
+                            <div class="git-commit-message" title="Docs">Docs</div>
+                            <div class="git-commit-meta">
+                              <span class="git-commit-author">NellowTCS</span>
+                              <span class="git-commit-date" data-timestamp="1793486742000"></span>
+                            </div>
+                          </div>
+                        </li>
+                      
+                    </ul>
+                  </div>
+                  
+                </span>
+              
+              <span class="git-spacer"></span>
+              
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/Docs/docs/overlay.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                  
+<svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-pencil"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
+  <path d="m15 5 4 4" />
+</svg>
+
+                  Edit this page
+                </a>
+              
+            </div>
+          </main>
+          
+
+
+<footer class="footer-complete">
+  <div class="footer-complete-top">
+      <div class="footer-brand">
+          
+            <span class="footer-title">PocketMage SDK</span>
+          
+          
+            <p class="footer-desc">The official SDK for PocketMage apps: each app is an ELF the OS loads and runs in-process.</p>
+          
+        </div>
+        
+          <div class="footer-columns">
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Get Started</span>
+                <ul>
+                  
+                    <li><a href="get-started/" >Overview</a></li>
+                  
+                    <li><a href="get-started/toolchain/" >Install the toolchain</a></li>
+                  
+                    <li><a href="get-started/first-app/" >Your first app</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Reference</span>
+                <ul>
+                  
+                    <li><a href="api/functions/" >Function index</a></li>
+                  
+                    <li><a href="app-abi/" >App ABI</a></li>
+                  
+                    <li><a href="overlay/" >Overlay format</a></li>
+                  
+                    <li><a href="symbols/" >Symbol surface</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Tooling</span>
+                <ul>
+                  
+                    <li><a href="build/" >Building apps</a></li>
+                  
+                    <li><a href="cli/" >pm CLI</a></li>
+                  
+                    <li><a href="guides/publishing/" >Publishing</a></li>
+                  
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Community</span>
+                <ul>
+                  
+                    <li><a href="https://talismandesign.github.io/PocketMage_PDA/docs" >PocketMageOS docs</a></li>
+                  
+                    <li><a href="https://github.com/TalismanDesign/PocketMage_SDK" >GitHub</a></li>
+                  
+                    <li><a href="https://discord.gg/KSCapSf4XH" >Discord</a></li>
+                  
+                </ul>
+              </div>
+            
+          </div>
+        
+      </div>
+      <div class="footer-complete-bottom">
+        <div class="user-footer">Built with <a href="https://docmd.io">docmd</a>. <a href="https://github.com/TalismanDesign/PocketMage_SDK">View on GitHub</a>.</div>
+        
+          <div class="branding-footer">
+            Built with <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path><path d="M12 5 9.04 7.96a2.17 2.17 0 0 0 0 3.08c.82.82 2.13.85 3 .07l2.07-1.9a2.82 2.82 0 0 1 3.79 0l2.96 2.66"></path><path d="m18 15-2-2"></path><path d="m15 18-2-2"></path></svg> <a href="https://docmd.io" target="_blank" rel="noopener">docmd.</a>
+          </div>
+        
+      </div>
+  </footer>
+
+        </div>
+      </div>
+      
+      <script src="../assets/js/docmd-main.js?v=mvwzpk2z"></script>
+      
+      <script src="../assets/js/docmd-git.js?v=mvwzpk2z"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-search.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/init-mermaid.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-git.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-ai.js?v=mvwzpk2z" ></script>
+
+  <!-- Search Modal (Injected by @docmd/plugin-search) -->
+  <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
+       data-search-placeholder="Search documentation..."
+       data-search-no-results="No results found."
+       data-search-error="Failed to load search index."
+       data-search-offline="Search requires a web server. Open this site via http://localhost instead of file:// to enable search."
+       data-search-offline-build="Search is disabled because these docs were built with the --offline flag. Rebuild the site without the flag to enable search."
+       data-search-initial="Type to start searching..."
+       data-search-navigate="to navigate"
+       data-search-escape="to close">
+      <div class="docmd-search-box">
+          <div class="docmd-search-header">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-search"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input type="text" id="docmd-search-input" placeholder="Search documentation..." autocomplete="off" spellcheck="false">
+              <button onclick="window.closeDocmdSearch()" class="docmd-search-close" aria-label="Close search">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-icon icon-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+          </div>
+          <div id="docmd-search-results" class="docmd-search-results"></div>
+          <div class="docmd-search-footer">
+              <span><kbd class="docmd-kbd">↑</kbd> <kbd class="docmd-kbd">↓</kbd> to navigate</span>
+              <span><kbd class="docmd-kbd">ESC</kbd> to close</span>
+          </div>
+      </div>
+  </div>
+
+    <script>
+      (function() {
+        var searchDebounceTimer;
+
+        document.addEventListener('click', function(e) {
+          var link = e.target.closest('a');
+          if (!link || !window.gtag) return;
+          
+          var url = link.href;
+          var hostname = window.location.hostname;
+          var isExternal = link.hostname && link.hostname !== hostname;
+          var isDownload = link.hasAttribute('download') || url.match(/\.(pdf|zip|tar|gz|exe|pkg)$/i);
+          
+          if (isExternal) {
+            gtag('event', 'click_external', { 'url': url, 'link_text': link.innerText.trim() });
+          } else if (isDownload) {
+            gtag('event', 'download', { 'file_name': url.split('/').pop(), 'url': url });
+          }
+
+          // TOC tracking
+          if (link.classList.contains('toc-link')) {
+            gtag('event', 'toc_click', { 'target_id': link.getAttribute('href'), 'title': link.innerText.trim() });
+          }
+
+          // Permalink tracking
+          if (link.classList.contains('heading-anchor')) {
+            gtag('event', 'permalink_click', { 'url': url });
+          }
+        });
+
+        
+        // Search Keyword Tracking
+        document.addEventListener('input', function(e) {
+          if (e.target.id === 'docmd-search-input' && window.gtag) {
+            var query = e.target.value.trim();
+            if (query.length < 3) return;
+            
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(function() {
+              gtag('event', 'search', { 'search_term': query });
+            }, 1000);
+          }
+        });
+        
+      })();
+    </script>
+
+<script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
+      
+      
+      
+  </body>
+</html>

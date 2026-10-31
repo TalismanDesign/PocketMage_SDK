@@ -36,6 +36,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/functions/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/i18n-runtime/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -101,6 +106,36 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/cli/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/get-started/first-app/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/get-started/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/get-started/toolchain/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/glossary/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/guides/i18n/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/guides/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -112,6 +147,11 @@
   </url>
   <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/guides/publishing/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -136,12 +176,22 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/overlay/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/publish/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/symbols/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/troubleshooting/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

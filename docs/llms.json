@@ -6,174 +6,273 @@
       "title": "Built-in asset bitmaps (libAssets.h)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/assets/",
       "description": "Compiled-in PROGMEM bitmaps for the status bar, screensavers, and battery gauge.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Buzzer (pocketmage_bz)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/",
       "description": "PWM buzzer output, Note/Jingle data model, and the built-in melodies.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Clock (pocketmage_clock)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/clock/",
       "description": "The PCF8563 RTC: reading, setting, validity, and the auto-sleep timer bookkeeping.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Configuration",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/configuration/",
       "description": "Compile-time pins and knobs in config.h, persistent preference globals, and how an app sees the SDK version.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "E-Ink (pocketmage_eink)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/eink/",
       "description": "The 320x240 GDEQ031T10 panel: PocketmageEink, the background refresh task, and refresh policy.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Fonts & Text (pocketmage_font)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/font/",
       "description": "FontStyle roles, DisplayTarget, the FontEngine static API, and the default font table.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Frames (frames.h)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/frames/",
       "description": "The Frame data model and the e-ink text/bitmap rendering engine.",
+      "section": "API",
+      "priority": "medium"
+    },
+    {
+      "title": "Function index (pm_*)",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/functions/",
+      "description": "Every pm_* wrapper an external app can call, grouped by module, with its exact C signature and a link to the page that documents it.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Internationalization (i18n)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/i18n-runtime/",
       "description": "Lang/StringID tables, the TR() lookup, runtime language switching, and command aliases.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "API Reference",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/",
       "description": "Every component an app links against: the umbrella header, the singleton accessors, and the per-component pages.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Text utilities (pocketmage_io)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/io/",
       "description": "Small string helpers apps use for command parsing and data marshaling.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Keyboard (pocketmage_kb)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/kb/",
       "description": "The TCA8418 matrix keyboard and USB HID stack: modifiers, key events, and scanning.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Layout (pocketmage_layout)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/",
       "description": "Canonical display geometry, the row-pitch helper, and the text-fit free functions.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "OLED (pocketmage_oled)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/",
       "description": "The 256x32 SSD1326 OLED: PocketmageOled class, the u8g2 object, and the status line.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "SD card (pocketmage_sd)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/sd/",
       "description": "Filesystems, files, metadata, and the dual SDMMC/SDSPI mode switch.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "System (pocketmage_sys, pocketmage_globals)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/",
       "description": "Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "Touch (pocketmage_touch)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/",
       "description": "The MPR121 capacitive slider: scroll offsets, line scrolling, and gesture vectors.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "UI helpers (pocketmage_ui)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/ui/",
       "description": "Screen scaffolding, scrollbars, list rows, inverted chips, and the OLED cycle picker.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "WiFi (pocketmage_wifi)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/wifi/",
       "description": "The station radio service: enabled/scan/connect lifecycle, status queries, and saved credentials.",
+      "section": "API",
       "priority": "medium"
     },
     {
       "title": "App binary contract (ABI)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/",
       "description": "The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.",
+      "section": "App Abi",
       "priority": "medium"
     },
     {
       "title": "Building an app",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/build/",
       "description": "The toolchain, the project layout, and the make targets that produce a shippable ELF and tar.",
+      "section": "Build",
+      "priority": "medium"
+    },
+    {
+      "title": "pm CLI",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/cli/",
+      "description": "The pm developer tool: scaffolding, building, gating, packing, exports reconciliation, and release bumps.",
+      "section": "Cli",
+      "priority": "medium"
+    },
+    {
+      "title": "Your first app",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/get-started/first-app/",
+      "description": "Scaffold, build, gate, pack, and install a minimal PocketMage app end to end.",
+      "section": "Get Started",
+      "priority": "medium"
+    },
+    {
+      "title": "Get Started",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/get-started/",
+      "description": "What a PocketMage app is, what you need installed, and the shortest path from an empty directory to a running ELF.",
+      "section": "Get Started",
+      "priority": "medium"
+    },
+    {
+      "title": "Install the toolchain",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/get-started/toolchain/",
+      "description": "The pinned espressif Xtensa compiler, the elf_overlay host tools, and the pm CLI an app build needs.",
+      "section": "Get Started",
+      "priority": "medium"
+    },
+    {
+      "title": "Glossary",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/glossary/",
+      "description": "The terms the SDK docs use, defined once, with links to the page that owns each concept.",
+      "section": "Glossary",
+      "priority": "medium"
+    },
+    {
+      "title": "Internationalization",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/guides/i18n/",
+      "description": "Give an app translatable strings: the catalog an app ships, how it merges with the SDK base catalog, and resolving strings at runtime.",
+      "section": "Guides",
       "priority": "medium"
     },
     {
       "title": "PocketMage SDK guides",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/guides/",
       "description": "How to build apps, understand their lifecycle, and draw to both displays.",
+      "section": "Guides",
       "priority": "medium"
     },
     {
       "title": "App lifecycle",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/",
       "description": "Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits.",
+      "section": "Guides",
       "priority": "medium"
     },
     {
       "title": "Making an app",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/",
       "description": "Scaffold, build, pack, and run your first PocketMage app.",
+      "section": "Guides",
+      "priority": "medium"
+    },
+    {
+      "title": "Publishing an app",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/guides/publishing/",
+      "description": "The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device.",
+      "section": "Guides",
       "priority": "medium"
     },
     {
       "title": "Rendering",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/guides/rendering/",
       "description": "Which draw calls go where, the E-Ink buffered refresh model, and the scroll loop.",
+      "section": "Guides",
       "priority": "medium"
     },
     {
       "title": "Internationalization (i18n)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/i18n/",
       "description": "Translation catalogs, the gen_i18n.py generator, ownership rules, and what the merge validates.",
+      "section": "I18n",
       "priority": "medium"
     },
     {
       "title": "PocketMage SDK Documentation",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/",
-      "description": "Official SDK for building PocketMage apps: guides, the full component API reference, the ELF app contract, and publishing.",
+      "description": "Official SDK for building PocketMage apps: get started, the full component API reference, the ELF app contract, build tooling, and publishing.",
+      "section": null,
       "priority": "high"
     },
     {
       "title": "Migrating an existing app",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/migration/",
       "description": "Moving a pre-ELF app to the runtime-load flow: what changed, the eight steps, and the traps that bite.",
+      "section": "Migration",
+      "priority": "medium"
+    },
+    {
+      "title": "Overlay format (.elfo)",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/overlay/",
+      "description": "The ELFO overlay blob that ships beside every app ELF: why it exists, its on-disk layout, and how the host pages overlay bodies into executable RAM.",
+      "section": "Overlay",
       "priority": "medium"
     },
     {
       "title": "Publishing an app",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/publish/",
-      "description": "The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device.",
+      "description": "Moved to Guides > Publishing an app.",
+      "section": "Publish",
       "priority": "medium"
     },
     {
       "title": "Symbols and the dependency contract",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/symbols/",
       "description": "The host-export surface apps resolve against, how third-party libraries link, and the rules for changing the surface.",
+      "section": "Symbols",
+      "priority": "medium"
+    },
+    {
+      "title": "Troubleshooting",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/troubleshooting/",
+      "description": "The failures an app build or load hits most, what causes each, and how to fix it.",
+      "section": "Troubleshooting",
       "priority": "medium"
     }
   ]

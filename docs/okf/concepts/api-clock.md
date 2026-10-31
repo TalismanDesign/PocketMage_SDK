@@ -7,7 +7,7 @@ path: /api/clock/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.498Z"
+  generated_at: "2026-10-31T22:45:59.830Z"
 ---
 ---
 title: "Clock (pocketmage_clock)"
@@ -71,3 +71,18 @@ void drawClockLine() {
   OLED().oledWord(String(now.hour()) + ":" +
                   String(now.minute() < 10 ? "0" : "") + String(now.minute()));
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+bool pm_clock_begin();
+void pm_clock_set_time_from_string(const char* a0);
+bool pm_clock_valid();
+```
+
+- `pm_clock_begin()` is `PocketmageCLOCK::begin()` on `CLOCK()`. Returns true once the RTC comes up.
+- `pm_clock_set_time_from_string(a0)` is `setTimeFromString(timeStr)`; `a0` is the `"HH:MM"` string. Bad input is rejected with a `STR_INVALID` OLED message instead of a bad write.
+- `pm_clock_valid()` is `isValid()`. Returns false until `begin()` succeeds and the RTC year is sane.

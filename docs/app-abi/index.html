@@ -10,7 +10,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.9.7">
+    <meta name="generator" content="docmd v0.9.8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <script>
@@ -102,11 +102,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mvw00s0r">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvw00s0r">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.png?v=mvwzpk2z">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvwzpk2z">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvw00s0r" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvw00s0r" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvwzpk2z" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvwzpk2z" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.">
@@ -119,17 +119,19 @@
 <meta name="twitter:title" content="App binary contract (ABI) - PocketMage SDK">
 <meta name="twitter:description" content="The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite.">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"App ABI","item":"https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/"}]}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"Binary Contract"},{"@type":"ListItem","position":3,"name":"App ABI","item":"https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/"}]}
 </script>
 
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvw00s0r" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvwzpk2z" >
 
+    
+      <link rel="stylesheet" href="../assets/css/theme.css?v=mvwzpk2z">
     
     
   </head>
@@ -222,10 +224,11 @@
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
+        <a href="../get-started/" class=" nav-group"
+          >
            
-<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-book"
+<svg class="lucide-icon icon-rocket " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-rocket"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -236,13 +239,16 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
+  <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
+  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05" />
 </svg>
 
           
           <span class="nav-item-title">
-            Guides
-          </span>
+            Get Started
+            </span>
           
             <span class="collapse-icon-wrapper">
 <svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -261,7 +267,8 @@
 </svg>
 </span>
           
-        </span>
+          
+        </a>
         
 
         
@@ -269,7 +276,76 @@
             
       <li class="" >
       
-        <a href="../guides/" class=" "
+        <a href="../get-started/toolchain/" class=" "
+          >
+           
+<svg class="lucide-icon icon-settings " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Install the toolchain
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../get-started/first-app/" class=" "
+          >
+           
+<svg class="lucide-icon icon-play " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-play"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Your first app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <a href="../guides/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -289,16 +365,33 @@
 
           
           <span class="nav-item-title">
-            Guide index
+            Guides
             </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
           
           
         </a>
         
 
         
-      </li>
-    
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../guides/making-apps/" class=" "
@@ -398,71 +491,85 @@
         
       </li>
     
+      <li class="" >
+      
+        <a href="../guides/i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Internationalization
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../guides/publishing/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
           </ul>
         
       </li>
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
-           
-<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-boxes"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
-  <path d="m7 16.5-4.74-2.85" />
-  <path d="m7 16.5 5-3" />
-  <path d="M7 16.5v5.17" />
-  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
-  <path d="m17 16.5-5-3" />
-  <path d="m17 16.5 4.74-2.85" />
-  <path d="M17 16.5v5.17" />
-  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
-  <path d="M12 8 7.26 5.15" />
-  <path d="m12 8 4.74-2.85" />
-  <path d="M12 13.5V8" />
-</svg>
-
-          
-          <span class="nav-item-title">
-            API Reference
-          </span>
-          
-            <span class="collapse-icon-wrapper">
-<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-chevron-right"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m9 18 6-6-6-6" />
-</svg>
-</span>
-          
-        </span>
-        
-
-        
-          <ul class="submenu">
-            
-      <li class="" >
-      
-        <a href="../api/" class=" "
+        <a href="../api/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -493,7 +600,61 @@
 
           
           <span class="nav-item-title">
-            API overview
+            API Reference
+            </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../api/functions/" class=" "
+          >
+           
+<svg class="lucide-icon icon-list " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-list"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 5h.01" />
+  <path d="M3 12h.01" />
+  <path d="M3 19h.01" />
+  <path d="M8 5h13" />
+  <path d="M8 12h13" />
+  <path d="M8 19h13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Function index
             </span>
           
           
@@ -1115,6 +1276,56 @@
         
       </li>
     
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-file-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-file-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 12.5 8 15l2 2.5" />
+  <path d="m14 12.5 2 2.5-2 2.5" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Binary Contract
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
       <li class="active" >
       
         <a href="../app-abi/" class="active "
@@ -1149,11 +1360,11 @@
     
       <li class="" >
       
-        <a href="../build/" class=" "
+        <a href="../overlay/" class=" "
           >
            
-<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-code"
+<svg class="lucide-icon icon-layers " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layers"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1164,13 +1375,14 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m16 18 6-6-6-6" />
-  <path d="m8 6-6 6 6 6" />
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
 </svg>
 
           
           <span class="nav-item-title">
-            Building Apps
+            Overlay format (.elfo)
             </span>
           
           
@@ -1204,7 +1416,7 @@
 
           
           <span class="nav-item-title">
-            Symbols
+            Symbol surface
             </span>
           
           
@@ -1214,13 +1426,16 @@
         
       </li>
     
-      <li class="" >
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <a href="../publish/" class=" "
-          >
+        <span class="nav-label nav-group">
            
-<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-package"
+<svg class="lucide-icon icon-wrench " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wrench"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1231,15 +1446,61 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
-  <path d="M12 22V12" />
-  <polyline points="3.29 7 12 12 20.71 7" />
-  <path d="m7.5 4.27 9 5.15" />
+  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" />
 </svg>
 
           
           <span class="nav-item-title">
-            Publishing
+            Tooling
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../build/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building apps
             </span>
           
           
@@ -1251,7 +1512,7 @@
     
       <li class="" >
       
-        <a href="../i18n/" class=" "
+        <a href="../cli/" class=" "
           >
            
 <svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1272,7 +1533,7 @@
 
           
           <span class="nav-item-title">
-            i18n catalogs
+            pm CLI
             </span>
           
           
@@ -1284,7 +1545,85 @@
     
       <li class="" >
       
-        <a href="../migration/" class=" "
+        <a href="../i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n catalogs
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../troubleshooting/" class=" "
+          >
+           
+<svg class="lucide-icon icon-life-buoy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-life-buoy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="m4.93 4.93 4.24 4.24" />
+  <path d="m14.83 9.17 4.24-4.24" />
+  <path d="m14.83 14.83 4.24 4.24" />
+  <path d="m9.17 14.83-4.24 4.24" />
+  <circle cx="12" cy="12" r="4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../glossary/" class=" "
           >
            
 <svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1301,6 +1640,40 @@
 >
   <path d="M12 5v16" />
   <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../migration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-git-branch " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-git-branch"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 6a9 9 0 0 0-9 9V3" />
+  <circle cx="18" cy="6" r="3" />
+  <circle cx="6" cy="18" r="3" />
 </svg>
 
           
@@ -1549,11 +1922,35 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22App%20binary%20contract%20(ABI)%22%0Adescription%3A%20%22The%20binary%20shape%20the%20loader%20accepts%2C%20how%20it%20is%20mapped%20and%20run%2C%20and%20the%20failure%20modes%20that%20bite.%22%0A---%0A%0A%23%20App%20binary%20contract%20(ABI)%0A%0AThe%20loader%20accepts%20exactly%20one%20thing%3A%20a%2032-bit%20%60ET_DYN%60%20ELF%2C%20little-endian%2C%0Aentry%20%60app_main%60.%20Anything%20else%20fails%20to%20load.%20Build%20and%20packaging%20mechanics%0Alive%20in%20%5Bbuild.md%5D(build.md)%3B%20the%20symbol%20surface%20in%20%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Format%0A%0A-%20%60e_ident%5BEI_CLASS%5D%60%20%3D%20%60ELFCLASS32%60%0A-%20%60e_ident%5BEI_DATA%5D%60%20%3D%20%60ELFDATA2LSB%60%0A-%20%60e_type%60%20%3D%20%60ET_DYN%60%20(position%20independent)%0A-%20entry%20%3D%20the%20%60app_main%60%20symbol%0A%0AThe%20loader%20reads%20the%20ELF%20structures%20with%20plain%20native%20reads.%20No%20byte%0Aswapping%2C%20no%20endianness%20validation.%20A%20big-endian%20file%20decodes%20into%20garbage%0Aand%20the%20load%20fails%2C%20which%20is%20why%20%60app.mk%60%20asserts%20endianness%20after%20link%20and%0Arefuses%20to%20keep%20a%20bad%20artifact.%0A%0AOnly%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%20emits%20output%20the%20loader%20can%0Aread.%20The%20PlatformIO%20package%20emits%20the%20wrong%20byte%20order%20and%20is%20unusable%20for%0Aapps%3B%20see%20%5Bbuild.md%5D(build.md)%20for%20install%20paths.%0A%0A%23%23%20Entry%20point%0A%0AThe%20host%20looks%20up%20%60app_main%60%20by%20name%20and%20calls%20it%20on%20core%201%20in%20a%20task%20with%20a%0A16%20KB%20stack%3A%0A%0A%60%60%60c%0Aint%20main(int%20argc%2C%20char%20**argv)%3B%20%20%20%2F%2F%20renamed%20to%20app_main%20at%20build%20time%0A%60%60%60%0A%0AThe%20build%20passes%20%60-Dmain%3Dapp_main%20-e%20app_main%60%2C%20so%20an%20app%20writes%20its%20entry%0Awith%20C%20linkage%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%0A%60%60%60%0A%0A%60argv%5B0%5D%60%20is%20the%20app%20base%20name%2C%20%60argv%5B1%5D%60%20is%20the%20absolute%20path%20of%20the%20loaded%0AELF.%20Returning%20from%20%60main%60%20tears%20the%20app%20down%20(the%20load%20is%20deinitialized)%20and%0Acontrol%20returns%20to%20the%20OS.%20There%20is%20no%20run-forever%20semantics%3B%20a%20UI%20app%20hands%0Acontrol%20back%20through%20the%20SDK%2Fhost%20API%20cooperatively%2C%20then%20returns.%20End%20the%0Alifetime.%20A%20%60main%60%20that%20never%20returns%20leaks%20the%20run%20task.%0A%0A%23%23%20How%20loading%20works%0A%0AThe%20host%20vendors%20the%20upstream%20%60esp_elf_loader%60%20(see%20%60lib%2FELFLoader%60).%20At%20load%0Atime%3A%0A%0A1.%20Text%20maps%20into%20%60MALLOC_CAP_EXEC%60%20memory%20(IRAM)%20through%20the%20bus%20address%0A%20%20%20mirror%2C%20so%20code%20is%20executable%20on%20the%20S3.%20Do%20not%20enable%0A%20%20%20%60CONFIG_ELF_LOADER_LOAD_PSRAM%60%3A%20on%20ESP32-S3%2C%20code%20in%20PSRAM%20is%20not%0A%20%20%20executable%2C%20app%20or%20firmware.%0A2.%20Data%2Frodata%20maps%20into%20%60MALLOC_CAP_8BIT%60%20DRAM%20segments.%0A3.%20Every%20relocation%20and%20every%20undefined%20symbol%20resolves%20from%20the%20host&#039;s%20own%0A%20%20%20live%20memory.%0A%0AThe%20upstream%20%60esp_elf%60%20loader%20does%20not%20run%20relocation-time%20constructors%2C%20so%0Aany%20%60.init_array%60%20the%20app%20links%20in%20is%20never%20executed.%20Keep%20the%20app%20free%20of%0Aconstructor%20sections%20(%60-fno-exceptions%20-fno-rtti%20-fno-threadsafe-statics%60%20are%0Aon%20by%20default%20in%20%60app.mk%60)%3B%20%60pm%20check%60%20warns%20if%20a%20%60.init_array%60%20slips%20in.%0ADo%20not%20rely%20on%20static-construction%20order%20at%20load%20time.%0A%0ASo%20apps%20link%20%60-nostdlib%60%3A%20no%20newlib%2C%20no%20libstdc%2B%2B%2C%20no%20SDK%20copy%20in%20the%20ELF.%0AEverything%20an%20app%20references%20must%20resolve%20at%20load%20time%20from%20the%20host.%20Linking%0Anewlib%20into%20the%20app%20is%20wasteful%20and%20collides%20with%20host%20globals.%20Don&#039;t.%0A%0A%23%23%20Third-party%20libraries%0A%0AAn%20app%20can%20link%20any%20C%20or%20C%2B%2B%20library%20that%20compiles%20for%20Xtensa.%20The%20host%0Aexports%20the%20C%20and%20C%2B%2B%20runtime%20symbols%2C%20so%20a%20library&#039;s%20references%20to%20%60malloc%60%2C%0A%60memcpy%60%2C%20%60operator%20new%60%2C%20and%20the%20soft-float%20helpers%20resolve%20against%20the%20host%0Ainstead%20of%20needing%20a%20copy%20in%20the%20app.%0A%0ASource%20is%20compiled%20into%20the%20app%20by%20overriding%20%60APP_SRCS%60%3A%0A%0A%60%60%60make%0AAPP_SRCS%20%3D%20main.cpp%20third_party%2FcJSON.c%0A%60%60%60%0A%0AThat%20keeps%20the%20app%20small.%20%60tools%2Fapp.mk%60%20links%20with%20%60-Os%60%2C%0A%60-ffunction-sections%60%2C%20%60--gc-sections%60%20and%20%60--strip-all%60%2C%20so%20a%20library&#039;s%0Aunused%20functions%20are%20dropped%3A%20cJSON%20linked%20into%20an%20app%20comes%20to%205.2%20KB%20rather%0Athan%20the%20size%20of%20its%20source.%0A%0ATwo%20limits%20worth%20knowing.%20The%20host%20exports%20runtime%20symbols%20the%20firmware%0Aalready%20links%2C%20so%20a%20library%20needing%20a%20function%20nothing%20in%20the%20firmware%20uses%0Awill%20not%20resolve%20until%20the%20host%20exports%20it%20deliberately.%20And%20symbol%20counts%0Adepend%20on%20the%20app&#039;s%20own%20optimization%20level%3A%20the%20same%20%60std%3A%3Avector%60%20source%20at%0A%60-O0%60%20wants%2013%20host%20symbols%2C%20at%20%60-Os%60%20it%20wants%207.%20%60app.mk%60%20uses%20%60-Os%60.%0A%0A%60sscanf%60%20is%20the%20one%20common%20libc%20function%20the%20host%20does%20not%20export.%20It%20exists%0Ain%20newlib%20but%20nothing%20in%20the%20firmware%20references%20it%2C%20so%20%60--gc-sections%60%20dropped%0Ait%2C%20and%20referencing%20it%20pulls%20in%20about%20190%20KB%20of%20stdio%20reentrancy.%20Prefer%0A%60strtod%60%20or%20%60strtol%60%20in%20app%20code%20and%20in%20vendored%20libraries.%20See%0A%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Calling%20the%20SDK%20from%20an%20app%0A%0AAn%20app%20includes%20one%20header%20and%20calls%20plain%20C%20functions%3A%0A%0A%60%60%60cpp%0A%23include%20%3Cpm_app_api.h%3E%0A%0Apm_i18n_set_language(PM_LANG_ENGLISH)%3B%0Aint%20w%20%3D%20pm_text_width(2%2C%20%22Hello%22%2C%202)%3B%0Apm_oled_sysmsg(%22saved%22%2C%201500)%3B%0A%60%60%60%0A%0A%60pm_app_api.h%60%20pulls%20in%20%60pm_sdk_app.h%60%2C%20which%20is%20generated%20from%20the%20SDK%0Aheaders%20by%20%60tools%2Fgen_app_api.py%60.%20Regenerate%20it%20after%20any%20SDK%20header%20change%3A%0A%0A%60%60%60sh%0Apython3%20tools%2Fgen_app_api.py%0A%60%60%60%0A%0ANames%20are%20%60pm_%3Cmodule%3E_%3Cmethod%3E%60%20with%20the%20method%20converted%20from%20camelCase%3A%0A%60Eink%3A%3Arefresh%60%20becomes%20%60pm_eink_refresh()%60.%20Enums%20are%20plain%20integers%20in%20the%20app%2C%0Anamed%20%60PM_TARGET_*%60%2C%20%60PM_STYLE_*%60%20and%20%60PM_LANG_*%60%2C%20and%20they%20are%20generated%20in%20the%0ASDK&#039;s%20own%20declaration%20order%2C%20so%20a%20value%20always%20means%20the%20same%20language%20or%0Atarget.%20%60PM_APP_API_ABI%60%20in%20the%20generated%20header%20changes%20when%20a%20signature%20does.%0A%0AC%2B%2B%20types%20are%20projected%20at%20the%20boundary.%20%60String%60%20arguments%20become%0A%60const%20char*%60%2C%20returned%20strings%20and%20%60const%20char*%60%20point%20into%20a%20small%20rotating%0Apool%20that%20is%20overwritten%20by%20later%20calls%2C%20and%20an%20SDK%20method%20that%20needs%20the%0Afilesystem%20gets%20the%20host&#039;s%20global%20handle%20rather%20than%20taking%20one.%20Methods%0Areturning%20an%20SDK%20type%20an%20app%20cannot%20construct%2C%20such%20as%20%60DateTime%60%20or%0A%60WifiApInfo%60%2C%20have%20no%20wrapper.%20Where%20the%20value%20matters%2C%20the%20accessor%20is%0Aflattened%20into%20plain%20fields%20instead%3A%20%60pm_clock_epoch()%60%20and%0A%60pm_clock_timestamp()%60%20rather%20than%20a%20%60DateTime%60%20return.%0A%0ABlob%20storage%20and%20directory%20creation%20have%20no%20SDK%20method%20to%20project.%20The%20text%0A%60writeFile%60%20path%20truncates%20on%20the%20first%20NUL%20and%20the%20read%20pool%20is%20256%20bytes%2C%20so%0A%60pm_sd_write_binary_file()%60%20and%20%60pm_sd_mkdir()%60%20are%20hand-written%20host%0Aprimitives%20in%20%60pm_app_api.h%60%2C%20backed%20by%20raw%20%60File%3A%3Awrite%60%20and%20%60FS%3A%3Amkdir%60%2C%20and%0A%60pm_sd_read_binary_file()%60%20reads%20back%20arbitrary%20sizes.%0A%0AA%20function%20returning%20%60std%3A%3Avector%3CString%3E%60%2C%20such%20as%20word%20wrapping%2C%20becomes%20a%0Acount%20call%20and%20an%20indexed%20getter%2C%20matching%20how%20the%20SDK%20already%20hands%20out%20scan%0Aresults%3A%0A%0A%60%60%60cpp%0Achar%20line%5B80%5D%3B%0Aint%20lines%20%3D%20pm_layout_word_wrap_count(text%2C%20maxWidth%2C%20PM_STYLE_BODY)%3B%0Afor%20(int%20i%20%3D%200%3B%20i%20%3C%20lines%3B%20i%2B%2B)%20%7B%0A%20%20pm_layout_word_wrap_get(text%2C%20maxWidth%2C%20PM_STYLE_BODY%2C%20i%2C%20line%2C%20sizeof%20line)%3B%0A%20%20draw(line)%3B%0A%7D%0A%60%60%60%0A%0AThe%20getter%20writes%20into%20a%20buffer%20the%20caller%20owns%20rather%20than%20the%20string%20pool%2C%0Abecause%20a%20wrapped%20paragraph%20can%20be%20far%20longer%20than%20the%20pool%20holds%2C%20and%20it%0Areturns%20%60-1%60%20for%20an%20out%20of%20range%20index.%20A%20function%20taking%0A%60const%20std%3A%3Avector%3CString%3E%26%60%20takes%20a%20C%20array%20and%20a%20count%20instead%3A%0A%60pm_io_join_string(const%20char*%20const*%20items%2C%20int%20count%2C%20char%20delimiter)%60.%0A%0AThe%20generated%20wrappers%20are%20exported%20through%20%60symbols.list%60%2C%20so%20an%20app%20that%20links%0Aagainst%20%60pm_sdk_app.h%60%20resolves%20every%20symbol%20it%20names.%20A%20new%20wrapper%20belongs%20in%0Athat%20list%20before%20any%20app%20can%20call%20it%3B%20a%20name%20that%20is%20missing%20fails%20at%20load%20with%0A%60Can&#039;t%20find%20common%20%3Cname%3E%60%20rather%20than%20at%20link%20time.%0A%0A%23%23%20SDK%20version%20stamp%0A%0AThe%20host%20exports%20the%20ABI%20version%20as%20a%20string%20symbol%2C%20defined%20in%0A%60pocketmage_globals.cpp%60%20and%20curated%20in%20%60symbols.list%60%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20const%20char%20pocketmage_sdk_version%5B%5D%3B%20%20%2F%2F%20e.g.%20%220.1.0%22%0A%60%60%60%0A%0AApps%20consume%20it%20through%20the%20macro%20surface%20in%20%60pocketmage_app_version.h%60%3A%0A%60POCKETMAGE_SDK_VERSION_STRING%60%2C%20%60POCKETMAGE_SDK_VERSION_MAJOR%60%2C%0A%60POCKETMAGE_SDK_VERSION_MINOR%60%2C%20%60POCKETMAGE_SDK_VERSION_PATCH%60.%20The%20firmware%0Aloads%20these%20macros%20from%20%60-DPM_SDK_VERSION_*%60%20supplied%20by%20%60app.mk%60%2C%20and%20the%0AOS&#039;s%20loader%20export%20table%20(generated%20from%20%60symbols.list%60%20via%20%60tools%2Fsymbols.py%60)%0Amust%20contain%20the%20matching%20string%20symbol.%0A%0AKeeping%20VERSION%2C%20the%20string%20literal%2C%20the%20header%20macros%2C%20and%20%60library.json%60%20in%0Async%20is%20enforced%20by%20the%20CI%20%60version-sync%60%20job%20and%20%60pm%20release%60%2C%20which%0Arewrites%20all%20four%20together.%0A%0A%23%23%20Runtime%20environment%0A%0A-%20The%20app%20shares%20the%20host&#039;s%20heap.%20Loading%20costs%20roughly%20the%20ELF%20size%20plus%20a%0A%20%20fixed%20reserve%3B%20%60runElfApp%60%20refuses%20to%20launch%20when%20free%20%60MALLOC_CAP_8BIT%60%0A%20%20drops%20below%20that%20floor.%20Keep%20the%20app%20small.%0A-%20The%20app%20runs%20in-process.%20It%20can%20call%20anything%20the%20host%20exports%20-%20the%0A%20%20display%2C%20keyboard%20stack%2C%20translation%20engine%2C%20peripheral%20drivers%20-%20at%20native%0A%20%20speed%2C%20no%20IPC.%0A-%20Stack%20is%20not%20heap.%20The%20run%20task%20gives%2016%20KB%3B%20deep%20recursion%20or%20fat%20frames%0A%20%20blow%20it.%20Move%20working%20sets%20to%20the%20heap.%0A-%20E-ink%20refreshes%20use%20the%20differential%20partial%20waveform%20while%20an%20app%20runs%2C%0A%20%20regardless%20of%20the%20device&#039;s%20FAST_REFRESH%20setting%3B%20the%20setting%20is%20restored%0A%20%20when%20the%20app%20exits.%20Redraw%20on%20change%2C%20not%20on%20a%20timer%3A%20even%20partial%0A%20%20updates%20are%20visible%2C%20and%20a%20periodic%20slow%20clean%20still%20flashes%20the%20panel.%0A%0A%23%23%20Sections%20and%20strip%0A%0A%60app.mk%60%20links%20with%20%60--gc-sections%60%20(functions%20and%20data)%20and%20strips%0Aloader-irrelevant%20sections%2C%20so%20the%20delivered%20ELF%20comes%20down%20to%20%60.text%60%2C%0A%60.rodata%60%2C%20%60.got%60%2C%20%60.rela.dyn%60%2C%20%60.rela.plt%60%2C%20%60.dynsym%60%2C%20%60.dynstr%60%2C%20%60.hash%60%2C%0A%60.shstrtab%60.%20Everything%20else%20is%20removed.%20Code%20that%20depends%20on%20other%20sections%0Aexisting%20is%20unsupported.%20Don&#039;t%20write%20it.%0A%0A%23%23%20App%20manifest%20(%60app.properties%60)%0A%0AWhen%20loading%20an%20app%20from%20SD%2C%20the%20host%20reads%20%60app.properties%60%20from%20the%20app%20directory%20(max%201024%20bytes).%20Recognized%20fields%3A%0A%0A-%20%60name%60%20%E2%80%93%20human-readable%20app%20name%0A-%20%60version%60%20%E2%80%93%20app%20version%20string%0A-%20%60author%60%20%E2%80%93%20author%20string%2C%20free%20form%3B%20multiple%20authors%20may%20be%20comma%0A%20%20separated%20(spaces%20are%20kept%2C%20up%20to%2031%20bytes)%0A-%20%60scope%60%20%E2%80%93%20symbol%20scope%20gate%20(default%3A%20%60all%60)%0A%0AOnly%20%60pm_*%60%20symbols%20are%20scope-gated.%20libc%2C%20libstdc%2B%2B%2C%20and%20ESP-IDF%20symbols%20remain%20available%20regardless%20of%20scope.%20The%20loader%20installs%20the%20scoped%20resolver%20before%20relocation%20and%20resets%20it%20on%20exit.%20argv%20metadata%20passed%20to%20%60app_main%60%20includes%20%60name%60%2C%20%60elfPath%60%2C%20%60version%60%2C%20and%20%60author%60.%0A%0A%23%23%20Endianness%20failure%20modes%0A%0A%7C%20Symptom%20at%20load%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Cause%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20--------------------------------------------%20%7C%20-----------------------------------%20%7C%0A%7C%20garbage%20%2F%20instruction%20fetch%20fault%20in%20IRAM%20%20%20%20%7C%20ELF%20fields%20decoded%20wrong%20(BE)%20%20%20%20%20%20%20%7C%0A%7C%20%60esp_elf_load_section%60%20fault%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20misaligned%20%2F%20incorrect%20section%20data%20%7C%0A%7C%20load%20%22succeeds%22%2C%20entry%20behaves%20wildly%20%20%20%20%20%20%20%20%7C%20wrong%20sizes%20from%20BE%20headers%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20build-time%20guard%20catches%20BE%20before%20it%20reaches%20a%20device%3A%20if%20the%20last%0A%60make%60%20line%20is%20%60error%3A%20...%20big-endian%20...%60%2C%20rebuild%20with%20the%20espressif%0Atoolchain%20(see%20%5Bbuild.md%5D(build.md)).%0A%0A%23%23%20Stability%20rules%20for%20SDK%20authors%0A%0A-%20The%20format%2C%20entry%20point%2C%20and%20load%20strategy%20are%20public%20contract.%20Changing%20how%0A%20%20an%20app%20maps%20or%20invokes%20takes%20a%20%60major%60%20bump%20of%20%60pocketmage_sdk_version%60%20and%0A%20%20a%20migration%20note.%0A-%20Exports%20are%20additive.%20Removing%20or%20changing%20an%20export%20breaks%20live%20apps.%20See%0A%20%20%5BCONTRIBUTING.md%5D(..%2FCONTRIBUTING.md).%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22App%20binary%20contract%20(ABI)%22%0Adescription%3A%20%22The%20binary%20shape%20the%20loader%20accepts%2C%20how%20it%20is%20mapped%20and%20run%2C%20and%20the%20failure%20modes%20that%20bite.%22%0A---%0A%0A%23%20App%20binary%20contract%20(ABI)%0A%0AThe%20loader%20accepts%20exactly%20one%20thing%3A%20a%2032-bit%20%60ET_DYN%60%20ELF%2C%20little-endian%2C%20entry%20%60app_main%60.%20Anything%20else%20fails%20to%20load.%20Build%20and%20packaging%20mechanics%20live%20in%20%5Bbuild.md%5D(build.md)%3B%20the%20symbol%20surface%20in%20%5Bsymbols.md%5D(symbols.md)%3B%20the%20overlay%20sidecar%20that%20ships%20beside%20the%20ELF%20in%20%5Boverlay.md%5D(overlay.md).%0A%0A%23%23%20Format%0A%0A-%20%60e_ident%5BEI_CLASS%5D%60%20%3D%20%60ELFCLASS32%60%0A-%20%60e_ident%5BEI_DATA%5D%60%20%3D%20%60ELFDATA2LSB%60%0A-%20%60e_type%60%20%3D%20%60ET_DYN%60%20(position%20independent)%0A-%20entry%20%3D%20the%20%60app_main%60%20symbol%0A%0AThe%20loader%20reads%20the%20ELF%20structures%20with%20plain%20native%20reads.%20No%20byte%20swapping%2C%20no%20endianness%20validation.%20A%20big-endian%20file%20decodes%20into%20garbage%20and%20the%20load%20fails%2C%20which%20is%20why%20%60app.mk%60%20asserts%20endianness%20after%20link%20and%20refuses%20to%20keep%20a%20bad%20artifact.%0A%0AOnly%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%20emits%20output%20the%20loader%20can%20read.%20The%20PlatformIO%20package%20emits%20the%20wrong%20byte%20order%20and%20is%20unusable%20for%20apps%3B%20see%20%5Bbuild.md%5D(build.md)%20for%20install%20paths.%0A%0A%23%23%20Entry%20point%0A%0AThe%20host%20looks%20up%20%60app_main%60%20by%20name%20and%20runs%20it%20on%20core%201%20in%20a%20dedicated%20task%20with%20a%2016%20KB%20stack%3A%0A%0A%60%60%60c%0Aint%20main(int%20argc%2C%20char%20**argv)%3B%20%20%20%2F%2F%20renamed%20to%20app_main%20at%20build%20time%0A%60%60%60%0A%0AThe%20build%20passes%20%60-Dmain%3Dapp_main%20-e%20app_main%60%2C%20so%20an%20app%20writes%20its%20entry%20with%20C%20linkage%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%0A%60%60%60%0A%0AThe%20runner%20passes%20four%20arguments%2C%20taken%20from%20the%20install%20record%20and%20the%20%60app.properties%60%20manifest%3A%0A%0A%7C%20Index%20%20%20%20%20%7C%20Value%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------%20%7C%20------------------------------------------%20%7C%0A%7C%20%60argv%5B0%5D%60%20%7C%20app%20name%20(manifest%20%60name%60%2C%20else%20base%20name)%20%7C%0A%7C%20%60argv%5B1%5D%60%20%7C%20absolute%20path%20of%20the%20loaded%20ELF%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60argv%5B2%5D%60%20%7C%20app%20version%20string%20(manifest%20%60version%60)%20%20%20%20%7C%0A%7C%20%60argv%5B3%5D%60%20%7C%20author%20string%20(manifest%20%60author%60)%20%20%20%20%20%20%20%20%20%20%7C%0A%0AReturning%20from%20%60main%60%20tears%20the%20app%20down%3A%20the%20overlay%20is%20unloaded%2C%20the%20base%20image%20is%20deinitialized%2C%20and%20control%20returns%20to%20the%20OS%2C%20which%20reopens%20HOME.%20There%20is%20no%20run-forever%20semantics.%20A%20UI%20app%20hands%20control%20back%20through%20the%20SDK%2Fhost%20API%20cooperatively%2C%20then%20returns.%20A%20%60main%60%20that%20never%20returns%20leaks%20the%20run%20task.%0A%0A%23%23%20How%20loading%20works%0A%0ALoading%20is%20two%20stages%3A%20a%20base%20relocation%20with%20%60esp_elf%60%2C%20then%20an%20overlay%20pass%20with%20%60elf_overlay%60.%20The%20runner%20is%20%60src%2Felf_runner.cpp%60.%0A%0A1.%20The%20scoped%20symbol%20resolver%20is%20installed%20first%2C%20because%20relocation%20is%20what%20asks%20the%20host%20to%20resolve%20each%20undefined%20symbol%20(see%20%5Bsymbols.md%5D(symbols.md)).%20%60esp_elf_init%60%20then%20%60esp_elf_relocate_source%60%20relocate%20the%20base%20image.%20The%20ELF%20is%20streamed%20by%20offset%20from%20the%20SD%20file%2C%20so%20the%20whole%20file%20is%20never%20held%20in%20RAM%3B%20only%20transient%20section%20buffers%20add%20to%20the%20peak.%0A2.%20Relocated%20%60.text%60%20lands%20in%20%60MALLOC_CAP_EXEC%60%20memory%20so%20code%20is%20executable%20on%20the%20S3%3B%20data%20and%20rodata%20land%20in%20%60MALLOC_CAP_8BIT%60%20DRAM.%20Code%20in%20PSRAM%20is%20not%20executable%20on%20the%20ESP32-S3%2C%20app%20or%20firmware.%0A3.%20The%20%60%3Cname%3E.elfo%60%20sidecar%20is%20located%20next%20to%20the%20ELF%20and%20loaded%20by%20%60elf_overlay%60%2C%20which%20pages%20overlay%20%60.text%60%20bodies%20into%20a%20pool%20of%20exec-RAM%20frames%20on%20demand%2C%20patches%20ISA-specific%20literal%20loads%20at%20page-in%2C%20applies%20redirects%20so%20resident%20calls%20route%20through%20stubs%2C%20and%20redirects%20the%20entry%20point%20through%20its%20stub.%20If%20no%20sidecar%20is%20present%20the%20app%20runs%20unredirected%20from%20the%20base%20relocation.%20The%20blob%20format%20and%20the%20full%20page-in%20sequence%20are%20in%20%5Boverlay.md%5D(overlay.md).%0A%0AThe%20%60esp_elf%60%20loader%20does%20not%20run%20relocation-time%20constructors%2C%20so%20any%20%60.init_array%60%20the%20app%20links%20in%20is%20never%20executed.%20Keep%20the%20app%20free%20of%20constructor%20sections%20(%60-fno-exceptions%20-fno-rtti%20-fno-threadsafe-statics%60%20are%20on%20by%20default%20in%20%60app.mk%60)%3B%20%60pm%20check%60%20warns%20if%20a%20%60.init_array%60%20slips%20in.%20Do%20not%20rely%20on%20static-construction%20order%20at%20load%20time.%0A%0AApps%20link%20%60-nostdlib%60%3A%20no%20newlib%2C%20no%20libstdc%2B%2B%2C%20no%20SDK%20copy%20in%20the%20ELF.%20Everything%20an%20app%20references%20must%20resolve%20at%20load%20time%20from%20the%20host.%20Linking%20newlib%20into%20the%20app%20is%20wasteful%20and%20collides%20with%20host%20globals.%20Don&#039;t.%0A%0A%23%23%20Third-party%20libraries%0A%0AAn%20app%20can%20link%20any%20C%20or%20C%2B%2B%20library%20that%20compiles%20for%20Xtensa.%20The%20host%20exports%20the%20C%20and%20C%2B%2B%20runtime%20symbols%2C%20so%20a%20library&#039;s%20references%20to%20%60malloc%60%2C%20%60memcpy%60%2C%20%60operator%20new%60%2C%20and%20the%20soft-float%20helpers%20resolve%20against%20the%20host%20instead%20of%20needing%20a%20copy%20in%20the%20app.%0A%0ASource%20is%20compiled%20into%20the%20app%20by%20overriding%20%60APP_SRCS%60%3A%0A%0A%60%60%60make%0AAPP_SRCS%20%3D%20main.cpp%20third_party%2FcJSON.c%0A%60%60%60%0A%0AThat%20keeps%20the%20app%20small.%20%60tools%2Fapp.mk%60%20links%20with%20%60-Os%60%2C%20%60-ffunction-sections%60%2C%20%60--gc-sections%60%20and%20%60--strip-all%60%2C%20so%20a%20library&#039;s%20unused%20functions%20are%20dropped%3A%20cJSON%20linked%20into%20an%20app%20comes%20to%205.2%20KB%20rather%20than%20the%20size%20of%20its%20source.%0A%0ATwo%20limits%20worth%20knowing.%20The%20host%20exports%20runtime%20symbols%20the%20firmware%20already%20links%2C%20so%20a%20library%20needing%20a%20function%20nothing%20in%20the%20firmware%20uses%20will%20not%20resolve%20until%20the%20host%20exports%20it%20deliberately.%20And%20symbol%20counts%20depend%20on%20the%20app&#039;s%20own%20optimization%20level%3A%20the%20same%20%60std%3A%3Avector%60%20source%20at%20%60-O0%60%20wants%2013%20host%20symbols%2C%20at%20%60-Os%60%20it%20wants%207.%20%60app.mk%60%20uses%20%60-Os%60.%0A%0A%60sscanf%60%20is%20the%20one%20common%20libc%20function%20the%20host%20does%20not%20export.%20It%20exists%20in%20newlib%20but%20nothing%20in%20the%20firmware%20references%20it%2C%20so%20%60--gc-sections%60%20dropped%20it%2C%20and%20referencing%20it%20pulls%20in%20about%20190%20KB%20of%20stdio%20reentrancy.%20Prefer%20%60strtod%60%20or%20%60strtol%60%20in%20app%20code%20and%20in%20vendored%20libraries.%20See%20%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Calling%20the%20SDK%20from%20an%20app%0A%0AAn%20app%20includes%20one%20header%20and%20calls%20plain%20C%20functions%3A%0A%0A%60%60%60cpp%0A%23include%20%3Cpm_app_api.h%3E%0A%0Apm_i18n_set_language(PM_LANG_ENGLISH)%3B%0Aint%20w%20%3D%20pm_text_width(2%2C%20%22Hello%22%2C%202)%3B%0Apm_oled_sysmsg(%22saved%22%2C%201500)%3B%0A%60%60%60%0A%0A%60pm_app_api.h%60%20pulls%20in%20%60pm_sdk_app.h%60%2C%20which%20is%20generated%20from%20the%20SDK%20headers%20by%20%60tools%2Fgen_app_api.py%60.%20Regenerate%20it%20after%20any%20SDK%20header%20change%3A%0A%0A%60%60%60sh%0Apython3%20tools%2Fgen_app_api.py%0A%60%60%60%0A%0ANames%20are%20%60pm_%3Cmodule%3E_%3Cmethod%3E%60%20with%20the%20method%20converted%20from%20camelCase%3A%20%60Eink%3A%3Arefresh%60%20becomes%20%60pm_eink_refresh()%60.%20Enums%20are%20plain%20integers%20in%20the%20app%2C%20named%20%60PM_TARGET_*%60%2C%20%60PM_STYLE_*%60%20and%20%60PM_LANG_*%60%2C%20and%20they%20are%20generated%20in%20the%20SDK&#039;s%20own%20declaration%20order%2C%20so%20a%20value%20always%20means%20the%20same%20language%20or%20target.%20%60PM_APP_API_ABI%60%20in%20the%20generated%20header%20changes%20when%20a%20signature%20does.%0A%0AC%2B%2B%20types%20are%20projected%20at%20the%20boundary.%20%60String%60%20arguments%20become%20%60const%20char*%60%2C%20returned%20strings%20and%20%60const%20char*%60%20point%20into%20a%20small%20rotating%20pool%20that%20is%20overwritten%20by%20later%20calls%2C%20and%20an%20SDK%20method%20that%20needs%20the%20filesystem%20gets%20the%20host&#039;s%20global%20handle%20rather%20than%20taking%20one.%20Methods%20returning%20an%20SDK%20type%20an%20app%20cannot%20construct%2C%20such%20as%20%60DateTime%60%20or%20%60WifiApInfo%60%2C%20have%20no%20wrapper.%20Where%20the%20value%20matters%2C%20the%20accessor%20is%20flattened%20into%20plain%20fields%20instead%3A%20%60pm_clock_epoch()%60%20and%20%60pm_clock_timestamp()%60%20rather%20than%20a%20%60DateTime%60%20return.%0A%0ABlob%20storage%20and%20directory%20creation%20have%20no%20SDK%20method%20to%20project.%20The%20text%20%60writeFile%60%20path%20truncates%20on%20the%20first%20NUL%20and%20the%20read%20pool%20is%20256%20bytes%2C%20so%20%60pm_sd_write_binary_file()%60%20and%20%60pm_sd_mkdir()%60%20are%20hand-written%20host%20primitives%20in%20%60pm_app_api.h%60%2C%20backed%20by%20raw%20%60File%3A%3Awrite%60%20and%20%60FS%3A%3Amkdir%60%2C%20and%20%60pm_sd_read_binary_file()%60%20reads%20back%20arbitrary%20sizes.%0A%0AA%20function%20returning%20%60std%3A%3Avector%3CString%3E%60%2C%20such%20as%20word%20wrapping%2C%20becomes%20a%20count%20call%20and%20an%20indexed%20getter%2C%20matching%20how%20the%20SDK%20already%20hands%20out%20scan%20results%3A%0A%0A%60%60%60cpp%0Achar%20line%5B80%5D%3B%0Aint%20lines%20%3D%20pm_layout_word_wrap_count(text%2C%20maxWidth%2C%20PM_STYLE_BODY)%3B%0Afor%20(int%20i%20%3D%200%3B%20i%20%3C%20lines%3B%20i%2B%2B)%20%7B%0A%20%20pm_layout_word_wrap_get(text%2C%20maxWidth%2C%20PM_STYLE_BODY%2C%20i%2C%20line%2C%20sizeof%20line)%3B%0A%20%20draw(line)%3B%0A%7D%0A%60%60%60%0A%0AThe%20getter%20writes%20into%20a%20buffer%20the%20caller%20owns%20rather%20than%20the%20string%20pool%2C%20because%20a%20wrapped%20paragraph%20can%20be%20far%20longer%20than%20the%20pool%20holds%2C%20and%20it%20returns%20%60-1%60%20for%20an%20out%20of%20range%20index.%20A%20function%20taking%20%60const%20std%3A%3Avector%3CString%3E%26%60%20takes%20a%20C%20array%20and%20a%20count%20instead%3A%20%60pm_io_join_string(const%20char*%20const*%20items%2C%20int%20count%2C%20char%20delimiter)%60.%0A%0AThe%20generated%20wrappers%20are%20exported%20through%20%60symbols.list%60%2C%20so%20an%20app%20that%20links%20against%20%60pm_sdk_app.h%60%20resolves%20every%20symbol%20it%20names.%20A%20new%20wrapper%20belongs%20in%20that%20list%20before%20any%20app%20can%20call%20it%3B%20a%20name%20that%20is%20missing%20fails%20at%20load%20with%20%60Can&#039;t%20find%20common%20%3Cname%3E%60%20rather%20than%20at%20link%20time.%0A%0A%23%23%20SDK%20version%20stamp%0A%0AThe%20host%20exports%20the%20ABI%20version%20as%20a%20string%20symbol%2C%20defined%20in%20%60pocketmage_globals.cpp%60%20and%20curated%20in%20%60symbols.list%60%3A%0A%0A%60%60%60cpp%0Aextern%20%22C%22%20const%20char%20pocketmage_sdk_version%5B%5D%3B%20%20%2F%2F%20e.g.%20%220.1.0%22%0A%60%60%60%0A%0AApps%20consume%20it%20through%20the%20macro%20surface%20in%20%60pocketmage_app_version.h%60%3A%20%60POCKETMAGE_SDK_VERSION_STRING%60%2C%20%60POCKETMAGE_SDK_VERSION_MAJOR%60%2C%20%60POCKETMAGE_SDK_VERSION_MINOR%60%2C%20%60POCKETMAGE_SDK_VERSION_PATCH%60.%20The%20firmware%20loads%20these%20macros%20from%20%60-DPM_SDK_VERSION_*%60%20supplied%20by%20%60app.mk%60%2C%20and%20the%20OS&#039;s%20loader%20export%20table%20(generated%20from%20%60symbols.list%60%20via%20%60tools%2Fsymbols.py%60)%20must%20contain%20the%20matching%20string%20symbol.%0A%0AKeeping%20VERSION%2C%20the%20string%20literal%2C%20the%20header%20macros%2C%20and%20%60library.json%60%20in%20sync%20is%20enforced%20by%20the%20CI%20%60version-sync%60%20job%20and%20%60pm%20release%60%2C%20which%20rewrites%20all%20four%20together.%0A%0A%23%23%20Runtime%20environment%0A%0A-%20The%20app%20shares%20the%20host&#039;s%20heap.%20Loading%20costs%20roughly%20the%20ELF%20size%20plus%20a%20fixed%20reserve%3B%20%60runElfApp%60%20refuses%20to%20launch%20when%20free%20%60MALLOC_CAP_8BIT%60%20drops%20below%20that%20floor.%20Keep%20the%20app%20small.%0A-%20The%20app%20runs%20in-process.%20It%20can%20call%20anything%20the%20host%20exports%20-%20the%20display%2C%20keyboard%20stack%2C%20translation%20engine%2C%20peripheral%20drivers%20-%20at%20native%20speed%2C%20no%20IPC.%0A-%20Stack%20is%20not%20heap.%20The%20run%20task%20gives%2016%20KB%3B%20deep%20recursion%20or%20fat%20frames%20blow%20it.%20Move%20working%20sets%20to%20the%20heap.%0A-%20E-ink%20refreshes%20use%20the%20differential%20partial%20waveform%20while%20an%20app%20runs%2C%20regardless%20of%20the%20device&#039;s%20FAST_REFRESH%20setting%3B%20the%20setting%20is%20restored%20when%20the%20app%20exits.%20Redraw%20on%20change%2C%20not%20on%20a%20timer%3A%20even%20partial%20updates%20are%20visible%2C%20and%20a%20periodic%20slow%20clean%20still%20flashes%20the%20panel.%0A%0A%23%23%20Sections%20and%20strip%0A%0A%60app.mk%60%20links%20with%20%60--gc-sections%60%20(functions%20and%20data)%20and%20strips%20loader-irrelevant%20sections%2C%20so%20the%20delivered%20ELF%20comes%20down%20to%20%60.text%60%2C%20%60.rodata%60%2C%20%60.got%60%2C%20%60.rela.dyn%60%2C%20%60.rela.plt%60%2C%20%60.dynsym%60%2C%20%60.dynstr%60%2C%20%60.hash%60%2C%20%60.shstrtab%60.%20Everything%20else%20is%20removed.%20Code%20that%20depends%20on%20other%20sections%20existing%20is%20unsupported.%20Don&#039;t%20write%20it.%0A%0AThe%20overlay%20sidecar%20is%20derived%20from%20the%20unstripped%20link%20output%2C%20not%20from%20this%20delivered%20ELF%2C%20so%20stripping%20the%20ELF%20does%20not%20lose%20the%20data%20the%20overlay%20needs.%20See%20%5Boverlay.md%5D(overlay.md).%0A%0A%23%23%20App%20manifest%20(%60app.properties%60)%0A%0AWhen%20loading%20an%20app%20from%20SD%2C%20the%20host%20reads%20%60app.properties%60%20from%20the%20app%20directory%20(max%201024%20bytes).%20Recognized%20fields%3A%0A%0A-%20%60name%60%20-%20human-readable%20app%20name%0A-%20%60version%60%20-%20app%20version%20string%0A-%20%60author%60%20-%20author%20string%2C%20free%20form%3B%20multiple%20authors%20may%20be%20comma%20separated%20(spaces%20are%20kept%2C%20up%20to%2031%20bytes)%0A-%20%60scope%60%20-%20symbol%20scope%20gate%20(default%3A%20%60all%60)%0A%0AOnly%20%60pm_*%60%20symbols%20are%20scope-gated.%20libc%2C%20libstdc%2B%2B%2C%20and%20ESP-IDF%20symbols%20remain%20available%20regardless%20of%20scope.%20The%20loader%20installs%20the%20scoped%20resolver%20before%20relocation%20and%20resets%20it%20on%20exit.%20argv%20metadata%20passed%20to%20%60app_main%60%20includes%20%60name%60%2C%20%60elfPath%60%2C%20%60version%60%2C%20and%20%60author%60.%0A%0A%23%23%20Endianness%20failure%20modes%0A%0A%7C%20Symptom%20at%20load%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Cause%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20--------------------------------------------%20%7C%20-----------------------------------%20%7C%0A%7C%20garbage%20%2F%20instruction%20fetch%20fault%20in%20IRAM%20%20%20%20%7C%20ELF%20fields%20decoded%20wrong%20(BE)%20%20%20%20%20%20%20%7C%0A%7C%20%60esp_elf_load_section%60%20fault%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20misaligned%20%2F%20incorrect%20section%20data%20%7C%0A%7C%20load%20%22succeeds%22%2C%20entry%20behaves%20wildly%20%20%20%20%20%20%20%20%7C%20wrong%20sizes%20from%20BE%20headers%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20build-time%20guard%20catches%20BE%20before%20it%20reaches%20a%20device%3A%20if%20the%20last%20%60make%60%20line%20is%20%60error%3A%20...%20big-endian%20...%60%2C%20rebuild%20with%20the%20espressif%20toolchain%20(see%20%5Bbuild.md%5D(build.md)).%0A%0A%23%23%20Stability%20rules%20for%20SDK%20authors%0A%0A-%20The%20format%2C%20entry%20point%2C%20and%20load%20strategy%20are%20public%20contract.%20Changing%20how%20an%20app%20maps%20or%20invokes%2C%20including%20the%20ELFO%20overlay%20format%20in%20%5Boverlay.md%5D(overlay.md)%2C%20takes%20a%20%60major%60%20bump%20of%20%60pocketmage_sdk_version%60%20and%20a%20migration%20note.%0A-%20Exports%20are%20additive.%20Removing%20or%20changing%20an%20export%20breaks%20live%20apps.%20See%20%5BCONTRIBUTING.md%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_SDK%2Fblob%2Fmain%2FCONTRIBUTING.md).%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
                         
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Binary Contract</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
                         
                           <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
                             
@@ -1621,9 +2018,7 @@
                   </h1>
                 
                 <h1 id="app-binary-contract-abi" class="docmd-heading"><a href="#app-binary-contract-abi" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>App binary contract (ABI)</h1>
-<p>The loader accepts exactly one thing: a 32-bit <code>ET_DYN</code> ELF, little-endian,<br>
-entry <code>app_main</code>. Anything else fails to load. Build and packaging mechanics<br>
-live in <a href="../build/">build.md</a>; the symbol surface in <a href="../symbols/">symbols.md</a>.</p>
+<p>The loader accepts exactly one thing: a 32-bit <code>ET_DYN</code> ELF, little-endian, entry <code>app_main</code>. Anything else fails to load. Build and packaging mechanics live in <a href="../build/">build.md</a>; the symbol surface in <a href="../symbols/">symbols.md</a>; the overlay sidecar that ships beside the ELF in <a href="../overlay/">overlay.md</a>.</p>
 <h2 id="app-binary-contract-abi-format" class="docmd-heading"><a href="#app-binary-contract-abi-format" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Format</h2>
 <ul>
 <li><code>e_ident[EI_CLASS]</code> = <code>ELFCLASS32</code></li>
@@ -1631,69 +2026,60 @@ live in <a href="../build/">build.md</a>; the symbol surface in <a href="../symb
 <li><code>e_type</code> = <code>ET_DYN</code> (position independent)</li>
 <li>entry = the <code>app_main</code> symbol</li>
 </ul>
-<p>The loader reads the ELF structures with plain native reads. No byte<br>
-swapping, no endianness validation. A big-endian file decodes into garbage<br>
-and the load fails, which is why <code>app.mk</code> asserts endianness after link and<br>
-refuses to keep a bad artifact.</p>
-<p>Only the espressif <code>xtensa-esp-elf</code> toolchain emits output the loader can<br>
-read. The PlatformIO package emits the wrong byte order and is unusable for<br>
-apps; see <a href="../build/">build.md</a> for install paths.</p>
+<p>The loader reads the ELF structures with plain native reads. No byte swapping, no endianness validation. A big-endian file decodes into garbage and the load fails, which is why <code>app.mk</code> asserts endianness after link and refuses to keep a bad artifact.</p>
+<p>Only the espressif <code>xtensa-esp-elf</code> toolchain emits output the loader can read. The PlatformIO package emits the wrong byte order and is unusable for apps; see <a href="../build/">build.md</a> for install paths.</p>
 <h2 id="app-binary-contract-abi-entry-point" class="docmd-heading"><a href="#app-binary-contract-abi-entry-point" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Entry point</h2>
-<p>The host looks up <code>app_main</code> by name and calls it on core 1 in a task with a<br>
-16 KB stack:</p>
+<p>The host looks up <code>app_main</code> by name and runs it on core 1 in a dedicated task with a 16 KB stack:</p>
 <pre class="hljs"><code class="language-c"><span class="hljs-keyword">int</span> <span class="hljs-title function_">main</span>(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> <span class="hljs-operator">**</span>argv);   <span class="hljs-comment">// renamed to app_main at build time</span>
 </code></pre>
-<p>The build passes <code>-Dmain=app_main -e app_main</code>, so an app writes its entry<br>
-with C linkage:</p>
+<p>The build passes <code>-Dmain=app_main -e app_main</code>, so an app writes its entry with C linkage:</p>
 <pre class="hljs"><code class="language-cpp">extern <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-keyword">int</span> <span class="hljs-title function_">main</span>(<span class="hljs-keyword">int</span> argc, <span class="hljs-keyword">char</span> <span class="hljs-operator">**</span>argv)
 </code></pre>
-<p><code>argv[0]</code> is the app base name, <code>argv[1]</code> is the absolute path of the loaded<br>
-ELF. Returning from <code>main</code> tears the app down (the load is deinitialized) and<br>
-control returns to the OS. There is no run-forever semantics; a UI app hands<br>
-control back through the SDK/host API cooperatively, then returns. End the<br>
-lifetime. A <code>main</code> that never returns leaks the run task.</p>
+<p>The runner passes four arguments, taken from the install record and the <code>app.properties</code> manifest:</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>Index</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>argv[0]</code></td>
+<td>app name (manifest <code>name</code>, else base name)</td>
+</tr>
+<tr>
+<td><code>argv[1]</code></td>
+<td>absolute path of the loaded ELF</td>
+</tr>
+<tr>
+<td><code>argv[2]</code></td>
+<td>app version string (manifest <code>version</code>)</td>
+</tr>
+<tr>
+<td><code>argv[3]</code></td>
+<td>author string (manifest <code>author</code>)</td>
+</tr>
+</tbody>
+</table>
+</div><p>Returning from <code>main</code> tears the app down: the overlay is unloaded, the base image is deinitialized, and control returns to the OS, which reopens HOME. There is no run-forever semantics. A UI app hands control back through the SDK/host API cooperatively, then returns. A <code>main</code> that never returns leaks the run task.</p>
 <h2 id="app-binary-contract-abi-how-loading-works" class="docmd-heading"><a href="#app-binary-contract-abi-how-loading-works" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>How loading works</h2>
-<p>The host vendors the upstream <code>esp_elf_loader</code> (see <code>lib/ELFLoader</code>). At load<br>
-time:</p>
+<p>Loading is two stages: a base relocation with <code>esp_elf</code>, then an overlay pass with <code>elf_overlay</code>. The runner is <code>src/elf_runner.cpp</code>.</p>
 <ol>
-<li>Text maps into <code>MALLOC_CAP_EXEC</code> memory (IRAM) through the bus address<br>
-mirror, so code is executable on the S3. Do not enable<br>
-<code>CONFIG_ELF_LOADER_LOAD_PSRAM</code>: on ESP32-S3, code in PSRAM is not<br>
-executable, app or firmware.</li>
-<li>Data/rodata maps into <code>MALLOC_CAP_8BIT</code> DRAM segments.</li>
-<li>Every relocation and every undefined symbol resolves from the host’s own<br>
-live memory.</li>
+<li>The scoped symbol resolver is installed first, because relocation is what asks the host to resolve each undefined symbol (see <a href="../symbols/">symbols.md</a>). <code>esp_elf_init</code> then <code>esp_elf_relocate_source</code> relocate the base image. The ELF is streamed by offset from the SD file, so the whole file is never held in RAM; only transient section buffers add to the peak.</li>
+<li>Relocated <code>.text</code> lands in <code>MALLOC_CAP_EXEC</code> memory so code is executable on the S3; data and rodata land in <code>MALLOC_CAP_8BIT</code> DRAM. Code in PSRAM is not executable on the ESP32-S3, app or firmware.</li>
+<li>The <code>&lt;name&gt;.elfo</code> sidecar is located next to the ELF and loaded by <code>elf_overlay</code>, which pages overlay <code>.text</code> bodies into a pool of exec-RAM frames on demand, patches ISA-specific literal loads at page-in, applies redirects so resident calls route through stubs, and redirects the entry point through its stub. If no sidecar is present the app runs unredirected from the base relocation. The blob format and the full page-in sequence are in <a href="../overlay/">overlay.md</a>.</li>
 </ol>
-<p>The upstream <code>esp_elf</code> loader does not run relocation-time constructors, so<br>
-any <code>.init_array</code> the app links in is never executed. Keep the app free of<br>
-constructor sections (<code>-fno-exceptions -fno-rtti -fno-threadsafe-statics</code> are<br>
-on by default in <code>app.mk</code>); <code>pm check</code> warns if a <code>.init_array</code> slips in.<br>
-Do not rely on static-construction order at load time.</p>
-<p>So apps link <code>-nostdlib</code>: no newlib, no libstdc++, no SDK copy in the ELF.<br>
-Everything an app references must resolve at load time from the host. Linking<br>
-newlib into the app is wasteful and collides with host globals. Don’t.</p>
+<p>The <code>esp_elf</code> loader does not run relocation-time constructors, so any <code>.init_array</code> the app links in is never executed. Keep the app free of constructor sections (<code>-fno-exceptions -fno-rtti -fno-threadsafe-statics</code> are on by default in <code>app.mk</code>); <code>pm check</code> warns if a <code>.init_array</code> slips in. Do not rely on static-construction order at load time.</p>
+<p>Apps link <code>-nostdlib</code>: no newlib, no libstdc++, no SDK copy in the ELF. Everything an app references must resolve at load time from the host. Linking newlib into the app is wasteful and collides with host globals. Don’t.</p>
 <h2 id="app-binary-contract-abi-third-party-libraries" class="docmd-heading"><a href="#app-binary-contract-abi-third-party-libraries" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Third-party libraries</h2>
-<p>An app can link any C or C++ library that compiles for Xtensa. The host<br>
-exports the C and C++ runtime symbols, so a library’s references to <code>malloc</code>,<br>
-<code>memcpy</code>, <code>operator new</code>, and the soft-float helpers resolve against the host<br>
-instead of needing a copy in the app.</p>
+<p>An app can link any C or C++ library that compiles for Xtensa. The host exports the C and C++ runtime symbols, so a library’s references to <code>malloc</code>, <code>memcpy</code>, <code>operator new</code>, and the soft-float helpers resolve against the host instead of needing a copy in the app.</p>
 <p>Source is compiled into the app by overriding <code>APP_SRCS</code>:</p>
 <pre class="hljs"><code class="language-make">APP_SRCS <span class="hljs-operator">=</span> main.<span class="hljs-attr">cpp</span> third_party<span class="hljs-operator">/</span>cJSON.<span class="hljs-attr">c</span>
 </code></pre>
-<p>That keeps the app small. <code>tools/app.mk</code> links with <code>-Os</code>,<br>
-<code>-ffunction-sections</code>, <code>--gc-sections</code> and <code>--strip-all</code>, so a library’s<br>
-unused functions are dropped: cJSON linked into an app comes to 5.2 KB rather<br>
-than the size of its source.</p>
-<p>Two limits worth knowing. The host exports runtime symbols the firmware<br>
-already links, so a library needing a function nothing in the firmware uses<br>
-will not resolve until the host exports it deliberately. And symbol counts<br>
-depend on the app’s own optimization level: the same <code>std::vector</code> source at<br>
-<code>-O0</code> wants 13 host symbols, at <code>-Os</code> it wants 7. <code>app.mk</code> uses <code>-Os</code>.</p>
-<p><code>sscanf</code> is the one common libc function the host does not export. It exists<br>
-in newlib but nothing in the firmware references it, so <code>--gc-sections</code> dropped<br>
-it, and referencing it pulls in about 190 KB of stdio reentrancy. Prefer<br>
-<code>strtod</code> or <code>strtol</code> in app code and in vendored libraries. See<br>
-<a href="../symbols/">symbols.md</a>.</p>
+<p>That keeps the app small. <code>tools/app.mk</code> links with <code>-Os</code>, <code>-ffunction-sections</code>, <code>--gc-sections</code> and <code>--strip-all</code>, so a library’s unused functions are dropped: cJSON linked into an app comes to 5.2 KB rather than the size of its source.</p>
+<p>Two limits worth knowing. The host exports runtime symbols the firmware already links, so a library needing a function nothing in the firmware uses will not resolve until the host exports it deliberately. And symbol counts depend on the app’s own optimization level: the same <code>std::vector</code> source at <code>-O0</code> wants 13 host symbols, at <code>-Os</code> it wants 7. <code>app.mk</code> uses <code>-Os</code>.</p>
+<p><code>sscanf</code> is the one common libc function the host does not export. It exists in newlib but nothing in the firmware references it, so <code>--gc-sections</code> dropped it, and referencing it pulls in about 190 KB of stdio reentrancy. Prefer <code>strtod</code> or <code>strtol</code> in app code and in vendored libraries. See <a href="../symbols/">symbols.md</a>.</p>
 <h2 id="app-binary-contract-abi-calling-the-sdk-from-an-app" class="docmd-heading"><a href="#app-binary-contract-abi-calling-the-sdk-from-an-app" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Calling the SDK from an app</h2>
 <p>An app includes one header and calls plain C functions:</p>
 <pre class="hljs"><code class="language-cpp"><span class="hljs-comment">#include &lt;pm_app_api.h&gt;</span>
@@ -1702,31 +2088,13 @@ it, and referencing it pulls in about 190 KB of stdio reentrancy. Prefer<br>
 <span class="hljs-keyword">int</span> w <span class="hljs-operator">=</span> <span class="hljs-title function_">pm_text_width</span>(<span class="hljs-number">2</span>, <span class="hljs-string">&quot;Hello&quot;</span>, <span class="hljs-number">2</span>);
 <span class="hljs-title function_">pm_oled_sysmsg</span>(<span class="hljs-string">&quot;saved&quot;</span>, <span class="hljs-number">1500</span>);
 </code></pre>
-<p><code>pm_app_api.h</code> pulls in <code>pm_sdk_app.h</code>, which is generated from the SDK<br>
-headers by <code>tools/gen_app_api.py</code>. Regenerate it after any SDK header change:</p>
+<p><code>pm_app_api.h</code> pulls in <code>pm_sdk_app.h</code>, which is generated from the SDK headers by <code>tools/gen_app_api.py</code>. Regenerate it after any SDK header change:</p>
 <pre class="hljs"><code class="language-sh">python3 tools<span class="hljs-operator">/</span>gen_app_api.<span class="hljs-attr">py</span>
 </code></pre>
-<p>Names are <code>pm_&lt;module&gt;_&lt;method&gt;</code> with the method converted from camelCase:<br>
-<code>Eink::refresh</code> becomes <code>pm_eink_refresh()</code>. Enums are plain integers in the app,<br>
-named <code>PM_TARGET_*</code>, <code>PM_STYLE_*</code> and <code>PM_LANG_*</code>, and they are generated in the<br>
-SDK’s own declaration order, so a value always means the same language or<br>
-target. <code>PM_APP_API_ABI</code> in the generated header changes when a signature does.</p>
-<p>C++ types are projected at the boundary. <code>String</code> arguments become<br>
-<code>const char*</code>, returned strings and <code>const char*</code> point into a small rotating<br>
-pool that is overwritten by later calls, and an SDK method that needs the<br>
-filesystem gets the host’s global handle rather than taking one. Methods<br>
-returning an SDK type an app cannot construct, such as <code>DateTime</code> or<br>
-<code>WifiApInfo</code>, have no wrapper. Where the value matters, the accessor is<br>
-flattened into plain fields instead: <code>pm_clock_epoch()</code> and<br>
-<code>pm_clock_timestamp()</code> rather than a <code>DateTime</code> return.</p>
-<p>Blob storage and directory creation have no SDK method to project. The text<br>
-<code>writeFile</code> path truncates on the first NUL and the read pool is 256 bytes, so<br>
-<code>pm_sd_write_binary_file()</code> and <code>pm_sd_mkdir()</code> are hand-written host<br>
-primitives in <code>pm_app_api.h</code>, backed by raw <code>File::write</code> and <code>FS::mkdir</code>, and<br>
-<code>pm_sd_read_binary_file()</code> reads back arbitrary sizes.</p>
-<p>A function returning <code>std::vector&lt;String&gt;</code>, such as word wrapping, becomes a<br>
-count call and an indexed getter, matching how the SDK already hands out scan<br>
-results:</p>
+<p>Names are <code>pm_&lt;module&gt;_&lt;method&gt;</code> with the method converted from camelCase: <code>Eink::refresh</code> becomes <code>pm_eink_refresh()</code>. Enums are plain integers in the app, named <code>PM_TARGET_*</code>, <code>PM_STYLE_*</code> and <code>PM_LANG_*</code>, and they are generated in the SDK’s own declaration order, so a value always means the same language or target. <code>PM_APP_API_ABI</code> in the generated header changes when a signature does.</p>
+<p>C++ types are projected at the boundary. <code>String</code> arguments become <code>const char*</code>, returned strings and <code>const char*</code> point into a small rotating pool that is overwritten by later calls, and an SDK method that needs the filesystem gets the host’s global handle rather than taking one. Methods returning an SDK type an app cannot construct, such as <code>DateTime</code> or <code>WifiApInfo</code>, have no wrapper. Where the value matters, the accessor is flattened into plain fields instead: <code>pm_clock_epoch()</code> and <code>pm_clock_timestamp()</code> rather than a <code>DateTime</code> return.</p>
+<p>Blob storage and directory creation have no SDK method to project. The text <code>writeFile</code> path truncates on the first NUL and the read pool is 256 bytes, so <code>pm_sd_write_binary_file()</code> and <code>pm_sd_mkdir()</code> are hand-written host primitives in <code>pm_app_api.h</code>, backed by raw <code>File::write</code> and <code>FS::mkdir</code>, and <code>pm_sd_read_binary_file()</code> reads back arbitrary sizes.</p>
+<p>A function returning <code>std::vector&lt;String&gt;</code>, such as word wrapping, becomes a count call and an indexed getter, matching how the SDK already hands out scan results:</p>
 <pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">char</span> line[<span class="hljs-number">80</span>];
 <span class="hljs-keyword">int</span> lines <span class="hljs-operator">=</span> <span class="hljs-title function_">pm_layout_word_wrap_count</span>(text, maxWidth, PM_STYLE_BODY);
 <span class="hljs-keyword">for</span> (<span class="hljs-keyword">int</span> i <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i <span class="hljs-operator">&lt;</span> lines; i<span class="hljs-operator">++</span>) {
@@ -1734,58 +2102,31 @@ results:</p>
   <span class="hljs-title function_">draw</span>(line);
 }
 </code></pre>
-<p>The getter writes into a buffer the caller owns rather than the string pool,<br>
-because a wrapped paragraph can be far longer than the pool holds, and it<br>
-returns <code>-1</code> for an out of range index. A function taking<br>
-<code>const std::vector&lt;String&gt;&amp;</code> takes a C array and a count instead:<br>
-<code>pm_io_join_string(const char* const* items, int count, char delimiter)</code>.</p>
-<p>The generated wrappers are exported through <code>symbols.list</code>, so an app that links<br>
-against <code>pm_sdk_app.h</code> resolves every symbol it names. A new wrapper belongs in<br>
-that list before any app can call it; a name that is missing fails at load with<br>
-<code>Can't find common &lt;name&gt;</code> rather than at link time.</p>
+<p>The getter writes into a buffer the caller owns rather than the string pool, because a wrapped paragraph can be far longer than the pool holds, and it returns <code>-1</code> for an out of range index. A function taking <code>const std::vector&lt;String&gt;&amp;</code> takes a C array and a count instead: <code>pm_io_join_string(const char* const* items, int count, char delimiter)</code>.</p>
+<p>The generated wrappers are exported through <code>symbols.list</code>, so an app that links against <code>pm_sdk_app.h</code> resolves every symbol it names. A new wrapper belongs in that list before any app can call it; a name that is missing fails at load with <code>Can't find common &lt;name&gt;</code> rather than at link time.</p>
 <h2 id="app-binary-contract-abi-sdk-version-stamp" class="docmd-heading"><a href="#app-binary-contract-abi-sdk-version-stamp" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>SDK version stamp</h2>
-<p>The host exports the ABI version as a string symbol, defined in<br>
-<code>pocketmage_globals.cpp</code> and curated in <code>symbols.list</code>:</p>
+<p>The host exports the ABI version as a string symbol, defined in <code>pocketmage_globals.cpp</code> and curated in <code>symbols.list</code>:</p>
 <pre class="hljs"><code class="language-cpp">extern <span class="hljs-string">&quot;C&quot;</span> <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> pocketmage_sdk_version[];  <span class="hljs-comment">// e.g. &quot;0.1.0&quot;</span>
 </code></pre>
-<p>Apps consume it through the macro surface in <code>pocketmage_app_version.h</code>:<br>
-<code>POCKETMAGE_SDK_VERSION_STRING</code>, <code>POCKETMAGE_SDK_VERSION_MAJOR</code>,<br>
-<code>POCKETMAGE_SDK_VERSION_MINOR</code>, <code>POCKETMAGE_SDK_VERSION_PATCH</code>. The firmware<br>
-loads these macros from <code>-DPM_SDK_VERSION_*</code> supplied by <code>app.mk</code>, and the<br>
-OS’s loader export table (generated from <code>symbols.list</code> via <code>tools/symbols.py</code>)<br>
-must contain the matching string symbol.</p>
-<p>Keeping VERSION, the string literal, the header macros, and <code>library.json</code> in<br>
-sync is enforced by the CI <code>version-sync</code> job and <code>pm release</code>, which<br>
-rewrites all four together.</p>
+<p>Apps consume it through the macro surface in <code>pocketmage_app_version.h</code>: <code>POCKETMAGE_SDK_VERSION_STRING</code>, <code>POCKETMAGE_SDK_VERSION_MAJOR</code>, <code>POCKETMAGE_SDK_VERSION_MINOR</code>, <code>POCKETMAGE_SDK_VERSION_PATCH</code>. The firmware loads these macros from <code>-DPM_SDK_VERSION_*</code> supplied by <code>app.mk</code>, and the OS’s loader export table (generated from <code>symbols.list</code> via <code>tools/symbols.py</code>) must contain the matching string symbol.</p>
+<p>Keeping VERSION, the string literal, the header macros, and <code>library.json</code> in sync is enforced by the CI <code>version-sync</code> job and <code>pm release</code>, which rewrites all four together.</p>
 <h2 id="app-binary-contract-abi-runtime-environment" class="docmd-heading"><a href="#app-binary-contract-abi-runtime-environment" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Runtime environment</h2>
 <ul>
-<li>The app shares the host’s heap. Loading costs roughly the ELF size plus a<br>
-fixed reserve; <code>runElfApp</code> refuses to launch when free <code>MALLOC_CAP_8BIT</code><br>
-drops below that floor. Keep the app small.</li>
-<li>The app runs in-process. It can call anything the host exports - the<br>
-display, keyboard stack, translation engine, peripheral drivers - at native<br>
-speed, no IPC.</li>
-<li>Stack is not heap. The run task gives 16 KB; deep recursion or fat frames<br>
-blow it. Move working sets to the heap.</li>
-<li>E-ink refreshes use the differential partial waveform while an app runs,<br>
-regardless of the device’s FAST_REFRESH setting; the setting is restored<br>
-when the app exits. Redraw on change, not on a timer: even partial<br>
-updates are visible, and a periodic slow clean still flashes the panel.</li>
+<li>The app shares the host’s heap. Loading costs roughly the ELF size plus a fixed reserve; <code>runElfApp</code> refuses to launch when free <code>MALLOC_CAP_8BIT</code> drops below that floor. Keep the app small.</li>
+<li>The app runs in-process. It can call anything the host exports - the display, keyboard stack, translation engine, peripheral drivers - at native speed, no IPC.</li>
+<li>Stack is not heap. The run task gives 16 KB; deep recursion or fat frames blow it. Move working sets to the heap.</li>
+<li>E-ink refreshes use the differential partial waveform while an app runs, regardless of the device’s FAST_REFRESH setting; the setting is restored when the app exits. Redraw on change, not on a timer: even partial updates are visible, and a periodic slow clean still flashes the panel.</li>
 </ul>
 <h2 id="app-binary-contract-abi-sections-and-strip" class="docmd-heading"><a href="#app-binary-contract-abi-sections-and-strip" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Sections and strip</h2>
-<p><code>app.mk</code> links with <code>--gc-sections</code> (functions and data) and strips<br>
-loader-irrelevant sections, so the delivered ELF comes down to <code>.text</code>,<br>
-<code>.rodata</code>, <code>.got</code>, <code>.rela.dyn</code>, <code>.rela.plt</code>, <code>.dynsym</code>, <code>.dynstr</code>, <code>.hash</code>,<br>
-<code>.shstrtab</code>. Everything else is removed. Code that depends on other sections<br>
-existing is unsupported. Don’t write it.</p>
+<p><code>app.mk</code> links with <code>--gc-sections</code> (functions and data) and strips loader-irrelevant sections, so the delivered ELF comes down to <code>.text</code>, <code>.rodata</code>, <code>.got</code>, <code>.rela.dyn</code>, <code>.rela.plt</code>, <code>.dynsym</code>, <code>.dynstr</code>, <code>.hash</code>, <code>.shstrtab</code>. Everything else is removed. Code that depends on other sections existing is unsupported. Don’t write it.</p>
+<p>The overlay sidecar is derived from the unstripped link output, not from this delivered ELF, so stripping the ELF does not lose the data the overlay needs. See <a href="../overlay/">overlay.md</a>.</p>
 <h2 id="app-binary-contract-abi-app-manifest-appproperties" class="docmd-heading"><a href="#app-binary-contract-abi-app-manifest-appproperties" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>App manifest (<code>app.properties</code>)</h2>
 <p>When loading an app from SD, the host reads <code>app.properties</code> from the app directory (max 1024 bytes). Recognized fields:</p>
 <ul>
-<li><code>name</code> – human-readable app name</li>
-<li><code>version</code> – app version string</li>
-<li><code>author</code> – author string, free form; multiple authors may be comma<br>
-separated (spaces are kept, up to 31 bytes)</li>
-<li><code>scope</code> – symbol scope gate (default: <code>all</code>)</li>
+<li><code>name</code> - human-readable app name</li>
+<li><code>version</code> - app version string</li>
+<li><code>author</code> - author string, free form; multiple authors may be comma separated (spaces are kept, up to 31 bytes)</li>
+<li><code>scope</code> - symbol scope gate (default: <code>all</code>)</li>
 </ul>
 <p>Only <code>pm_*</code> symbols are scope-gated. libc, libstdc++, and ESP-IDF symbols remain available regardless of scope. The loader installs the scoped resolver before relocation and resets it on exit. argv metadata passed to <code>app_main</code> includes <code>name</code>, <code>elfPath</code>, <code>version</code>, and <code>author</code>.</p>
 <h2 id="app-binary-contract-abi-endianness-failure-modes" class="docmd-heading"><a href="#app-binary-contract-abi-endianness-failure-modes" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Endianness failure modes</h2>
@@ -1811,16 +2152,11 @@ separated (spaces are kept, up to 31 bytes)</li>
 </tr>
 </tbody>
 </table>
-</div><p>The build-time guard catches BE before it reaches a device: if the last<br>
-<code>make</code> line is <code>error: ... big-endian ...</code>, rebuild with the espressif<br>
-toolchain (see <a href="../build/">build.md</a>).</p>
+</div><p>The build-time guard catches BE before it reaches a device: if the last <code>make</code> line is <code>error: ... big-endian ...</code>, rebuild with the espressif toolchain (see <a href="../build/">build.md</a>).</p>
 <h2 id="app-binary-contract-abi-stability-rules-for-sdk-authors" class="docmd-heading"><a href="#app-binary-contract-abi-stability-rules-for-sdk-authors" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Stability rules for SDK authors</h2>
 <ul>
-<li>The format, entry point, and load strategy are public contract. Changing how<br>
-an app maps or invokes takes a <code>major</code> bump of <code>pocketmage_sdk_version</code> and<br>
-a migration note.</li>
-<li>Exports are additive. Removing or changing an export breaks live apps. See<br>
-<a href="../../CONTRIBUTING/">CONTRIBUTING.md</a>.</li>
+<li>The format, entry point, and load strategy are public contract. Changing how an app maps or invokes, including the ELFO overlay format in <a href="../overlay/">overlay.md</a>, takes a <code>major</code> bump of <code>pocketmage_sdk_version</code> and a migration note.</li>
+<li>Exports are additive. Removing or changing an export breaks live apps. See <a href="https://github.com/TalismanDesign/PocketMage_SDK/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>.</li>
 </ul>
 
                 
@@ -1850,10 +2186,10 @@ a migration note.</li>
                       </a>
                     
                     
-                      <a href="../build/" class="next-page">
+                      <a href="../overlay/" class="next-page">
                         <span><small>Next</small>
                           <strong>
-                            Building Apps
+                            Overlay format (.elfo)
                           </strong></span>
                         
 <svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1963,13 +2299,13 @@ a migration note.</li>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1793426792000">
+                <span class="git-last-updated" data-timestamp="1793486742000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1793426792000"></span>
+                  <span class="git-time" data-timestamp="1793486742000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1982,10 +2318,10 @@ a migration note.</li>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Fix">Fix</div>
+                            <div class="git-commit-message" title="Docs">Docs</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1793426792000"></span>
+                              <span class="git-commit-date" data-timestamp="1793486742000"></span>
                             </div>
                           </div>
                         </li>
@@ -1997,7 +2333,7 @@ a migration note.</li>
               
               <span class="git-spacer"></span>
               
-                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/docs/docs/app-abi.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/Docs/docs/app-abi.md" target="_blank" rel="noopener noreferrer" class="edit-link">
                   
 <svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-pencil"
@@ -2037,44 +2373,42 @@ a migration note.</li>
           <div class="footer-columns">
             
               <div class="footer-column">
-                <span class="footer-column-title">Guides</span>
+                <span class="footer-column-title">Get Started</span>
                 <ul>
                   
-                    <li><a href="guides/making-apps/" >Making an app</a></li>
+                    <li><a href="get-started/" >Overview</a></li>
                   
-                    <li><a href="guides/lifecycle/" >App lifecycle</a></li>
+                    <li><a href="get-started/toolchain/" >Install the toolchain</a></li>
                   
-                    <li><a href="guides/rendering/" >Rendering</a></li>
+                    <li><a href="get-started/first-app/" >Your first app</a></li>
                   
                 </ul>
               </div>
             
               <div class="footer-column">
-                <span class="footer-column-title">API Reference</span>
+                <span class="footer-column-title">Reference</span>
                 <ul>
                   
-                    <li><a href="api/" >Overview</a></li>
-                  
-                    <li><a href="api/oled/" >OLED</a></li>
-                  
-                    <li><a href="api/eink/" >E-Ink</a></li>
-                  
-                    <li><a href="api/sys/" >System</a></li>
-                  
-                </ul>
-              </div>
-            
-              <div class="footer-column">
-                <span class="footer-column-title">Platform</span>
-                <ul>
+                    <li><a href="api/functions/" >Function index</a></li>
                   
                     <li><a href="app-abi/" >App ABI</a></li>
                   
-                    <li><a href="build/" >Building Apps</a></li>
+                    <li><a href="overlay/" >Overlay format</a></li>
                   
-                    <li><a href="symbols/" >Symbols</a></li>
+                    <li><a href="symbols/" >Symbol surface</a></li>
                   
-                    <li><a href="publish/" >Publishing</a></li>
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Tooling</span>
+                <ul>
+                  
+                    <li><a href="build/" >Building apps</a></li>
+                  
+                    <li><a href="cli/" >pm CLI</a></li>
+                  
+                    <li><a href="guides/publishing/" >Publishing</a></li>
                   
                 </ul>
               </div>
@@ -2108,14 +2442,14 @@ a migration note.</li>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mvw00s0r"></script>
+      <script src="../assets/js/docmd-main.js?v=mvwzpk2z"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mvw00s0r"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mvw00s0r" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-search.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-git.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-ai.js?v=mvw00s0r" ></script>
+      <script src="../assets/js/docmd-git.js?v=mvwzpk2z"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-search.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-git.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-ai.js?v=mvwzpk2z" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
@@ -2191,7 +2525,7 @@ a migration note.</li>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
-<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Guides","icon":"book","collapsible":true,"children":[{"title":"Guide index","path":"/guides/","icon":"book"},{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"children":[{"title":"API overview","path":"/api/","icon":"boxes"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Building Apps","path":"/build/","icon":"code"},{"title":"Symbols","path":"/symbols/","icon":"box"},{"title":"Publishing","path":"/publish/","icon":"package"},{"title":"i18n catalogs","path":"/i18n/","icon":"terminal"},{"title":"Migration","path":"/migration/","icon":"book-open"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
       
       
       

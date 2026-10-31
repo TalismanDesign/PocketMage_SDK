@@ -10,7 +10,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.9.7">
+    <meta name="generator" content="docmd v0.9.8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <script>
@@ -102,11 +102,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mvw00s0r">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvw00s0r">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.png?v=mvwzpk2z">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvwzpk2z">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvw00s0r" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvw00s0r" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvwzpk2z" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvwzpk2z" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The toolchain, the project layout, and the make targets that produce a shippable ELF and tar.">
@@ -119,17 +119,19 @@
 <meta name="twitter:title" content="Building an app - PocketMage SDK">
 <meta name="twitter:description" content="The toolchain, the project layout, and the make targets that produce a shippable ELF and tar.">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"Building Apps","item":"https://talismandesign.github.io/PocketMage_SDK/docs/build/"}]}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"Tooling"},{"@type":"ListItem","position":3,"name":"Building apps","item":"https://talismandesign.github.io/PocketMage_SDK/docs/build/"}]}
 </script>
 
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvw00s0r" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvwzpk2z" >
 
+    
+      <link rel="stylesheet" href="../assets/css/theme.css?v=mvwzpk2z">
     
     
   </head>
@@ -222,10 +224,11 @@
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
+        <a href="../get-started/" class=" nav-group"
+          >
            
-<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-book"
+<svg class="lucide-icon icon-rocket " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-rocket"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -236,13 +239,16 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
+  <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
+  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05" />
 </svg>
 
           
           <span class="nav-item-title">
-            Guides
-          </span>
+            Get Started
+            </span>
           
             <span class="collapse-icon-wrapper">
 <svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -261,7 +267,8 @@
 </svg>
 </span>
           
-        </span>
+          
+        </a>
         
 
         
@@ -269,7 +276,76 @@
             
       <li class="" >
       
-        <a href="../guides/" class=" "
+        <a href="../get-started/toolchain/" class=" "
+          >
+           
+<svg class="lucide-icon icon-settings " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Install the toolchain
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../get-started/first-app/" class=" "
+          >
+           
+<svg class="lucide-icon icon-play " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-play"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Your first app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <a href="../guides/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -289,16 +365,33 @@
 
           
           <span class="nav-item-title">
-            Guide index
+            Guides
             </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
           
           
         </a>
         
 
         
-      </li>
-    
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../guides/making-apps/" class=" "
@@ -398,71 +491,85 @@
         
       </li>
     
+      <li class="" >
+      
+        <a href="../guides/i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Internationalization
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../guides/publishing/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
           </ul>
         
       </li>
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
-           
-<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-boxes"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
-  <path d="m7 16.5-4.74-2.85" />
-  <path d="m7 16.5 5-3" />
-  <path d="M7 16.5v5.17" />
-  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
-  <path d="m17 16.5-5-3" />
-  <path d="m17 16.5 4.74-2.85" />
-  <path d="M17 16.5v5.17" />
-  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
-  <path d="M12 8 7.26 5.15" />
-  <path d="m12 8 4.74-2.85" />
-  <path d="M12 13.5V8" />
-</svg>
-
-          
-          <span class="nav-item-title">
-            API Reference
-          </span>
-          
-            <span class="collapse-icon-wrapper">
-<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-chevron-right"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m9 18 6-6-6-6" />
-</svg>
-</span>
-          
-        </span>
-        
-
-        
-          <ul class="submenu">
-            
-      <li class="" >
-      
-        <a href="../api/" class=" "
+        <a href="../api/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -493,7 +600,61 @@
 
           
           <span class="nav-item-title">
-            API overview
+            API Reference
+            </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../api/functions/" class=" "
+          >
+           
+<svg class="lucide-icon icon-list " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-list"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 5h.01" />
+  <path d="M3 12h.01" />
+  <path d="M3 19h.01" />
+  <path d="M8 5h13" />
+  <path d="M8 12h13" />
+  <path d="M8 19h13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Function index
             </span>
           
           
@@ -1115,6 +1276,56 @@
         
       </li>
     
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-file-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-file-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 12.5 8 15l2 2.5" />
+  <path d="m14 12.5 2 2.5-2 2.5" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Binary Contract
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../app-abi/" class=" "
@@ -1147,13 +1358,13 @@
         
       </li>
     
-      <li class="active" >
+      <li class="" >
       
-        <a href="../build/" class="active "
+        <a href="../overlay/" class=" "
           >
            
-<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-code"
+<svg class="lucide-icon icon-layers " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layers"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1164,13 +1375,14 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m16 18 6-6-6-6" />
-  <path d="m8 6-6 6 6 6" />
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
 </svg>
 
           
           <span class="nav-item-title">
-            Building Apps
+            Overlay format (.elfo)
             </span>
           
           
@@ -1204,7 +1416,7 @@
 
           
           <span class="nav-item-title">
-            Symbols
+            Symbol surface
             </span>
           
           
@@ -1214,13 +1426,16 @@
         
       </li>
     
-      <li class="" >
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
       
-        <a href="../publish/" class=" "
-          >
+        <span class="nav-label nav-group">
            
-<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-package"
+<svg class="lucide-icon icon-wrench " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wrench"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1231,15 +1446,61 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
-  <path d="M12 22V12" />
-  <polyline points="3.29 7 12 12 20.71 7" />
-  <path d="m7.5 4.27 9 5.15" />
+  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" />
 </svg>
 
           
           <span class="nav-item-title">
-            Publishing
+            Tooling
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="active" >
+      
+        <a href="../build/" class="active "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building apps
             </span>
           
           
@@ -1251,7 +1512,7 @@
     
       <li class="" >
       
-        <a href="../i18n/" class=" "
+        <a href="../cli/" class=" "
           >
            
 <svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1272,7 +1533,7 @@
 
           
           <span class="nav-item-title">
-            i18n catalogs
+            pm CLI
             </span>
           
           
@@ -1284,7 +1545,85 @@
     
       <li class="" >
       
-        <a href="../migration/" class=" "
+        <a href="../i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            i18n catalogs
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../troubleshooting/" class=" "
+          >
+           
+<svg class="lucide-icon icon-life-buoy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-life-buoy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="m4.93 4.93 4.24 4.24" />
+  <path d="m14.83 9.17 4.24-4.24" />
+  <path d="m14.83 14.83 4.24 4.24" />
+  <path d="m9.17 14.83-4.24 4.24" />
+  <circle cx="12" cy="12" r="4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../glossary/" class=" "
           >
            
 <svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1301,6 +1640,40 @@
 >
   <path d="M12 5v16" />
   <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../migration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-git-branch " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-git-branch"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 6a9 9 0 0 0-9 9V3" />
+  <circle cx="18" cy="6" r="3" />
+  <circle cx="6" cy="18" r="3" />
 </svg>
 
           
@@ -1549,15 +1922,39 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Building%20an%20app%22%0Adescription%3A%20%22The%20toolchain%2C%20the%20project%20layout%2C%20and%20the%20make%20targets%20that%20produce%20a%20shippable%20ELF%20and%20tar.%22%0A---%0A%0A%23%20Building%20an%20app%0A%0AThe%20whole%20build%20system%20is%20one%20%60Makefile%60%20that%20includes%20the%20SDK%20recipe%20in%0A%60tools%2Fapp.mk%60.%0A%0A%23%23%20Project%20layout%0A%0A%60%60%60text%0Amyapp%2F%0A%20%20Makefile%20%20%20%20%20%20%20%23%20include%20of%20tools%2Fapp.mk%0A%20%20main.cpp%0A%20%20myapp_ICON.bin%20%23%20optional%2040x40%20icon%2C%20see%20Icon%20below%0A%20%20src%2Fi18n%2F%20%20%20%20%20%20%23%20optional%20app%20translation%20catalog%0A%60%60%60%0A%0A%60%60%60make%0ASDK_ROOT%20%3F%3D%20%24(abspath%20..%2F..)%20%20%20%20%20%20%23%20path%20to%20this%20repo%0Ainclude%20%24(SDK_ROOT)%2Ftools%2Fapp.mk%0A%60%60%60%0A%0AEverything%20is%20overridable%20on%20the%20command%20line%20or%20in%20the%20%60Makefile%60%3A%0A%60APP_SRCS%60%20(default%20%60main.cpp%60)%2C%20%60APP_NAME%60%20(default%20the%20directory%20basename)%2C%0A%60APP_BUILD_DIR%60%20(default%20%60build%60)%2C%20%60XTENSA_CXX%60%20(default%3A%20probed%20toolchain).%0A%0A%23%23%20Toolchain%0A%0A%7C%20Requirement%20%7C%20Value%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------%20%7C%20------------------------------------------%20%7C%0A%7C%20Compiler%20%20%20%20%7C%20espressif%20%60xtensa-esp32s3-elf-g%2B%2B%60%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Output%20%20%20%20%20%20%7C%20little-endian%20(required%20by%20the%20loader)%20%20%20%20%20%7C%0A%0AThe%20PlatformIO%20%60toolchain-xtensa-esp32s3%60%20package%20emits%20big-endian%20ELFs%20and%0Ais%20unusable%20for%20apps%3B%20if%20it%20is%20the%20only%20compiler%20found%2C%20%60app.mk%60%20fails%20the%0Abuild%20with%20a%20clear%20error.%20Install%20the%20espressif%20toolchain%20so%20it%20lands%20at%20one%0Aof%20the%20probed%20paths%20(newest%20first)%3A%0A%0A%60%60%60sh%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-15.2.0_20251204%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20251107%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20241119%2Fxtensa-esp-elf%2Fbin%0A%60%60%60%0A%0A%60esp-15.2.0_20251204%60%20is%20the%20one%20SDK%20CI%20pins%20(URL%20and%20SHA256).%20It%20is%20the%0Aeasiest%20known-good%20install%3A%0A%0A%60%60%60sh%0AVER%3Desp-15.2.0_20251204%0ASHA%3D3d50f5cd5f173acfd524e07c1cd69bc99585731a415ca2e5bce879997fe602b8%0AURL%3D%22https%3A%2F%2Fgithub.com%2Fespressif%2Fcrosstool-NG%2Freleases%2Fdownload%2F%24VER%2Fxtensa-esp-elf-15.2.0_20251204-x86_64-linux-gnu.tar.xz%22%0Amkdir%20-p%20%22%24HOME%2F.espressif%2Ftools%2Fxtensa-esp-elf%2F%24VER%22%0Acurl%20-fsSL%20-o%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%20%22%24URL%22%0Aecho%20%22%24SHA%20%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%22%20%7C%20sha256sum%20-c%20-%0Atar%20-xJf%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%20-C%20%22%24HOME%2F.espressif%2Ftools%2Fxtensa-esp-elf%2F%24VER%22%0A%60%60%60%0A%0AThe%20example%20builds%20with%20any%20probed%20version.%20The%20host%20OS%20pins%20its%20own%0Atoolchain%20independently%20of%20the%20SDK.%0A%0A%23%23%20Targets%0A%0A%7C%20Target%20%20%20%20%20%20%20%20%7C%20Result%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------%20%7C%20-------------------------------------------------------------%20%7C%0A%7C%20%60make%60%20%20%20%20%20%20%20%20%7C%20Builds%20%60build%2F%3Cname%3E.app.elf%60%2C%20stripped%2C%20endianness-asserted%20%20%7C%0A%7C%20%60make%20check%60%20%20%7C%20Prints%20the%20entry%20point%20and%20every%20undefined%20symbol%20(the%20app&#039;s%20host%20dependency%20list).%20Informational%3B%20the%20enforcing%20gate%20is%20%60pm%20check%60%20%7C%0A%7C%20%60make%20pack%60%20%20%20%7C%20Builds%20%60build%2F%3Cname%3E.tar%60%20with%20%60%3Cname%3E.app.elf%60%2C%20%60%3Cname%3E_ICON.bin%60%20and%20%60app.properties%60%20when%20present%20(see%20%5Bpublish.md%5D(publish.md))%20%7C%0A%7C%20%60make%20clean%60%20%20%7C%20Removes%20%60build%2F%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20endianness%20assertion%20runs%20after%20every%20link.%20A%20big-endian%20artifact%20gets%0Adeleted%20and%20the%20build%20fails.%0A%0A%23%23%20Entry%20point%0A%0A%60extern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%60%2C%20renamed%20to%20%60app_main%60%20via%0A%60-Dmain%3Dapp_main%20-e%20app_main%60.%20See%20%5Bapp-abi.md%5D(app-abi.md)%20for%20the%20full%0Acontract.%20Everything%20the%20app%20calls%20resolves%20from%20the%20host%20at%20load%20time%2C%20so%0Akeep%20the%20undefined-symbol%20list%20(from%20%60make%20check%60)%20small%20and%20intentional%3B%20see%0A%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Compiler%20flags%0A%0AThe%20SDK%20builds%20with%20%60-Wall%20-Wextra%60%2C%20exceptions%20and%20RTTI%20disabled%2C%20and%20hidden%0Avisibility.%20Keep%20the%20code%20warning-free.%0A%0A%60app.mk%60%20injects%20%60PM_SDK_VERSION%60%20plus%20%60PM_SDK_VERSION_MAJOR%2FMINOR%2FPATCH%60%20from%0Athe%20repo%20%60VERSION%60%20file%2C%20so%20an%20app%20always%20sees%20%60POCKETMAGE_SDK_VERSION_*%60%20in%0A%60pocketmage_app_version.h%60%20alongside%20the%20host-exported%20string%20literal%0A%60pocketmage_sdk_version%60%3B%20see%20%5Bapp-abi.md%5D(app-abi.md).%0A%0A%23%23%20Icon%0A%0A%60%3Cname%3E_ICON.bin%60%20is%20an%20optional%20200-byte%20file%3A%20a%2040x40%2C%201-bit-per-pixel%0Abitmap%20(5%20bytes%20per%20row%2C%208%20pixels%20per%20byte)%2C%20drawn%20by%20the%20OS%20as%20the%20app%20icon.%0AMissing%20icons%20fall%20back%20to%20the%20OS%20default.%20%60make%20pack%60%20requires%20the%20file%20next%0Ato%20the%20%60Makefile%60%3B%20without%20one%20the%20pack%20step%20errors.%0A%0A%23%23%20Translations%0A%0AAn%20app%20that%20shows%20strings%20uses%20its%20own%20catalog%3B%20see%20%5Bi18n.md%5D(i18n.md).%20The%0Ashort%20version%3A%20put%20a%20%60src%2Fi18n%2F%60%20tree%20in%20your%20app%20and%20merge%20it%20via%20the%0Agenerator%20the%20way%20%60platformio.ini%60%20shows%20in%20that%20doc.%0A%0A%23%23%20Before%20you%20ship%0A%0ARun%20%60make%20clean%20all%60%20then%20%60pm%20check%60%20before%20every%20commit%3B%20%60pm%20check%60%20is%20the%0Agate%20CI%20runs%2C%20and%20%60--host-elf%20%3Cfirmware.elf%3E%60%20pins%20the%20host%20export%20surface%0Aexactly%20(see%20%5Bsymbols.md%5D(symbols.md)).%20%60make%20pack%60%20is%20the%20deliverable%3B%0Averify%20the%20tar&#039;s%20members%20with%20%60tar%20-tf%20build%2F%3Cname%3E.tar%60.%0A%0A%60pm%20new%20myapp%60%20scaffolds%20from%20the%20official%0A%5BPocketMage_App%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_App)%20template.%0ACI%20also%20builds%20a%20%60broken_app%60%20fixture%20that%20intentionally%20fails%20the%20gate%3A%0Ait%20references%20a%20symbol%20the%20host%20does%20not%20export%20and%20must%20fail%20%60pm%20check%60." style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Building%20an%20app%22%0Adescription%3A%20%22The%20toolchain%2C%20the%20project%20layout%2C%20and%20the%20make%20targets%20that%20produce%20a%20shippable%20ELF%20and%20tar.%22%0A---%0A%0A%23%20Building%20an%20app%0A%0AThe%20whole%20build%20system%20is%20one%20%60Makefile%60%20that%20includes%20the%20SDK%20recipe%20in%20%60tools%2Fapp.mk%60.%0A%0A%23%23%20Project%20layout%0A%0A%60%60%60text%0Amyapp%2F%0A%20%20Makefile%20%20%20%20%20%20%20%20%20%23%20include%20of%20tools%2Fapp.mk%0A%20%20main.cpp%0A%20%20myapp_ICON.bin%20%20%20%23%2040x40%20icon%2C%20see%20Icon%20below%0A%20%20app.properties%20%20%20%23%20optional%20manifest%3A%20name%2C%20version%2C%20author%2C%20scope%0A%20%20src%2Fi18n%2F%20%20%20%20%20%20%20%20%23%20optional%20app%20translation%20catalog%0A%60%60%60%0A%0A%60%60%60make%0ASDK_ROOT%20%3F%3D%20%24(abspath%20..%2F..)%20%20%20%20%20%20%23%20path%20to%20this%20repo%0Ainclude%20%24(SDK_ROOT)%2Ftools%2Fapp.mk%0A%60%60%60%0A%0AEverything%20is%20overridable%20on%20the%20command%20line%20or%20in%20the%20%60Makefile%60%3A%20%60APP_SRCS%60%20(default%20%60main.cpp%60)%2C%20%60APP_NAME%60%20(default%20the%20directory%20basename)%2C%20%60APP_BUILD_DIR%60%20(default%20%60build%60)%2C%20%60XTENSA_CXX%60%20(default%3A%20probed%20toolchain).%0A%0A%23%23%20Toolchain%0A%0A%7C%20Requirement%20%7C%20Value%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------%20%7C%20------------------------------------------%20%7C%0A%7C%20Compiler%20%20%20%20%7C%20espressif%20%60xtensa-esp32s3-elf-g%2B%2B%60%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Output%20%20%20%20%20%20%7C%20little-endian%20(required%20by%20the%20loader)%20%20%20%20%20%7C%0A%0AThe%20PlatformIO%20%60toolchain-xtensa-esp32s3%60%20package%20emits%20big-endian%20ELFs%20and%20is%20unusable%20for%20apps%3B%20if%20it%20is%20the%20only%20compiler%20found%2C%20%60app.mk%60%20fails%20the%20build%20with%20a%20clear%20error.%20Install%20the%20espressif%20toolchain%20so%20it%20lands%20at%20one%20of%20the%20probed%20paths%20(newest%20first)%3A%0A%0A%60%60%60sh%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-15.2.0_20251204%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20251107%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20241119%2Fxtensa-esp-elf%2Fbin%0A%60%60%60%0A%0A%60esp-15.2.0_20251204%60%20is%20the%20one%20SDK%20CI%20pins%20(URL%20and%20SHA256).%20It%20is%20the%20easiest%20known-good%20install%3A%0A%0A%60%60%60sh%0AVER%3Desp-15.2.0_20251204%0ASHA%3D3d50f5cd5f173acfd524e07c1cd69bc99585731a415ca2e5bce879997fe602b8%0AURL%3D%22https%3A%2F%2Fgithub.com%2Fespressif%2Fcrosstool-NG%2Freleases%2Fdownload%2F%24VER%2Fxtensa-esp-elf-15.2.0_20251204-x86_64-linux-gnu.tar.xz%22%0Amkdir%20-p%20%22%24HOME%2F.espressif%2Ftools%2Fxtensa-esp-elf%2F%24VER%22%0Acurl%20-fsSL%20-o%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%20%22%24URL%22%0Aecho%20%22%24SHA%20%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%22%20%7C%20sha256sum%20-c%20-%0Atar%20-xJf%20%2Ftmp%2Fxtensa-esp-elf.tar.xz%20-C%20%22%24HOME%2F.espressif%2Ftools%2Fxtensa-esp-elf%2F%24VER%22%0A%60%60%60%0A%0AThe%20example%20builds%20with%20any%20probed%20version.%20The%20host%20OS%20pins%20its%20own%20toolchain%20independently%20of%20the%20SDK.%0A%0A%23%23%20Targets%0A%0A%7C%20Target%20%20%20%20%20%20%20%20%7C%20Result%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-------------%20%7C%20-------------------------------------------------------------%20%7C%0A%7C%20%60make%60%20%20%20%20%20%20%20%20%7C%20Builds%20%60build%2F%3Cname%3E.app.elf%60%20(stripped%2C%20endianness-asserted)%20and%20%60build%2F%3Cname%3E.elfo%60%20(the%20overlay%20sidecar)%20%7C%0A%7C%20%60make%20overlay%60%7C%20Builds%20only%20%60build%2F%3Cname%3E.elfo%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60make%20check%60%20%20%7C%20Prints%20the%20entry%20point%20and%20every%20undefined%20symbol%20(the%20app&#039;s%20host%20dependency%20list).%20Informational%3B%20the%20enforcing%20gate%20is%20%60pm%20check%60%20%7C%0A%7C%20%60make%20pack%60%20%20%20%7C%20Builds%20%60build%2F%3Cname%3E.tar%60%20with%20%60%3Cname%3E.app.elf%60%2C%20%60%3Cname%3E.elfo%60%2C%20%60%3Cname%3E_ICON.bin%60%2C%20and%20%60app.properties%60%20when%20present%20(see%20%5Bpublishing%5D(guides%2Fpublishing.md))%20%7C%0A%7C%20%60make%20pm-info%60%7C%20Prints%20the%20resolved%20paths%20and%20toolchain%20the%20%60pm%60%20CLI%20reads%20%20%20%7C%0A%7C%20%60make%20clean%60%20%20%7C%20Removes%20%60build%2F%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20endianness%20assertion%20runs%20after%20every%20link.%20A%20big-endian%20artifact%20gets%20deleted%20and%20the%20build%20fails.%0A%0A%23%23%20Overlay%20emission%0A%0AAlongside%20the%20ELF%2C%20%60make%60%20produces%20%60build%2F%3Cname%3E.elfo%60%2C%20the%20overlay%20blob%20the%20host%20pages%20into%20executable%20RAM%20at%20load%20time.%20It%20is%20built%20from%20the%20unstripped%20link%20output%20in%20two%20steps%3A%0A%0A%60%60%60text%0Aelf_overlay_relink%20%3Cname%3E.app.tool%20%3Cname%3E.relk%0Aelf_overlay_emit%20%20%20%3Cname%3E.relk%20%20%20%20%20%3Cname%3E.elfo%0A%60%60%60%0A%0ABoth%20tools%20must%20be%20on%20%60PATH%60.%20They%20come%20from%20an%20%60elf_overlay%60%20checkout%2C%20built%20with%20CMake%20(%60cmake%20-S%20.%20-B%20build%20%26%26%20cmake%20--build%20build%20--target%20elf_overlay_relink%20elf_overlay_emit%60)%2C%20then%20the%20build%20directory%20added%20to%20%60PATH%60.%20Override%20%60ELF_OVERLAY_RELINK%60%20and%20%60ELF_OVERLAY_EMIT%60%20to%20point%20at%20specific%20binaries.%20The%20format%20and%20the%20device-side%20load%20sequence%20are%20in%20%5Boverlay.md%5D(overlay.md).%0A%0A%23%23%20Entry%20point%0A%0A%60extern%20%22C%22%20int%20main(int%20argc%2C%20char%20**argv)%60%2C%20renamed%20to%20%60app_main%60%20via%20%60-Dmain%3Dapp_main%20-e%20app_main%60.%20See%20%5Bapp-abi.md%5D(app-abi.md)%20for%20the%20full%20contract.%20Everything%20the%20app%20calls%20resolves%20from%20the%20host%20at%20load%20time%2C%20so%20keep%20the%20undefined-symbol%20list%20(from%20%60make%20check%60)%20small%20and%20intentional%3B%20see%20%5Bsymbols.md%5D(symbols.md).%0A%0A%23%23%20Compiler%20flags%0A%0AThe%20SDK%20builds%20with%20%60-Wall%20-Wextra%60%2C%20exceptions%20and%20RTTI%20disabled%2C%20and%20hidden%20visibility.%20Keep%20the%20code%20warning-free.%0A%0A%60app.mk%60%20injects%20%60PM_SDK_VERSION%60%20plus%20%60PM_SDK_VERSION_MAJOR%2FMINOR%2FPATCH%60%20from%20the%20repo%20%60VERSION%60%20file%2C%20so%20an%20app%20always%20sees%20%60POCKETMAGE_SDK_VERSION_*%60%20in%20%60pocketmage_app_version.h%60%20alongside%20the%20host-exported%20string%20literal%20%60pocketmage_sdk_version%60%3B%20see%20%5Bapp-abi.md%5D(app-abi.md).%0A%0A%23%23%20Icon%0A%0A%60%3Cname%3E_ICON.bin%60%20is%20a%20200-byte%20file%3A%20a%2040x40%2C%201-bit-per-pixel%20bitmap%20(5%20bytes%20per%20row%2C%208%20pixels%20per%20byte)%2C%20drawn%20by%20the%20OS%20as%20the%20app%20icon.%20%60make%20pack%60%20requires%20the%20file%20next%20to%20the%20%60Makefile%60%20and%20errors%20without%20it.%20The%20OS%20falls%20back%20to%20a%20default%20icon%20only%20for%20an%20installed%20app%20that%20has%20none.%0A%0A%23%23%20Translations%0A%0AAn%20app%20that%20shows%20strings%20uses%20its%20own%20catalog%3B%20see%20%5Bi18n.md%5D(i18n.md).%20The%20short%20version%3A%20put%20a%20%60src%2Fi18n%2F%60%20tree%20in%20your%20app%20and%20merge%20it%20via%20the%20generator%20the%20way%20%60platformio.ini%60%20shows%20in%20that%20doc.%0A%0A%23%23%20Before%20you%20ship%0A%0ARun%20%60make%20clean%20all%60%20then%20%60pm%20check%60%20before%20every%20commit%3B%20%60pm%20check%60%20is%20the%20gate%20CI%20runs%2C%20and%20%60--host-elf%20%3Cfirmware.elf%3E%60%20pins%20the%20host%20export%20surface%20exactly%20(see%20%5Bsymbols.md%5D(symbols.md)).%20%60make%20pack%60%20is%20the%20deliverable%3B%20verify%20the%20tar&#039;s%20members%20with%20%60tar%20-tf%20build%2F%3Cname%3E.tar%60.%20It%20should%20list%20%60%3Cname%3E.app.elf%60%2C%20%60%3Cname%3E.elfo%60%2C%20%60%3Cname%3E_ICON.bin%60%2C%20and%20%60app.properties%60.%0A%0A%60pm%20new%20myapp%60%20scaffolds%20from%20the%20official%20%5BPocketMage_App%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2FPocketMage_App)%20template.%20The%20SDK&#039;s%20%60pm%60%20CLI%20is%20the%20fastest%20path%20from%20scaffold%20to%20shippable%20tar%3B%20the%20full%20command%20surface%20is%20in%20%5Bcli.md%5D(cli.md).%20CI%20builds%20that%20same%20template%20against%20the%20SDK%20on%20every%20push%2C%20and%20rejects%20a%20%60broken_app%60%20fixture%20that%20references%20a%20symbol%20the%20host%20does%20not%20export%20and%20so%20must%20fail%20%60pm%20check%60." style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
                         
                         
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Tooling</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
+                        
                           <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
                             
-                              <span>Building Apps</span>
+                              <span>Building apps</span>
                             
                             
                           </li>
@@ -1621,21 +2018,19 @@
                   </h1>
                 
                 <h1 id="building-an-app" class="docmd-heading"><a href="#building-an-app" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Building an app</h1>
-<p>The whole build system is one <code>Makefile</code> that includes the SDK recipe in<br>
-<code>tools/app.mk</code>.</p>
+<p>The whole build system is one <code>Makefile</code> that includes the SDK recipe in <code>tools/app.mk</code>.</p>
 <h2 id="building-an-app-project-layout" class="docmd-heading"><a href="#building-an-app-project-layout" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Project layout</h2>
 <pre class="hljs"><code class="language-text">myapp<span class="hljs-operator">/</span>
-  Makefile       <span class="hljs-comment"># include of tools/app.mk</span>
+  Makefile         <span class="hljs-comment"># include of tools/app.mk</span>
   main.<span class="hljs-attr">cpp</span>
-  myapp_ICON.<span class="hljs-attr">bin</span> <span class="hljs-comment"># optional 40x40 icon, see Icon below</span>
-  src<span class="hljs-operator">/</span>i18n<span class="hljs-operator">/</span>      <span class="hljs-comment"># optional app translation catalog</span>
+  myapp_ICON.<span class="hljs-attr">bin</span>   <span class="hljs-comment"># 40x40 icon, see Icon below</span>
+  app.<span class="hljs-attr">properties</span>   <span class="hljs-comment"># optional manifest: name, version, author, scope</span>
+  src<span class="hljs-operator">/</span>i18n<span class="hljs-operator">/</span>        <span class="hljs-comment"># optional app translation catalog</span>
 </code></pre>
 <pre class="hljs"><code class="language-make">SDK_ROOT <span class="hljs-operator">?=</span> <span class="hljs-title function_">$</span>(abspath ..<span class="hljs-operator">/</span>..)      <span class="hljs-comment"># path to this repo</span>
 include <span class="hljs-title function_">$</span>(SDK_ROOT)<span class="hljs-operator">/</span>tools<span class="hljs-operator">/</span>app.<span class="hljs-attr">mk</span>
 </code></pre>
-<p>Everything is overridable on the command line or in the <code>Makefile</code>:<br>
-<code>APP_SRCS</code> (default <code>main.cpp</code>), <code>APP_NAME</code> (default the directory basename),<br>
-<code>APP_BUILD_DIR</code> (default <code>build</code>), <code>XTENSA_CXX</code> (default: probed toolchain).</p>
+<p>Everything is overridable on the command line or in the <code>Makefile</code>: <code>APP_SRCS</code> (default <code>main.cpp</code>), <code>APP_NAME</code> (default the directory basename), <code>APP_BUILD_DIR</code> (default <code>build</code>), <code>XTENSA_CXX</code> (default: probed toolchain).</p>
 <h2 id="building-an-app-toolchain" class="docmd-heading"><a href="#building-an-app-toolchain" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Toolchain</h2>
 <div class="table-wrapper"><table>
 <thead>
@@ -1655,16 +2050,12 @@ include <span class="hljs-title function_">$</span>(SDK_ROOT)<span class="hljs-o
 </tr>
 </tbody>
 </table>
-</div><p>The PlatformIO <code>toolchain-xtensa-esp32s3</code> package emits big-endian ELFs and<br>
-is unusable for apps; if it is the only compiler found, <code>app.mk</code> fails the<br>
-build with a clear error. Install the espressif toolchain so it lands at one<br>
-of the probed paths (newest first):</p>
+</div><p>The PlatformIO <code>toolchain-xtensa-esp32s3</code> package emits big-endian ELFs and is unusable for apps; if it is the only compiler found, <code>app.mk</code> fails the build with a clear error. Install the espressif toolchain so it lands at one of the probed paths (newest first):</p>
 <pre class="hljs"><code class="language-sh"><span class="hljs-operator">~/</span>.<span class="hljs-attr">espressif</span><span class="hljs-operator">/</span>tools<span class="hljs-operator">/</span>xtensa<span class="hljs-operator">-</span>esp<span class="hljs-operator">-</span>elf<span class="hljs-operator">/</span>esp<span class="hljs-operator">-</span><span class="hljs-number">15.2</span>.0_20251204<span class="hljs-operator">/</span>xtensa<span class="hljs-operator">-</span>esp<span class="hljs-operator">-</span>elf<span class="hljs-operator">/</span>bin
 <span class="hljs-operator">~/</span>.<span class="hljs-attr">espressif</span><span class="hljs-operator">/</span>tools<span class="hljs-operator">/</span>xtensa<span class="hljs-operator">-</span>esp<span class="hljs-operator">-</span>elf<span class="hljs-operator">/</span>esp<span class="hljs-operator">-</span><span class="hljs-number">14.2</span>.0_20251107<span class="hljs-operator">/</span>xtensa<span class="hljs-operator">-</span>esp<span class="hljs-operator">-</span>elf<span class="hljs-operator">/</span>bin
 <span class="hljs-operator">~/</span>.<span class="hljs-attr">espressif</span><span class="hljs-operator">/</span>tools<span class="hljs-operator">/</span>xtensa<span class="hljs-operator">-</span>esp<span class="hljs-operator">-</span>elf<span class="hljs-operator">/</span>esp<span class="hljs-operator">-</span><span class="hljs-number">14.2</span>.0_20241119<span class="hljs-operator">/</span>xtensa<span class="hljs-operator">-</span>esp<span class="hljs-operator">-</span>elf<span class="hljs-operator">/</span>bin
 </code></pre>
-<p><code>esp-15.2.0_20251204</code> is the one SDK CI pins (URL and SHA256). It is the<br>
-easiest known-good install:</p>
+<p><code>esp-15.2.0_20251204</code> is the one SDK CI pins (URL and SHA256). It is the easiest known-good install:</p>
 <pre class="hljs"><code class="language-sh">VER<span class="hljs-operator">=</span>esp<span class="hljs-operator">-</span><span class="hljs-number">15.2</span>.0_20251204
 SHA<span class="hljs-operator">=</span>3d50f5cd5f173acfd524e07c1cd69bc99585731a415ca2e5bce879997fe602b8
 URL<span class="hljs-operator">=</span><span class="hljs-string">&quot;https://github.com/espressif/crosstool-NG/releases/download/$VER/xtensa-esp-elf-15.2.0_20251204-x86_64-linux-gnu.tar.xz&quot;</span>
@@ -1673,8 +2064,7 @@ URL<span class="hljs-operator">=</span><span class="hljs-string">&quot;https://g
 <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;$SHA  /tmp/xtensa-esp-elf.tar.xz&quot;</span> <span class="hljs-operator">|</span> sha256sum <span class="hljs-operator">-</span>c <span class="hljs-operator">-</span>
 <span class="hljs-keyword">tar</span> <span class="hljs-operator">-</span>xJf <span class="hljs-operator">/</span>tmp<span class="hljs-operator">/</span>xtensa<span class="hljs-operator">-</span>esp<span class="hljs-operator">-</span>elf.<span class="hljs-keyword">tar</span>.<span class="hljs-attr">xz</span> <span class="hljs-operator">-</span>C <span class="hljs-string">&quot;$HOME/.espressif/tools/xtensa-esp-elf/$VER&quot;</span>
 </code></pre>
-<p>The example builds with any probed version. The host OS pins its own<br>
-toolchain independently of the SDK.</p>
+<p>The example builds with any probed version. The host OS pins its own toolchain independently of the SDK.</p>
 <h2 id="building-an-app-targets" class="docmd-heading"><a href="#building-an-app-targets" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Targets</h2>
 <div class="table-wrapper"><table>
 <thead>
@@ -1686,7 +2076,11 @@ toolchain independently of the SDK.</p>
 <tbody>
 <tr>
 <td><code>make</code></td>
-<td>Builds <code>build/&lt;name&gt;.app.elf</code>, stripped, endianness-asserted</td>
+<td>Builds <code>build/&lt;name&gt;.app.elf</code> (stripped, endianness-asserted) and <code>build/&lt;name&gt;.elfo</code> (the overlay sidecar)</td>
+</tr>
+<tr>
+<td><code>make overlay</code></td>
+<td>Builds only <code>build/&lt;name&gt;.elfo</code></td>
 </tr>
 <tr>
 <td><code>make check</code></td>
@@ -1694,7 +2088,11 @@ toolchain independently of the SDK.</p>
 </tr>
 <tr>
 <td><code>make pack</code></td>
-<td>Builds <code>build/&lt;name&gt;.tar</code> with <code>&lt;name&gt;.app.elf</code>, <code>&lt;name&gt;_ICON.bin</code> and <code>app.properties</code> when present (see <a href="../publish/">publish.md</a>)</td>
+<td>Builds <code>build/&lt;name&gt;.tar</code> with <code>&lt;name&gt;.app.elf</code>, <code>&lt;name&gt;.elfo</code>, <code>&lt;name&gt;_ICON.bin</code>, and <code>app.properties</code> when present (see <a href="../guides/publishing/">publishing</a>)</td>
+</tr>
+<tr>
+<td><code>make pm-info</code></td>
+<td>Prints the resolved paths and toolchain the <code>pm</code> CLI reads</td>
 </tr>
 <tr>
 <td><code>make clean</code></td>
@@ -1702,44 +2100,30 @@ toolchain independently of the SDK.</p>
 </tr>
 </tbody>
 </table>
-</div><p>The endianness assertion runs after every link. A big-endian artifact gets<br>
-deleted and the build fails.</p>
+</div><p>The endianness assertion runs after every link. A big-endian artifact gets deleted and the build fails.</p>
+<h2 id="building-an-app-overlay-emission" class="docmd-heading"><a href="#building-an-app-overlay-emission" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Overlay emission</h2>
+<p>Alongside the ELF, <code>make</code> produces <code>build/&lt;name&gt;.elfo</code>, the overlay blob the host pages into executable RAM at load time. It is built from the unstripped link output in two steps:</p>
+<pre class="hljs"><code class="language-text">elf_overlay_relink <span class="hljs-operator">&lt;</span>name<span class="hljs-operator">&gt;</span>.<span class="hljs-attr">app</span>.<span class="hljs-attr">tool</span> <span class="hljs-operator">&lt;</span>name<span class="hljs-operator">&gt;</span>.<span class="hljs-attr">relk</span>
+elf_overlay_emit   <span class="hljs-operator">&lt;</span>name<span class="hljs-operator">&gt;</span>.<span class="hljs-attr">relk</span>     <span class="hljs-operator">&lt;</span>name<span class="hljs-operator">&gt;</span>.<span class="hljs-attr">elfo</span>
+</code></pre>
+<p>Both tools must be on <code>PATH</code>. They come from an <code>elf_overlay</code> checkout, built with CMake (<code>cmake -S . -B build &amp;&amp; cmake --build build --target elf_overlay_relink elf_overlay_emit</code>), then the build directory added to <code>PATH</code>. Override <code>ELF_OVERLAY_RELINK</code> and <code>ELF_OVERLAY_EMIT</code> to point at specific binaries. The format and the device-side load sequence are in <a href="../overlay/">overlay.md</a>.</p>
 <h2 id="building-an-app-entry-point" class="docmd-heading"><a href="#building-an-app-entry-point" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Entry point</h2>
-<p><code>extern &quot;C&quot; int main(int argc, char **argv)</code>, renamed to <code>app_main</code> via<br>
-<code>-Dmain=app_main -e app_main</code>. See <a href="../app-abi/">app-abi.md</a> for the full<br>
-contract. Everything the app calls resolves from the host at load time, so<br>
-keep the undefined-symbol list (from <code>make check</code>) small and intentional; see<br>
-<a href="../symbols/">symbols.md</a>.</p>
+<p><code>extern &quot;C&quot; int main(int argc, char **argv)</code>, renamed to <code>app_main</code> via <code>-Dmain=app_main -e app_main</code>. See <a href="../app-abi/">app-abi.md</a> for the full contract. Everything the app calls resolves from the host at load time, so keep the undefined-symbol list (from <code>make check</code>) small and intentional; see <a href="../symbols/">symbols.md</a>.</p>
 <h2 id="building-an-app-compiler-flags" class="docmd-heading"><a href="#building-an-app-compiler-flags" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Compiler flags</h2>
-<p>The SDK builds with <code>-Wall -Wextra</code>, exceptions and RTTI disabled, and hidden<br>
-visibility. Keep the code warning-free.</p>
-<p><code>app.mk</code> injects <code>PM_SDK_VERSION</code> plus <code>PM_SDK_VERSION_MAJOR/MINOR/PATCH</code> from<br>
-the repo <code>VERSION</code> file, so an app always sees <code>POCKETMAGE_SDK_VERSION_*</code> in<br>
-<code>pocketmage_app_version.h</code> alongside the host-exported string literal<br>
-<code>pocketmage_sdk_version</code>; see <a href="../app-abi/">app-abi.md</a>.</p>
+<p>The SDK builds with <code>-Wall -Wextra</code>, exceptions and RTTI disabled, and hidden visibility. Keep the code warning-free.</p>
+<p><code>app.mk</code> injects <code>PM_SDK_VERSION</code> plus <code>PM_SDK_VERSION_MAJOR/MINOR/PATCH</code> from the repo <code>VERSION</code> file, so an app always sees <code>POCKETMAGE_SDK_VERSION_*</code> in <code>pocketmage_app_version.h</code> alongside the host-exported string literal <code>pocketmage_sdk_version</code>; see <a href="../app-abi/">app-abi.md</a>.</p>
 <h2 id="building-an-app-icon" class="docmd-heading"><a href="#building-an-app-icon" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Icon</h2>
-<p><code>&lt;name&gt;_ICON.bin</code> is an optional 200-byte file: a 40x40, 1-bit-per-pixel<br>
-bitmap (5 bytes per row, 8 pixels per byte), drawn by the OS as the app icon.<br>
-Missing icons fall back to the OS default. <code>make pack</code> requires the file next<br>
-to the <code>Makefile</code>; without one the pack step errors.</p>
+<p><code>&lt;name&gt;_ICON.bin</code> is a 200-byte file: a 40x40, 1-bit-per-pixel bitmap (5 bytes per row, 8 pixels per byte), drawn by the OS as the app icon. <code>make pack</code> requires the file next to the <code>Makefile</code> and errors without it. The OS falls back to a default icon only for an installed app that has none.</p>
 <h2 id="building-an-app-translations" class="docmd-heading"><a href="#building-an-app-translations" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Translations</h2>
-<p>An app that shows strings uses its own catalog; see <a href="../i18n/">i18n.md</a>. The<br>
-short version: put a <code>src/i18n/</code> tree in your app and merge it via the<br>
-generator the way <code>platformio.ini</code> shows in that doc.</p>
+<p>An app that shows strings uses its own catalog; see <a href="../i18n/">i18n.md</a>. The short version: put a <code>src/i18n/</code> tree in your app and merge it via the generator the way <code>platformio.ini</code> shows in that doc.</p>
 <h2 id="building-an-app-before-you-ship" class="docmd-heading"><a href="#building-an-app-before-you-ship" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Before you ship</h2>
-<p>Run <code>make clean all</code> then <code>pm check</code> before every commit; <code>pm check</code> is the<br>
-gate CI runs, and <code>--host-elf &lt;firmware.elf&gt;</code> pins the host export surface<br>
-exactly (see <a href="../symbols/">symbols.md</a>). <code>make pack</code> is the deliverable;<br>
-verify the tar’s members with <code>tar -tf build/&lt;name&gt;.tar</code>.</p>
-<p><code>pm new myapp</code> scaffolds from the official<br>
-<a href="https://github.com/TalismanDesign/PocketMage_App">PocketMage_App</a> template.<br>
-CI also builds a <code>broken_app</code> fixture that intentionally fails the gate:<br>
-it references a symbol the host does not export and must fail <code>pm check</code>.</p>
+<p>Run <code>make clean all</code> then <code>pm check</code> before every commit; <code>pm check</code> is the gate CI runs, and <code>--host-elf &lt;firmware.elf&gt;</code> pins the host export surface exactly (see <a href="../symbols/">symbols.md</a>). <code>make pack</code> is the deliverable; verify the tar’s members with <code>tar -tf build/&lt;name&gt;.tar</code>. It should list <code>&lt;name&gt;.app.elf</code>, <code>&lt;name&gt;.elfo</code>, <code>&lt;name&gt;_ICON.bin</code>, and <code>app.properties</code>.</p>
+<p><code>pm new myapp</code> scaffolds from the official <a href="https://github.com/TalismanDesign/PocketMage_App">PocketMage_App</a> template. The SDK’s <code>pm</code> CLI is the fastest path from scaffold to shippable tar; the full command surface is in <a href="../cli/">cli.md</a>. CI builds that same template against the SDK on every push, and rejects a <code>broken_app</code> fixture that references a symbol the host does not export and so must fail <code>pm check</code>.</p>
 
                 
                   <div class="page-navigation">
                     
-                      <a href="../app-abi/" class="prev-page">
+                      <a href="../symbols/" class="prev-page">
                         
 <svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-arrow-left"
@@ -1758,15 +2142,15 @@ it references a symbol the host does not export and must fail <code>pm check</co
 </svg>
 
                         <span><small>Previous</small><strong>
-                            App ABI
+                            Symbol surface
                           </strong></span>
                       </a>
                     
                     
-                      <a href="../symbols/" class="next-page">
+                      <a href="../cli/" class="next-page">
                         <span><small>Next</small>
                           <strong>
-                            Symbols
+                            pm CLI
                           </strong></span>
                         
 <svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1834,6 +2218,10 @@ it references a symbol the host does not export and must fail <code>pm check</co
         </li>
       
         <li class="toc-item toc-level-2">
+          <a href="#building-an-app-overlay-emission" class="toc-link">Overlay emission</a>
+        </li>
+      
+        <li class="toc-item toc-level-2">
           <a href="#building-an-app-entry-point" class="toc-link">Entry point</a>
         </li>
       
@@ -1864,13 +2252,13 @@ it references a symbol the host does not export and must fail <code>pm check</co
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1793426792000">
+                <span class="git-last-updated" data-timestamp="1793486742000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1793426792000"></span>
+                  <span class="git-time" data-timestamp="1793486742000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1883,10 +2271,10 @@ it references a symbol the host does not export and must fail <code>pm check</co
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Fix">Fix</div>
+                            <div class="git-commit-message" title="Docs">Docs</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1793426792000"></span>
+                              <span class="git-commit-date" data-timestamp="1793486742000"></span>
                             </div>
                           </div>
                         </li>
@@ -1898,7 +2286,7 @@ it references a symbol the host does not export and must fail <code>pm check</co
               
               <span class="git-spacer"></span>
               
-                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/docs/docs/build.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/Docs/docs/build.md" target="_blank" rel="noopener noreferrer" class="edit-link">
                   
 <svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-pencil"
@@ -1938,44 +2326,42 @@ it references a symbol the host does not export and must fail <code>pm check</co
           <div class="footer-columns">
             
               <div class="footer-column">
-                <span class="footer-column-title">Guides</span>
+                <span class="footer-column-title">Get Started</span>
                 <ul>
                   
-                    <li><a href="guides/making-apps/" >Making an app</a></li>
+                    <li><a href="get-started/" >Overview</a></li>
                   
-                    <li><a href="guides/lifecycle/" >App lifecycle</a></li>
+                    <li><a href="get-started/toolchain/" >Install the toolchain</a></li>
                   
-                    <li><a href="guides/rendering/" >Rendering</a></li>
+                    <li><a href="get-started/first-app/" >Your first app</a></li>
                   
                 </ul>
               </div>
             
               <div class="footer-column">
-                <span class="footer-column-title">API Reference</span>
+                <span class="footer-column-title">Reference</span>
                 <ul>
                   
-                    <li><a href="api/" >Overview</a></li>
-                  
-                    <li><a href="api/oled/" >OLED</a></li>
-                  
-                    <li><a href="api/eink/" >E-Ink</a></li>
-                  
-                    <li><a href="api/sys/" >System</a></li>
-                  
-                </ul>
-              </div>
-            
-              <div class="footer-column">
-                <span class="footer-column-title">Platform</span>
-                <ul>
+                    <li><a href="api/functions/" >Function index</a></li>
                   
                     <li><a href="app-abi/" >App ABI</a></li>
                   
-                    <li><a href="build/" >Building Apps</a></li>
+                    <li><a href="overlay/" >Overlay format</a></li>
                   
-                    <li><a href="symbols/" >Symbols</a></li>
+                    <li><a href="symbols/" >Symbol surface</a></li>
                   
-                    <li><a href="publish/" >Publishing</a></li>
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Tooling</span>
+                <ul>
+                  
+                    <li><a href="build/" >Building apps</a></li>
+                  
+                    <li><a href="cli/" >pm CLI</a></li>
+                  
+                    <li><a href="guides/publishing/" >Publishing</a></li>
                   
                 </ul>
               </div>
@@ -2009,14 +2395,14 @@ it references a symbol the host does not export and must fail <code>pm check</co
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mvw00s0r"></script>
+      <script src="../assets/js/docmd-main.js?v=mvwzpk2z"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mvw00s0r"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mvw00s0r" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-search.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-git.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-ai.js?v=mvw00s0r" ></script>
+      <script src="../assets/js/docmd-git.js?v=mvwzpk2z"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-search.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-git.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-ai.js?v=mvwzpk2z" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
@@ -2092,7 +2478,7 @@ it references a symbol the host does not export and must fail <code>pm check</co
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
-<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Guides","icon":"book","collapsible":true,"children":[{"title":"Guide index","path":"/guides/","icon":"book"},{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"children":[{"title":"API overview","path":"/api/","icon":"boxes"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Building Apps","path":"/build/","icon":"code"},{"title":"Symbols","path":"/symbols/","icon":"box"},{"title":"Publishing","path":"/publish/","icon":"package"},{"title":"i18n catalogs","path":"/i18n/","icon":"terminal"},{"title":"Migration","path":"/migration/","icon":"book-open"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
       
       
       

@@ -7,7 +7,7 @@ path: /api/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.501Z"
+  generated_at: "2026-10-31T22:45:59.832Z"
 ---
 ---
 title: "API Reference"
@@ -23,6 +23,8 @@ The SDK exposes the PocketMage hardware and OS services to loaded apps through a
 ```
 
 `pocketmage.h` pulls in every component header, `config.h`, the `frames` and `assets` modules, and `Preferences.h`. It also includes `pocketmage_app_version.h` when the build defines `PM_TARGET_APP`, so the SDK-version macros are always available to apps.
+
+An external app does not call these C++ classes directly across the ELF boundary; it calls the flat `pm_*` C ABI that projects them. See [The C ABI (pm_*)](#api-reference-the-c-abi-pm) below, and the complete [function index](functions.md) for every wrapper and its signature.
 
 ## Compile target
 
@@ -60,6 +62,30 @@ Most components are owned by a single global instance created inside the SDK and
 | Config      | (free)      | pins, counters, prefs, SDK version stamping        | [configuration](configuration.md) |
 
 The `frames` component is used by the OS's built-in apps. Third-party apps start from the simpler primitives in [oled](oled.md), [eink](eink.md), [font](font.md), and [layout](layout.md).
+
+## The C ABI (pm_*)
+
+The accessors and classes above are the host-side API. The SDK compiles the firmware with the C++ API directly, but an external ELF app cannot: it links `-nostdlib` and resolves symbols by name at load time, so the app-facing surface is a flat C ABI, the `pm_*` functions, generated from the C++ classes by `tools/gen_app_api.py`. An app includes the generated header through `pm_app_api.h`:
+
+```cpp
+#include <pm_app_api.h>
+```
+
+The generator projects each exported C++ method to one C function by a fixed set of rules:
+
+| C++ shape                         | C projection                                              |
+| --------------------------------- | --------------------------------------------------------- |
+| `ClassName::method(args)`         | `pm_<module>_<method>(args)` on the module's singleton    |
+| `String` parameter or return      | `const char*` (returns point into the string pool, below) |
+| enum parameter or return          | plain `int` (values in SDK declaration order)             |
+| `std::vector<T>` return           | a `_count` function plus a `_get(index, out, out_size)` pair |
+| scalar out-parameter by reference | `T*` out-pointer                                          |
+
+Enums become integers with generated value tables: `pm_target`, `pm_style`, `pm_lang`, `pm_refresh`, and `pm_jingle`. `PM_APP_API_ABI` tracks incompatible changes to this surface; an app compares it against `pm_app_abi()` at startup, and `pocketmage_sdk_version` (via `pm_host_sdk_version()`) gives the running host's SDK version.
+
+Every `const char*` return points into a shared rotating string pool: four 256-byte slots, where the fifth string-returning call overwrites the first. Copy a returned string before making further SDK calls if you need to keep it. Functions that can return arbitrary length write into a caller-owned buffer instead. The full rule and the per-function list are in the [function index](functions.md#function-index-string-return-lifetime).
+
+The `pm_*` names are the app's real dependency contract and are gated at load time against the curated host surface; see [symbols.md](../symbols.md). Each component page below documents its `pm_*` wrappers alongside the C++ class they project.
 
 ## Reading a component page
 

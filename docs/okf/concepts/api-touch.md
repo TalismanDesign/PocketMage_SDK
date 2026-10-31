@@ -7,7 +7,7 @@ path: /api/touch/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.505Z"
+  generated_at: "2026-10-31T22:45:59.833Z"
 ---
 ---
 title: "Touch (pocketmage_touch)"
@@ -78,3 +78,30 @@ void onLoop() {
   TOUCH().updateScrollFromTouch();
   // page view scrolls with TOUCH().getDynamicScroll();
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_touch_update_scroll_from_touch();
+bool pm_touch_update_scroll(int a0, unsigned long* a1, int a2);
+int pm_touch_get_scroll_vector();
+long pm_touch_get_dynamic_scroll();
+long pm_touch_get_prev_dynamic_scroll();
+int pm_touch_get_last_touch();
+unsigned long pm_touch_get_last_touch_time();
+int pm_touch_get_diff();
+```
+
+All operate on the `TOUCH()` singleton.
+
+- `pm_touch_update_scroll_from_touch()` is `updateScrollFromTouch()`.
+- `pm_touch_update_scroll(a0, a1, a2)` is `updateScroll(maxScroll, lineScroll, stepSize)`; `a0` is `maxScroll`, `a2` is `stepSize`. The `ulong&` reference parameter becomes the out-pointer `a1`: the current `lineScroll` is read from and written back through it. Returns true when the view changed.
+- `pm_touch_get_scroll_vector()` is `getScrollVector()`. Returns the signed movement of the most recent pad step, 0 when idle.
+- `pm_touch_get_dynamic_scroll()` is `getDynamicScroll()`.
+- `pm_touch_get_prev_dynamic_scroll()` is `getPrevDynamicScroll()`.
+- `pm_touch_get_last_touch()` is `getLastTouch()`.
+- `pm_touch_get_last_touch_time()` is `getLastTouchTime()`.
+- `pm_touch_get_diff()` is `getDiff()`; the `dynamicScroll_ - prev_dynamicScroll_` difference.

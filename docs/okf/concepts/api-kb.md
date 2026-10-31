@@ -7,7 +7,7 @@ path: /api/kb/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.502Z"
+  generated_at: "2026-10-31T22:45:59.832Z"
 ---
 ---
 title: "Keyboard (pocketmage_kb)"
@@ -77,3 +77,28 @@ void pumpKeys() {
   if (!KB().acceptKey()) return;
   // handle the character
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_kb_state();
+void pm_kb_toggle_shift();
+void pm_kb_toggle_fn();
+bool pm_kb_accept_key();
+char pm_kb_read();
+void pm_kb_check_usbkb();
+void pm_kb_flush();
+```
+
+All operate on the `KB()` singleton.
+
+- `pm_kb_state()` is `getKeyboardState()`. Returns the `KBState` modifier value (`NORMAL`, `SHIFT`, `FUNC`, `FN_SHIFT`) as int.
+- `pm_kb_toggle_shift()` is `toggleShift()`.
+- `pm_kb_toggle_fn()` is `toggleFn()`.
+- `pm_kb_accept_key()` is `acceptKey()`. Returns true only once `KB_COOLDOWN` ms have passed since the last accepted press.
+- `pm_kb_read()` is `updateKeypress()`. Returns the next character, or `'\0'` when none is pending; never blocks.
+- `pm_kb_check_usbkb()` is `checkUSBKB()`; services the USB HID connection.
+- `pm_kb_flush()` is `flush()`; drops any queued events.

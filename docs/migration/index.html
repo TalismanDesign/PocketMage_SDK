@@ -10,7 +10,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.9.7">
+    <meta name="generator" content="docmd v0.9.8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <script>
@@ -102,11 +102,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mvw00s0r">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvw00s0r">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.png?v=mvwzpk2z">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvwzpk2z">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvw00s0r" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvw00s0r" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvwzpk2z" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvwzpk2z" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Moving a pre-ELF app to the runtime-load flow: what changed, the eight steps, and the traps that bite.">
@@ -125,11 +125,13 @@
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvw00s0r" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvwzpk2z" >
 
+    
+      <link rel="stylesheet" href="../assets/css/theme.css?v=mvwzpk2z">
     
     
   </head>
@@ -222,10 +224,11 @@
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
+        <a href="../get-started/" class=" nav-group"
+          >
            
-<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-book"
+<svg class="lucide-icon icon-rocket " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-rocket"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -236,13 +239,16 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
+  <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
+  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05" />
 </svg>
 
           
           <span class="nav-item-title">
-            Guides
-          </span>
+            Get Started
+            </span>
           
             <span class="collapse-icon-wrapper">
 <svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -261,7 +267,8 @@
 </svg>
 </span>
           
-        </span>
+          
+        </a>
         
 
         
@@ -269,7 +276,76 @@
             
       <li class="" >
       
-        <a href="../guides/" class=" "
+        <a href="../get-started/toolchain/" class=" "
+          >
+           
+<svg class="lucide-icon icon-settings " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Install the toolchain
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../get-started/first-app/" class=" "
+          >
+           
+<svg class="lucide-icon icon-play " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-play"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Your first app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <a href="../guides/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -289,16 +365,33 @@
 
           
           <span class="nav-item-title">
-            Guide index
+            Guides
             </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
           
           
         </a>
         
 
         
-      </li>
-    
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../guides/making-apps/" class=" "
@@ -398,71 +491,85 @@
         
       </li>
     
+      <li class="" >
+      
+        <a href="../guides/i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Internationalization
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../guides/publishing/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
           </ul>
         
       </li>
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
-           
-<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-boxes"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
-  <path d="m7 16.5-4.74-2.85" />
-  <path d="m7 16.5 5-3" />
-  <path d="M7 16.5v5.17" />
-  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
-  <path d="m17 16.5-5-3" />
-  <path d="m17 16.5 4.74-2.85" />
-  <path d="M17 16.5v5.17" />
-  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
-  <path d="M12 8 7.26 5.15" />
-  <path d="m12 8 4.74-2.85" />
-  <path d="M12 13.5V8" />
-</svg>
-
-          
-          <span class="nav-item-title">
-            API Reference
-          </span>
-          
-            <span class="collapse-icon-wrapper">
-<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-chevron-right"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m9 18 6-6-6-6" />
-</svg>
-</span>
-          
-        </span>
-        
-
-        
-          <ul class="submenu">
-            
-      <li class="" >
-      
-        <a href="../api/" class=" "
+        <a href="../api/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -493,7 +600,61 @@
 
           
           <span class="nav-item-title">
-            API overview
+            API Reference
+            </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../api/functions/" class=" "
+          >
+           
+<svg class="lucide-icon icon-list " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-list"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 5h.01" />
+  <path d="M3 12h.01" />
+  <path d="M3 19h.01" />
+  <path d="M8 5h13" />
+  <path d="M8 12h13" />
+  <path d="M8 19h13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Function index
             </span>
           
           
@@ -1115,6 +1276,56 @@
         
       </li>
     
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-file-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-file-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 12.5 8 15l2 2.5" />
+  <path d="m14 12.5 2 2.5-2 2.5" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Binary Contract
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../app-abi/" class=" "
@@ -1149,11 +1360,11 @@
     
       <li class="" >
       
-        <a href="../build/" class=" "
+        <a href="../overlay/" class=" "
           >
            
-<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-code"
+<svg class="lucide-icon icon-layers " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layers"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1164,13 +1375,14 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m16 18 6-6-6-6" />
-  <path d="m8 6-6 6 6 6" />
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
 </svg>
 
           
           <span class="nav-item-title">
-            Building Apps
+            Overlay format (.elfo)
             </span>
           
           
@@ -1204,7 +1416,7 @@
 
           
           <span class="nav-item-title">
-            Symbols
+            Symbol surface
             </span>
           
           
@@ -1214,13 +1426,16 @@
         
       </li>
     
-      <li class="" >
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <a href="../publish/" class=" "
-          >
+        <span class="nav-label nav-group">
            
-<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-package"
+<svg class="lucide-icon icon-wrench " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wrench"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1231,15 +1446,61 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
-  <path d="M12 22V12" />
-  <polyline points="3.29 7 12 12 20.71 7" />
-  <path d="m7.5 4.27 9 5.15" />
+  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" />
 </svg>
 
           
           <span class="nav-item-title">
-            Publishing
+            Tooling
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../build/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building apps
             </span>
           
           
@@ -1251,7 +1512,7 @@
     
       <li class="" >
       
-        <a href="../i18n/" class=" "
+        <a href="../cli/" class=" "
           >
            
 <svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1272,6 +1533,43 @@
 
           
           <span class="nav-item-title">
+            pm CLI
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
             i18n catalogs
             </span>
           
@@ -1282,9 +1580,50 @@
         
       </li>
     
-      <li class="active" >
+          </ul>
+        
+      </li>
+    
+      <li class="" >
       
-        <a href="../migration/" class="active "
+        <a href="../troubleshooting/" class=" "
+          >
+           
+<svg class="lucide-icon icon-life-buoy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-life-buoy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="m4.93 4.93 4.24 4.24" />
+  <path d="m14.83 9.17 4.24-4.24" />
+  <path d="m14.83 14.83 4.24 4.24" />
+  <path d="m9.17 14.83-4.24 4.24" />
+  <circle cx="12" cy="12" r="4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../glossary/" class=" "
           >
            
 <svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1301,6 +1640,40 @@
 >
   <path d="M12 5v16" />
   <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../migration/" class="active "
+          >
+           
+<svg class="lucide-icon icon-git-branch " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-git-branch"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 6a9 9 0 0 0-9 9V3" />
+  <circle cx="18" cy="6" r="3" />
+  <circle cx="6" cy="18" r="3" />
 </svg>
 
           
@@ -1549,7 +1922,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Migrating%20an%20existing%20app%22%0Adescription%3A%20%22Moving%20a%20pre-ELF%20app%20to%20the%20runtime-load%20flow%3A%20what%20changed%2C%20the%20eight%20steps%2C%20and%20the%20traps%20that%20bite.%22%0A---%0A%0A%23%20Migrating%20an%20existing%20app%0A%0AProduction%20devices%20no%20longer%20run%20apps%20built%20the%20old%20way.%20An%20app%20is%20now%20a%0Aruntime-loaded%20ELF%20shipped%20as%20%60%2Fapps%2F*.tar%60%3B%20there%20is%20no%20firmware-flashing%0Aapp%20flow%20and%20no%20OTA-style%20app%20package%20on%20production.%0A%0AThe%20short%20version%3A%20if%20you%20shipped%20an%20app%20pre-ELF%2C%20that%20package%20will%20not%20launch%0Aon%20production%20firmware.%20Rebuild%20it%20against%20the%20ELF%20contract%20and%20re-package.%0A%0A%23%23%20What%20changed%0A%0A%7C%20Aspect%20%20%20%20%20%20%20%20%20%20%7C%20Old%20flow%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20New%20flow%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------%20%7C%20------------------------------------------%20%7C%20----------------------------------------------------%20%7C%0A%7C%20Binary%20%20%20%20%20%20%20%20%20%20%7C%20monolithic%20app%20inside%20the%20firmware%20image%20%20%20%7C%20standalone%20%60ET_DYN%60%20ELF%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Delivery%20%20%20%20%20%20%20%20%7C%20firmware%20%60.bin%60%20%2F%20OTA-style%20app%20package%20%20%20%20%7C%20%60%2Fapps%2F%3Cname%3E.tar%60%20on%20the%20SD%20card%2C%20installed%20via%20APPLOADER%20%7C%0A%7C%20Instantiation%20%20%20%7C%20compiled%20in%2C%20launched%20by%20the%20OS%20%20%20%20%20%20%20%20%20%20%20%20%7C%20loaded%20in-process%20when%20launched%2C%20torn%20down%20on%20return%20%7C%0A%7C%20Dependencies%20%20%20%20%7C%20linked%20into%20the%20firmware%20build%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20resolved%20from%20the%20host%20at%20load%20time%20(%60-nostdlib%60)%20%20%20%20%7C%0A%7C%20Toolchain%20%20%20%20%20%20%20%7C%20PlatformIO%20(big-endian)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20espressif%20%60xtensa-esp-elf%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Layout%2Fnaming%20%20%20%7C%20app%20id%20%2F%20metadata%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20derived%20from%20the%20tar%20base%20name%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20OS%20keeps%20app%20code%20out%20of%20PSRAM%20by%20design%3B%20code%20runs%20from%20IRAM.%20That%20is%0Athe%20loader&#039;s%20job%2C%20not%20yours.%0A%0A%23%23%20Migration%20steps%0A%0A1.%20**Get%20the%20toolchain.**%20Install%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%0A%20%20%20into%20%60~%2F.espressif%2F...%60%20as%20shown%20in%20%5Bbuild.md%5D(build.md).%20Do%20not%20rely%20on%0A%20%20%20the%20PlatformIO%20toolchain%3B%20it%20emits%20big-endian%20ELFs%20the%20loader%20cannot%20read.%0A2.%20**Scaffold.**%20Run%20%60pm%20new%20myapp%60.%20Its%20%60Makefile%60%0A%20%20%20(%60include%20tools%2Fapp.mk%60)%20is%20the%20whole%20build%20system.%0A3.%20**Port%20the%20entry.**%20Wrap%20your%20start%20logic%20in%20%60extern%20%22C%22%20int%0A%20%20%20main(int%2C%20char**)%60.%20The%20build%20renames%20it%20to%20%60app_main%60.%20Fit%20the%20previous%0A%20%20%20app&#039;s%20lifetime%20to%20the%20return-from-%60main%60%20model%0A%20%20%20(%5Bapp-abi.md%5D(app-abi.md)).%0A4.%20**Replace%20dependencies.**%20Every%20call%20must%20resolve%20at%20load%20time.%20Host%0A%20%20%20exports%20are%20the%20curated%20surface%20in%20%5Bsymbols.md%5D(symbols.md)%20plus%20the%0A%20%20%20host&#039;s%20newlib%2FIDF%2FArduino%20globals.%20That%20covers%20display%2C%20keyboard%2C%20buzzer%2C%0A%20%20%20clock%2C%20IO%2C%20and%20the%20standard%20library.%20If%20you%20depended%20on%20app-side%20firmware%0A%20%20%20globals%20that%20are%20not%20exported%2C%20move%20that%20dependency%20to%20API%20calls.%0A5.%20**Move%20assets.**%20Files%20the%20app%20used%20at%20compile%20time%20become%20a%20top-level%0A%20%20%20%60assets%2F%60%20directory%20in%20the%20tar%2C%20read%20at%20runtime%20from%20%60%2Fassets%2F%3Cname%3E%60%0A%20%20%20(%5Bpublish.md%5D(publish.md)).%0A6.%20**Localize.**%20If%20the%20app%20contained%20strings%2C%20move%20them%20into%20an%20app%20catalog%0A%20%20%20(%60src%2Fi18n%2F%60%2C%20merged%20per%20%5Bi18n.md%5D(i18n.md))%20instead%20of%20hardcoding.%0A7.%20**Verify.**%20%60make%20clean%20all%20check%60%20must%20succeed%2C%20list%20a%20sane%20set%20of%0A%20%20%20undefined%20symbols%2C%20and%20the%20endianness%20check%20must%20pass.%20Then%20%60make%20pack%60%0A%20%20%20and%20%60tar%20-tvf%20build%2F%3Cname%3E.tar%60.%0A8.%20**Ship.**%20Copy%20the%20tar%20to%20%60%2Fapps%2F%60%20on%20the%20device%2C%20install%20with%20APPLOADER%0A%20%20%20into%20a%20slot%2C%20launch.%20The%20launcher%20shows%20the%20name%20and%20icon%20drawn%20from%20the%0A%20%20%20package.%0A%0A%23%23%20Gotchas%0A%0A-%20**Big-endian%20artifacts.**%20The%20classic%20failure.%20The%20loader%20does%20no%20byte%0A%20%20swapping%2C%20so%20a%20PlatformIO-built%20app%20faults%20at%20load%20with%20a%20section%20or%0A%20%20instruction%20fault.%20%60readelf%20-h%60%20shows%20%60big%20endian%60%20before%20you%20ship.%0A-%20**Statically%20linked%20runtime.**%20Symbols%20collide%20or%20bloat%3B%20keep%20%60-nostdlib%60.%0A-%20**Relying%20on%20slot%20directories.**%20After%20install%20the%20ELF%20lives%20in%20the%20slot%0A%20%20dir%2C%20but%20the%20app%20should%20treat%20%60%2Fassets%2F%3Cname%3E%60%20(copied%20at%20install)%20as%20its%0A%20%20data%20home%20and%20never%20assume%20the%20slot%20path.%0A-%20**Long-lived%20loops.**%20The%20app%20shares%20the%20device.%20Cooperative%20lifetimes%0A%20%20(render%2C%20yield%20via%20the%20SDK%20API%2C%20return)%20beat%20spin%20loops%20on%20the%2016%20KB%20run%0A%20%20stack.%0A%0A%23%23%20Announcement%0A%0AIf%20you%20maintained%20published%20apps%20pre-ELF%2C%20publish%20a%20migration%20notice%3A%20existing%0Apackages%20targeting%20production%20will%20not%20launch%20on%20the%20new%20firmware%2C%20and%20step%208%0Aabove%20is%20the%20path%20forward." style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Migrating%20an%20existing%20app%22%0Adescription%3A%20%22Moving%20a%20pre-ELF%20app%20to%20the%20runtime-load%20flow%3A%20what%20changed%2C%20the%20eight%20steps%2C%20and%20the%20traps%20that%20bite.%22%0A---%0A%0A%23%20Migrating%20an%20existing%20app%0A%0AProduction%20devices%20no%20longer%20run%20apps%20built%20the%20old%20way.%20An%20app%20is%20now%20a%20runtime-loaded%20ELF%20shipped%20as%20%60%2Fapps%2F*.tar%60%3B%20there%20is%20no%20firmware-flashing%20app%20flow%20and%20no%20OTA-style%20app%20package%20on%20production.%0A%0AThe%20short%20version%3A%20if%20you%20shipped%20an%20app%20pre-ELF%2C%20that%20package%20will%20not%20launch%20on%20production%20firmware.%20Rebuild%20it%20against%20the%20ELF%20contract%20and%20re-package.%0A%0A%23%23%20What%20changed%0A%0A%7C%20Aspect%20%20%20%20%20%20%20%20%20%20%7C%20Old%20flow%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20New%20flow%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------%20%7C%20------------------------------------------%20%7C%20----------------------------------------------------%20%7C%0A%7C%20Binary%20%20%20%20%20%20%20%20%20%20%7C%20monolithic%20app%20inside%20the%20firmware%20image%20%20%20%7C%20standalone%20%60ET_DYN%60%20ELF%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Delivery%20%20%20%20%20%20%20%20%7C%20firmware%20%60.bin%60%20%2F%20OTA-style%20app%20package%20%20%20%20%7C%20%60%2Fapps%2F%3Cname%3E.tar%60%20on%20the%20SD%20card%2C%20installed%20via%20APPLOADER%20%7C%0A%7C%20Instantiation%20%20%20%7C%20compiled%20in%2C%20launched%20by%20the%20OS%20%20%20%20%20%20%20%20%20%20%20%20%7C%20loaded%20in-process%20when%20launched%2C%20torn%20down%20on%20return%20%7C%0A%7C%20Dependencies%20%20%20%20%7C%20linked%20into%20the%20firmware%20build%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20resolved%20from%20the%20host%20at%20load%20time%20(%60-nostdlib%60)%20%20%20%20%7C%0A%7C%20Toolchain%20%20%20%20%20%20%20%7C%20PlatformIO%20(big-endian)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20espressif%20%60xtensa-esp-elf%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Layout%2Fnaming%20%20%20%7C%20app%20id%20%2F%20metadata%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20derived%20from%20the%20tar%20base%20name%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20OS%20keeps%20app%20code%20out%20of%20PSRAM%20by%20design%3B%20code%20runs%20from%20IRAM.%20That%20is%20the%20loader&#039;s%20job%2C%20not%20yours.%0A%0A%23%23%20Migration%20steps%0A%0A1.%20**Get%20the%20toolchain.**%20Install%20the%20espressif%20%60xtensa-esp-elf%60%20toolchain%20into%20%60~%2F.espressif%2F...%60%20as%20shown%20in%20%5Bbuild.md%5D(build.md).%20Do%20not%20rely%20on%20the%20PlatformIO%20toolchain%3B%20it%20emits%20big-endian%20ELFs%20the%20loader%20cannot%20read.%0A2.%20**Scaffold.**%20Run%20%60pm%20new%20myapp%60.%20Its%20%60Makefile%60%20(%60include%20tools%2Fapp.mk%60)%20is%20the%20whole%20build%20system.%0A3.%20**Port%20the%20entry.**%20Wrap%20your%20start%20logic%20in%20%60extern%20%22C%22%20int%20main(int%2C%20char**)%60.%20The%20build%20renames%20it%20to%20%60app_main%60.%20Fit%20the%20previous%20app&#039;s%20lifetime%20to%20the%20return-from-%60main%60%20model%20(%5Bapp-abi.md%5D(app-abi.md)).%0A4.%20**Replace%20dependencies.**%20Every%20call%20must%20resolve%20at%20load%20time.%20Host%20exports%20are%20the%20curated%20surface%20in%20%5Bsymbols.md%5D(symbols.md)%20plus%20the%20host&#039;s%20newlib%2FIDF%2FArduino%20globals.%20That%20covers%20display%2C%20keyboard%2C%20buzzer%2C%20clock%2C%20IO%2C%20and%20the%20standard%20library.%20If%20you%20depended%20on%20app-side%20firmware%20globals%20that%20are%20not%20exported%2C%20move%20that%20dependency%20to%20API%20calls.%0A5.%20**Move%20assets.**%20Files%20the%20app%20used%20at%20compile%20time%20become%20a%20top-level%20%60assets%2F%60%20directory%20in%20the%20tar%2C%20read%20at%20runtime%20from%20%60%2Fassets%2F%3Cname%3E%60%20(%5Bpublishing%5D(guides%2Fpublishing.md)).%0A6.%20**Localize.**%20If%20the%20app%20contained%20strings%2C%20move%20them%20into%20an%20app%20catalog%20(%60src%2Fi18n%2F%60%2C%20merged%20per%20%5Bi18n.md%5D(i18n.md))%20instead%20of%20hardcoding.%0A7.%20**Verify.**%20%60make%20clean%20all%20check%60%20must%20succeed%2C%20list%20a%20sane%20set%20of%20undefined%20symbols%2C%20and%20the%20endianness%20check%20must%20pass.%20Then%20%60make%20pack%60%20and%20%60tar%20-tvf%20build%2F%3Cname%3E.tar%60.%0A8.%20**Ship.**%20Copy%20the%20tar%20to%20%60%2Fapps%2F%60%20on%20the%20device%2C%20install%20with%20APPLOADER%20into%20a%20slot%2C%20launch.%20The%20launcher%20shows%20the%20name%20and%20icon%20drawn%20from%20the%20package.%0A%0A%23%23%20Gotchas%0A%0A-%20**Big-endian%20artifacts.**%20The%20classic%20failure.%20The%20loader%20does%20no%20byte%20swapping%2C%20so%20a%20PlatformIO-built%20app%20faults%20at%20load%20with%20a%20section%20or%20instruction%20fault.%20%60readelf%20-h%60%20shows%20%60big%20endian%60%20before%20you%20ship.%0A-%20**Statically%20linked%20runtime.**%20Symbols%20collide%20or%20bloat%3B%20keep%20%60-nostdlib%60.%0A-%20**Relying%20on%20slot%20directories.**%20After%20install%20the%20ELF%20lives%20in%20the%20slot%20dir%2C%20but%20the%20app%20should%20treat%20%60%2Fassets%2F%3Cname%3E%60%20(copied%20at%20install)%20as%20its%20data%20home%20and%20never%20assume%20the%20slot%20path.%0A-%20**Long-lived%20loops.**%20The%20app%20shares%20the%20device.%20Cooperative%20lifetimes%20(render%2C%20yield%20via%20the%20SDK%20API%2C%20return)%20beat%20spin%20loops%20on%20the%2016%20KB%20run%20stack.%0A%0A%23%23%20Announcement%0A%0AIf%20you%20maintained%20published%20apps%20pre-ELF%2C%20publish%20a%20migration%20notice%3A%20existing%20packages%20targeting%20production%20will%20not%20launch%20on%20the%20new%20firmware%2C%20and%20step%208%20above%20is%20the%20path%20forward." style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1621,11 +1994,8 @@
                   </h1>
                 
                 <h1 id="migrating-an-existing-app" class="docmd-heading"><a href="#migrating-an-existing-app" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Migrating an existing app</h1>
-<p>Production devices no longer run apps built the old way. An app is now a<br>
-runtime-loaded ELF shipped as <code>/apps/*.tar</code>; there is no firmware-flashing<br>
-app flow and no OTA-style app package on production.</p>
-<p>The short version: if you shipped an app pre-ELF, that package will not launch<br>
-on production firmware. Rebuild it against the ELF contract and re-package.</p>
+<p>Production devices no longer run apps built the old way. An app is now a runtime-loaded ELF shipped as <code>/apps/*.tar</code>; there is no firmware-flashing app flow and no OTA-style app package on production.</p>
+<p>The short version: if you shipped an app pre-ELF, that package will not launch on production firmware. Rebuild it against the ELF contract and re-package.</p>
 <h2 id="migrating-an-existing-app-what-changed" class="docmd-heading"><a href="#migrating-an-existing-app-what-changed" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>What changed</h2>
 <div class="table-wrapper"><table>
 <thead>
@@ -1668,57 +2038,32 @@ on production firmware. Rebuild it against the ELF contract and re-package.</p>
 </tr>
 </tbody>
 </table>
-</div><p>The OS keeps app code out of PSRAM by design; code runs from IRAM. That is<br>
-the loader’s job, not yours.</p>
+</div><p>The OS keeps app code out of PSRAM by design; code runs from IRAM. That is the loader’s job, not yours.</p>
 <h2 id="migrating-an-existing-app-migration-steps" class="docmd-heading"><a href="#migrating-an-existing-app-migration-steps" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Migration steps</h2>
 <ol>
-<li><strong>Get the toolchain.</strong> Install the espressif <code>xtensa-esp-elf</code> toolchain<br>
-into <code>~/.espressif/...</code> as shown in <a href="../build/">build.md</a>. Do not rely on<br>
-the PlatformIO toolchain; it emits big-endian ELFs the loader cannot read.</li>
-<li><strong>Scaffold.</strong> Run <code>pm new myapp</code>. Its <code>Makefile</code><br>
-(<code>include tools/app.mk</code>) is the whole build system.</li>
-<li><strong>Port the entry.</strong> Wrap your start logic in <code>extern &quot;C&quot; int main(int, char**)</code>. The build renames it to <code>app_main</code>. Fit the previous<br>
-app’s lifetime to the return-from-<code>main</code> model<br>
-(<a href="../app-abi/">app-abi.md</a>).</li>
-<li><strong>Replace dependencies.</strong> Every call must resolve at load time. Host<br>
-exports are the curated surface in <a href="../symbols/">symbols.md</a> plus the<br>
-host’s newlib/IDF/Arduino globals. That covers display, keyboard, buzzer,<br>
-clock, IO, and the standard library. If you depended on app-side firmware<br>
-globals that are not exported, move that dependency to API calls.</li>
-<li><strong>Move assets.</strong> Files the app used at compile time become a top-level<br>
-<code>assets/</code> directory in the tar, read at runtime from <code>/assets/&lt;name&gt;</code><br>
-(<a href="../publish/">publish.md</a>).</li>
-<li><strong>Localize.</strong> If the app contained strings, move them into an app catalog<br>
-(<code>src/i18n/</code>, merged per <a href="../i18n/">i18n.md</a>) instead of hardcoding.</li>
-<li><strong>Verify.</strong> <code>make clean all check</code> must succeed, list a sane set of<br>
-undefined symbols, and the endianness check must pass. Then <code>make pack</code><br>
-and <code>tar -tvf build/&lt;name&gt;.tar</code>.</li>
-<li><strong>Ship.</strong> Copy the tar to <code>/apps/</code> on the device, install with APPLOADER<br>
-into a slot, launch. The launcher shows the name and icon drawn from the<br>
-package.</li>
+<li><strong>Get the toolchain.</strong> Install the espressif <code>xtensa-esp-elf</code> toolchain into <code>~/.espressif/...</code> as shown in <a href="../build/">build.md</a>. Do not rely on the PlatformIO toolchain; it emits big-endian ELFs the loader cannot read.</li>
+<li><strong>Scaffold.</strong> Run <code>pm new myapp</code>. Its <code>Makefile</code> (<code>include tools/app.mk</code>) is the whole build system.</li>
+<li><strong>Port the entry.</strong> Wrap your start logic in <code>extern &quot;C&quot; int main(int, char**)</code>. The build renames it to <code>app_main</code>. Fit the previous app’s lifetime to the return-from-<code>main</code> model (<a href="../app-abi/">app-abi.md</a>).</li>
+<li><strong>Replace dependencies.</strong> Every call must resolve at load time. Host exports are the curated surface in <a href="../symbols/">symbols.md</a> plus the host’s newlib/IDF/Arduino globals. That covers display, keyboard, buzzer, clock, IO, and the standard library. If you depended on app-side firmware globals that are not exported, move that dependency to API calls.</li>
+<li><strong>Move assets.</strong> Files the app used at compile time become a top-level <code>assets/</code> directory in the tar, read at runtime from <code>/assets/&lt;name&gt;</code> (<a href="../guides/publishing/">publishing</a>).</li>
+<li><strong>Localize.</strong> If the app contained strings, move them into an app catalog (<code>src/i18n/</code>, merged per <a href="../i18n/">i18n.md</a>) instead of hardcoding.</li>
+<li><strong>Verify.</strong> <code>make clean all check</code> must succeed, list a sane set of undefined symbols, and the endianness check must pass. Then <code>make pack</code> and <code>tar -tvf build/&lt;name&gt;.tar</code>.</li>
+<li><strong>Ship.</strong> Copy the tar to <code>/apps/</code> on the device, install with APPLOADER into a slot, launch. The launcher shows the name and icon drawn from the package.</li>
 </ol>
 <h2 id="migrating-an-existing-app-gotchas" class="docmd-heading"><a href="#migrating-an-existing-app-gotchas" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Gotchas</h2>
 <ul>
-<li><strong>Big-endian artifacts.</strong> The classic failure. The loader does no byte<br>
-swapping, so a PlatformIO-built app faults at load with a section or<br>
-instruction fault. <code>readelf -h</code> shows <code>big endian</code> before you ship.</li>
+<li><strong>Big-endian artifacts.</strong> The classic failure. The loader does no byte swapping, so a PlatformIO-built app faults at load with a section or instruction fault. <code>readelf -h</code> shows <code>big endian</code> before you ship.</li>
 <li><strong>Statically linked runtime.</strong> Symbols collide or bloat; keep <code>-nostdlib</code>.</li>
-<li><strong>Relying on slot directories.</strong> After install the ELF lives in the slot<br>
-dir, but the app should treat <code>/assets/&lt;name&gt;</code> (copied at install) as its<br>
-data home and never assume the slot path.</li>
-<li><strong>Long-lived loops.</strong> The app shares the device. Cooperative lifetimes<br>
-(render, yield via the SDK API, return) beat spin loops on the 16 KB run<br>
-stack.</li>
+<li><strong>Relying on slot directories.</strong> After install the ELF lives in the slot dir, but the app should treat <code>/assets/&lt;name&gt;</code> (copied at install) as its data home and never assume the slot path.</li>
+<li><strong>Long-lived loops.</strong> The app shares the device. Cooperative lifetimes (render, yield via the SDK API, return) beat spin loops on the 16 KB run stack.</li>
 </ul>
 <h2 id="migrating-an-existing-app-announcement" class="docmd-heading"><a href="#migrating-an-existing-app-announcement" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Announcement</h2>
-<p>If you maintained published apps pre-ELF, publish a migration notice: existing<br>
-packages targeting production will not launch on the new firmware, and step 8<br>
-above is the path forward.</p>
+<p>If you maintained published apps pre-ELF, publish a migration notice: existing packages targeting production will not launch on the new firmware, and step 8 above is the path forward.</p>
 
                 
                   <div class="page-navigation">
                     
-                      <a href="../i18n/" class="prev-page">
+                      <a href="../glossary/" class="prev-page">
                         
 <svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-arrow-left"
@@ -1737,7 +2082,7 @@ above is the path forward.</p>
 </svg>
 
                         <span><small>Previous</small><strong>
-                            i18n catalogs
+                            Glossary
                           </strong></span>
                       </a>
                     
@@ -1806,13 +2151,13 @@ above is the path forward.</p>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1793426792000">
+                <span class="git-last-updated" data-timestamp="1793486742000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1793426792000"></span>
+                  <span class="git-time" data-timestamp="1793486742000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1825,10 +2170,10 @@ above is the path forward.</p>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Fix">Fix</div>
+                            <div class="git-commit-message" title="Docs">Docs</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1793426792000"></span>
+                              <span class="git-commit-date" data-timestamp="1793486742000"></span>
                             </div>
                           </div>
                         </li>
@@ -1840,7 +2185,7 @@ above is the path forward.</p>
               
               <span class="git-spacer"></span>
               
-                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/docs/docs/migration.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/Docs/docs/migration.md" target="_blank" rel="noopener noreferrer" class="edit-link">
                   
 <svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-pencil"
@@ -1880,44 +2225,42 @@ above is the path forward.</p>
           <div class="footer-columns">
             
               <div class="footer-column">
-                <span class="footer-column-title">Guides</span>
+                <span class="footer-column-title">Get Started</span>
                 <ul>
                   
-                    <li><a href="guides/making-apps/" >Making an app</a></li>
+                    <li><a href="get-started/" >Overview</a></li>
                   
-                    <li><a href="guides/lifecycle/" >App lifecycle</a></li>
+                    <li><a href="get-started/toolchain/" >Install the toolchain</a></li>
                   
-                    <li><a href="guides/rendering/" >Rendering</a></li>
+                    <li><a href="get-started/first-app/" >Your first app</a></li>
                   
                 </ul>
               </div>
             
               <div class="footer-column">
-                <span class="footer-column-title">API Reference</span>
+                <span class="footer-column-title">Reference</span>
                 <ul>
                   
-                    <li><a href="api/" >Overview</a></li>
-                  
-                    <li><a href="api/oled/" >OLED</a></li>
-                  
-                    <li><a href="api/eink/" >E-Ink</a></li>
-                  
-                    <li><a href="api/sys/" >System</a></li>
-                  
-                </ul>
-              </div>
-            
-              <div class="footer-column">
-                <span class="footer-column-title">Platform</span>
-                <ul>
+                    <li><a href="api/functions/" >Function index</a></li>
                   
                     <li><a href="app-abi/" >App ABI</a></li>
                   
-                    <li><a href="build/" >Building Apps</a></li>
+                    <li><a href="overlay/" >Overlay format</a></li>
                   
-                    <li><a href="symbols/" >Symbols</a></li>
+                    <li><a href="symbols/" >Symbol surface</a></li>
                   
-                    <li><a href="publish/" >Publishing</a></li>
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Tooling</span>
+                <ul>
+                  
+                    <li><a href="build/" >Building apps</a></li>
+                  
+                    <li><a href="cli/" >pm CLI</a></li>
+                  
+                    <li><a href="guides/publishing/" >Publishing</a></li>
                   
                 </ul>
               </div>
@@ -1951,14 +2294,14 @@ above is the path forward.</p>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mvw00s0r"></script>
+      <script src="../assets/js/docmd-main.js?v=mvwzpk2z"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mvw00s0r"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mvw00s0r" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-search.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-git.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-ai.js?v=mvw00s0r" ></script>
+      <script src="../assets/js/docmd-git.js?v=mvwzpk2z"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-search.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-git.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-ai.js?v=mvwzpk2z" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
@@ -2034,7 +2377,7 @@ above is the path forward.</p>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
-<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Guides","icon":"book","collapsible":true,"children":[{"title":"Guide index","path":"/guides/","icon":"book"},{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"children":[{"title":"API overview","path":"/api/","icon":"boxes"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Building Apps","path":"/build/","icon":"code"},{"title":"Symbols","path":"/symbols/","icon":"box"},{"title":"Publishing","path":"/publish/","icon":"package"},{"title":"i18n catalogs","path":"/i18n/","icon":"terminal"},{"title":"Migration","path":"/migration/","icon":"book-open"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
       
       
       

@@ -7,7 +7,7 @@ path: /api/eink/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.499Z"
+  generated_at: "2026-10-31T22:45:59.830Z"
 ---
 ---
 title: "E-Ink (pocketmage_eink)"
@@ -86,7 +86,7 @@ Sets rotation 3 and the full window, optionally filling `color`. Call before reb
 
 #### `lockPanel` / `unlockPanel`
 
-The recursive mutex. `refresh()` takes it itself; hold it when a task draws into the framebuffer directly, so a background refresh cannot swap buffers mid-draw. See [threading](index.md#reading-a-component-page).
+The recursive mutex. `refresh()` takes it itself; hold it when a task draws into the framebuffer directly, so a background refresh cannot swap buffers mid-draw. See [the background task](#e-ink-api-the-background-task).
 
 ## The background task
 
@@ -111,4 +111,36 @@ extern "C" int main(int, char**) {
 }
 ```
 
-The buffer is the GLCD framebuffer of `display`; fill it with
+The buffer is the `GxEPD2_BW` framebuffer behind `getDisplay()`; fill it with GFX primitives or with `FontEngine`/`u8g2f` text, then commit it with `refresh()`. The panel does not update until `refresh()` runs the policy above.
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_eink_refresh();
+void pm_eink_set_fast_full_refresh(bool a0);
+void pm_eink_status_bar(const char* a0, bool a1);
+void pm_eink_draw_status_bar(const char* a0);
+void pm_eink_reset_display(bool a0, uint16_t a1);
+int pm_eink_count_lines(const char* a0, size_t a1);
+uint8_t pm_eink_get_font_height();
+int pm_eink_max_lines();
+uint16_t pm_eink_get_eink_text_width(const char* a0);
+uint8_t pm_eink_get_line_spacing();
+void pm_eink_force_slow_full_update(bool a0);
+```
+
+All operate on the `EINK()` singleton.
+
+- `pm_eink_refresh()` is `refresh()`; renders the current buffer per the refresh policy and takes the panel mutex for the whole redraw.
+- `pm_eink_set_fast_full_refresh(a0)` is `setFastFullRefresh(setting)`.
+- `pm_eink_status_bar(a0, a1)` is `statusBar(input, fullWindow)`; `a0` is the status text, `a1` is `fullWindow`.
+- `pm_eink_draw_status_bar(a0)` is `drawStatusBar(input)`.
+- `pm_eink_reset_display(a0, a1)` is `resetDisplay(clearScreen, color)`; `a1` is the 16-bit fill color.
+- `pm_eink_count_lines(a0, a1)` is `countLines(input, maxLineLength)`. Returns the rendered line count.
+- `pm_eink_get_font_height()` is `getFontHeight()`.
+- `pm_eink_max_lines()` is `maxLines()`.
+- `pm_eink_get_eink_text_width(a0)` is `getEinkTextWidth(s)`. Returns the measured pixel width.
+- `pm_eink_get_line_spacing()` is `getLineSpacing()`.
+- `pm_eink_force_slow_full_update(a0)` is `forceSlowFullUpdate(force)`.

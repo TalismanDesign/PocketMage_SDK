@@ -7,7 +7,7 @@ path: /api/oled/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.503Z"
+  generated_at: "2026-10-31T22:45:59.832Z"
 ---
 ---
 title: "OLED (pocketmage_oled)"
@@ -94,4 +94,28 @@ void showStatus() {
 }
 ```
 
-`bottomText` display string is drawn centered in the status-line slot; `allowLarge` with a short word renders the `Heading2` variant at the large
+A `bottomText` string is drawn centered in the status-line slot in place of the info bar. With `allowLarge`, a short word that fits the display width renders as the `Heading2` variant centered at `kOledWordLargeBaseline` (21); a word that does not fit falls through to the size cascade (`OledWord`, `Heading3`, `BodyBold`, `Caption`) centered at baseline 16.
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_oled_oled_word(const char* a0, bool a1, bool a2, const char* a3);
+void pm_oled_oled_line(const char* a0, int a1, bool a2, const char* a3, bool a4);
+void pm_oled_sysmsg(const char* a0, int a1);
+void pm_oled_oled_scroll();
+void pm_oled_info_bar();
+void pm_oled_set_power_save(bool a0);
+bool pm_oled_power_save();
+```
+
+All operate on the `OLED()` singleton.
+
+- `pm_oled_oled_word(a0, a1, a2, a3)` is `oledWord(word, allowLarge, showInfo, bottomText)`; `a0` is the centered word, `a1` is `allowLarge`, `a2` is `showInfo`, `a3` is the optional `bottomText`.
+- `pm_oled_oled_line(a0, a1, a2, a3, a4)` is `oledLine(line, input_pos, doProgressBar, bottomMsg, deferSend)`; `a0` is the editor line, `a1` is the cursor position, `a2` is `doProgressBar`, `a3` is the optional `bottomMsg`, `a4` is `deferSend`.
+- `pm_oled_sysmsg(a0, a1)` is `sysMessage(msg, showTime)`; `a0` is the message, `a1` is the hold time in ms.
+- `pm_oled_oled_scroll()` is `oledScroll()`.
+- `pm_oled_info_bar()` is `infoBar()`.
+- `pm_oled_set_power_save(a0)` is `setPowerSave(enable)`.
+- `pm_oled_power_save()` is `getPowerSave()`. Returns the stored power-save flag.

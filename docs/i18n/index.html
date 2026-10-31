@@ -10,7 +10,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="docmd v0.9.7">
+    <meta name="generator" content="docmd v0.9.8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <script>
@@ -102,11 +102,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.ico?v=mvw00s0r">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvw00s0r">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.png?v=mvwzpk2z">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvwzpk2z">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvw00s0r" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvw00s0r" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvwzpk2z" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvwzpk2z" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Translation catalogs, the gen_i18n.py generator, ownership rules, and what the merge validates.">
@@ -119,17 +119,19 @@
 <meta name="twitter:title" content="Internationalization (i18n) - PocketMage SDK">
 <meta name="twitter:description" content="Translation catalogs, the gen_i18n.py generator, ownership rules, and what the merge validates.">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"i18n catalogs","item":"https://talismandesign.github.io/PocketMage_SDK/docs/i18n/"}]}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"PocketMage SDK","item":"https://talismandesign.github.io/PocketMage_SDK/docs/"},{"@type":"ListItem","position":2,"name":"Tooling"},{"@type":"ListItem","position":3,"name":"i18n catalogs","item":"https://talismandesign.github.io/PocketMage_SDK/docs/i18n/"}]}
 </script>
 
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvw00s0r" >
-<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvw00s0r" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvwzpk2z" >
 
+    
+      <link rel="stylesheet" href="../assets/css/theme.css?v=mvwzpk2z">
     
     
   </head>
@@ -222,10 +224,11 @@
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
+        <a href="../get-started/" class=" nav-group"
+          >
            
-<svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-book"
+<svg class="lucide-icon icon-rocket " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-rocket"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -236,13 +239,16 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+  <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09" />
+  <path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z" />
+  <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05" />
 </svg>
 
           
           <span class="nav-item-title">
-            Guides
-          </span>
+            Get Started
+            </span>
           
             <span class="collapse-icon-wrapper">
 <svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -261,7 +267,8 @@
 </svg>
 </span>
           
-        </span>
+          
+        </a>
         
 
         
@@ -269,7 +276,76 @@
             
       <li class="" >
       
-        <a href="../guides/" class=" "
+        <a href="../get-started/toolchain/" class=" "
+          >
+           
+<svg class="lucide-icon icon-settings " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-settings"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915" />
+  <circle cx="12" cy="12" r="3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Install the toolchain
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../get-started/first-app/" class=" "
+          >
+           
+<svg class="lucide-icon icon-play " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-play"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Your first app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <a href="../guides/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-book " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -289,16 +365,33 @@
 
           
           <span class="nav-item-title">
-            Guide index
+            Guides
             </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
           
           
         </a>
         
 
         
-      </li>
-    
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../guides/making-apps/" class=" "
@@ -398,71 +491,85 @@
         
       </li>
     
+      <li class="" >
+      
+        <a href="../guides/i18n/" class=" "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Internationalization
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../guides/publishing/" class=" "
+          >
+           
+<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Publishing an app
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
           </ul>
         
       </li>
     
       <li class="collapsible nav-group"  aria-expanded="false" >
       
-        <span class="nav-label nav-group">
-           
-<svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-boxes"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z" />
-  <path d="m7 16.5-4.74-2.85" />
-  <path d="m7 16.5 5-3" />
-  <path d="M7 16.5v5.17" />
-  <path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z" />
-  <path d="m17 16.5-5-3" />
-  <path d="m17 16.5 4.74-2.85" />
-  <path d="M17 16.5v5.17" />
-  <path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z" />
-  <path d="M12 8 7.26 5.15" />
-  <path d="m12 8 4.74-2.85" />
-  <path d="M12 13.5V8" />
-</svg>
-
-          
-          <span class="nav-item-title">
-            API Reference
-          </span>
-          
-            <span class="collapse-icon-wrapper">
-<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-chevron-right"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m9 18 6-6-6-6" />
-</svg>
-</span>
-          
-        </span>
-        
-
-        
-          <ul class="submenu">
-            
-      <li class="" >
-      
-        <a href="../api/" class=" "
+        <a href="../api/" class=" nav-group"
           >
            
 <svg class="lucide-icon icon-boxes " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -493,7 +600,61 @@
 
           
           <span class="nav-item-title">
-            API overview
+            API Reference
+            </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+          
+        </a>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../api/functions/" class=" "
+          >
+           
+<svg class="lucide-icon icon-list " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-list"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 5h.01" />
+  <path d="M3 12h.01" />
+  <path d="M3 19h.01" />
+  <path d="M8 5h13" />
+  <path d="M8 12h13" />
+  <path d="M8 19h13" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Function index
             </span>
           
           
@@ -1115,6 +1276,56 @@
         
       </li>
     
+      <li class="collapsible nav-group"  aria-expanded="false" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-file-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-file-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+  <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+  <path d="M10 12.5 8 15l2 2.5" />
+  <path d="m14 12.5 2 2.5-2 2.5" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Binary Contract
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
       <li class="" >
       
         <a href="../app-abi/" class=" "
@@ -1149,11 +1360,11 @@
     
       <li class="" >
       
-        <a href="../build/" class=" "
+        <a href="../overlay/" class=" "
           >
            
-<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-code"
+<svg class="lucide-icon icon-layers " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-layers"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1164,13 +1375,14 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m16 18 6-6-6-6" />
-  <path d="m8 6-6 6 6 6" />
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
 </svg>
 
           
           <span class="nav-item-title">
-            Building Apps
+            Overlay format (.elfo)
             </span>
           
           
@@ -1204,7 +1416,91 @@
 
           
           <span class="nav-item-title">
-            Symbols
+            Symbol surface
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="active-parent collapsible expanded nav-group"  aria-expanded="true" >
+      
+        <span class="nav-label nav-group">
+           
+<svg class="lucide-icon icon-wrench " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-wrench"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Tooling
+          </span>
+          
+            <span class="collapse-icon-wrapper">
+<svg class="lucide-icon icon-chevron-right collapse-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+          
+        </span>
+        
+
+        
+          <ul class="submenu">
+            
+      <li class="" >
+      
+        <a href="../build/" class=" "
+          >
+           
+<svg class="lucide-icon icon-code " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-code"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m16 18 6-6-6-6" />
+  <path d="m8 6-6 6 6 6" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Building apps
             </span>
           
           
@@ -1216,42 +1512,7 @@
     
       <li class="" >
       
-        <a href="../publish/" class=" "
-          >
-           
-<svg class="lucide-icon icon-package " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
-  class="lucide lucide-package"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
-  <path d="M12 22V12" />
-  <polyline points="3.29 7 12 12 20.71 7" />
-  <path d="m7.5 4.27 9 5.15" />
-</svg>
-
-          
-          <span class="nav-item-title">
-            Publishing
-            </span>
-          
-          
-        </a>
-        
-
-        
-      </li>
-    
-      <li class="active" >
-      
-        <a href="../i18n/" class="active "
+        <a href="../cli/" class=" "
           >
            
 <svg class="lucide-icon icon-terminal " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1272,7 +1533,85 @@
 
           
           <span class="nav-item-title">
+            pm CLI
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="active" >
+      
+        <a href="../i18n/" class="active "
+          >
+           
+<svg class="lucide-icon icon-languages " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-languages"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m5 8 6 6" />
+  <path d="m4 14 6-6 2-3" />
+  <path d="M2 5h12" />
+  <path d="M7 2h1" />
+  <path d="m22 22-5-10-5 10" />
+  <path d="M14 18h6" />
+</svg>
+
+          
+          <span class="nav-item-title">
             i18n catalogs
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+          </ul>
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../troubleshooting/" class=" "
+          >
+           
+<svg class="lucide-icon icon-life-buoy " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-life-buoy"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="12" cy="12" r="10" />
+  <path d="m4.93 4.93 4.24 4.24" />
+  <path d="m14.83 9.17 4.24-4.24" />
+  <path d="m14.83 14.83 4.24 4.24" />
+  <path d="m9.17 14.83-4.24 4.24" />
+  <circle cx="12" cy="12" r="4" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Troubleshooting
             </span>
           
           
@@ -1284,7 +1623,7 @@
     
       <li class="" >
       
-        <a href="../migration/" class=" "
+        <a href="../glossary/" class=" "
           >
            
 <svg class="lucide-icon icon-book-open " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1301,6 +1640,40 @@
 >
   <path d="M12 5v16" />
   <path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Glossary
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../migration/" class=" "
+          >
+           
+<svg class="lucide-icon icon-git-branch " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-git-branch"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 6a9 9 0 0 0-9 9V3" />
+  <circle cx="18" cy="6" r="3" />
+  <circle cx="6" cy="18" r="3" />
 </svg>
 
           
@@ -1549,11 +1922,35 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Internationalization%20(i18n)%22%0Adescription%3A%20%22Translation%20catalogs%2C%20the%20gen_i18n.py%20generator%2C%20ownership%20rules%2C%20and%20what%20the%20merge%20validates.%22%0A---%0A%0A%23%20Internationalization%20(i18n)%0A%0AThe%20SDK%20carries%20the%20translation%20engine%2C%20the%20generator%20tooling%2C%20and%20the%20base%0Acatalog%20of%20SDK-owned%20strings.%20An%20app%20brings%20its%20own%20catalog.%20At%20build%20time%0Athe%20catalogs%20merge%20into%20a%20single%20enum%20and%20one%20set%20of%20string%20tables%20per%0Afirmware%20image.%0A%0A%23%23%20Layout%0A%0A%60%60%60text%0APocketMage_SDK%2F%0A%20%20pocketmage_i18n%2F%0A%20%20%20%20pocketmage_i18n.h%20%2F%20.cpp%20%20%20%20%20%20%20%20%20%20%23%20runtime%20engine%20(I18n%20class)%0A%20%20%20%20languages%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20base%20catalog%20(SDK-owned%20strings)%0A%20%20%20%20%20%20en%2Fpocketmage_i18n.po%0A%20%20%20%20%20%20fr%2Fpocketmage_i18n.po%0A%20%20%20%20%20%20fr%2Fpocketmage_i18n.aliases%0A%20%20%20%20%20%20es%2F...%20%20de%2F...%0A%20%20%20%20tools%2F%0A%20%20%20%20%20%20gen_i18n.py%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20merger%2C%20generator%2C%20and%20build%20hook%0A%20%20%20%20tests%2F%0A%20%20%20%20%20%20test_gen_i18n.py%0A%60%60%60%0A%0AAn%20app%20adds%20one%20catalog%20directory%20of%20its%20own%3A%0A%0A%60%60%60text%0A%3Capp%3E%2Fsrc%2Fi18n%2F%0A%20%20en%2Fpocketmage_i18n.po%0A%20%20fr%2Fpocketmage_i18n.po%0A%20%20fr%2Fpocketmage_i18n.aliases%0A%20%20...%0A%60%60%60%0A%0AA%20catalog%20directory%20has%20one%20subdirectory%20per%20language%2C%20named%20by%20the%20language%0Acode.%20%60en%60%20is%20required%20and%20defines%20that%20catalog&#039;s%20string%20order.%0A%0A%23%23%20Catalog%20format%0A%0AStandard%20gettext%20%60.po%60.%20%60msgctxt%60%20is%20the%20%60StringID%60%20enum%20name%3B%20%60msgid%60%20is%20the%0AEnglish%20text%3B%20%60msgstr%60%20is%20the%20translation.%20The%20%60en%60%20file%20carries%20a%0A%60%23%20Languages%3A%60%20directive%20in%20its%20leading%20comment%20block%3A%0A%0A%60%60%60po%0A%23%20PocketMage%20OS%20English%20Translations%0A%23%20Languages%3A%20en%20fr%20es%20de%0A%0Amsgctxt%20%22STR_SYS_HELLO%22%0Amsgid%20%22Hello%22%0Amsgstr%20%22Hello%22%0A%60%60%60%0A%0AThat%20directive%2C%20in%20the%20base%20catalog%2C%20is%20where%20the%20language%20list%20and%20order%0Acome%20from.%20Each%20catalog&#039;s%20%60en%60%20file%20defines%20the%20order%20of%20the%20strings%20that%0Acatalog%20contributes%3B%20the%20catalog&#039;s%20other%20languages%20must%20list%20the%20same%0A%60msgctxt%60s%2C%20with%20the%20same%20%60msgid%60s%2C%20in%20the%20same%20order.%0A%0AA%20language%20missing%20from%20a%20catalog%20falls%20back%20to%20that%20catalog&#039;s%20English%20text%2C%0Aso%20an%20English-only%20app%20catalog%20is%20valid%20without%20translating%20anything.%0A%0A%23%23%23%20Aliases%0A%0A%60pocketmage_i18n.aliases%60%20maps%20folded%2C%20lowercase%20user%20input%20to%20a%20%60StringID%60.%0AOptional%2C%20only%20defined%20for%20non-English%20languages%3A%0A%0A%60%60%60text%0Aannuler%20-%3E%20STR_KB_APP_CANCEL%0A%60%60%60%0A%0AFolding%20strips%20diacritics%20(%60Param%C3%A8tres%20-%3E%20parametres%60).%20Aliases%20from%20all%0Acatalogs%20concatenate%20per%20language%3B%20a%20key%20that%20folds%20to%20the%20same%20value%20twice%0Ais%20a%20build%20error.%0A%0A%23%23%20Ownership%0A%0A%7C%20Owner%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Namespaces%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------%20%7C%20--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%20%7C%0A%7C%20SDK%20base%20catalog%20%7C%20%60STR_KB_*%60%20(incl.%20%60STR_KB_APP_*%60%2C%20%60STR_KB_USB_*%60%2C%20%60STR_KB_INIT_*%60)%2C%20%60STR_GRID_*%60%2C%20%60STR_SD_*%60%2C%20%60STR_WIFI_*%60%2C%20%60STR_SYS_*%60%2C%20%60STR_TOUCHPAD_*%60%2C%20%60STR_OLED_*%60%2C%20%60STR_FRAME(S)_*%60%2C%20%60STR_INFO%2FGOOD%2FSAVED_*%60%2C%20%60STR_DAY_*%60%2C%20%60STR_MONTH_*%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20App%20catalog%20%20%20%20%20%20%7C%20%60STR_TERM_*%60%2C%20%60STR_ONBOARD_*%60%2C%20%60STR_SSH_*%60%2C%20%60STR_SETTINGS_*%60%2C%20%60STR_CAL_*%60%2C%20%60STR_UTILS_*%60%2C%20%60STR_LOCK_*%60%2C%20%60STR_HOME_*%60%2C%20%60STR_TASKS_*%60%2C%20%60STR_FILEWIZ_*%60%2C%20%60STR_APPLOADER_*%60%2C%20%60STR_COMM_*%60%2C%20%60STR_USB_*%60%2C%20%60STR_LEX_*%60%2C%20%60STR_JOURNAL_*%60%2C%20%60STR_TXT_*%60%2C%20%60STR_GOTO_*%60%2C%20%60STR_SAVE_*%60%20%7C%0A%0A%60msgctxt%60%20names%20are%20globally%20unique%20across%20the%20merged%20catalogs%3B%20reusing%20one%0Athe%20SDK%20already%20defines%20is%20a%20build%20error.%20SDK%20code%20only%20references%20SDK%0Anamespaces%2C%20so%20merging%20an%20app%20catalog%20never%20changes%20how%20SDK%20code%20behaves.%0A%0AOwnership%20follows%20the%20consumer%3A%20base%20if%20SDK%20code%20references%20the%20string%2C%20app%0Aotherwise.%20That%20keeps%20a%20bare%20SDK%20checkout%20building%20standalone%20(its%20base%0Acatalog%20contains%20every%20string%20its%20own%20modules%20use)%2C%20and%20the%20merge%20appends%20the%0Aapp%20catalog%20after%20the%20base%2C%20so%20app%20strings%20never%20move%20base%20enum%20values.%20The%0Aindexed%20helper%20ranges%20all%20sit%20in%20the%20base%3B%20their%20relative%20order%20is%20fixed%20and%0Anever%20perturbed%20by%20an%20app%20catalog.%0A%0A%23%23%20Generator%0A%0A%60tools%2Fgen_i18n.py%60%20merges%20the%20catalogs%20in%20command-line%20order%20and%20writes%0A%60pocketmage_i18n_gen.h%60%20and%20%60pocketmage_i18n_gen.cpp%60%3A%0A%0A%60%60%60sh%0Apython3%20pocketmage_i18n%2Ftools%2Fgen_i18n.py%20%5C%0A%20%20%20%20--catalog%20pocketmage_i18n%2Flanguages%20%5C%0A%20%20%20%20--catalog%20..%2Fapp%2Fsrc%2Fi18n%20%5C%0A%20%20%20%20--out-dir%20%3Cbuild-dir%3E%0A%60%60%60%0A%0A%60--catalog%60%20is%20repeatable%3B%20the%20first%20catalog%20is%20the%20base.%20With%20no%20arguments%2C%0Athe%20tool%20generates%20the%20SDK&#039;s%20own%20base%20catalog%20into%20%60pocketmage_i18n%2F%60%2C%20so%20a%0Abare%20SDK%20checkout%20builds%20standalone.%0A%0AThe%20merge%20keeps%20base%20strings%20first%20and%20appends%20each%20later%20catalog%20in%20turn.%0AEvery%20enum%20value%20equals%20its%20index%20in%20the%20merged%20order%2C%20so%20the%20layout%20is%0Astable%3A%20adding%20an%20app%20catalog%20never%20changes%20SDK%20string%20values.%0A%0A%23%23%23%20Validation%0A%0AThe%20generator%20exits%20non-zero%20and%20aborts%20the%20build%20on%20any%20of%3A%0A%0A-%20a%20missing%20%60%23%20Languages%3A%60%20directive%20in%20the%20base%20%60en%60%20file%2C%20or%20%60en%60%20not%20first%3B%0A-%20a%20%60msgctxt%60%20that%20is%20not%20%60%5BA-Z%5D%5BA-Z0-9_%5D*%60%3B%0A-%20a%20duplicate%20%60msgctxt%60%20within%20a%20catalog%20or%20across%20catalogs%3B%0A-%20a%20non-%60en%60%20file%20whose%20%60msgctxt%60%20set%2C%20order%2C%20or%20%60msgid%60s%20differ%20from%20that%0A%20%20catalog&#039;s%20%60en%60%3B%0A-%20a%20duplicated%20folded%20alias%3B%0A-%20the%20indexed%20helper%20ranges%20missing%2C%20inverted%2C%20overlapping%2C%20or%20out%20of%20order.%0A%0A%23%23%23%20Indexed%20helper%20ranges%0A%0AFour%20ranges%20are%20indexed%20by%20the%20runtime%20helpers%20(%60appName()%60%2C%20%60dayName()%60%2C%0A%60monthName()%60%2C%20%60kbAppName()%60).%20They%20must%20stay%20contiguous%20blocks%2C%20in%20this%0Aorder%3A%0A%0A%7C%20Range%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Members%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20------------------------------------------%20%7C%20-------------------------------------%20%7C%0A%7C%20%60STR_KB_APP_CANCEL%60%20..%20%60STR_KB_APP_LOADER%60%20%7C%20app%20list%20in%20the%20keyboard%20app%20switcher%20%7C%0A%7C%20%60STR_GRID_TXT%60%20..%20%60STR_GRID_LOADER%60%20%20%20%20%20%20%20%20%7C%20app%20list%20in%20the%20launcher%20grid%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60STR_DAY_SUNDAY%60%20..%20%60STR_DAY_SATURDAY%60%20%20%20%20%20%7C%20weekdays%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60STR_MONTH_JAN%60%20..%20%60STR_MONTH_ERR%60%20%20%20%20%20%20%20%20%20%7C%20months%20(%60ERR%60%20is%20the%20last%20member)%20%20%20%20%20%7C%0A%0ATheir%20heads%20are%20emitted%20with%20explicit%20%60%3D%20N%60%20enum%20values%20as%20documentation%20of%0Aintent%3B%20the%20values%20always%20equal%20the%20index%20in%20the%20merged%20order.%0A%0A%23%23%20Build%20integration%0A%0AThe%20generator%20doubles%20as%20the%20build%20hook.%20Point%20%60extra_scripts%60%20at%20it%20in%20the%0Aapp&#039;s%20%60platformio.ini%60%3B%20it%20reads%20its%20settings%20from%20project%20options%20(or%0A%60POCKETMAGE_I18N_CATALOGS%60%20%2F%20%60POCKETMAGE_I18N_OUT_DIR%60%2C%20or%20the%20SDK%20base%0Acatalog%20as%20a%20last%20resort)%3A%0A%0A%60%60%60ini%0Aextra_scripts%20%3D%20pre%3Alib%2FPocketMage_SDK%2Fpocketmage_i18n%2Ftools%2Fgen_i18n.py%0A%0Acustom_i18n_catalogs%20%3D%0A%20%20%20%20lib%2FPocketMage_SDK%2Fpocketmage_i18n%2Flanguages%0A%20%20%20%20src%2Fi18n%0Acustom_i18n_out_dir%20%3D%20.pio%2Fbuild%2F%24%7BPIOENV%7D%2Fi18n%0A%60%60%60%0A%0AAs%20a%20hook%20it%20regenerates%20only%20when%20a%20%60.po%60%2F%60.aliases%60%20file%20is%20newer%20than%20the%0Agenerated%20tables%2C%20so%20incremental%20builds%20stay%20cheap.%0A%0A%60custom_i18n_out_dir%60%20must%20be%20ahead%20of%20any%20stale%20copy%20on%20the%20include%20path.%0AThe%20engine%20includes%20%60%22pocketmage_i18n_gen.h%22%60%3B%20the%20generated%20files%20are%20build%0Aartifacts%2C%20never%20committed.%0A%0A%23%23%20Adding%20a%20string%20or%20a%20language%0A%0A-%20**String%3A**%20add%20the%20%60msgctxt%60%2F%60msgid%60%2F%60msgstr%60%20to%20the%20owning%20catalog&#039;s%20%60en%60%0A%20%20file%20and%20to%20each%20language%20file%2C%20in%20the%20same%20position%20relative%20to%20that%0A%20%20catalog&#039;s%20other%20strings.%20App%20strings%20go%20in%20the%20app%20catalog.%0A-%20**Language%3A**%20append%20the%20code%20to%20the%20base%20%60en%60%20file&#039;s%20%60%23%20Languages%3A%60%0A%20%20directive%20and%20add%20that%20language&#039;s%20directory%20to%20each%20catalog%20that%20translates%0A%20%20it.%20Never%20reorder%20existing%20languages%3A%20the%20index%20is%20the%20value%20stored%20in%20NVS.%0A%0A%23%23%20Testing%0A%0A%60%60%60sh%0Apython3%20-m%20unittest%20discover%20-s%20pocketmage_i18n%2Ftests%0A%60%60%60%0A%0AThe%20suite%20covers%20catalog%20merging%2C%20language%20fallback%2C%20alias%20merging%2C%20and%20every%0Avalidation%20failure%20above%2C%20using%20small%20in-test%20catalogs." style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Internationalization%20(i18n)%22%0Adescription%3A%20%22Translation%20catalogs%2C%20the%20gen_i18n.py%20generator%2C%20ownership%20rules%2C%20and%20what%20the%20merge%20validates.%22%0A---%0A%0A%23%20Internationalization%20(i18n)%0A%0AThe%20SDK%20carries%20the%20translation%20engine%2C%20the%20generator%20tooling%2C%20and%20the%20base%20catalog%20of%20SDK-owned%20strings.%20An%20app%20brings%20its%20own%20catalog.%20At%20build%20time%20the%20catalogs%20merge%20into%20a%20single%20enum%20and%20one%20set%20of%20string%20tables%20per%20firmware%20image.%0A%0A%23%23%20Layout%0A%0A%60%60%60text%0APocketMage_SDK%2F%0A%20%20pocketmage_i18n%2F%0A%20%20%20%20pocketmage_i18n.h%20%2F%20.cpp%20%20%20%20%20%20%20%20%20%20%23%20runtime%20engine%20(I18n%20class)%0A%20%20%20%20languages%2F%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20base%20catalog%20(SDK-owned%20strings)%0A%20%20%20%20%20%20en%2Fpocketmage_i18n.po%0A%20%20%20%20%20%20fr%2Fpocketmage_i18n.po%0A%20%20%20%20%20%20fr%2Fpocketmage_i18n.aliases%0A%20%20%20%20%20%20es%2F...%20%20de%2F...%0A%20%20%20%20tools%2F%0A%20%20%20%20%20%20gen_i18n.py%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20merger%2C%20generator%2C%20and%20build%20hook%0A%20%20%20%20tests%2F%0A%20%20%20%20%20%20test_gen_i18n.py%0A%60%60%60%0A%0AAn%20app%20adds%20one%20catalog%20directory%20of%20its%20own%3A%0A%0A%60%60%60text%0A%3Capp%3E%2Fsrc%2Fi18n%2F%0A%20%20en%2Fpocketmage_i18n.po%0A%20%20fr%2Fpocketmage_i18n.po%0A%20%20fr%2Fpocketmage_i18n.aliases%0A%20%20...%0A%60%60%60%0A%0AA%20catalog%20directory%20has%20one%20subdirectory%20per%20language%2C%20named%20by%20the%20language%20code.%20%60en%60%20is%20required%20and%20defines%20that%20catalog&#039;s%20string%20order.%0A%0A%23%23%20Catalog%20format%0A%0AStandard%20gettext%20%60.po%60.%20%60msgctxt%60%20is%20the%20%60StringID%60%20enum%20name%3B%20%60msgid%60%20is%20the%20English%20text%3B%20%60msgstr%60%20is%20the%20translation.%20The%20%60en%60%20file%20carries%20a%20%60%23%20Languages%3A%60%20directive%20in%20its%20leading%20comment%20block%3A%0A%0A%60%60%60po%0A%23%20PocketMage%20OS%20English%20Translations%0A%23%20Languages%3A%20en%20fr%20es%20de%0A%0Amsgctxt%20%22STR_SYS_HELLO%22%0Amsgid%20%22Hello%22%0Amsgstr%20%22Hello%22%0A%60%60%60%0A%0AThat%20directive%2C%20in%20the%20base%20catalog%2C%20is%20where%20the%20language%20list%20and%20order%20come%20from.%20Each%20catalog&#039;s%20%60en%60%20file%20defines%20the%20order%20of%20the%20strings%20that%20catalog%20contributes%3B%20the%20catalog&#039;s%20other%20languages%20must%20list%20the%20same%20%60msgctxt%60s%2C%20with%20the%20same%20%60msgid%60s%2C%20in%20the%20same%20order.%0A%0AA%20language%20missing%20from%20a%20catalog%20falls%20back%20to%20that%20catalog&#039;s%20English%20text%2C%20so%20an%20English-only%20app%20catalog%20is%20valid%20without%20translating%20anything.%0A%0A%23%23%23%20Aliases%0A%0A%60pocketmage_i18n.aliases%60%20maps%20folded%2C%20lowercase%20user%20input%20to%20a%20%60StringID%60.%20Optional%2C%20only%20defined%20for%20non-English%20languages%3A%0A%0A%60%60%60text%0Aannuler%20-%3E%20STR_KB_APP_CANCEL%0A%60%60%60%0A%0AFolding%20strips%20diacritics%20(%60Param%C3%A8tres%20-%3E%20parametres%60).%20Aliases%20from%20all%20catalogs%20concatenate%20per%20language%3B%20a%20key%20that%20folds%20to%20the%20same%20value%20twice%20is%20a%20build%20error.%0A%0A%23%23%20Ownership%0A%0A%7C%20Owner%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Namespaces%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------%20%7C%20--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%20%7C%0A%7C%20SDK%20base%20catalog%20%7C%20%60STR_KB_*%60%20(incl.%20%60STR_KB_APP_*%60%2C%20%60STR_KB_USB_*%60%2C%20%60STR_KB_INIT_*%60)%2C%20%60STR_GRID_*%60%2C%20%60STR_SD_*%60%2C%20%60STR_WIFI_*%60%2C%20%60STR_SYS_*%60%2C%20%60STR_TOUCHPAD_*%60%2C%20%60STR_OLED_*%60%2C%20%60STR_FRAME(S)_*%60%2C%20%60STR_INFO%2FGOOD%2FSAVED_*%60%2C%20%60STR_DAY_*%60%2C%20%60STR_MONTH_*%60%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20App%20catalog%20%20%20%20%20%20%7C%20%60STR_TERM_*%60%2C%20%60STR_ONBOARD_*%60%2C%20%60STR_SSH_*%60%2C%20%60STR_SETTINGS_*%60%2C%20%60STR_CAL_*%60%2C%20%60STR_UTILS_*%60%2C%20%60STR_LOCK_*%60%2C%20%60STR_HOME_*%60%2C%20%60STR_TASKS_*%60%2C%20%60STR_FILEWIZ_*%60%2C%20%60STR_APPLOADER_*%60%2C%20%60STR_COMM_*%60%2C%20%60STR_USB_*%60%2C%20%60STR_LEX_*%60%2C%20%60STR_JOURNAL_*%60%2C%20%60STR_TXT_*%60%2C%20%60STR_GOTO_*%60%2C%20%60STR_SAVE_*%60%20%7C%0A%0A%60msgctxt%60%20names%20are%20globally%20unique%20across%20the%20merged%20catalogs%3B%20reusing%20one%20the%20SDK%20already%20defines%20is%20a%20build%20error.%20SDK%20code%20only%20references%20SDK%20namespaces%2C%20so%20merging%20an%20app%20catalog%20never%20changes%20how%20SDK%20code%20behaves.%0A%0AOwnership%20follows%20the%20consumer%3A%20base%20if%20SDK%20code%20references%20the%20string%2C%20app%20otherwise.%20That%20keeps%20a%20bare%20SDK%20checkout%20building%20standalone%20(its%20base%20catalog%20contains%20every%20string%20its%20own%20modules%20use)%2C%20and%20the%20merge%20appends%20the%20app%20catalog%20after%20the%20base%2C%20so%20app%20strings%20never%20move%20base%20enum%20values.%20The%20indexed%20helper%20ranges%20all%20sit%20in%20the%20base%3B%20their%20relative%20order%20is%20fixed%20and%20never%20perturbed%20by%20an%20app%20catalog.%0A%0A%23%23%20Generator%0A%0A%60tools%2Fgen_i18n.py%60%20merges%20the%20catalogs%20in%20command-line%20order%20and%20writes%20%60pocketmage_i18n_gen.h%60%20and%20%60pocketmage_i18n_gen.cpp%60%3A%0A%0A%60%60%60sh%0Apython3%20pocketmage_i18n%2Ftools%2Fgen_i18n.py%20%5C%0A%20%20%20%20--catalog%20pocketmage_i18n%2Flanguages%20%5C%0A%20%20%20%20--catalog%20..%2Fapp%2Fsrc%2Fi18n%20%5C%0A%20%20%20%20--out-dir%20%3Cbuild-dir%3E%0A%60%60%60%0A%0A%60--catalog%60%20is%20repeatable%3B%20the%20first%20catalog%20is%20the%20base.%20With%20no%20arguments%2C%20the%20tool%20generates%20the%20SDK&#039;s%20own%20base%20catalog%20into%20%60pocketmage_i18n%2F%60%2C%20so%20a%20bare%20SDK%20checkout%20builds%20standalone.%0A%0AThe%20merge%20keeps%20base%20strings%20first%20and%20appends%20each%20later%20catalog%20in%20turn.%20Every%20enum%20value%20equals%20its%20index%20in%20the%20merged%20order%2C%20so%20the%20layout%20is%20stable%3A%20adding%20an%20app%20catalog%20never%20changes%20SDK%20string%20values.%0A%0A%23%23%23%20Validation%0A%0AThe%20generator%20exits%20non-zero%20and%20aborts%20the%20build%20on%20any%20of%3A%0A%0A-%20a%20missing%20%60%23%20Languages%3A%60%20directive%20in%20the%20base%20%60en%60%20file%2C%20or%20%60en%60%20not%20first%3B%0A-%20a%20%60msgctxt%60%20that%20is%20not%20%60%5BA-Z%5D%5BA-Z0-9_%5D*%60%3B%0A-%20a%20duplicate%20%60msgctxt%60%20within%20a%20catalog%20or%20across%20catalogs%3B%0A-%20a%20non-%60en%60%20file%20whose%20%60msgctxt%60%20set%2C%20order%2C%20or%20%60msgid%60s%20differ%20from%20that%20catalog&#039;s%20%60en%60%3B%0A-%20a%20duplicated%20folded%20alias%3B%0A-%20the%20indexed%20helper%20ranges%20missing%2C%20inverted%2C%20overlapping%2C%20or%20out%20of%20order.%0A%0A%23%23%23%20Indexed%20helper%20ranges%0A%0AFour%20ranges%20are%20indexed%20by%20the%20runtime%20helpers%20(%60appName()%60%2C%20%60dayName()%60%2C%20%60monthName()%60%2C%20%60kbAppName()%60).%20They%20must%20stay%20contiguous%20blocks%2C%20in%20this%20order%3A%0A%0A%7C%20Range%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Members%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20------------------------------------------%20%7C%20-------------------------------------%20%7C%0A%7C%20%60STR_KB_APP_CANCEL%60%20..%20%60STR_KB_APP_LOADER%60%20%7C%20app%20list%20in%20the%20keyboard%20app%20switcher%20%7C%0A%7C%20%60STR_GRID_TXT%60%20..%20%60STR_GRID_LOADER%60%20%20%20%20%20%20%20%20%7C%20app%20list%20in%20the%20launcher%20grid%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60STR_DAY_SUNDAY%60%20..%20%60STR_DAY_SATURDAY%60%20%20%20%20%20%7C%20weekdays%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60STR_MONTH_JAN%60%20..%20%60STR_MONTH_ERR%60%20%20%20%20%20%20%20%20%20%7C%20months%20(%60ERR%60%20is%20the%20last%20member)%20%20%20%20%20%7C%0A%0ATheir%20heads%20are%20emitted%20with%20explicit%20%60%3D%20N%60%20enum%20values%20as%20documentation%20of%20intent%3B%20the%20values%20always%20equal%20the%20index%20in%20the%20merged%20order.%0A%0A%23%23%20Build%20integration%0A%0AThe%20generator%20doubles%20as%20the%20build%20hook.%20Point%20%60extra_scripts%60%20at%20it%20in%20the%20app&#039;s%20%60platformio.ini%60%3B%20it%20reads%20its%20settings%20from%20project%20options%20(or%20%60POCKETMAGE_I18N_CATALOGS%60%20%2F%20%60POCKETMAGE_I18N_OUT_DIR%60%2C%20or%20the%20SDK%20base%20catalog%20as%20a%20last%20resort)%3A%0A%0A%60%60%60ini%0Aextra_scripts%20%3D%20pre%3Alib%2FPocketMage_SDK%2Fpocketmage_i18n%2Ftools%2Fgen_i18n.py%0A%0Acustom_i18n_catalogs%20%3D%0A%20%20%20%20lib%2FPocketMage_SDK%2Fpocketmage_i18n%2Flanguages%0A%20%20%20%20src%2Fi18n%0Acustom_i18n_out_dir%20%3D%20.pio%2Fbuild%2F%24%7BPIOENV%7D%2Fi18n%0A%60%60%60%0A%0AAs%20a%20hook%20it%20regenerates%20only%20when%20a%20%60.po%60%2F%60.aliases%60%20file%20is%20newer%20than%20the%20generated%20tables%2C%20so%20incremental%20builds%20stay%20cheap.%0A%0A%60custom_i18n_out_dir%60%20must%20be%20ahead%20of%20any%20stale%20copy%20on%20the%20include%20path.%20The%20engine%20includes%20%60%22pocketmage_i18n_gen.h%22%60%3B%20the%20generated%20files%20are%20build%20artifacts%2C%20never%20committed.%0A%0A%23%23%20Adding%20a%20string%20or%20a%20language%0A%0A-%20**String%3A**%20add%20the%20%60msgctxt%60%2F%60msgid%60%2F%60msgstr%60%20to%20the%20owning%20catalog&#039;s%20%60en%60%20file%20and%20to%20each%20language%20file%2C%20in%20the%20same%20position%20relative%20to%20that%20catalog&#039;s%20other%20strings.%20App%20strings%20go%20in%20the%20app%20catalog.%0A-%20**Language%3A**%20append%20the%20code%20to%20the%20base%20%60en%60%20file&#039;s%20%60%23%20Languages%3A%60%20directive%20and%20add%20that%20language&#039;s%20directory%20to%20each%20catalog%20that%20translates%20it.%20Never%20reorder%20existing%20languages%3A%20the%20index%20is%20the%20value%20stored%20in%20NVS.%0A%0A%23%23%20Testing%0A%0A%60%60%60sh%0Apython3%20-m%20unittest%20discover%20-s%20pocketmage_i18n%2Ftests%0A%60%60%60%0A%0AThe%20suite%20covers%20catalog%20merging%2C%20language%20fallback%2C%20alias%20merging%2C%20and%20every%20validation%20failure%20above%2C%20using%20small%20in-test%20catalogs." style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
                         
+                        
+                          <li class="breadcrumb-item " >
+                            
+                              <span>Tooling</span>
+                            
+                            
+                              <span class="breadcrumb-separator">
+<svg class="lucide-icon icon-chevron-right " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-chevron-right"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m9 18 6-6-6-6" />
+</svg>
+</span>
+                            
+                          </li>
                         
                           <li class="breadcrumb-item active" aria-current=&quot;page&quot;>
                             
@@ -1621,10 +2018,7 @@
                   </h1>
                 
                 <h1 id="internationalization-i18n" class="docmd-heading"><a href="#internationalization-i18n" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Internationalization (i18n)</h1>
-<p>The SDK carries the translation engine, the generator tooling, and the base<br>
-catalog of SDK-owned strings. An app brings its own catalog. At build time<br>
-the catalogs merge into a single enum and one set of string tables per<br>
-firmware image.</p>
+<p>The SDK carries the translation engine, the generator tooling, and the base catalog of SDK-owned strings. An app brings its own catalog. At build time the catalogs merge into a single enum and one set of string tables per firmware image.</p>
 <h2 id="internationalization-i18n-layout" class="docmd-heading"><a href="#internationalization-i18n-layout" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Layout</h2>
 <pre class="hljs"><code class="language-text">PocketMage_SDK<span class="hljs-operator">/</span>
   pocketmage_i18n<span class="hljs-operator">/</span>
@@ -1646,12 +2040,9 @@ firmware image.</p>
   fr<span class="hljs-operator">/</span>pocketmage_i18n.<span class="hljs-attr">aliases</span>
   ...
 </code></pre>
-<p>A catalog directory has one subdirectory per language, named by the language<br>
-code. <code>en</code> is required and defines that catalog’s string order.</p>
+<p>A catalog directory has one subdirectory per language, named by the language code. <code>en</code> is required and defines that catalog’s string order.</p>
 <h2 id="internationalization-i18n-catalog-format" class="docmd-heading"><a href="#internationalization-i18n-catalog-format" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Catalog format</h2>
-<p>Standard gettext <code>.po</code>. <code>msgctxt</code> is the <code>StringID</code> enum name; <code>msgid</code> is the<br>
-English text; <code>msgstr</code> is the translation. The <code>en</code> file carries a<br>
-<code># Languages:</code> directive in its leading comment block:</p>
+<p>Standard gettext <code>.po</code>. <code>msgctxt</code> is the <code>StringID</code> enum name; <code>msgid</code> is the English text; <code>msgstr</code> is the translation. The <code>en</code> file carries a <code># Languages:</code> directive in its leading comment block:</p>
 <pre class="hljs"><code class="language-po"><span class="hljs-comment"># PocketMage OS English Translations</span>
 <span class="hljs-comment"># Languages: en fr es de</span>
 
@@ -1659,20 +2050,13 @@ msgctxt <span class="hljs-string">&quot;STR_SYS_HELLO&quot;</span>
 msgid <span class="hljs-string">&quot;Hello&quot;</span>
 msgstr <span class="hljs-string">&quot;Hello&quot;</span>
 </code></pre>
-<p>That directive, in the base catalog, is where the language list and order<br>
-come from. Each catalog’s <code>en</code> file defines the order of the strings that<br>
-catalog contributes; the catalog’s other languages must list the same<br>
-<code>msgctxt</code>s, with the same <code>msgid</code>s, in the same order.</p>
-<p>A language missing from a catalog falls back to that catalog’s English text,<br>
-so an English-only app catalog is valid without translating anything.</p>
+<p>That directive, in the base catalog, is where the language list and order come from. Each catalog’s <code>en</code> file defines the order of the strings that catalog contributes; the catalog’s other languages must list the same <code>msgctxt</code>s, with the same <code>msgid</code>s, in the same order.</p>
+<p>A language missing from a catalog falls back to that catalog’s English text, so an English-only app catalog is valid without translating anything.</p>
 <h3 id="internationalization-i18n-catalog-format-aliases" class="docmd-heading"><a href="#internationalization-i18n-catalog-format-aliases" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Aliases</h3>
-<p><code>pocketmage_i18n.aliases</code> maps folded, lowercase user input to a <code>StringID</code>.<br>
-Optional, only defined for non-English languages:</p>
+<p><code>pocketmage_i18n.aliases</code> maps folded, lowercase user input to a <code>StringID</code>. Optional, only defined for non-English languages:</p>
 <pre class="hljs"><code class="language-text">annuler <span class="hljs-operator">-&gt;</span> STR_KB_APP_CANCEL
 </code></pre>
-<p>Folding strips diacritics (<code>Paramètres -&gt; parametres</code>). Aliases from all<br>
-catalogs concatenate per language; a key that folds to the same value twice<br>
-is a build error.</p>
+<p>Folding strips diacritics (<code>Paramètres -&gt; parametres</code>). Aliases from all catalogs concatenate per language; a key that folds to the same value twice is a build error.</p>
 <h2 id="internationalization-i18n-ownership" class="docmd-heading"><a href="#internationalization-i18n-ownership" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Ownership</h2>
 <div class="table-wrapper"><table>
 <thead>
@@ -1692,44 +2076,29 @@ is a build error.</p>
 </tr>
 </tbody>
 </table>
-</div><p><code>msgctxt</code> names are globally unique across the merged catalogs; reusing one<br>
-the SDK already defines is a build error. SDK code only references SDK<br>
-namespaces, so merging an app catalog never changes how SDK code behaves.</p>
-<p>Ownership follows the consumer: base if SDK code references the string, app<br>
-otherwise. That keeps a bare SDK checkout building standalone (its base<br>
-catalog contains every string its own modules use), and the merge appends the<br>
-app catalog after the base, so app strings never move base enum values. The<br>
-indexed helper ranges all sit in the base; their relative order is fixed and<br>
-never perturbed by an app catalog.</p>
+</div><p><code>msgctxt</code> names are globally unique across the merged catalogs; reusing one the SDK already defines is a build error. SDK code only references SDK namespaces, so merging an app catalog never changes how SDK code behaves.</p>
+<p>Ownership follows the consumer: base if SDK code references the string, app otherwise. That keeps a bare SDK checkout building standalone (its base catalog contains every string its own modules use), and the merge appends the app catalog after the base, so app strings never move base enum values. The indexed helper ranges all sit in the base; their relative order is fixed and never perturbed by an app catalog.</p>
 <h2 id="internationalization-i18n-generator" class="docmd-heading"><a href="#internationalization-i18n-generator" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Generator</h2>
-<p><code>tools/gen_i18n.py</code> merges the catalogs in command-line order and writes<br>
-<code>pocketmage_i18n_gen.h</code> and <code>pocketmage_i18n_gen.cpp</code>:</p>
+<p><code>tools/gen_i18n.py</code> merges the catalogs in command-line order and writes <code>pocketmage_i18n_gen.h</code> and <code>pocketmage_i18n_gen.cpp</code>:</p>
 <pre class="hljs"><code class="language-sh">python3 pocketmage_i18n<span class="hljs-operator">/</span>tools<span class="hljs-operator">/</span>gen_i18n.<span class="hljs-attr">py</span> \
     <span class="hljs-operator">--</span>catalog pocketmage_i18n<span class="hljs-operator">/</span>languages \
     <span class="hljs-operator">--</span>catalog ..<span class="hljs-operator">/</span>app<span class="hljs-operator">/</span>src<span class="hljs-operator">/</span>i18n \
     <span class="hljs-operator">--</span>out<span class="hljs-operator">-</span>dir <span class="hljs-operator">&lt;</span>build<span class="hljs-operator">-</span>dir<span class="hljs-operator">&gt;</span>
 </code></pre>
-<p><code>--catalog</code> is repeatable; the first catalog is the base. With no arguments,<br>
-the tool generates the SDK’s own base catalog into <code>pocketmage_i18n/</code>, so a<br>
-bare SDK checkout builds standalone.</p>
-<p>The merge keeps base strings first and appends each later catalog in turn.<br>
-Every enum value equals its index in the merged order, so the layout is<br>
-stable: adding an app catalog never changes SDK string values.</p>
+<p><code>--catalog</code> is repeatable; the first catalog is the base. With no arguments, the tool generates the SDK’s own base catalog into <code>pocketmage_i18n/</code>, so a bare SDK checkout builds standalone.</p>
+<p>The merge keeps base strings first and appends each later catalog in turn. Every enum value equals its index in the merged order, so the layout is stable: adding an app catalog never changes SDK string values.</p>
 <h3 id="internationalization-i18n-generator-validation" class="docmd-heading"><a href="#internationalization-i18n-generator-validation" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Validation</h3>
 <p>The generator exits non-zero and aborts the build on any of:</p>
 <ul>
 <li>a missing <code># Languages:</code> directive in the base <code>en</code> file, or <code>en</code> not first;</li>
 <li>a <code>msgctxt</code> that is not <code>[A-Z][A-Z0-9_]*</code>;</li>
 <li>a duplicate <code>msgctxt</code> within a catalog or across catalogs;</li>
-<li>a non-<code>en</code> file whose <code>msgctxt</code> set, order, or <code>msgid</code>s differ from that<br>
-catalog’s <code>en</code>;</li>
+<li>a non-<code>en</code> file whose <code>msgctxt</code> set, order, or <code>msgid</code>s differ from that catalog’s <code>en</code>;</li>
 <li>a duplicated folded alias;</li>
 <li>the indexed helper ranges missing, inverted, overlapping, or out of order.</li>
 </ul>
 <h3 id="internationalization-i18n-generator-indexed-helper-ranges" class="docmd-heading"><a href="#internationalization-i18n-generator-indexed-helper-ranges" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Indexed helper ranges</h3>
-<p>Four ranges are indexed by the runtime helpers (<code>appName()</code>, <code>dayName()</code>,<br>
-<code>monthName()</code>, <code>kbAppName()</code>). They must stay contiguous blocks, in this<br>
-order:</p>
+<p>Four ranges are indexed by the runtime helpers (<code>appName()</code>, <code>dayName()</code>, <code>monthName()</code>, <code>kbAppName()</code>). They must stay contiguous blocks, in this order:</p>
 <div class="table-wrapper"><table>
 <thead>
 <tr>
@@ -1756,13 +2125,9 @@ order:</p>
 </tr>
 </tbody>
 </table>
-</div><p>Their heads are emitted with explicit <code>= N</code> enum values as documentation of<br>
-intent; the values always equal the index in the merged order.</p>
+</div><p>Their heads are emitted with explicit <code>= N</code> enum values as documentation of intent; the values always equal the index in the merged order.</p>
 <h2 id="internationalization-i18n-build-integration" class="docmd-heading"><a href="#internationalization-i18n-build-integration" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Build integration</h2>
-<p>The generator doubles as the build hook. Point <code>extra_scripts</code> at it in the<br>
-app’s <code>platformio.ini</code>; it reads its settings from project options (or<br>
-<code>POCKETMAGE_I18N_CATALOGS</code> / <code>POCKETMAGE_I18N_OUT_DIR</code>, or the SDK base<br>
-catalog as a last resort):</p>
+<p>The generator doubles as the build hook. Point <code>extra_scripts</code> at it in the app’s <code>platformio.ini</code>; it reads its settings from project options (or <code>POCKETMAGE_I18N_CATALOGS</code> / <code>POCKETMAGE_I18N_OUT_DIR</code>, or the SDK base catalog as a last resort):</p>
 <pre class="hljs"><code class="language-ini">extra_scripts <span class="hljs-operator">=</span> pre<span class="hljs-operator">:</span>lib<span class="hljs-operator">/</span>PocketMage_SDK<span class="hljs-operator">/</span>pocketmage_i18n<span class="hljs-operator">/</span>tools<span class="hljs-operator">/</span>gen_i18n.<span class="hljs-attr">py</span>
 
 custom_i18n_catalogs <span class="hljs-operator">=</span>
@@ -1770,30 +2135,22 @@ custom_i18n_catalogs <span class="hljs-operator">=</span>
     src<span class="hljs-operator">/</span>i18n
 custom_i18n_out_dir <span class="hljs-operator">=</span> .<span class="hljs-attr">pio</span><span class="hljs-operator">/</span>build<span class="hljs-operator">/</span><span class="hljs-variable">${PIOENV}</span><span class="hljs-operator">/</span>i18n
 </code></pre>
-<p>As a hook it regenerates only when a <code>.po</code>/<code>.aliases</code> file is newer than the<br>
-generated tables, so incremental builds stay cheap.</p>
-<p><code>custom_i18n_out_dir</code> must be ahead of any stale copy on the include path.<br>
-The engine includes <code>&quot;pocketmage_i18n_gen.h&quot;</code>; the generated files are build<br>
-artifacts, never committed.</p>
+<p>As a hook it regenerates only when a <code>.po</code>/<code>.aliases</code> file is newer than the generated tables, so incremental builds stay cheap.</p>
+<p><code>custom_i18n_out_dir</code> must be ahead of any stale copy on the include path. The engine includes <code>&quot;pocketmage_i18n_gen.h&quot;</code>; the generated files are build artifacts, never committed.</p>
 <h2 id="internationalization-i18n-adding-a-string-or-a-language" class="docmd-heading"><a href="#internationalization-i18n-adding-a-string-or-a-language" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Adding a string or a language</h2>
 <ul>
-<li><strong>String:</strong> add the <code>msgctxt</code>/<code>msgid</code>/<code>msgstr</code> to the owning catalog’s <code>en</code><br>
-file and to each language file, in the same position relative to that<br>
-catalog’s other strings. App strings go in the app catalog.</li>
-<li><strong>Language:</strong> append the code to the base <code>en</code> file’s <code># Languages:</code><br>
-directive and add that language’s directory to each catalog that translates<br>
-it. Never reorder existing languages: the index is the value stored in NVS.</li>
+<li><strong>String:</strong> add the <code>msgctxt</code>/<code>msgid</code>/<code>msgstr</code> to the owning catalog’s <code>en</code> file and to each language file, in the same position relative to that catalog’s other strings. App strings go in the app catalog.</li>
+<li><strong>Language:</strong> append the code to the base <code>en</code> file’s <code># Languages:</code> directive and add that language’s directory to each catalog that translates it. Never reorder existing languages: the index is the value stored in NVS.</li>
 </ul>
 <h2 id="internationalization-i18n-testing" class="docmd-heading"><a href="#internationalization-i18n-testing" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Testing</h2>
 <pre class="hljs"><code class="language-sh">python3 <span class="hljs-operator">-</span>m unittest discover <span class="hljs-operator">-</span>s pocketmage_i18n<span class="hljs-operator">/</span>tests
 </code></pre>
-<p>The suite covers catalog merging, language fallback, alias merging, and every<br>
-validation failure above, using small in-test catalogs.</p>
+<p>The suite covers catalog merging, language fallback, alias merging, and every validation failure above, using small in-test catalogs.</p>
 
                 
                   <div class="page-navigation">
                     
-                      <a href="../publish/" class="prev-page">
+                      <a href="../cli/" class="prev-page">
                         
 <svg class="lucide-icon icon-arrow-left page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-arrow-left"
@@ -1812,15 +2169,15 @@ validation failure above, using small in-test catalogs.</p>
 </svg>
 
                         <span><small>Previous</small><strong>
-                            Publishing
+                            pm CLI
                           </strong></span>
                       </a>
                     
                     
-                      <a href="../migration/" class="next-page">
+                      <a href="../troubleshooting/" class="next-page">
                         <span><small>Next</small>
                           <strong>
-                            Migration
+                            Troubleshooting
                           </strong></span>
                         
 <svg class="lucide-icon icon-arrow-right page-nav-icon" width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
@@ -1926,13 +2283,13 @@ validation failure above, using small in-test catalogs.</p>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1793426792000">
+                <span class="git-last-updated" data-timestamp="1793486742000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1793426792000"></span>
+                  <span class="git-time" data-timestamp="1793486742000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -1945,10 +2302,10 @@ validation failure above, using small in-test catalogs.</p>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Fix">Fix</div>
+                            <div class="git-commit-message" title="Docs">Docs</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1793426792000"></span>
+                              <span class="git-commit-date" data-timestamp="1793486742000"></span>
                             </div>
                           </div>
                         </li>
@@ -1960,7 +2317,7 @@ validation failure above, using small in-test catalogs.</p>
               
               <span class="git-spacer"></span>
               
-                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/docs/docs/i18n.md" target="_blank" rel="noopener noreferrer" class="edit-link">
+                <a href="https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs/Docs/docs/i18n.md" target="_blank" rel="noopener noreferrer" class="edit-link">
                   
 <svg class="lucide-icon icon-pencil " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
   class="lucide lucide-pencil"
@@ -2000,44 +2357,42 @@ validation failure above, using small in-test catalogs.</p>
           <div class="footer-columns">
             
               <div class="footer-column">
-                <span class="footer-column-title">Guides</span>
+                <span class="footer-column-title">Get Started</span>
                 <ul>
                   
-                    <li><a href="guides/making-apps/" >Making an app</a></li>
+                    <li><a href="get-started/" >Overview</a></li>
                   
-                    <li><a href="guides/lifecycle/" >App lifecycle</a></li>
+                    <li><a href="get-started/toolchain/" >Install the toolchain</a></li>
                   
-                    <li><a href="guides/rendering/" >Rendering</a></li>
+                    <li><a href="get-started/first-app/" >Your first app</a></li>
                   
                 </ul>
               </div>
             
               <div class="footer-column">
-                <span class="footer-column-title">API Reference</span>
+                <span class="footer-column-title">Reference</span>
                 <ul>
                   
-                    <li><a href="api/" >Overview</a></li>
-                  
-                    <li><a href="api/oled/" >OLED</a></li>
-                  
-                    <li><a href="api/eink/" >E-Ink</a></li>
-                  
-                    <li><a href="api/sys/" >System</a></li>
-                  
-                </ul>
-              </div>
-            
-              <div class="footer-column">
-                <span class="footer-column-title">Platform</span>
-                <ul>
+                    <li><a href="api/functions/" >Function index</a></li>
                   
                     <li><a href="app-abi/" >App ABI</a></li>
                   
-                    <li><a href="build/" >Building Apps</a></li>
+                    <li><a href="overlay/" >Overlay format</a></li>
                   
-                    <li><a href="symbols/" >Symbols</a></li>
+                    <li><a href="symbols/" >Symbol surface</a></li>
                   
-                    <li><a href="publish/" >Publishing</a></li>
+                </ul>
+              </div>
+            
+              <div class="footer-column">
+                <span class="footer-column-title">Tooling</span>
+                <ul>
+                  
+                    <li><a href="build/" >Building apps</a></li>
+                  
+                    <li><a href="cli/" >pm CLI</a></li>
+                  
+                    <li><a href="guides/publishing/" >Publishing</a></li>
                   
                 </ul>
               </div>
@@ -2071,14 +2426,14 @@ validation failure above, using small in-test catalogs.</p>
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mvw00s0r"></script>
+      <script src="../assets/js/docmd-main.js?v=mvwzpk2z"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mvw00s0r"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mvw00s0r" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-search.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-git.js?v=mvw00s0r" ></script>
-<script src="../assets/js/docmd-ai.js?v=mvw00s0r" ></script>
+      <script src="../assets/js/docmd-git.js?v=mvwzpk2z"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-search.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-git.js?v=mvwzpk2z" ></script>
+<script src="../assets/js/docmd-ai.js?v=mvwzpk2z" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
@@ -2154,7 +2509,7 @@ validation failure above, using small in-test catalogs.</p>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
-<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Guides","icon":"book","collapsible":true,"children":[{"title":"Guide index","path":"/guides/","icon":"book"},{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"children":[{"title":"API overview","path":"/api/","icon":"boxes"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Building Apps","path":"/build/","icon":"code"},{"title":"Symbols","path":"/symbols/","icon":"box"},{"title":"Publishing","path":"/publish/","icon":"package"},{"title":"i18n catalogs","path":"/i18n/","icon":"terminal"},{"title":"Migration","path":"/migration/","icon":"book-open"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
       
       
       

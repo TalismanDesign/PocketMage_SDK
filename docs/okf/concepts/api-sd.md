@@ -7,7 +7,7 @@ path: /api/sd/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.504Z"
+  generated_at: "2026-10-31T22:45:59.833Z"
 ---
 ---
 title: "SD card (pocketmage_sd)"
@@ -87,7 +87,7 @@ bool    readBinaryFile(const char* path, uint8_t* buf, size_t len);
 size_t  getFileSize(const char* path);
 ```
 
-Standard file operations that take an explicit `fs::FS`. Apps storing their assets read them from `/assets/<name>` (see [publishing](../publish.md)) with `readFileToString` / `readBinaryFile`; `readBinaryFile` returns false on a partial read.
+Standard file operations that take an explicit `fs::FS`. Apps storing their assets read them from `/assets/<name>` (see [publishing](../guides/publishing.md)) with `readFileToString` / `readBinaryFile`; `readBinaryFile` returns false on a partial read.
 
 ## Example
 
@@ -101,3 +101,62 @@ extern "C" int main(int, char**) {
   // draw text...
   return 0;
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_sd_get_mode();
+void pm_sd_save_file();
+void pm_sd_write_metadata(const char* a0);
+void pm_sd_load_file(bool a0);
+void pm_sd_del_file(const char* a0);
+void pm_sd_delete_metadata(const char* a0);
+void pm_sd_ren_file(const char* a0, const char* a1);
+void pm_sd_ren_metadata(const char* a0, const char* a1);
+void pm_sd_copy_file(const char* a0, const char* a1);
+void pm_sd_append_to_file(const char* a0, const char* a1);
+void pm_sd_begin_io();
+void pm_sd_end_io();
+bool pm_sd_get_no_sd();
+const char* pm_sd_get_working_file();
+const char* pm_sd_get_editing_file();
+const char* pm_sd_get_files_list_index(int a0);
+void pm_sd_list_dir(const char* a1);
+void pm_sd_read_file(const char* a1);
+const char* pm_sd_read_file_to_string(const char* a1);
+void pm_sd_write_file(const char* a1, const char* a2);
+void pm_sd_append_file(const char* a1, const char* a2);
+void pm_sd_rename_file(const char* a1, const char* a2);
+void pm_sd_delete_file(const char* a1);
+bool pm_sd_read_binary_file(const char* a0, uint8_t* a1, size_t a2);
+size_t pm_sd_get_file_size(const char* a0);
+```
+
+All operate on the `PM_SDAUTO()` singleton. Every `const char*` return points into the rotating string pool; copy it before the next SDK call if it must survive four further string-returning calls.
+
+- `pm_sd_get_mode()` is `getMode()`. Returns the `Mode` value (`SDMMC` = 0, `SDSPI` = 1) as int.
+- `pm_sd_save_file()` is `saveFile()`.
+- `pm_sd_write_metadata(a0)` is `writeMetadata(path)`.
+- `pm_sd_load_file(a0)` is `loadFile(showOLED)`.
+- `pm_sd_del_file(a0)` is `delFile(fileName)`.
+- `pm_sd_delete_metadata(a0)` is `deleteMetadata(path)`.
+- `pm_sd_ren_file(a0, a1)` is `renFile(oldFile, newFile)`.
+- `pm_sd_ren_metadata(a0, a1)` is `renMetadata(oldPath, newPath)`.
+- `pm_sd_copy_file(a0, a1)` is `copyFile(oldFile, newFile)`.
+- `pm_sd_append_to_file(a0, a1)` is `appendToFile(path, inText)`.
+- `pm_sd_begin_io()` / `pm_sd_end_io()` are `beginIO()` / `endIO()`; they toggle the `SDActive` indicator around longer operations.
+- `pm_sd_get_no_sd()` is `getNoSD()`. Returns true when no card was found.
+- `pm_sd_get_working_file()` / `pm_sd_get_editing_file()` are `getWorkingFile()` / `getEditingFile()`.
+- `pm_sd_get_files_list_index(a0)` is `getFilesListIndex(index)`; `a0` is the slot 0..`MAX_FILES`-1.
+- `pm_sd_list_dir(a1)` is `listDir(fs, dirname)`; the `fs::FS&` first argument is dropped from the C ABI (the active filesystem is used), so `a1` is the directory path.
+- `pm_sd_read_file(a1)` is `readFile(fs, path)`; `a1` is the path, with the `fs::FS&` dropped.
+- `pm_sd_read_file_to_string(a1)` is `readFileToString(fs, path)`; `a1` is the path, with the `fs::FS&` dropped. Returns a pointer into the rotating string pool.
+- `pm_sd_write_file(a1, a2)` is `writeFile(fs, path, message)`; `a1` is the path, `a2` is the content, with the `fs::FS&` dropped.
+- `pm_sd_append_file(a1, a2)` is `appendFile(fs, path, message)`; `a1`/`a2` as above, with the `fs::FS&` dropped.
+- `pm_sd_rename_file(a1, a2)` is `renameFile(fs, path1, path2)`; `a1`/`a2` are the paths, with the `fs::FS&` dropped.
+- `pm_sd_delete_file(a1)` is `deleteFile(fs, path)`; `a1` is the path, with the `fs::FS&` dropped.
+- `pm_sd_read_binary_file(a0, a1, a2)` is `readBinaryFile(path, buf, len)`; `a0` is the path, `a1` is the caller buffer, `a2` is its size. Returns false on a partial read.
+- `pm_sd_get_file_size(a0)` is `getFileSize(path)`. Returns the byte size.

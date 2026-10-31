@@ -1,20 +1,20 @@
 {
-  "okf_version": "0.9.7",
+  "okf_version": "0.9.8",
   "bundle": {
     "name": "pocketmage-sdk",
     "title": "PocketMage SDK",
     "description": "",
     "url": "https://talismandesign.github.io/PocketMage_SDK/docs",
     "generated_by": "@docmd/plugin-okf",
-    "generated_at": "2026-10-31T06:06:57.512Z",
+    "generated_at": "2026-10-31T22:45:59.839Z",
     "default_type": "concept"
   },
   "stats": {
-    "concepts": 29,
+    "concepts": 39,
     "by_type": {
-      "api": 18,
-      "concept": 7,
-      "guide": 4
+      "api": 19,
+      "concept": 14,
+      "guide": 6
     },
     "locales": [],
     "versions": []
@@ -93,6 +93,17 @@
       "description": "The Frame data model and the e-ink text/bitmap rendering engine.",
       "path": "/api/frames/",
       "file": "concepts/api-frames.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "api-functions",
+      "type": "api",
+      "title": "Function index (pm_*)",
+      "description": "Every pm_* wrapper an external app can call, grouped by module, with its exact C signature and a link to the page that documents it.",
+      "path": "/api/functions/",
+      "file": "concepts/api-functions.md",
       "locale": "",
       "version": "",
       "tags": []
@@ -241,6 +252,72 @@
       "tags": []
     },
     {
+      "id": "cli",
+      "type": "concept",
+      "title": "pm CLI",
+      "description": "The pm developer tool: scaffolding, building, gating, packing, exports reconciliation, and release bumps.",
+      "path": "/cli/",
+      "file": "concepts/cli.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "get-started-first-app",
+      "type": "concept",
+      "title": "Your first app",
+      "description": "Scaffold, build, gate, pack, and install a minimal PocketMage app end to end.",
+      "path": "/get-started/first-app/",
+      "file": "concepts/get-started-first-app.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "get-started",
+      "type": "concept",
+      "title": "Get Started",
+      "description": "What a PocketMage app is, what you need installed, and the shortest path from an empty directory to a running ELF.",
+      "path": "/get-started/",
+      "file": "concepts/get-started.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "get-started-toolchain",
+      "type": "concept",
+      "title": "Install the toolchain",
+      "description": "The pinned espressif Xtensa compiler, the elf_overlay host tools, and the pm CLI an app build needs.",
+      "path": "/get-started/toolchain/",
+      "file": "concepts/get-started-toolchain.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "glossary",
+      "type": "concept",
+      "title": "Glossary",
+      "description": "The terms the SDK docs use, defined once, with links to the page that owns each concept.",
+      "path": "/glossary/",
+      "file": "concepts/glossary.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "guides-i18n",
+      "type": "guide",
+      "title": "Internationalization",
+      "description": "Give an app translatable strings: the catalog an app ships, how it merges with the SDK base catalog, and resolving strings at runtime.",
+      "path": "/guides/i18n/",
+      "file": "concepts/guides-i18n.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
       "id": "guides",
       "type": "guide",
       "title": "PocketMage SDK guides",
@@ -274,6 +351,17 @@
       "tags": []
     },
     {
+      "id": "guides-publishing",
+      "type": "guide",
+      "title": "Publishing an app",
+      "description": "The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device.",
+      "path": "/guides/publishing/",
+      "file": "concepts/guides-publishing.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
       "id": "guides-rendering",
       "type": "guide",
       "title": "Rendering",
@@ -299,7 +387,7 @@
       "id": "root",
       "type": "concept",
       "title": "PocketMage SDK Documentation",
-      "description": "Official SDK for building PocketMage apps: guides, the full component API reference, the ELF app contract, and publishing.",
+      "description": "Official SDK for building PocketMage apps: get started, the full component API reference, the ELF app contract, build tooling, and publishing.",
       "path": "/",
       "file": "concepts/root.md",
       "locale": "",
@@ -318,10 +406,21 @@
       "tags": []
     },
     {
+      "id": "overlay",
+      "type": "concept",
+      "title": "Overlay format (.elfo)",
+      "description": "The ELFO overlay blob that ships beside every app ELF: why it exists, its on-disk layout, and how the host pages overlay bodies into executable RAM.",
+      "path": "/overlay/",
+      "file": "concepts/overlay.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
       "id": "publish",
       "type": "concept",
       "title": "Publishing an app",
-      "description": "The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device.",
+      "description": "Moved to Guides > Publishing an app.",
       "path": "/publish/",
       "file": "concepts/publish.md",
       "locale": "",
@@ -335,6 +434,17 @@
       "description": "The host-export surface apps resolve against, how third-party libraries link, and the rules for changing the surface.",
       "path": "/symbols/",
       "file": "concepts/symbols.md",
+      "locale": "",
+      "version": "",
+      "tags": []
+    },
+    {
+      "id": "troubleshooting",
+      "type": "concept",
+      "title": "Troubleshooting",
+      "description": "The failures an app build or load hits most, what causes each, and how to fix it.",
+      "path": "/troubleshooting/",
+      "file": "concepts/troubleshooting.md",
       "locale": "",
       "version": "",
       "tags": []

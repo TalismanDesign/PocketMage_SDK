@@ -7,7 +7,7 @@ path: /api/wifi/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.506Z"
+  generated_at: "2026-10-31T22:45:59.833Z"
 ---
 ---
 title: "WiFi (pocketmage_wifi)"
@@ -118,3 +118,52 @@ void connectHome() {
 void drawWifiStatus() {
   // draw a status line from the thread-safe getters
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_wifi_begin();
+void pm_wifi_stop();
+void pm_wifi_enable();
+void pm_wifi_disable();
+void pm_wifi_scan();
+void pm_wifi_connect(const char* a0, const char* a1, bool a2);
+void pm_wifi_disconnect();
+void pm_wifi_reconnect();
+int pm_wifi_get_state();
+bool pm_wifi_is_connected();
+bool pm_wifi_is_scanning();
+const char* pm_wifi_get_status_message();
+const char* pm_wifi_get_connected_ssid();
+const char* pm_wifi_get_ip_address();
+int pm_wifi_get_rssi();
+const char* pm_wifi_get_last_error();
+uint16_t pm_wifi_get_scan_result_count();
+bool pm_wifi_has_saved_credentials(const char* a0);
+bool pm_wifi_load_saved_credentials(const char* a0, char* a1, size_t a2);
+void pm_wifi_clear_saved_credentials(const char* a0);
+void pm_wifi_dispatch_events();
+```
+
+All operate on the `P_WIFI` singleton. Every `const char*` return points into the rotating string pool; copy it before the next SDK call if it must survive four further string-returning calls.
+
+- `pm_wifi_begin()` / `pm_wifi_stop()` are `begin()` / `stop()`.
+- `pm_wifi_enable()` / `pm_wifi_disable()` are `enable()` / `disable()`.
+- `pm_wifi_scan()` is `scan()`.
+- `pm_wifi_connect(a0, a1, a2)` is `connect(ssid, password, save)`; `a0` is the SSID, `a1` is the password, `a2` persists the credentials when true.
+- `pm_wifi_disconnect()` / `pm_wifi_reconnect()` are `disconnect()` / `reconnect()`.
+- `pm_wifi_get_state()` is `getState()`. Returns the `WifiRadioState` value as int.
+- `pm_wifi_is_connected()` / `pm_wifi_is_scanning()` are `isConnected()` / `isScanning()`.
+- `pm_wifi_get_status_message()` is `getStatusMessage()`; a human-readable status line.
+- `pm_wifi_get_connected_ssid()` is `getConnectedSSID()`.
+- `pm_wifi_get_ip_address()` is `getIpAddress()`.
+- `pm_wifi_get_rssi()` is `getRssi()`.
+- `pm_wifi_get_last_error()` is `getLastError()`; the connection-failure reason text.
+- `pm_wifi_get_scan_result_count()` is `getScanResultCount()`. Returns the AP count, capped at `MAX_SCAN_RESULTS`. The per-result `getScanResult()` is not projected to the C ABI.
+- `pm_wifi_has_saved_credentials(a0)` is `hasSavedCredentials(ssid)`.
+- `pm_wifi_load_saved_credentials(a0, a1, a2)` is `loadSavedCredentials(ssid, password, maxLen)`; `a0` is the SSID, `a1` is the caller buffer the password is written into, `a2` is its size. Returns true when a credential was found and copied.
+- `pm_wifi_clear_saved_credentials(a0)` is `clearSavedCredentials(ssid)`.
+- `pm_wifi_dispatch_events()` is `dispatchEvents()`; call it from the app loop to process pending notifications. The `setEventCallback()` method is not projected to the C ABI.

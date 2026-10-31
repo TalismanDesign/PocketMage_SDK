@@ -4,7 +4,7 @@
 
 ---
 
-## [Built-in asset bitmaps (libAssets.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/assets/)
+## [Built-in asset bitmaps (libAssets.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/assets/) (API)
 
 ---
 title: "Built-in asset bitmaps (libAssets.h)"
@@ -13,7 +13,7 @@ description: "Compiled-in PROGMEM bitmaps for the status bar, screensavers, and 
 
 # Built-in assets
 
-The SDK ships small PROGMEM bitmaps for the OS status line and screensavers. Apps can draw them directly with the E-Ink/OLED bitmap primitives, or they can draw custom assets from the SD card (`/assets/...`, see [publishing](../publish.md)) instead.
+The SDK ships small PROGMEM bitmaps for the OS status line and screensavers. Apps can draw them directly with the E-Ink/OLED bitmap primitives, or they can draw custom assets from the SD card (`/assets/...`, see [publishing](../guides/publishing.md)) instead.
 
 ```cpp
 #include <pocketmage.h>
@@ -75,11 +75,12 @@ void drawOwnBatteryGauge(int x, int y) {
   FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
   EINK().drawBitmap(x, y, batt_allArray[battState], 10, 6, GxEPD_BLACK);
 }
+```
 
 
 ---
 
-## [Buzzer (pocketmage_bz)](https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/)
+## [Buzzer (pocketmage_bz)](https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/) (API)
 
 ---
 title: "Buzzer (pocketmage_bz)"
@@ -119,7 +120,7 @@ namespace Jingles {
 }
 ```
 
-Built-in melodies use `NOTE_A8` / `NOTE_B8` / `NOTE_C8` / `NOTE_D8` constants from the include set. A custom jingle is just a new `constexpr` note array plus a `Jingle`:
+Built-in melodies use `NOTE_A8` / `NOTE_B8` / `NOTE_C8` / `NOTE_D8` constants from the include set. A custom jingle is a new `constexpr` note array plus a `Jingle`:
 
 ```cpp
 constexpr static const Note myNotes[] = {
@@ -152,11 +153,26 @@ public:
 void announce() {
   BZ().playJingle(Jingles::Startup);
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+bool pm_bz_begin(int a0);
+void pm_bz_end();
+void pm_bz_play_jingle(int a0);
+```
+
+- `pm_bz_begin(a0)` is `PocketmageBZ::begin(channel)` on `BZ()`; `a0` is the PWM channel. Returns true on success.
+- `pm_bz_end()` is `end()`.
+- `pm_bz_play_jingle(a0)` is `playJingle()`; `a0` is a `pm_jingle` value as int (`PM_JINGLE_STARTUP` or `PM_JINGLE_SHUTDOWN`) selecting a built-in melody. Plays synchronously.
 
 
 ---
 
-## [Clock (pocketmage_clock)](https://talismandesign.github.io/PocketMage_SDK/docs/api/clock/)
+## [Clock (pocketmage_clock)](https://talismandesign.github.io/PocketMage_SDK/docs/api/clock/) (API)
 
 ---
 title: "Clock (pocketmage_clock)"
@@ -220,11 +236,26 @@ void drawClockLine() {
   OLED().oledWord(String(now.hour()) + ":" +
                   String(now.minute() < 10 ? "0" : "") + String(now.minute()));
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+bool pm_clock_begin();
+void pm_clock_set_time_from_string(const char* a0);
+bool pm_clock_valid();
+```
+
+- `pm_clock_begin()` is `PocketmageCLOCK::begin()` on `CLOCK()`. Returns true once the RTC comes up.
+- `pm_clock_set_time_from_string(a0)` is `setTimeFromString(timeStr)`; `a0` is the `"HH:MM"` string. Bad input is rejected with a `STR_INVALID` OLED message instead of a bad write.
+- `pm_clock_valid()` is `isValid()`. Returns false until `begin()` succeeds and the RTC year is sane.
 
 
 ---
 
-## [Configuration](https://talismandesign.github.io/PocketMage_SDK/docs/api/configuration/)
+## [Configuration](https://talismandesign.github.io/PocketMage_SDK/docs/api/configuration/) (API)
 
 ---
 title: "Configuration"
@@ -323,7 +354,7 @@ The host exports the same version as the `pocketmage_sdk_version` string symbol,
 
 ---
 
-## [E-Ink (pocketmage_eink)](https://talismandesign.github.io/PocketMage_SDK/docs/api/eink/)
+## [E-Ink (pocketmage_eink)](https://talismandesign.github.io/PocketMage_SDK/docs/api/eink/) (API)
 
 ---
 title: "E-Ink (pocketmage_eink)"
@@ -402,7 +433,7 @@ Sets rotation 3 and the full window, optionally filling `color`. Call before reb
 
 #### `lockPanel` / `unlockPanel`
 
-The recursive mutex. `refresh()` takes it itself; hold it when a task draws into the framebuffer directly, so a background refresh cannot swap buffers mid-draw. See [threading](index.md#reading-a-component-page).
+The recursive mutex. `refresh()` takes it itself; hold it when a task draws into the framebuffer directly, so a background refresh cannot swap buffers mid-draw. See [the background task](#e-ink-api-the-background-task).
 
 ## The background task
 
@@ -427,12 +458,44 @@ extern "C" int main(int, char**) {
 }
 ```
 
-The buffer is the GLCD framebuffer of `display`; fill it with
+The buffer is the `GxEPD2_BW` framebuffer behind `getDisplay()`; fill it with GFX primitives or with `FontEngine`/`u8g2f` text, then commit it with `refresh()`. The panel does not update until `refresh()` runs the policy above.
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_eink_refresh();
+void pm_eink_set_fast_full_refresh(bool a0);
+void pm_eink_status_bar(const char* a0, bool a1);
+void pm_eink_draw_status_bar(const char* a0);
+void pm_eink_reset_display(bool a0, uint16_t a1);
+int pm_eink_count_lines(const char* a0, size_t a1);
+uint8_t pm_eink_get_font_height();
+int pm_eink_max_lines();
+uint16_t pm_eink_get_eink_text_width(const char* a0);
+uint8_t pm_eink_get_line_spacing();
+void pm_eink_force_slow_full_update(bool a0);
+```
+
+All operate on the `EINK()` singleton.
+
+- `pm_eink_refresh()` is `refresh()`; renders the current buffer per the refresh policy and takes the panel mutex for the whole redraw.
+- `pm_eink_set_fast_full_refresh(a0)` is `setFastFullRefresh(setting)`.
+- `pm_eink_status_bar(a0, a1)` is `statusBar(input, fullWindow)`; `a0` is the status text, `a1` is `fullWindow`.
+- `pm_eink_draw_status_bar(a0)` is `drawStatusBar(input)`.
+- `pm_eink_reset_display(a0, a1)` is `resetDisplay(clearScreen, color)`; `a1` is the 16-bit fill color.
+- `pm_eink_count_lines(a0, a1)` is `countLines(input, maxLineLength)`. Returns the rendered line count.
+- `pm_eink_get_font_height()` is `getFontHeight()`.
+- `pm_eink_max_lines()` is `maxLines()`.
+- `pm_eink_get_eink_text_width(a0)` is `getEinkTextWidth(s)`. Returns the measured pixel width.
+- `pm_eink_get_line_spacing()` is `getLineSpacing()`.
+- `pm_eink_force_slow_full_update(a0)` is `forceSlowFullUpdate(force)`.
 
 
 ---
 
-## [Fonts & Text (pocketmage_font)](https://talismandesign.github.io/PocketMage_SDK/docs/api/font/)
+## [Fonts & Text (pocketmage_font)](https://talismandesign.github.io/PocketMage_SDK/docs/api/font/) (API)
 
 ---
 title: "Fonts & Text (pocketmage_font)"
@@ -572,12 +635,36 @@ void drawTitle() {
 }
 ```
 
-Remember `y` is the baseline. `kOledWordBaseline` (16) and the
+Remember `y` is the baseline, not the top of the glyph. The layout constants give the standard baselines: `kOledWordBaseline` (16) for the `oledWord`/`sysMessage` cascade, `kOledWordLargeBaseline` (21) for the `allowLarge` (`Heading2`) variant, and `kOledEditBaseline` (20) for the `oledLine` input row. They are defined in `pocketmage_layout.h`; see [layout](layout.md).
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_font_engine_char_width(int a0, uint16_t a1, int a2);
+int pm_font_engine_font_ascent(int a0, int a1);
+int pm_font_engine_font_descent(int a0, int a1);
+int pm_font_engine_font_height_txt(uint8_t a0, uint8_t a1, uint8_t a2);
+int pm_text_width(int a0, const char* a1, int a2);
+int pm_font_height(int a0, int a1);
+void pm_text_color(int a0, uint16_t a1);
+```
+
+These project the static `FontEngine` methods. In every signature `a0` (the first `int`) is a `pm_target` value as int (`PM_TARGET_OLED` or `PM_TARGET_EINK`) except for `pm_font_engine_font_height_txt`, which takes no target. A trailing `int` carrying a style is a `pm_style` value as int.
+
+- `pm_font_engine_char_width(a0, a1, a2)` is `charWidth(target, unicode, style)`; `a1` is the codepoint, `a2` is a `pm_style`. Returns the advance width in pixels.
+- `pm_font_engine_font_ascent(a0, a1)` is `fontAscent(target, style)`; `a1` is a `pm_style`.
+- `pm_font_engine_font_descent(a0, a1)` is `fontDescent(target, style)`; `a1` is a `pm_style`.
+- `pm_font_engine_font_height_txt(a0, a1, a2)` is `fontHeightTxt(family, sizeIdx, variant)` with the TXT matrix indices; no target argument.
+- `pm_text_width(a0, a1, a2)` is `textWidth(target, text, style)`; `a1` is the UTF-8 text, `a2` is a `pm_style`. Returns the measured pixel width.
+- `pm_font_height(a0, a1)` is `fontHeight(target, style)`; `a1` is a `pm_style`.
+- `pm_text_color(a0, a1)` is `setTextColor(target, color)`; `a1` is the 16-bit color (0 = black, 1 = white), touching only the given target.
 
 
 ---
 
-## [Frames (frames.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/frames/)
+## [Frames (frames.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/frames/) (API)
 
 ---
 title: "Frames (frames.h)"
@@ -719,11 +806,260 @@ void runList() {
   einkFramesDynamic(stack, /*doFull=*/false);
   EINK().refresh();
 }
+```
 
 
 ---
 
-## [Internationalization (i18n)](https://talismandesign.github.io/PocketMage_SDK/docs/api/i18n-runtime/)
+## [Function index (pm_*)](https://talismandesign.github.io/PocketMage_SDK/docs/api/functions/) (API)
+
+---
+title: "Function index (pm_*)"
+description: "Every pm_* wrapper an external app can call, grouped by module, with its exact C signature and a link to the page that documents it."
+---
+
+# Function index
+
+An external ELF app does not call the SDK's C++ classes directly. It calls a flat C ABI, the `pm_*` functions, declared in the generated header `pm_sdk_app.h` and pulled in through `pm_app_api.h`. This page is the complete index of that surface: every wrapper, its exact signature, and the module page that documents its behavior.
+
+```cpp
+#include <pm_app_api.h>
+```
+
+The signatures here are generated verbatim from `pm_sdk_app.h`. Parameter names are positional (`a0`, `a1`, ...) in the generated header; the module pages give them meaning. See [the projection model](index.md#api-reference-the-c-abi-pm) for how C++ methods become these C functions, and [symbols.md](../symbols.md) for how they are gated at load time.
+
+Enums are plain integers in the app: `pm_target`, `pm_style`, `pm_lang`, `pm_refresh`, and `pm_jingle`, with values generated in the SDK's own declaration order (`PM_TARGET_*`, `PM_STYLE_*`, and so on). `PM_APP_API_ABI` tracks incompatible changes to this surface; an app compares it against `pm_app_abi()` at startup.
+
+## Version and host
+
+| Function                              | Returns        |
+| ------------------------------------- | -------------- |
+| `pm_app_abi(void)`                    | `uint32_t`     |
+| `pm_host_sdk_version(void)`           | `const char*`  |
+| `delay(unsigned long ms)`             | `void`         |
+
+Documented on [System](sys.md).
+
+## Buzzer
+
+Documented on [Buzzer](bz.md).
+
+```c
+bool pm_bz_begin(int a0);
+void pm_bz_end();
+void pm_bz_play_jingle(int a0);
+```
+
+## Clock
+
+Documented on [Clock](clock.md).
+
+```c
+bool pm_clock_begin();
+void pm_clock_set_time_from_string(const char* a0);
+bool pm_clock_valid();
+```
+
+## E-Ink
+
+Documented on [E-Ink](eink.md).
+
+```c
+void pm_eink_refresh();
+void pm_eink_set_fast_full_refresh(bool a0);
+void pm_eink_status_bar(const char* a0, bool a1);
+void pm_eink_draw_status_bar(const char* a0);
+void pm_eink_reset_display(bool a0, uint16_t a1);
+int pm_eink_count_lines(const char* a0, size_t a1);
+uint8_t pm_eink_get_font_height();
+int pm_eink_max_lines();
+uint16_t pm_eink_get_eink_text_width(const char* a0);
+uint8_t pm_eink_get_line_spacing();
+void pm_eink_force_slow_full_update(bool a0);
+```
+
+## Fonts and text
+
+Documented on [Fonts & text](font.md).
+
+```c
+int pm_font_engine_char_width(int a0, uint16_t a1, int a2);
+int pm_font_engine_font_ascent(int a0, int a1);
+int pm_font_engine_font_descent(int a0, int a1);
+int pm_font_engine_font_height_txt(uint8_t a0, uint8_t a1, uint8_t a2);
+int pm_text_width(int a0, const char* a1, int a2);
+int pm_font_height(int a0, int a1);
+void pm_text_color(int a0, uint16_t a1);
+```
+
+## Internationalization (runtime)
+
+Documented on [i18n (runtime)](i18n-runtime.md).
+
+```c
+void pm_i18n_set_language(int a0);
+bool pm_i18n_set_language_by_code(const char* a0);
+int pm_i18n_language();
+int pm_i18n_language_count();
+const char* pm_i18n_code();
+const char* pm_i18n_code_at(int a0);
+const char* pm_i18n_native_name();
+const char* pm_i18n_native_name_at(int a0);
+const char* pm_i18n_get(int a0);
+const char* pm_i18n_month_name(int a0);
+const char* pm_i18n_day_name(int a0);
+const char* pm_i18n_app_name(int a0);
+const char* pm_i18n_kb_app_name(int a0);
+const char* pm_i18n_normalize_command(const char* a0);
+```
+
+## Keyboard
+
+Documented on [Keyboard](kb.md).
+
+```c
+int pm_kb_state();
+void pm_kb_toggle_shift();
+void pm_kb_toggle_fn();
+bool pm_kb_accept_key();
+char pm_kb_read();
+void pm_kb_check_usbkb();
+void pm_kb_flush();
+```
+
+## Layout
+
+Documented on [Layout](layout.md).
+
+```c
+int pm_layout_eink_row_pitch(int a0);
+size_t pm_layout_slice_that_fits(const char* a0, size_t a1, int a2, int a3);
+const char* pm_layout_truncate_with_ellipsis(const char* a0, int a1, int a2, int a3);
+int pm_layout_word_wrap_count(const char* a0, int a1, int a2);
+int pm_layout_word_wrap_get(const char* a0, int a1, int a2, int index, char* out, size_t out_size);
+```
+
+## OLED
+
+Documented on [OLED](oled.md).
+
+```c
+void pm_oled_oled_word(const char* a0, bool a1, bool a2, const char* a3);
+void pm_oled_oled_line(const char* a0, int a1, bool a2, const char* a3, bool a4);
+void pm_oled_sysmsg(const char* a0, int a1);
+void pm_oled_oled_scroll();
+void pm_oled_info_bar();
+void pm_oled_set_power_save(bool a0);
+bool pm_oled_power_save();
+```
+
+## SD card
+
+Documented on [SD card](sd.md).
+
+```c
+int pm_sd_get_mode();
+void pm_sd_save_file();
+void pm_sd_write_metadata(const char* a0);
+void pm_sd_load_file(bool a0);
+void pm_sd_del_file(const char* a0);
+void pm_sd_delete_metadata(const char* a0);
+void pm_sd_ren_file(const char* a0, const char* a1);
+void pm_sd_ren_metadata(const char* a0, const char* a1);
+void pm_sd_copy_file(const char* a0, const char* a1);
+void pm_sd_append_to_file(const char* a0, const char* a1);
+void pm_sd_begin_io();
+void pm_sd_end_io();
+bool pm_sd_get_no_sd();
+const char* pm_sd_get_working_file();
+const char* pm_sd_get_editing_file();
+const char* pm_sd_get_files_list_index(int a0);
+void pm_sd_list_dir(const char* a1);
+void pm_sd_read_file(const char* a1);
+const char* pm_sd_read_file_to_string(const char* a1);
+void pm_sd_write_file(const char* a1, const char* a2);
+void pm_sd_append_file(const char* a1, const char* a2);
+void pm_sd_rename_file(const char* a1, const char* a2);
+void pm_sd_delete_file(const char* a1);
+bool pm_sd_read_binary_file(const char* a0, uint8_t* a1, size_t a2);
+size_t pm_sd_get_file_size(const char* a0);
+```
+
+## Text utilities
+
+Documented on [Text utilities](io.md).
+
+```c
+int pm_io_split_string_count(const char* a0, char a1);
+int pm_io_split_string_get(const char* a0, char a1, int index, char* out, size_t out_size);
+const char* pm_io_join_string(const char* const* a0_items, int a0_count, char a1);
+const char* pm_io_remove_char(const char* a0, char a1);
+int pm_io_string_to_int(const char* a0, int a1);
+```
+
+## Touch
+
+Documented on [Touch](touch.md).
+
+```c
+void pm_touch_update_scroll_from_touch();
+bool pm_touch_update_scroll(int a0, unsigned long* a1, int a2);
+int pm_touch_get_scroll_vector();
+long pm_touch_get_dynamic_scroll();
+long pm_touch_get_prev_dynamic_scroll();
+int pm_touch_get_last_touch();
+unsigned long pm_touch_get_last_touch_time();
+int pm_touch_get_diff();
+```
+
+## UI helpers
+
+Documented on [UI helpers](ui.md).
+
+```c
+void pm_ui_draw_scrollbar(int a0, int a1, int a2, int a3, int a4, int a5, int a6, bool a7, uint16_t a8, uint16_t a9);
+void pm_ui_begin_eink_screen(bool a0);
+void pm_ui_end_eink_screen(const char* a0, int a1);
+void pm_ui_draw_list_item(int a0, int a1, const char* a2, int a3);
+int pm_ui_draw_chip_text(int a0, int a1, const char* a2, int a3, int a4, bool a5, int a6, int a7, int a8, int a9);
+```
+
+## WiFi
+
+Documented on [WiFi](wifi.md).
+
+```c
+void pm_wifi_begin();
+void pm_wifi_stop();
+void pm_wifi_enable();
+void pm_wifi_disable();
+void pm_wifi_scan();
+void pm_wifi_connect(const char* a0, const char* a1, bool a2);
+void pm_wifi_disconnect();
+void pm_wifi_reconnect();
+int pm_wifi_get_state();
+bool pm_wifi_is_connected();
+bool pm_wifi_is_scanning();
+const char* pm_wifi_get_status_message();
+const char* pm_wifi_get_connected_ssid();
+const char* pm_wifi_get_ip_address();
+int pm_wifi_get_rssi();
+const char* pm_wifi_get_last_error();
+uint16_t pm_wifi_get_scan_result_count();
+bool pm_wifi_has_saved_credentials(const char* a0);
+bool pm_wifi_load_saved_credentials(const char* a0, char* a1, size_t a2);
+void pm_wifi_clear_saved_credentials(const char* a0);
+void pm_wifi_dispatch_events();
+```
+
+## String return lifetime
+
+Every `const char*` return points into a small rotating pool shared by all string-returning wrappers. The pool holds four slots; the fifth string-returning call overwrites the first slot's buffer. Copy a returned string before making further SDK calls if you need to keep it. The buffer is 256 bytes; longer values are truncated. Functions that can produce arbitrary length, such as `pm_layout_word_wrap_get` and `pm_io_split_string_get`, write into a caller-owned buffer instead and return a length or `-1`.
+
+
+---
+
+## [Internationalization (i18n)](https://talismandesign.github.io/PocketMage_SDK/docs/api/i18n-runtime/) (API)
 
 ---
 title: "Internationalization (i18n)"
@@ -795,12 +1131,48 @@ So both `"réglages"` and `"reglages"` resolve to settings, while file arguments
 
 ## Adding a language
 
-The string tables are generated (see `pocketmage_i18n/README`): add a `.po` catalog and re-run the generator, and the `Lang` enum, `StringID`-ordered table, and string block for `appName`/`kbAppName`/months/days all follow. Fallback rules: a missing id in a non-English table falls back to the
+The string tables are generated (see `pocketmage_i18n/README`): add a `.po` catalog and re-run the generator, and the `Lang` enum, `StringID`-ordered table, and string block for `appName`/`kbAppName`/months/days all follow. Fallback rules: a missing (empty `msgstr`) id in a non-English table falls back to the English string at generation time, so every `StringID` always resolves to a non-empty string. An out-of-range language index clamps to English; an out-of-range `StringID` returns the empty string.
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_i18n_set_language(int a0);
+bool pm_i18n_set_language_by_code(const char* a0);
+int pm_i18n_language();
+int pm_i18n_language_count();
+const char* pm_i18n_code();
+const char* pm_i18n_code_at(int a0);
+const char* pm_i18n_native_name();
+const char* pm_i18n_native_name_at(int a0);
+const char* pm_i18n_get(int a0);
+const char* pm_i18n_month_name(int a0);
+const char* pm_i18n_day_name(int a0);
+const char* pm_i18n_app_name(int a0);
+const char* pm_i18n_kb_app_name(int a0);
+const char* pm_i18n_normalize_command(const char* a0);
+```
+
+These project the static `I18n` methods. Every `const char*` return points into the rotating string pool; copy it before the next SDK call if it must outlive four further string-returning calls.
+
+- `pm_i18n_set_language(a0)` is `setLanguage(lang)`; `a0` is a `pm_lang` value as int, out-of-range clamping to English.
+- `pm_i18n_set_language_by_code(a0)` is `setLanguageByCode(code)`; `a0` is a two-letter code. Returns false and leaves the language unchanged for an unknown code.
+- `pm_i18n_language()` is `language()`. Returns the active `pm_lang` as int.
+- `pm_i18n_language_count()` is `languageCount()`.
+- `pm_i18n_code()` / `pm_i18n_code_at(a0)` are `code()` / `code(idx)`; `a0` is the catalog index.
+- `pm_i18n_native_name()` / `pm_i18n_native_name_at(a0)` are `nativeName()` / `nativeName(idx)`.
+- `pm_i18n_get(a0)` is `get(id)`; `a0` is a `StringID` value as int (for example `STR_INVALID`). This is the `TR()` lookup.
+- `pm_i18n_month_name(a0)` is `monthName(month)`; `a0` is 1..12.
+- `pm_i18n_day_name(a0)` is `dayName(idx)`; `a0` is 0..6, Sunday-first.
+- `pm_i18n_app_name(a0)` is `appName(idx)`; `a0` is the home-grid index 0..10.
+- `pm_i18n_kb_app_name(a0)` is `kbAppName(idx)`; `a0` is the app-switcher index 0..11.
+- `pm_i18n_normalize_command(a0)` is `normalizeCommand(raw)`; `a0` is the raw command line. Returns the canonical English verb with argument bytes preserved.
 
 
 ---
 
-## [API Reference](https://talismandesign.github.io/PocketMage_SDK/docs/api/)
+## [API Reference](https://talismandesign.github.io/PocketMage_SDK/docs/api/) (API)
 
 ---
 title: "API Reference"
@@ -816,6 +1188,8 @@ The SDK exposes the PocketMage hardware and OS services to loaded apps through a
 ```
 
 `pocketmage.h` pulls in every component header, `config.h`, the `frames` and `assets` modules, and `Preferences.h`. It also includes `pocketmage_app_version.h` when the build defines `PM_TARGET_APP`, so the SDK-version macros are always available to apps.
+
+An external app does not call these C++ classes directly across the ELF boundary; it calls the flat `pm_*` C ABI that projects them. See [The C ABI (pm_*)](#api-reference-the-c-abi-pm) below, and the complete [function index](functions.md) for every wrapper and its signature.
 
 ## Compile target
 
@@ -854,6 +1228,30 @@ Most components are owned by a single global instance created inside the SDK and
 
 The `frames` component is used by the OS's built-in apps. Third-party apps start from the simpler primitives in [oled](oled.md), [eink](eink.md), [font](font.md), and [layout](layout.md).
 
+## The C ABI (pm_*)
+
+The accessors and classes above are the host-side API. The SDK compiles the firmware with the C++ API directly, but an external ELF app cannot: it links `-nostdlib` and resolves symbols by name at load time, so the app-facing surface is a flat C ABI, the `pm_*` functions, generated from the C++ classes by `tools/gen_app_api.py`. An app includes the generated header through `pm_app_api.h`:
+
+```cpp
+#include <pm_app_api.h>
+```
+
+The generator projects each exported C++ method to one C function by a fixed set of rules:
+
+| C++ shape                         | C projection                                              |
+| --------------------------------- | --------------------------------------------------------- |
+| `ClassName::method(args)`         | `pm_<module>_<method>(args)` on the module's singleton    |
+| `String` parameter or return      | `const char*` (returns point into the string pool, below) |
+| enum parameter or return          | plain `int` (values in SDK declaration order)             |
+| `std::vector<T>` return           | a `_count` function plus a `_get(index, out, out_size)` pair |
+| scalar out-parameter by reference | `T*` out-pointer                                          |
+
+Enums become integers with generated value tables: `pm_target`, `pm_style`, `pm_lang`, `pm_refresh`, and `pm_jingle`. `PM_APP_API_ABI` tracks incompatible changes to this surface; an app compares it against `pm_app_abi()` at startup, and `pocketmage_sdk_version` (via `pm_host_sdk_version()`) gives the running host's SDK version.
+
+Every `const char*` return points into a shared rotating string pool: four 256-byte slots, where the fifth string-returning call overwrites the first. Copy a returned string before making further SDK calls if you need to keep it. Functions that can return arbitrary length write into a caller-owned buffer instead. The full rule and the per-function list are in the [function index](functions.md#function-index-string-return-lifetime).
+
+The `pm_*` names are the app's real dependency contract and are gated at load time against the curated host surface; see [symbols.md](../symbols.md). Each component page below documents its `pm_*` wrappers alongside the C++ class they project.
+
 ## Reading a component page
 
 Every API page follows the same shape:
@@ -868,7 +1266,7 @@ Threading notes matter: the E-Ink panel is guarded by a recursive mutex and refr
 
 ---
 
-## [Text utilities (pocketmage_io)](https://talismandesign.github.io/PocketMage_SDK/docs/api/io/)
+## [Text utilities (pocketmage_io)](https://talismandesign.github.io/PocketMage_SDK/docs/api/io/) (API)
 
 ---
 title: "Text utilities (pocketmage_io)"
@@ -904,11 +1302,29 @@ int parseDuration(String raw) {
   if (parts.size() != 2) return -1;
   return stringToInt(parts[1], -1);
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ functions above; they are generated from them by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_io_split_string_count(const char* a0, char a1);
+int pm_io_split_string_get(const char* a0, char a1, int index, char* out, size_t out_size);
+const char* pm_io_join_string(const char* const* a0_items, int a0_count, char a1);
+const char* pm_io_remove_char(const char* a0, char a1);
+int pm_io_string_to_int(const char* a0, int a1);
+```
+
+- `pm_io_split_string_count` / `pm_io_split_string_get` project `splitString()`, which returns `std::vector<String>`. Call `pm_io_split_string_count(a0, a1)` to get the token count, then `pm_io_split_string_get(a0, a1, index, out, out_size)` per index to copy a token into the caller buffer `out` (at most `out_size` bytes). `a0` is the input, `a1` is the delimiter. `_get` returns the token length or -1 for a bad index. These write into the caller buffer, not the rotating pool, so an arbitrary-length token is not truncated to 256 bytes.
+- `pm_io_join_string(a0_items, a0_count, a1)` is `joinString(parts, delimiter)`; the `std::vector<String>` becomes a `const char* const*` array `a0_items` of length `a0_count`, and `a1` is the delimiter. Returns a pointer into the rotating string pool.
+- `pm_io_remove_char(a0, a1)` is `removeChar(str, character)`; strips every `a1` from `a0`. Returns a pointer into the rotating string pool.
+- `pm_io_string_to_int(a0, a1)` is `stringToInt(str, defaultVal)`; `a1` is the fallback returned when `a0` is empty or not a decimal integer.
 
 
 ---
 
-## [Keyboard (pocketmage_kb)](https://talismandesign.github.io/PocketMage_SDK/docs/api/kb/)
+## [Keyboard (pocketmage_kb)](https://talismandesign.github.io/PocketMage_SDK/docs/api/kb/) (API)
 
 ---
 title: "Keyboard (pocketmage_kb)"
@@ -978,11 +1394,36 @@ void pumpKeys() {
   if (!KB().acceptKey()) return;
   // handle the character
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_kb_state();
+void pm_kb_toggle_shift();
+void pm_kb_toggle_fn();
+bool pm_kb_accept_key();
+char pm_kb_read();
+void pm_kb_check_usbkb();
+void pm_kb_flush();
+```
+
+All operate on the `KB()` singleton.
+
+- `pm_kb_state()` is `getKeyboardState()`. Returns the `KBState` modifier value (`NORMAL`, `SHIFT`, `FUNC`, `FN_SHIFT`) as int.
+- `pm_kb_toggle_shift()` is `toggleShift()`.
+- `pm_kb_toggle_fn()` is `toggleFn()`.
+- `pm_kb_accept_key()` is `acceptKey()`. Returns true only once `KB_COOLDOWN` ms have passed since the last accepted press.
+- `pm_kb_read()` is `updateKeypress()`. Returns the next character, or `'\0'` when none is pending; never blocks.
+- `pm_kb_check_usbkb()` is `checkUSBKB()`; services the USB HID connection.
+- `pm_kb_flush()` is `flush()`; drops any queued events.
 
 
 ---
 
-## [Layout (pocketmage_layout)](https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/)
+## [Layout (pocketmage_layout)](https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/) (API)
 
 ---
 title: "Layout (pocketmage_layout)"
@@ -1120,11 +1561,29 @@ void drawBudget(std::vector<String>& lines) {
     if (y > kEinkContentH) break;
   }
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ functions above; they are generated from them by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_layout_eink_row_pitch(int a0);
+size_t pm_layout_slice_that_fits(const char* a0, size_t a1, int a2, int a3);
+const char* pm_layout_truncate_with_ellipsis(const char* a0, int a1, int a2, int a3);
+int pm_layout_word_wrap_count(const char* a0, int a1, int a2);
+int pm_layout_word_wrap_get(const char* a0, int a1, int a2, int index, char* out, size_t out_size);
+```
+
+- `pm_layout_eink_row_pitch(a0)` is `einkRowPitch(s)`; `a0` is a `pm_style` value as int. Returns the canonical row height for that style.
+- `pm_layout_slice_that_fits(a0, a1, a2, a3)` is `sliceThatFits(s, n, maxTextWidth, style)`; `a0` is the string, `a1` is the byte length, `a2` is the pixel budget, `a3` is a `pm_style`. Returns the byte length of the longest prefix that fits, or 0 when nothing fits.
+- `pm_layout_truncate_with_ellipsis(a0, a1, a2, a3)` is `truncateWithEllipsis(text, maxWidthPx, style, target)`; `a0` is the text, `a1` is the pixel budget, `a2` is a `pm_style`, `a3` is a `pm_target` value as int. Returns a pointer into the rotating string pool.
+- `pm_layout_word_wrap_count` / `pm_layout_word_wrap_get` project `wordWrap()`, which returns `std::vector<String>`. Call `pm_layout_word_wrap_count(a0, a1, a2)` for the line count, then `pm_layout_word_wrap_get(a0, a1, a2, index, out, out_size)` per index to copy a wrapped line into the caller buffer `out` (at most `out_size` bytes). `a0` is the text, `a1` is the pixel budget, `a2` is a `pm_style`. `_get` returns the line length or -1 for a bad index. These write into the caller buffer, not the rotating pool.
 
 
 ---
 
-## [OLED (pocketmage_oled)](https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/)
+## [OLED (pocketmage_oled)](https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/) (API)
 
 ---
 title: "OLED (pocketmage_oled)"
@@ -1211,12 +1670,36 @@ void showStatus() {
 }
 ```
 
-`bottomText` display string is drawn centered in the status-line slot; `allowLarge` with a short word renders the `Heading2` variant at the large
+A `bottomText` string is drawn centered in the status-line slot in place of the info bar. With `allowLarge`, a short word that fits the display width renders as the `Heading2` variant centered at `kOledWordLargeBaseline` (21); a word that does not fit falls through to the size cascade (`OledWord`, `Heading3`, `BodyBold`, `Caption`) centered at baseline 16.
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_oled_oled_word(const char* a0, bool a1, bool a2, const char* a3);
+void pm_oled_oled_line(const char* a0, int a1, bool a2, const char* a3, bool a4);
+void pm_oled_sysmsg(const char* a0, int a1);
+void pm_oled_oled_scroll();
+void pm_oled_info_bar();
+void pm_oled_set_power_save(bool a0);
+bool pm_oled_power_save();
+```
+
+All operate on the `OLED()` singleton.
+
+- `pm_oled_oled_word(a0, a1, a2, a3)` is `oledWord(word, allowLarge, showInfo, bottomText)`; `a0` is the centered word, `a1` is `allowLarge`, `a2` is `showInfo`, `a3` is the optional `bottomText`.
+- `pm_oled_oled_line(a0, a1, a2, a3, a4)` is `oledLine(line, input_pos, doProgressBar, bottomMsg, deferSend)`; `a0` is the editor line, `a1` is the cursor position, `a2` is `doProgressBar`, `a3` is the optional `bottomMsg`, `a4` is `deferSend`.
+- `pm_oled_sysmsg(a0, a1)` is `sysMessage(msg, showTime)`; `a0` is the message, `a1` is the hold time in ms.
+- `pm_oled_oled_scroll()` is `oledScroll()`.
+- `pm_oled_info_bar()` is `infoBar()`.
+- `pm_oled_set_power_save(a0)` is `setPowerSave(enable)`.
+- `pm_oled_power_save()` is `getPowerSave()`. Returns the stored power-save flag.
 
 
 ---
 
-## [SD card (pocketmage_sd)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sd/)
+## [SD card (pocketmage_sd)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sd/) (API)
 
 ---
 title: "SD card (pocketmage_sd)"
@@ -1296,7 +1779,7 @@ bool    readBinaryFile(const char* path, uint8_t* buf, size_t len);
 size_t  getFileSize(const char* path);
 ```
 
-Standard file operations that take an explicit `fs::FS`. Apps storing their assets read them from `/assets/<name>` (see [publishing](../publish.md)) with `readFileToString` / `readBinaryFile`; `readBinaryFile` returns false on a partial read.
+Standard file operations that take an explicit `fs::FS`. Apps storing their assets read them from `/assets/<name>` (see [publishing](../guides/publishing.md)) with `readFileToString` / `readBinaryFile`; `readBinaryFile` returns false on a partial read.
 
 ## Example
 
@@ -1310,11 +1793,70 @@ extern "C" int main(int, char**) {
   // draw text...
   return 0;
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_sd_get_mode();
+void pm_sd_save_file();
+void pm_sd_write_metadata(const char* a0);
+void pm_sd_load_file(bool a0);
+void pm_sd_del_file(const char* a0);
+void pm_sd_delete_metadata(const char* a0);
+void pm_sd_ren_file(const char* a0, const char* a1);
+void pm_sd_ren_metadata(const char* a0, const char* a1);
+void pm_sd_copy_file(const char* a0, const char* a1);
+void pm_sd_append_to_file(const char* a0, const char* a1);
+void pm_sd_begin_io();
+void pm_sd_end_io();
+bool pm_sd_get_no_sd();
+const char* pm_sd_get_working_file();
+const char* pm_sd_get_editing_file();
+const char* pm_sd_get_files_list_index(int a0);
+void pm_sd_list_dir(const char* a1);
+void pm_sd_read_file(const char* a1);
+const char* pm_sd_read_file_to_string(const char* a1);
+void pm_sd_write_file(const char* a1, const char* a2);
+void pm_sd_append_file(const char* a1, const char* a2);
+void pm_sd_rename_file(const char* a1, const char* a2);
+void pm_sd_delete_file(const char* a1);
+bool pm_sd_read_binary_file(const char* a0, uint8_t* a1, size_t a2);
+size_t pm_sd_get_file_size(const char* a0);
+```
+
+All operate on the `PM_SDAUTO()` singleton. Every `const char*` return points into the rotating string pool; copy it before the next SDK call if it must survive four further string-returning calls.
+
+- `pm_sd_get_mode()` is `getMode()`. Returns the `Mode` value (`SDMMC` = 0, `SDSPI` = 1) as int.
+- `pm_sd_save_file()` is `saveFile()`.
+- `pm_sd_write_metadata(a0)` is `writeMetadata(path)`.
+- `pm_sd_load_file(a0)` is `loadFile(showOLED)`.
+- `pm_sd_del_file(a0)` is `delFile(fileName)`.
+- `pm_sd_delete_metadata(a0)` is `deleteMetadata(path)`.
+- `pm_sd_ren_file(a0, a1)` is `renFile(oldFile, newFile)`.
+- `pm_sd_ren_metadata(a0, a1)` is `renMetadata(oldPath, newPath)`.
+- `pm_sd_copy_file(a0, a1)` is `copyFile(oldFile, newFile)`.
+- `pm_sd_append_to_file(a0, a1)` is `appendToFile(path, inText)`.
+- `pm_sd_begin_io()` / `pm_sd_end_io()` are `beginIO()` / `endIO()`; they toggle the `SDActive` indicator around longer operations.
+- `pm_sd_get_no_sd()` is `getNoSD()`. Returns true when no card was found.
+- `pm_sd_get_working_file()` / `pm_sd_get_editing_file()` are `getWorkingFile()` / `getEditingFile()`.
+- `pm_sd_get_files_list_index(a0)` is `getFilesListIndex(index)`; `a0` is the slot 0..`MAX_FILES`-1.
+- `pm_sd_list_dir(a1)` is `listDir(fs, dirname)`; the `fs::FS&` first argument is dropped from the C ABI (the active filesystem is used), so `a1` is the directory path.
+- `pm_sd_read_file(a1)` is `readFile(fs, path)`; `a1` is the path, with the `fs::FS&` dropped.
+- `pm_sd_read_file_to_string(a1)` is `readFileToString(fs, path)`; `a1` is the path, with the `fs::FS&` dropped. Returns a pointer into the rotating string pool.
+- `pm_sd_write_file(a1, a2)` is `writeFile(fs, path, message)`; `a1` is the path, `a2` is the content, with the `fs::FS&` dropped.
+- `pm_sd_append_file(a1, a2)` is `appendFile(fs, path, message)`; `a1`/`a2` as above, with the `fs::FS&` dropped.
+- `pm_sd_rename_file(a1, a2)` is `renameFile(fs, path1, path2)`; `a1`/`a2` are the paths, with the `fs::FS&` dropped.
+- `pm_sd_delete_file(a1)` is `deleteFile(fs, path)`; `a1` is the path, with the `fs::FS&` dropped.
+- `pm_sd_read_binary_file(a0, a1, a2)` is `readBinaryFile(path, buf, len)`; `a0` is the path, `a1` is the caller buffer, `a2` is its size. Returns false on a partial read.
+- `pm_sd_get_file_size(a0)` is `getFileSize(path)`. Returns the byte size.
 
 
 ---
 
-## [System (pocketmage_sys, pocketmage_globals)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/)
+## [System (pocketmage_sys, pocketmage_globals)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/) (API)
 
 ---
 title: "System (pocketmage_sys, pocketmage_globals)"
@@ -1476,11 +2018,28 @@ void onUserExit() {
   }  // back to the previous speed
   pocketmage::deepSleep();              // and go to sleep
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers and host primitives rather than the C++ API above; the `pm_*` wrappers are generated by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+uint32_t pm_app_abi(void);
+const char* pm_host_sdk_version(void);
+extern const char pocketmage_sdk_version[];
+void delay(unsigned long ms);
+```
+
+- `pm_app_abi()` returns the `PM_APP_API_ABI` value the running host was built with. An app compares it against its own `PM_APP_API_ABI` at startup and refuses to run on a mismatch.
+- `pm_host_sdk_version()` returns the SDK version string the host was built with. The return points into the rotating string pool; copy it if it must outlive four further string-returning calls.
+- `pocketmage_sdk_version` is the SDK version string exported as a bare `const char[]` symbol (not a function), declared directly rather than through `pocketmage_globals.h` so the export table can take its address. `pm_host_sdk_version()` returns this value.
+- `delay(ms)` is the host `delay` primitive exported from the firmware core, not a generated `pm_*` wrapper. It blocks the calling task for `ms` milliseconds.
 
 
 ---
 
-## [Touch (pocketmage_touch)](https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/)
+## [Touch (pocketmage_touch)](https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/) (API)
 
 ---
 title: "Touch (pocketmage_touch)"
@@ -1551,11 +2110,38 @@ void onLoop() {
   TOUCH().updateScrollFromTouch();
   // page view scrolls with TOUCH().getDynamicScroll();
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_touch_update_scroll_from_touch();
+bool pm_touch_update_scroll(int a0, unsigned long* a1, int a2);
+int pm_touch_get_scroll_vector();
+long pm_touch_get_dynamic_scroll();
+long pm_touch_get_prev_dynamic_scroll();
+int pm_touch_get_last_touch();
+unsigned long pm_touch_get_last_touch_time();
+int pm_touch_get_diff();
+```
+
+All operate on the `TOUCH()` singleton.
+
+- `pm_touch_update_scroll_from_touch()` is `updateScrollFromTouch()`.
+- `pm_touch_update_scroll(a0, a1, a2)` is `updateScroll(maxScroll, lineScroll, stepSize)`; `a0` is `maxScroll`, `a2` is `stepSize`. The `ulong&` reference parameter becomes the out-pointer `a1`: the current `lineScroll` is read from and written back through it. Returns true when the view changed.
+- `pm_touch_get_scroll_vector()` is `getScrollVector()`. Returns the signed movement of the most recent pad step, 0 when idle.
+- `pm_touch_get_dynamic_scroll()` is `getDynamicScroll()`.
+- `pm_touch_get_prev_dynamic_scroll()` is `getPrevDynamicScroll()`.
+- `pm_touch_get_last_touch()` is `getLastTouch()`.
+- `pm_touch_get_last_touch_time()` is `getLastTouchTime()`.
+- `pm_touch_get_diff()` is `getDiff()`; the `dynamicScroll_ - prev_dynamicScroll_` difference.
 
 
 ---
 
-## [UI helpers (pocketmage_ui)](https://talismandesign.github.io/PocketMage_SDK/docs/api/ui/)
+## [UI helpers (pocketmage_ui)](https://talismandesign.github.io/PocketMage_SDK/docs/api/ui/) (API)
 
 ---
 title: "UI helpers (pocketmage_ui)"
@@ -1640,11 +2226,30 @@ extern "C" int main(int, char**) {
   endEinkScreen("Settings");
   return 0;
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ functions above; they are generated from them by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_ui_draw_scrollbar(int a0, int a1, int a2, int a3, int a4, int a5, int a6, bool a7, uint16_t a8, uint16_t a9);
+void pm_ui_begin_eink_screen(bool a0);
+void pm_ui_end_eink_screen(const char* a0, int a1);
+void pm_ui_draw_list_item(int a0, int a1, const char* a2, int a3);
+int pm_ui_draw_chip_text(int a0, int a1, const char* a2, int a3, int a4, bool a5, int a6, int a7, int a8, int a9);
+```
+
+- `pm_ui_draw_scrollbar(a0..a9)` is `drawScrollbar(total, visible, index, barX, barY, barH, barW, clearBg, fg, bg)`; `a0..a6` are the int geometry args, `a7` is `clearBg`, and `a8`/`a9` are the 16-bit `fg`/`bg` colors.
+- `pm_ui_begin_eink_screen(a0)` is `beginEinkScreen(preserveBg)`.
+- `pm_ui_end_eink_screen(a0, a1)` is `endEinkScreen(statusText, mode)`; `a0` is the status text, `a1` is a `pm_refresh` value as int (`PM_REFRESH_NORMAL` or `PM_REFRESH_FORCE_FULL`).
+- `pm_ui_draw_list_item(a0, a1, a2, a3)` is `drawListItem(x, y, text, maxWidth)`; `a2` is the row text, `a3` is the max width (-1 to disable truncation).
+- `pm_ui_draw_chip_text(a0..a9)` is `drawChipText(x, baselineY, text, style, maxTextW, inverted, chipMaxW, padX, chipH, bottomPad)`; `a2` is the text, `a3` is a `pm_style` value as int, `a5` is `inverted`, and the rest are the int geometry args. Returns the chip width in pixels.
 
 
 ---
 
-## [WiFi (pocketmage_wifi)](https://talismandesign.github.io/PocketMage_SDK/docs/api/wifi/)
+## [WiFi (pocketmage_wifi)](https://talismandesign.github.io/PocketMage_SDK/docs/api/wifi/) (API)
 
 ---
 title: "WiFi (pocketmage_wifi)"
@@ -1755,11 +2360,60 @@ void connectHome() {
 void drawWifiStatus() {
   // draw a status line from the thread-safe getters
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_wifi_begin();
+void pm_wifi_stop();
+void pm_wifi_enable();
+void pm_wifi_disable();
+void pm_wifi_scan();
+void pm_wifi_connect(const char* a0, const char* a1, bool a2);
+void pm_wifi_disconnect();
+void pm_wifi_reconnect();
+int pm_wifi_get_state();
+bool pm_wifi_is_connected();
+bool pm_wifi_is_scanning();
+const char* pm_wifi_get_status_message();
+const char* pm_wifi_get_connected_ssid();
+const char* pm_wifi_get_ip_address();
+int pm_wifi_get_rssi();
+const char* pm_wifi_get_last_error();
+uint16_t pm_wifi_get_scan_result_count();
+bool pm_wifi_has_saved_credentials(const char* a0);
+bool pm_wifi_load_saved_credentials(const char* a0, char* a1, size_t a2);
+void pm_wifi_clear_saved_credentials(const char* a0);
+void pm_wifi_dispatch_events();
+```
+
+All operate on the `P_WIFI` singleton. Every `const char*` return points into the rotating string pool; copy it before the next SDK call if it must survive four further string-returning calls.
+
+- `pm_wifi_begin()` / `pm_wifi_stop()` are `begin()` / `stop()`.
+- `pm_wifi_enable()` / `pm_wifi_disable()` are `enable()` / `disable()`.
+- `pm_wifi_scan()` is `scan()`.
+- `pm_wifi_connect(a0, a1, a2)` is `connect(ssid, password, save)`; `a0` is the SSID, `a1` is the password, `a2` persists the credentials when true.
+- `pm_wifi_disconnect()` / `pm_wifi_reconnect()` are `disconnect()` / `reconnect()`.
+- `pm_wifi_get_state()` is `getState()`. Returns the `WifiRadioState` value as int.
+- `pm_wifi_is_connected()` / `pm_wifi_is_scanning()` are `isConnected()` / `isScanning()`.
+- `pm_wifi_get_status_message()` is `getStatusMessage()`; a human-readable status line.
+- `pm_wifi_get_connected_ssid()` is `getConnectedSSID()`.
+- `pm_wifi_get_ip_address()` is `getIpAddress()`.
+- `pm_wifi_get_rssi()` is `getRssi()`.
+- `pm_wifi_get_last_error()` is `getLastError()`; the connection-failure reason text.
+- `pm_wifi_get_scan_result_count()` is `getScanResultCount()`. Returns the AP count, capped at `MAX_SCAN_RESULTS`. The per-result `getScanResult()` is not projected to the C ABI.
+- `pm_wifi_has_saved_credentials(a0)` is `hasSavedCredentials(ssid)`.
+- `pm_wifi_load_saved_credentials(a0, a1, a2)` is `loadSavedCredentials(ssid, password, maxLen)`; `a0` is the SSID, `a1` is the caller buffer the password is written into, `a2` is its size. Returns true when a credential was found and copied.
+- `pm_wifi_clear_saved_credentials(a0)` is `clearSavedCredentials(ssid)`.
+- `pm_wifi_dispatch_events()` is `dispatchEvents()`; call it from the app loop to process pending notifications. The `setEventCallback()` method is not projected to the C ABI.
 
 
 ---
 
-## [App binary contract (ABI)](https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/)
+## [App binary contract (ABI)](https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/) (App Abi)
 
 ---
 title: "App binary contract (ABI)"
@@ -1768,9 +2422,7 @@ description: "The binary shape the loader accepts, how it is mapped and run, and
 
 # App binary contract (ABI)
 
-The loader accepts exactly one thing: a 32-bit `ET_DYN` ELF, little-endian,
-entry `app_main`. Anything else fails to load. Build and packaging mechanics
-live in [build.md](build.md); the symbol surface in [symbols.md](symbols.md).
+The loader accepts exactly one thing: a 32-bit `ET_DYN` ELF, little-endian, entry `app_main`. Anything else fails to load. Build and packaging mechanics live in [build.md](build.md); the symbol surface in [symbols.md](symbols.md); the overlay sidecar that ships beside the ELF in [overlay.md](overlay.md).
 
 ## Format
 
@@ -1779,66 +2431,50 @@ live in [build.md](build.md); the symbol surface in [symbols.md](symbols.md).
 - `e_type` = `ET_DYN` (position independent)
 - entry = the `app_main` symbol
 
-The loader reads the ELF structures with plain native reads. No byte
-swapping, no endianness validation. A big-endian file decodes into garbage
-and the load fails, which is why `app.mk` asserts endianness after link and
-refuses to keep a bad artifact.
+The loader reads the ELF structures with plain native reads. No byte swapping, no endianness validation. A big-endian file decodes into garbage and the load fails, which is why `app.mk` asserts endianness after link and refuses to keep a bad artifact.
 
-Only the espressif `xtensa-esp-elf` toolchain emits output the loader can
-read. The PlatformIO package emits the wrong byte order and is unusable for
-apps; see [build.md](build.md) for install paths.
+Only the espressif `xtensa-esp-elf` toolchain emits output the loader can read. The PlatformIO package emits the wrong byte order and is unusable for apps; see [build.md](build.md) for install paths.
 
 ## Entry point
 
-The host looks up `app_main` by name and calls it on core 1 in a task with a
-16 KB stack:
+The host looks up `app_main` by name and runs it on core 1 in a dedicated task with a 16 KB stack:
 
 ```c
 int main(int argc, char **argv);   // renamed to app_main at build time
 ```
 
-The build passes `-Dmain=app_main -e app_main`, so an app writes its entry
-with C linkage:
+The build passes `-Dmain=app_main -e app_main`, so an app writes its entry with C linkage:
 
 ```cpp
 extern "C" int main(int argc, char **argv)
 ```
 
-`argv[0]` is the app base name, `argv[1]` is the absolute path of the loaded
-ELF. Returning from `main` tears the app down (the load is deinitialized) and
-control returns to the OS. There is no run-forever semantics; a UI app hands
-control back through the SDK/host API cooperatively, then returns. End the
-lifetime. A `main` that never returns leaks the run task.
+The runner passes four arguments, taken from the install record and the `app.properties` manifest:
+
+| Index     | Value                                      |
+| --------- | ------------------------------------------ |
+| `argv[0]` | app name (manifest `name`, else base name) |
+| `argv[1]` | absolute path of the loaded ELF            |
+| `argv[2]` | app version string (manifest `version`)    |
+| `argv[3]` | author string (manifest `author`)          |
+
+Returning from `main` tears the app down: the overlay is unloaded, the base image is deinitialized, and control returns to the OS, which reopens HOME. There is no run-forever semantics. A UI app hands control back through the SDK/host API cooperatively, then returns. A `main` that never returns leaks the run task.
 
 ## How loading works
 
-The host vendors the upstream `esp_elf_loader` (see `lib/ELFLoader`). At load
-time:
+Loading is two stages: a base relocation with `esp_elf`, then an overlay pass with `elf_overlay`. The runner is `src/elf_runner.cpp`.
 
-1. Text maps into `MALLOC_CAP_EXEC` memory (IRAM) through the bus address
-   mirror, so code is executable on the S3. Do not enable
-   `CONFIG_ELF_LOADER_LOAD_PSRAM`: on ESP32-S3, code in PSRAM is not
-   executable, app or firmware.
-2. Data/rodata maps into `MALLOC_CAP_8BIT` DRAM segments.
-3. Every relocation and every undefined symbol resolves from the host's own
-   live memory.
+1. The scoped symbol resolver is installed first, because relocation is what asks the host to resolve each undefined symbol (see [symbols.md](symbols.md)). `esp_elf_init` then `esp_elf_relocate_source` relocate the base image. The ELF is streamed by offset from the SD file, so the whole file is never held in RAM; only transient section buffers add to the peak.
+2. Relocated `.text` lands in `MALLOC_CAP_EXEC` memory so code is executable on the S3; data and rodata land in `MALLOC_CAP_8BIT` DRAM. Code in PSRAM is not executable on the ESP32-S3, app or firmware.
+3. The `<name>.elfo` sidecar is located next to the ELF and loaded by `elf_overlay`, which pages overlay `.text` bodies into a pool of exec-RAM frames on demand, patches ISA-specific literal loads at page-in, applies redirects so resident calls route through stubs, and redirects the entry point through its stub. If no sidecar is present the app runs unredirected from the base relocation. The blob format and the full page-in sequence are in [overlay.md](overlay.md).
 
-The upstream `esp_elf` loader does not run relocation-time constructors, so
-any `.init_array` the app links in is never executed. Keep the app free of
-constructor sections (`-fno-exceptions -fno-rtti -fno-threadsafe-statics` are
-on by default in `app.mk`); `pm check` warns if a `.init_array` slips in.
-Do not rely on static-construction order at load time.
+The `esp_elf` loader does not run relocation-time constructors, so any `.init_array` the app links in is never executed. Keep the app free of constructor sections (`-fno-exceptions -fno-rtti -fno-threadsafe-statics` are on by default in `app.mk`); `pm check` warns if a `.init_array` slips in. Do not rely on static-construction order at load time.
 
-So apps link `-nostdlib`: no newlib, no libstdc++, no SDK copy in the ELF.
-Everything an app references must resolve at load time from the host. Linking
-newlib into the app is wasteful and collides with host globals. Don't.
+Apps link `-nostdlib`: no newlib, no libstdc++, no SDK copy in the ELF. Everything an app references must resolve at load time from the host. Linking newlib into the app is wasteful and collides with host globals. Don't.
 
 ## Third-party libraries
 
-An app can link any C or C++ library that compiles for Xtensa. The host
-exports the C and C++ runtime symbols, so a library's references to `malloc`,
-`memcpy`, `operator new`, and the soft-float helpers resolve against the host
-instead of needing a copy in the app.
+An app can link any C or C++ library that compiles for Xtensa. The host exports the C and C++ runtime symbols, so a library's references to `malloc`, `memcpy`, `operator new`, and the soft-float helpers resolve against the host instead of needing a copy in the app.
 
 Source is compiled into the app by overriding `APP_SRCS`:
 
@@ -1846,22 +2482,11 @@ Source is compiled into the app by overriding `APP_SRCS`:
 APP_SRCS = main.cpp third_party/cJSON.c
 ```
 
-That keeps the app small. `tools/app.mk` links with `-Os`,
-`-ffunction-sections`, `--gc-sections` and `--strip-all`, so a library's
-unused functions are dropped: cJSON linked into an app comes to 5.2 KB rather
-than the size of its source.
+That keeps the app small. `tools/app.mk` links with `-Os`, `-ffunction-sections`, `--gc-sections` and `--strip-all`, so a library's unused functions are dropped: cJSON linked into an app comes to 5.2 KB rather than the size of its source.
 
-Two limits worth knowing. The host exports runtime symbols the firmware
-already links, so a library needing a function nothing in the firmware uses
-will not resolve until the host exports it deliberately. And symbol counts
-depend on the app's own optimization level: the same `std::vector` source at
-`-O0` wants 13 host symbols, at `-Os` it wants 7. `app.mk` uses `-Os`.
+Two limits worth knowing. The host exports runtime symbols the firmware already links, so a library needing a function nothing in the firmware uses will not resolve until the host exports it deliberately. And symbol counts depend on the app's own optimization level: the same `std::vector` source at `-O0` wants 13 host symbols, at `-Os` it wants 7. `app.mk` uses `-Os`.
 
-`sscanf` is the one common libc function the host does not export. It exists
-in newlib but nothing in the firmware references it, so `--gc-sections` dropped
-it, and referencing it pulls in about 190 KB of stdio reentrancy. Prefer
-`strtod` or `strtol` in app code and in vendored libraries. See
-[symbols.md](symbols.md).
+`sscanf` is the one common libc function the host does not export. It exists in newlib but nothing in the firmware references it, so `--gc-sections` dropped it, and referencing it pulls in about 190 KB of stdio reentrancy. Prefer `strtod` or `strtol` in app code and in vendored libraries. See [symbols.md](symbols.md).
 
 ## Calling the SDK from an app
 
@@ -1875,37 +2500,19 @@ int w = pm_text_width(2, "Hello", 2);
 pm_oled_sysmsg("saved", 1500);
 ```
 
-`pm_app_api.h` pulls in `pm_sdk_app.h`, which is generated from the SDK
-headers by `tools/gen_app_api.py`. Regenerate it after any SDK header change:
+`pm_app_api.h` pulls in `pm_sdk_app.h`, which is generated from the SDK headers by `tools/gen_app_api.py`. Regenerate it after any SDK header change:
 
 ```sh
 python3 tools/gen_app_api.py
 ```
 
-Names are `pm_<module>_<method>` with the method converted from camelCase:
-`Eink::refresh` becomes `pm_eink_refresh()`. Enums are plain integers in the app,
-named `PM_TARGET_*`, `PM_STYLE_*` and `PM_LANG_*`, and they are generated in the
-SDK's own declaration order, so a value always means the same language or
-target. `PM_APP_API_ABI` in the generated header changes when a signature does.
+Names are `pm_<module>_<method>` with the method converted from camelCase: `Eink::refresh` becomes `pm_eink_refresh()`. Enums are plain integers in the app, named `PM_TARGET_*`, `PM_STYLE_*` and `PM_LANG_*`, and they are generated in the SDK's own declaration order, so a value always means the same language or target. `PM_APP_API_ABI` in the generated header changes when a signature does.
 
-C++ types are projected at the boundary. `String` arguments become
-`const char*`, returned strings and `const char*` point into a small rotating
-pool that is overwritten by later calls, and an SDK method that needs the
-filesystem gets the host's global handle rather than taking one. Methods
-returning an SDK type an app cannot construct, such as `DateTime` or
-`WifiApInfo`, have no wrapper. Where the value matters, the accessor is
-flattened into plain fields instead: `pm_clock_epoch()` and
-`pm_clock_timestamp()` rather than a `DateTime` return.
+C++ types are projected at the boundary. `String` arguments become `const char*`, returned strings and `const char*` point into a small rotating pool that is overwritten by later calls, and an SDK method that needs the filesystem gets the host's global handle rather than taking one. Methods returning an SDK type an app cannot construct, such as `DateTime` or `WifiApInfo`, have no wrapper. Where the value matters, the accessor is flattened into plain fields instead: `pm_clock_epoch()` and `pm_clock_timestamp()` rather than a `DateTime` return.
 
-Blob storage and directory creation have no SDK method to project. The text
-`writeFile` path truncates on the first NUL and the read pool is 256 bytes, so
-`pm_sd_write_binary_file()` and `pm_sd_mkdir()` are hand-written host
-primitives in `pm_app_api.h`, backed by raw `File::write` and `FS::mkdir`, and
-`pm_sd_read_binary_file()` reads back arbitrary sizes.
+Blob storage and directory creation have no SDK method to project. The text `writeFile` path truncates on the first NUL and the read pool is 256 bytes, so `pm_sd_write_binary_file()` and `pm_sd_mkdir()` are hand-written host primitives in `pm_app_api.h`, backed by raw `File::write` and `FS::mkdir`, and `pm_sd_read_binary_file()` reads back arbitrary sizes.
 
-A function returning `std::vector<String>`, such as word wrapping, becomes a
-count call and an indexed getter, matching how the SDK already hands out scan
-results:
+A function returning `std::vector<String>`, such as word wrapping, becomes a count call and an indexed getter, matching how the SDK already hands out scan results:
 
 ```cpp
 char line[80];
@@ -1916,69 +2523,43 @@ for (int i = 0; i < lines; i++) {
 }
 ```
 
-The getter writes into a buffer the caller owns rather than the string pool,
-because a wrapped paragraph can be far longer than the pool holds, and it
-returns `-1` for an out of range index. A function taking
-`const std::vector<String>&` takes a C array and a count instead:
-`pm_io_join_string(const char* const* items, int count, char delimiter)`.
+The getter writes into a buffer the caller owns rather than the string pool, because a wrapped paragraph can be far longer than the pool holds, and it returns `-1` for an out of range index. A function taking `const std::vector<String>&` takes a C array and a count instead: `pm_io_join_string(const char* const* items, int count, char delimiter)`.
 
-The generated wrappers are exported through `symbols.list`, so an app that links
-against `pm_sdk_app.h` resolves every symbol it names. A new wrapper belongs in
-that list before any app can call it; a name that is missing fails at load with
-`Can't find common <name>` rather than at link time.
+The generated wrappers are exported through `symbols.list`, so an app that links against `pm_sdk_app.h` resolves every symbol it names. A new wrapper belongs in that list before any app can call it; a name that is missing fails at load with `Can't find common <name>` rather than at link time.
 
 ## SDK version stamp
 
-The host exports the ABI version as a string symbol, defined in
-`pocketmage_globals.cpp` and curated in `symbols.list`:
+The host exports the ABI version as a string symbol, defined in `pocketmage_globals.cpp` and curated in `symbols.list`:
 
 ```cpp
 extern "C" const char pocketmage_sdk_version[];  // e.g. "0.1.0"
 ```
 
-Apps consume it through the macro surface in `pocketmage_app_version.h`:
-`POCKETMAGE_SDK_VERSION_STRING`, `POCKETMAGE_SDK_VERSION_MAJOR`,
-`POCKETMAGE_SDK_VERSION_MINOR`, `POCKETMAGE_SDK_VERSION_PATCH`. The firmware
-loads these macros from `-DPM_SDK_VERSION_*` supplied by `app.mk`, and the
-OS's loader export table (generated from `symbols.list` via `tools/symbols.py`)
-must contain the matching string symbol.
+Apps consume it through the macro surface in `pocketmage_app_version.h`: `POCKETMAGE_SDK_VERSION_STRING`, `POCKETMAGE_SDK_VERSION_MAJOR`, `POCKETMAGE_SDK_VERSION_MINOR`, `POCKETMAGE_SDK_VERSION_PATCH`. The firmware loads these macros from `-DPM_SDK_VERSION_*` supplied by `app.mk`, and the OS's loader export table (generated from `symbols.list` via `tools/symbols.py`) must contain the matching string symbol.
 
-Keeping VERSION, the string literal, the header macros, and `library.json` in
-sync is enforced by the CI `version-sync` job and `pm release`, which
-rewrites all four together.
+Keeping VERSION, the string literal, the header macros, and `library.json` in sync is enforced by the CI `version-sync` job and `pm release`, which rewrites all four together.
 
 ## Runtime environment
 
-- The app shares the host's heap. Loading costs roughly the ELF size plus a
-  fixed reserve; `runElfApp` refuses to launch when free `MALLOC_CAP_8BIT`
-  drops below that floor. Keep the app small.
-- The app runs in-process. It can call anything the host exports - the
-  display, keyboard stack, translation engine, peripheral drivers - at native
-  speed, no IPC.
-- Stack is not heap. The run task gives 16 KB; deep recursion or fat frames
-  blow it. Move working sets to the heap.
-- E-ink refreshes use the differential partial waveform while an app runs,
-  regardless of the device's FAST_REFRESH setting; the setting is restored
-  when the app exits. Redraw on change, not on a timer: even partial
-  updates are visible, and a periodic slow clean still flashes the panel.
+- The app shares the host's heap. Loading costs roughly the ELF size plus a fixed reserve; `runElfApp` refuses to launch when free `MALLOC_CAP_8BIT` drops below that floor. Keep the app small.
+- The app runs in-process. It can call anything the host exports - the display, keyboard stack, translation engine, peripheral drivers - at native speed, no IPC.
+- Stack is not heap. The run task gives 16 KB; deep recursion or fat frames blow it. Move working sets to the heap.
+- E-ink refreshes use the differential partial waveform while an app runs, regardless of the device's FAST_REFRESH setting; the setting is restored when the app exits. Redraw on change, not on a timer: even partial updates are visible, and a periodic slow clean still flashes the panel.
 
 ## Sections and strip
 
-`app.mk` links with `--gc-sections` (functions and data) and strips
-loader-irrelevant sections, so the delivered ELF comes down to `.text`,
-`.rodata`, `.got`, `.rela.dyn`, `.rela.plt`, `.dynsym`, `.dynstr`, `.hash`,
-`.shstrtab`. Everything else is removed. Code that depends on other sections
-existing is unsupported. Don't write it.
+`app.mk` links with `--gc-sections` (functions and data) and strips loader-irrelevant sections, so the delivered ELF comes down to `.text`, `.rodata`, `.got`, `.rela.dyn`, `.rela.plt`, `.dynsym`, `.dynstr`, `.hash`, `.shstrtab`. Everything else is removed. Code that depends on other sections existing is unsupported. Don't write it.
+
+The overlay sidecar is derived from the unstripped link output, not from this delivered ELF, so stripping the ELF does not lose the data the overlay needs. See [overlay.md](overlay.md).
 
 ## App manifest (`app.properties`)
 
 When loading an app from SD, the host reads `app.properties` from the app directory (max 1024 bytes). Recognized fields:
 
-- `name` – human-readable app name
-- `version` – app version string
-- `author` – author string, free form; multiple authors may be comma
-  separated (spaces are kept, up to 31 bytes)
-- `scope` – symbol scope gate (default: `all`)
+- `name` - human-readable app name
+- `version` - app version string
+- `author` - author string, free form; multiple authors may be comma separated (spaces are kept, up to 31 bytes)
+- `scope` - symbol scope gate (default: `all`)
 
 Only `pm_*` symbols are scope-gated. libc, libstdc++, and ESP-IDF symbols remain available regardless of scope. The loader installs the scoped resolver before relocation and resets it on exit. argv metadata passed to `app_main` includes `name`, `elfPath`, `version`, and `author`.
 
@@ -1990,22 +2571,17 @@ Only `pm_*` symbols are scope-gated. libc, libstdc++, and ESP-IDF symbols remain
 | `esp_elf_load_section` fault                 | misaligned / incorrect section data |
 | load "succeeds", entry behaves wildly        | wrong sizes from BE headers         |
 
-The build-time guard catches BE before it reaches a device: if the last
-`make` line is `error: ... big-endian ...`, rebuild with the espressif
-toolchain (see [build.md](build.md)).
+The build-time guard catches BE before it reaches a device: if the last `make` line is `error: ... big-endian ...`, rebuild with the espressif toolchain (see [build.md](build.md)).
 
 ## Stability rules for SDK authors
 
-- The format, entry point, and load strategy are public contract. Changing how
-  an app maps or invokes takes a `major` bump of `pocketmage_sdk_version` and
-  a migration note.
-- Exports are additive. Removing or changing an export breaks live apps. See
-  [CONTRIBUTING.md](../CONTRIBUTING.md).
+- The format, entry point, and load strategy are public contract. Changing how an app maps or invokes, including the ELFO overlay format in [overlay.md](overlay.md), takes a `major` bump of `pocketmage_sdk_version` and a migration note.
+- Exports are additive. Removing or changing an export breaks live apps. See [CONTRIBUTING.md](https://github.com/TalismanDesign/PocketMage_SDK/blob/main/CONTRIBUTING.md).
 
 
 ---
 
-## [Building an app](https://talismandesign.github.io/PocketMage_SDK/docs/build/)
+## [Building an app](https://talismandesign.github.io/PocketMage_SDK/docs/build/) (Build)
 
 ---
 title: "Building an app"
@@ -2014,17 +2590,17 @@ description: "The toolchain, the project layout, and the make targets that produ
 
 # Building an app
 
-The whole build system is one `Makefile` that includes the SDK recipe in
-`tools/app.mk`.
+The whole build system is one `Makefile` that includes the SDK recipe in `tools/app.mk`.
 
 ## Project layout
 
 ```text
 myapp/
-  Makefile       # include of tools/app.mk
+  Makefile         # include of tools/app.mk
   main.cpp
-  myapp_ICON.bin # optional 40x40 icon, see Icon below
-  src/i18n/      # optional app translation catalog
+  myapp_ICON.bin   # 40x40 icon, see Icon below
+  app.properties   # optional manifest: name, version, author, scope
+  src/i18n/        # optional app translation catalog
 ```
 
 ```make
@@ -2032,9 +2608,7 @@ SDK_ROOT ?= $(abspath ../..)      # path to this repo
 include $(SDK_ROOT)/tools/app.mk
 ```
 
-Everything is overridable on the command line or in the `Makefile`:
-`APP_SRCS` (default `main.cpp`), `APP_NAME` (default the directory basename),
-`APP_BUILD_DIR` (default `build`), `XTENSA_CXX` (default: probed toolchain).
+Everything is overridable on the command line or in the `Makefile`: `APP_SRCS` (default `main.cpp`), `APP_NAME` (default the directory basename), `APP_BUILD_DIR` (default `build`), `XTENSA_CXX` (default: probed toolchain).
 
 ## Toolchain
 
@@ -2043,10 +2617,7 @@ Everything is overridable on the command line or in the `Makefile`:
 | Compiler    | espressif `xtensa-esp32s3-elf-g++`         |
 | Output      | little-endian (required by the loader)     |
 
-The PlatformIO `toolchain-xtensa-esp32s3` package emits big-endian ELFs and
-is unusable for apps; if it is the only compiler found, `app.mk` fails the
-build with a clear error. Install the espressif toolchain so it lands at one
-of the probed paths (newest first):
+The PlatformIO `toolchain-xtensa-esp32s3` package emits big-endian ELFs and is unusable for apps; if it is the only compiler found, `app.mk` fails the build with a clear error. Install the espressif toolchain so it lands at one of the probed paths (newest first):
 
 ```sh
 ~/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin
@@ -2054,8 +2625,7 @@ of the probed paths (newest first):
 ~/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin
 ```
 
-`esp-15.2.0_20251204` is the one SDK CI pins (URL and SHA256). It is the
-easiest known-good install:
+`esp-15.2.0_20251204` is the one SDK CI pins (URL and SHA256). It is the easiest known-good install:
 
 ```sh
 VER=esp-15.2.0_20251204
@@ -2067,67 +2637,464 @@ echo "$SHA  /tmp/xtensa-esp-elf.tar.xz" | sha256sum -c -
 tar -xJf /tmp/xtensa-esp-elf.tar.xz -C "$HOME/.espressif/tools/xtensa-esp-elf/$VER"
 ```
 
-The example builds with any probed version. The host OS pins its own
-toolchain independently of the SDK.
+The example builds with any probed version. The host OS pins its own toolchain independently of the SDK.
 
 ## Targets
 
 | Target        | Result                                                        |
 | ------------- | ------------------------------------------------------------- |
-| `make`        | Builds `build/<name>.app.elf`, stripped, endianness-asserted  |
+| `make`        | Builds `build/<name>.app.elf` (stripped, endianness-asserted) and `build/<name>.elfo` (the overlay sidecar) |
+| `make overlay`| Builds only `build/<name>.elfo`                               |
 | `make check`  | Prints the entry point and every undefined symbol (the app's host dependency list). Informational; the enforcing gate is `pm check` |
-| `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf`, `<name>_ICON.bin` and `app.properties` when present (see [publish.md](publish.md)) |
+| `make pack`   | Builds `build/<name>.tar` with `<name>.app.elf`, `<name>.elfo`, `<name>_ICON.bin`, and `app.properties` when present (see [publishing](guides/publishing.md)) |
+| `make pm-info`| Prints the resolved paths and toolchain the `pm` CLI reads   |
 | `make clean`  | Removes `build/`                                              |
 
-The endianness assertion runs after every link. A big-endian artifact gets
-deleted and the build fails.
+The endianness assertion runs after every link. A big-endian artifact gets deleted and the build fails.
+
+## Overlay emission
+
+Alongside the ELF, `make` produces `build/<name>.elfo`, the overlay blob the host pages into executable RAM at load time. It is built from the unstripped link output in two steps:
+
+```text
+elf_overlay_relink <name>.app.tool <name>.relk
+elf_overlay_emit   <name>.relk     <name>.elfo
+```
+
+Both tools must be on `PATH`. They come from an `elf_overlay` checkout, built with CMake (`cmake -S . -B build && cmake --build build --target elf_overlay_relink elf_overlay_emit`), then the build directory added to `PATH`. Override `ELF_OVERLAY_RELINK` and `ELF_OVERLAY_EMIT` to point at specific binaries. The format and the device-side load sequence are in [overlay.md](overlay.md).
 
 ## Entry point
 
-`extern "C" int main(int argc, char **argv)`, renamed to `app_main` via
-`-Dmain=app_main -e app_main`. See [app-abi.md](app-abi.md) for the full
-contract. Everything the app calls resolves from the host at load time, so
-keep the undefined-symbol list (from `make check`) small and intentional; see
-[symbols.md](symbols.md).
+`extern "C" int main(int argc, char **argv)`, renamed to `app_main` via `-Dmain=app_main -e app_main`. See [app-abi.md](app-abi.md) for the full contract. Everything the app calls resolves from the host at load time, so keep the undefined-symbol list (from `make check`) small and intentional; see [symbols.md](symbols.md).
 
 ## Compiler flags
 
-The SDK builds with `-Wall -Wextra`, exceptions and RTTI disabled, and hidden
-visibility. Keep the code warning-free.
+The SDK builds with `-Wall -Wextra`, exceptions and RTTI disabled, and hidden visibility. Keep the code warning-free.
 
-`app.mk` injects `PM_SDK_VERSION` plus `PM_SDK_VERSION_MAJOR/MINOR/PATCH` from
-the repo `VERSION` file, so an app always sees `POCKETMAGE_SDK_VERSION_*` in
-`pocketmage_app_version.h` alongside the host-exported string literal
-`pocketmage_sdk_version`; see [app-abi.md](app-abi.md).
+`app.mk` injects `PM_SDK_VERSION` plus `PM_SDK_VERSION_MAJOR/MINOR/PATCH` from the repo `VERSION` file, so an app always sees `POCKETMAGE_SDK_VERSION_*` in `pocketmage_app_version.h` alongside the host-exported string literal `pocketmage_sdk_version`; see [app-abi.md](app-abi.md).
 
 ## Icon
 
-`<name>_ICON.bin` is an optional 200-byte file: a 40x40, 1-bit-per-pixel
-bitmap (5 bytes per row, 8 pixels per byte), drawn by the OS as the app icon.
-Missing icons fall back to the OS default. `make pack` requires the file next
-to the `Makefile`; without one the pack step errors.
+`<name>_ICON.bin` is a 200-byte file: a 40x40, 1-bit-per-pixel bitmap (5 bytes per row, 8 pixels per byte), drawn by the OS as the app icon. `make pack` requires the file next to the `Makefile` and errors without it. The OS falls back to a default icon only for an installed app that has none.
 
 ## Translations
 
-An app that shows strings uses its own catalog; see [i18n.md](i18n.md). The
-short version: put a `src/i18n/` tree in your app and merge it via the
-generator the way `platformio.ini` shows in that doc.
+An app that shows strings uses its own catalog; see [i18n.md](i18n.md). The short version: put a `src/i18n/` tree in your app and merge it via the generator the way `platformio.ini` shows in that doc.
 
 ## Before you ship
 
-Run `make clean all` then `pm check` before every commit; `pm check` is the
-gate CI runs, and `--host-elf <firmware.elf>` pins the host export surface
-exactly (see [symbols.md](symbols.md)). `make pack` is the deliverable;
-verify the tar's members with `tar -tf build/<name>.tar`.
+Run `make clean all` then `pm check` before every commit; `pm check` is the gate CI runs, and `--host-elf <firmware.elf>` pins the host export surface exactly (see [symbols.md](symbols.md)). `make pack` is the deliverable; verify the tar's members with `tar -tf build/<name>.tar`. It should list `<name>.app.elf`, `<name>.elfo`, `<name>_ICON.bin`, and `app.properties`.
 
-`pm new myapp` scaffolds from the official
-[PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template.
-CI also builds a `broken_app` fixture that intentionally fails the gate:
-it references a symbol the host does not export and must fail `pm check`.
+`pm new myapp` scaffolds from the official [PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template. The SDK's `pm` CLI is the fastest path from scaffold to shippable tar; the full command surface is in [cli.md](cli.md). CI builds that same template against the SDK on every push, and rejects a `broken_app` fixture that references a symbol the host does not export and so must fail `pm check`.
 
 ---
 
-## [PocketMage SDK guides](https://talismandesign.github.io/PocketMage_SDK/docs/guides/)
+## [pm CLI](https://talismandesign.github.io/PocketMage_SDK/docs/cli/) (Cli)
+
+---
+title: "pm CLI"
+description: "The pm developer tool: scaffolding, building, gating, packing, exports reconciliation, and release bumps."
+---
+
+# `pm` CLI
+
+`pm` is the developer-facing wrapper around the SDK build. It drives the same `make` contract documented in [build.md](build.md), adds the enforcing dependency gate, and handles scaffolding and release bookkeeping. Everything `pm` does can be done with `make` and the raw tools; `pm` is the ergonomic path and is what CI runs.
+
+## Install
+
+The CLI ships with the SDK as the `pocketmage_sdk` package:
+
+```sh
+pip install .        # from the SDK repo root
+pm --help
+```
+
+It shells out to `make` and the Xtensa toolchain, so an app build still needs the pinned espressif toolchain on the machine (see [get-started/toolchain](get-started/toolchain.md)).
+
+## Global options
+
+| Option          | Effect                                                   |
+| --------------- | -------------------------------------------------------- |
+| `--ci`          | plain output, no ANSI escapes                            |
+| `--no-color`    | alias for `--ci`                                         |
+| `--theme NAME`  | output theme: `default`, `mono`, or `pastel`             |
+
+CI mode also turns on automatically when `CI` or `NO_COLOR` is set in the environment.
+
+## Commands
+
+### `pm new <name> [dest]`
+
+Scaffolds a new app from the official [PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template into `dest` (default: the current directory). Replace the scaffolded `assets/icon.png` with your own 40x40 artwork to change the APPLOADER card icon. The next steps are `pm build --pack` then `pm check`.
+
+### `pm build [app_dir] [--clean] [--pack]`
+
+Builds the app via `make`. `--clean` runs `make clean` first; `--pack` also builds the delivery tar. Requires the Xtensa toolchain to be present and resolves the same paths `make pm-info` prints. Produces `build/<name>.app.elf` and `build/<name>.elfo`.
+
+### `pm check [app_dir] [--host-elf ELF] [--readelf BIN]`
+
+The enforcing dependency gate. Reads the built ELF's undefined-symbol list and classifies each symbol against the curated host surface (see [symbols.md](symbols.md)):
+
+- **resolvable** - in the curated surface (`symbols.list` plus `host_baseline.list`). Passes.
+- **unconfirmed** - outside the curated surface. Needs `--host-elf <firmware.elf>` to confirm against the actual host export table; without it, `check` reports the app as unconfirmed and exits non-zero.
+- **broken** - not resolvable by the host. The load would fail. Exits non-zero.
+
+`check` also surfaces two warnings that do not fail the gate on their own:
+
+- `app_main` not present in the shipped ELF's symbol table. The entry is still trusted because it is linker-pinned with `-e app_main`; a post-link strip removed the name.
+- A non-empty `.init_array`. The app links static constructors, and the host's `esp_elf` loader does not run them. Do not rely on static construction at load time.
+
+The icon is validated as part of the gate; an invalid icon fails the check.
+
+### `pm pack [app_dir]`
+
+Builds the delivery tar via `make pack`. The tar holds `<name>.app.elf`, `<name>.elfo`, `<name>_ICON.bin`, and `app.properties` when present. See [publishing](guides/publishing.md).
+
+### `pm exports [--host LIST] [--all]`
+
+Reconciles the SDK's `symbols.list` against a PocketMageOS `src/ELF_SYMS/host_exports.list`. Every curated symbol must be exported by the host; a curated symbol the host does not export is an error to fix on the OS side, not in `symbols.list`. `--host` points at a specific host list (default: a sibling PocketMageOS checkout). `--all` additionally lists host exports that sit outside the curated surface, as advisory output.
+
+### `pm release {major|minor|patch} [--message TEXT]`
+
+Bumps the SDK release version. Updates `VERSION`, `pocketmage_globals.cpp`, `library.json`, and `CHANGELOG.md`; `--message` files a feature line under the new version in the changelog. It does not commit or tag; commit the bump and tag the release yourself when ready.
+
+### `pm version`
+
+Prints `pocketmage_sdk_version`, the version string the host exports and apps compare against at startup.
+
+## Relationship to make
+
+`pm build`, `pm pack`, and `pm check` run the `make` targets in [build.md](build.md). `pm` reads the resolved toolchain and paths through `make pm-info`, so its view of the build matches `make`'s exactly. When a build behaves differently under `pm` than under `make`, compare `make pm-info` output first.
+
+
+---
+
+## [Your first app](https://talismandesign.github.io/PocketMage_SDK/docs/get-started/first-app/) (Get Started)
+
+---
+title: "Your first app"
+description: "Scaffold, build, gate, pack, and install a minimal PocketMage app end to end."
+---
+
+# Your first app
+
+This walks the full path from an empty directory to an app running on the device. It assumes the [toolchain](toolchain.md) is installed.
+
+## 1. Scaffold
+
+```sh
+pm new hello
+cd hello
+```
+
+`pm new` clones the official [PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template. You get a `Makefile` that includes `tools/app.mk`, a `main.cpp` with an `app_main` entry, an icon, and an `app.properties` manifest.
+
+The entry point is `app_main`, written with C linkage so the mangled name matches the `-e app_main` linker entry. An app calls the flat `pm_*` C API from `pm_app_api.h`, not the C++ singletons; the app links `-nostdlib` and resolves every `pm_*` symbol from the host at load time:
+
+```cpp
+#include "pm_app_api.h"
+
+extern "C" int main(int argc, char **argv) {
+    const char *name = argc > 0 && argv[0] ? argv[0] : "hello";
+    pm_oled_sysmsg(name, 1500);
+    return 0;   // returning hands control back to the OS
+}
+```
+
+The runner passes four arguments: `argv[0]` is the app name, `argv[1]` the absolute ELF path, `argv[2]` the version string, and `argv[3]` the author, all taken from the install record and the manifest. See [app-abi.md](../app-abi.md).
+
+## 2. Build
+
+```sh
+pm build --pack
+```
+
+This produces `build/hello.app.elf` (the relocatable ELF), `build/hello.elfo` (the overlay sidecar), and `build/hello.tar` (the delivery package). Under the hood it runs `make all pack`; the targets are in [build.md](../build.md).
+
+## 3. Gate
+
+```sh
+pm check
+```
+
+`pm check` reads the app's undefined-symbol list, which is its real dependency contract because the app links `-nostdlib`, and classifies every symbol against the host surface. A green result means the host resolves everything. For an exact result against a specific firmware, pass the host ELF:
+
+```sh
+pm check --host-elf /path/to/firmware.elf
+```
+
+The symbol model is in [symbols.md](../symbols.md); the gate's warnings and exit codes are in [cli.md](../cli.md#pm-cli-commands-pm-check-appdir-host-elf-elf-readelf-bin).
+
+## 4. Inspect the package
+
+```sh
+tar -tf build/hello.tar
+```
+
+It should list `hello.app.elf`, `hello.elfo`, `hello_ICON.bin`, and `app.properties`. The packaging rules are in [publishing](../guides/publishing.md).
+
+## 5. Install on the device
+
+1. Copy `build/hello.tar` onto the SD card at `/apps/hello.tar`, usually over USB.
+2. On the device, open the app loader and use the swap action to install the tar into one of the four slots.
+3. Launch it from the home screen with `A`, `B`, `C`, or `D`, or from the loader.
+
+Delete the tar from `/apps` after a successful install to free space on the card. The device-side install behavior is owned by the [PocketMageOS docs](https://talismandesign.github.io/PocketMage_PDA/docs/guides/elf-apps/).
+
+## Next
+
+- Understand the whole model: [Making an app](../guides/making-apps.md).
+- Draw to the displays: [Rendering](../guides/rendering.md).
+- Browse the API: [Function index](../api/functions.md).
+
+
+---
+
+## [Get Started](https://talismandesign.github.io/PocketMage_SDK/docs/get-started/) (Get Started)
+
+---
+title: "Get Started"
+description: "What a PocketMage app is, what you need installed, and the shortest path from an empty directory to a running ELF."
+---
+
+# Get Started
+
+A PocketMage app is a standalone ELF the device loads and runs at runtime. There is no firmware reflash: you build an ELF, pack it with an overlay sidecar and an icon, copy the tar onto the SD card, and install it through the on-device app loader. The host resolves everything the app references, from `malloc` to the `pm_*` API, at load time.
+
+This section takes you from nothing to a running app in two steps.
+
+::: steps
+
+1. [Install the toolchain](toolchain.md) - the pinned espressif Xtensa compiler, the `elf_overlay` host tools, and the `pm` CLI.
+2. [Build your first app](first-app.md) - scaffold, build, gate, pack, and install.
+
+:::
+
+## How the pieces fit
+
+| Piece              | Role                                                              |
+| ------------------ | ----------------------------------------------------------------- |
+| SDK repo           | the app-facing contract: headers, the `pm_*` ABI, the build recipe, the base i18n catalog |
+| Xtensa toolchain   | compiles and links the app into a 32-bit `ET_DYN` ELF             |
+| `elf_overlay` tools| turn the link output into the `.elfo` overlay sidecar            |
+| `pm` CLI           | scaffolds, builds, gates, and packs (wraps `make`)                |
+| App template       | the starting point `pm new` clones from                           |
+
+## Where to go next
+
+- The whole app model, end to end: [Making an app](../guides/making-apps.md).
+- The binary contract the loader enforces: [App ABI](../app-abi.md).
+- Every function an app can call: [Function index](../api/functions.md).
+- The device side of loading, installing, and slots: [PocketMageOS docs](https://talismandesign.github.io/PocketMage_PDA/docs).
+
+
+---
+
+## [Install the toolchain](https://talismandesign.github.io/PocketMage_SDK/docs/get-started/toolchain/) (Get Started)
+
+---
+title: "Install the toolchain"
+description: "The pinned espressif Xtensa compiler, the elf_overlay host tools, and the pm CLI an app build needs."
+---
+
+# Install the toolchain
+
+An app build needs three things on the machine: the espressif Xtensa compiler, the `elf_overlay` host tools, and the `pm` CLI. Only the espressif toolchain produces output the loader can read; the PlatformIO Xtensa package emits the wrong byte order and is unusable for apps.
+
+## Xtensa compiler
+
+The build targets the espressif `xtensa-esp32s3-elf-g++` toolchain. `app.mk` probes for it in the espressif install directory, newest to oldest, then the PlatformIO package, then `PATH`:
+
+```text
+~/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin
+~/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20251107/xtensa-esp-elf/bin
+~/.espressif/tools/xtensa-esp-elf/esp-14.2.0_20241119/xtensa-esp-elf/bin
+~/.platformio/packages/toolchain-xtensa-esp32s3/bin
+```
+
+The pinned release is `esp-15.2.0_20251204`. The simplest way to get it is through ESP-IDF's installer, which places it under `~/.espressif`. If you have an existing install elsewhere, point the build at it:
+
+```sh
+make XTENSA_CXX=/path/to/xtensa-esp32s3-elf-g++
+```
+
+`XTENSA_STRIP` and `XTENSA_READELF` are derived from `XTENSA_CXX` unless set.
+
+Verify the compiler resolves:
+
+```sh
+make -C <app> pm-info     # prints the resolved toolchain and paths
+```
+
+## elf_overlay host tools
+
+The build emits the `.elfo` overlay sidecar with two host tools, `elf_overlay_relink` and `elf_overlay_emit`, which must be on `PATH`. Build them from an [elf_overlay](https://github.com/TalismanDesign/elf_overlay) checkout:
+
+```sh
+git clone https://github.com/TalismanDesign/elf_overlay
+cd elf_overlay
+cmake -S . -B build
+cmake --build build --target elf_overlay_relink elf_overlay_emit
+export PATH="$PWD/build:$PATH"
+```
+
+Override the tool paths instead of using `PATH` with `ELF_OVERLAY_RELINK` and `ELF_OVERLAY_EMIT`. The overlay format itself is documented in [overlay.md](../overlay.md).
+
+## pm CLI
+
+The `pm` CLI ships with the SDK as the `pocketmage_sdk` package:
+
+```sh
+pip install .        # from the SDK repo root
+pm --help
+```
+
+`pm` wraps the same `make` contract and adds the enforcing dependency gate. The full command surface is in [cli.md](../cli.md). Icon validation uses Pillow, so install it if you want `pm check` to validate the icon:
+
+```sh
+pip install Pillow
+```
+
+## Verify
+
+```sh
+pm new hello
+cd hello
+pm build --pack
+pm check
+```
+
+A green `pm check` means every symbol the app references resolves against the host surface, and the app is ready to install. If any of these steps fail, see [Troubleshooting](../troubleshooting.md).
+
+
+---
+
+## [Glossary](https://talismandesign.github.io/PocketMage_SDK/docs/glossary/) (Glossary)
+
+---
+title: "Glossary"
+description: "The terms the SDK docs use, defined once, with links to the page that owns each concept."
+---
+
+# Glossary
+
+The terms below mean exactly one thing across these docs. Where a concept has its own page, the definition links to it.
+
+**App.** A standalone 32-bit `ET_DYN` ELF the host loads and runs in-process at runtime. Links `-nostdlib`; resolves everything from the host. See [App ABI](app-abi.md).
+
+**`app_main`.** The app entry point. Written as `main` with C linkage; the build renames it to `app_main` with `-Dmain=app_main -e app_main`. Runs on core 1 in a 16 KB task. See [App ABI](app-abi.md#app-binary-contract-abi-entry-point).
+
+**`app.properties`.** The optional per-app manifest: `name`, `version`, `author`, and `scope`. Shipped in the tar and copied to the slot; the first three reach `app_main` as `argv`. See [App ABI](app-abi.md) and [per-app scope](symbols.md#symbols-and-the-dependency-contract-per-app-scope).
+
+**APPLOADER.** The on-device installer. Extracts a `/apps/*.tar`, finds the `*.app.elf`, and installs it with its icon and manifest into one of four slots. See [publishing](guides/publishing.md).
+
+**Curated surface.** The union of `symbols.list` and `host_baseline.list`: the set of symbols an app may resolve against. See [symbols.md](symbols.md).
+
+**ELFO / `.elfo`.** The overlay blob that ships beside each app ELF. Magic `ELFO`, ISA-tagged, carrying overlay bodies, stubs, and relocation patch tables. See [overlay.md](overlay.md).
+
+**`elf_overlay`.** The ISA-abstracted overlay runtime that pages app `.text` bodies into executable RAM and patches ISA-specific literal loads at page-in. Sits next to `esp_elf`. See [overlay.md](overlay.md).
+
+**`esp_elf`.** The base ELF relocator. Relocates the app image streamed from SD, then hands off to `elf_overlay` for the overlay pass. See [App ABI](app-abi.md#app-binary-contract-abi-how-loading-works).
+
+**`gen_app_api.py`.** The generator that walks the SDK headers and projects each C++ method to a `pm_*` C wrapper, writing the names into `symbols.list` and the host `host_exports.list`. See [symbols.md](symbols.md).
+
+**Host.** The PocketMageOS firmware. It owns the hardware, exports the symbol surface, and runs apps in-process. The device side is documented in the [PocketMageOS docs](https://talismandesign.github.io/PocketMage_PDA/docs).
+
+**`host_baseline.list`.** The committed list of C/C++ runtime, newlib, and POSIX symbols the firmware exports unconditionally. Generated from the firmware export table; part of the curated surface. See [symbols.md](symbols.md).
+
+**ISA.** Instruction set architecture. PocketMage runs on Xtensa (ESP32-S3); `elf_overlay` also has a RISC-V backend. The ELFO header is ISA-tagged and a blob loads only on its ISA. See [overlay.md](overlay.md#overlay-format-elfo-isa-abstraction).
+
+**`MALLOC_CAP_EXEC`.** Heap capability for memory the instruction bus can fetch. Relocated and paged-in `.text` lands here; it is scarce, which is why the overlay model pages bodies in on demand. Code in PSRAM is not executable on the S3.
+
+**Overlay body.** One `.text` image paged into an exec-RAM frame on demand. A body must fit in a single frame. See [overlay.md](overlay.md#overlay-format-elfo-how-the-host-consumes-it-the-frame-pool).
+
+**`pm_*` ABI.** The flat C ABI an app calls, generated from the SDK's C++ classes. Declared in `pm_sdk_app.h`, pulled in through `pm_app_api.h`. See the [function index](api/functions.md).
+
+**`PM_APP_API_ABI`.** The ABI version an app compares against `pm_app_abi()` at startup to confirm it was built against a compatible surface.
+
+**`pocketmage_sdk_version`.** The version string the host exports and apps read to check compatibility at runtime. Bumped by `pm release`.
+
+**Scope.** The `app.properties` field that restricts which `pm_*` symbols an app may resolve (default `all`). An out-of-scope `pm_*` reference fails the load. See [per-app scope](symbols.md#symbols-and-the-dependency-contract-per-app-scope).
+
+**Slot.** One of four install locations on the SD card (`/apps/slot1` through `/apps/slot4`), tracked in NVS. Launched from HOME with `A`-`D`.
+
+**String pool.** The rotating buffer backing `pm_*` `const char*` returns: four 256-byte slots, the fifth string-returning call overwrites the first. Copy a returned string before further SDK calls. See [function index](api/functions.md#function-index-string-return-lifetime).
+
+**Stub.** The small entry/leave code in the ELFO blob that pages an overlay body in on first call and drops its frame refcount on return. See [overlay.md](overlay.md).
+
+**Target.** The compile mode, exactly one of `PM_TARGET_HOST` (firmware) or `PM_TARGET_APP` (external app), enforced by `config.h`. See [API overview](api/index.md#api-reference-compile-target).
+
+
+---
+
+## [Internationalization](https://talismandesign.github.io/PocketMage_SDK/docs/guides/i18n/) (Guides)
+
+---
+title: "Internationalization"
+description: "Give an app translatable strings: the catalog an app ships, how it merges with the SDK base catalog, and resolving strings at runtime."
+---
+
+# Internationalization
+
+PocketMage translates every user-facing string through a single merged catalog. The SDK owns the base catalog of its own strings; an app ships its own catalog, and the two merge at build time into one enum and one set of string tables. This guide covers the app side, start to finish. The generator, the merge rules, and the validation it enforces are the reference material in [i18n catalogs](../i18n.md).
+
+## Add a catalog to your app
+
+Create one catalog directory with a subdirectory per language, named by the language code. `en` is required and defines the order of the strings your catalog contributes:
+
+```text
+myapp/src/i18n/
+  en/pocketmage_i18n.po
+  fr/pocketmage_i18n.po
+  fr/pocketmage_i18n.aliases
+```
+
+Each string is a standard gettext entry. `msgctxt` is the string's `StringID` enum name, `msgid` is the English text, and `msgstr` is the translation:
+
+```po
+msgctxt "STR_MYAPP_HELLO"
+msgid "Hello"
+msgstr "Bonjour"
+```
+
+Keep your `msgctxt` names in your own namespace (for example `STR_MYAPP_*`). They must be globally unique across the merged catalogs; reusing a name the SDK already defines is a build error. A language missing from your catalog falls back to its English text, so an English-only catalog is valid.
+
+## Wire it into the build
+
+Point the generator at both your catalog and the SDK base catalog from your app's `platformio.ini`; the generator doubles as the build hook:
+
+```ini
+extra_scripts = pre:lib/PocketMage_SDK/pocketmage_i18n/tools/gen_i18n.py
+
+custom_i18n_catalogs =
+    lib/PocketMage_SDK/pocketmage_i18n/languages
+    src/i18n
+custom_i18n_out_dir = .pio/build/${PIOENV}/i18n
+```
+
+The base catalog must come first. The merge keeps base strings first and appends your catalog after, so your strings never shift the base enum values. The generated files are build artifacts and are never committed.
+
+## Resolve strings at runtime
+
+The runtime engine is the `I18n` singleton, exposed to apps through the `pm_*` i18n API. Set the active language, then fetch strings by their enum:
+
+```cpp
+pm_i18n_set_language_by_code("fr");
+const char *hello = pm_i18n_get(STR_MYAPP_HELLO);
+```
+
+The indexed helpers resolve names from fixed ranges in the base catalog: `pm_i18n_month_name`, `pm_i18n_day_name`, `pm_i18n_app_name`, and `pm_i18n_kb_app_name`. The full runtime surface is on the [i18n (runtime) API page](../api/i18n-runtime.md).
+
+Returned strings point into the shared rotating string pool, so copy a string before further SDK calls if you need to keep it. See the [string return lifetime note](../api/functions.md#function-index-string-return-lifetime).
+
+## Add a language
+
+Append the language code to the base catalog's `en` file `# Languages:` directive and add that language's directory to each catalog that translates it. Never reorder existing languages: the index is the value stored in NVS. The full rules, including aliases for command input and the validation the generator enforces, are in [i18n catalogs](../i18n.md).
+
+
+---
+
+## [PocketMage SDK guides](https://talismandesign.github.io/PocketMage_SDK/docs/guides/) (Guides)
 
 ---
 title: "PocketMage SDK guides"
@@ -2136,7 +3103,7 @@ description: "How to build apps, understand their lifecycle, and draw to both di
 
 # SDK Guides
 
-These guides teach the PocketMage application model end to end. They pair with the [app ABI reference](app-abi.md) and the [API reference](../api/).
+These guides teach the PocketMage application model end to end. They pair with the [app ABI reference](../app-abi.md) and the [API reference](../api/).
 
 ## [Making an app](making-apps.md)
 
@@ -2150,18 +3117,26 @@ Entry point conventions, the `APP_INIT` hook, the bidirectional host/app export 
 
 The two-display model: which draw calls target which panel, the E-Ink buffered refresh model, and the touch/scroll interaction loop.
 
+## [Internationalization](i18n.md)
+
+Give an app translatable strings: the catalog an app ships, how it merges with the SDK base catalog, and the runtime engine that resolves them.
+
+## [Publishing an app](publishing.md)
+
+The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device.
+
 ## Also see
 
-- [App ABI and binary layout](app-abi.md)
-- [Build pipeline for the host firmware](build.md)
+- [App ABI and binary layout](../app-abi.md)
+- [Overlay format (`.elfo`)](../overlay.md)
+- [Building apps](../build.md)
 - [Export table and `symbols.list`](../symbols.md)
-- [Publishing an app](../publish.md)
-- [Internationalization catalogs](../i18n.md)
+- [i18n catalog tooling](../i18n.md)
 
 
 ---
 
-## [App lifecycle](https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/)
+## [App lifecycle](https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/) (Guides)
 
 ---
 title: "App lifecycle"
@@ -2170,7 +3145,7 @@ description: "Entry points, build-time vs host symbols, the APP_INIT hook, and h
 
 # App lifecycle
 
-A PocketMage app is a plugin that runs *inside* the host firmware's address space. Understanding where the app boundaries are is the whole battle: the app is a normal `main`, everything it touches comes from the host, and "exiting" is just `return`.
+A PocketMage app is a plugin that runs *inside* the host firmware's address space. Understanding where the app boundaries are is the whole battle: the app is a normal `main`, everything it touches comes from the host, and "exiting" is a `return`.
 
 ## The entry point
 
@@ -2216,7 +3191,7 @@ There is no cooperative yield handshake: the app either returns, sleeps, or keep
 return 0;   // plain exit; control returns to the OS cleanly
 ```
 
-Exiting is just `return` from `main`. There is no reboot handoff and no exit API. The loader tears down the app context, restores `HOME`, and repaints. A crashing app (fault, uncaught aborts) follows the same OS recovery path as the built-in apps ([`recoverFromCrash`](../api/sys.md)); the device boots back to HOME rather than leaving the app stuck.
+Exiting is a `return` from `main`. There is no reboot handoff and no exit API. The loader tears down the app context, restores `HOME`, and repaints. A crashing app (fault, uncaught aborts) follows the same OS recovery path as the built-in apps ([`recoverFromCrash`](../api/sys.md)); the device boots back to HOME rather than leaving the app stuck.
 
 ## Built-in vs third-party
 
@@ -2225,7 +3200,7 @@ The OS's `HOME`, TXT, and friends are compiled-in apps that live entirely on the
 
 ---
 
-## [Making an app](https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/)
+## [Making an app](https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/) (Guides)
 
 ---
 title: "Making an app"
@@ -2234,7 +3209,7 @@ description: "Scaffold, build, pack, and run your first PocketMage app."
 
 # Making an app
 
-A PocketMage app is a position-independent xtensa ELF that the host firmware loads into RAM and runs in-process. It links nothing: newlib, libstdc++, and the SDK itself are all left undefined and resolved at load time against the host's export table (see [the ABI](app-abi.md) and [symbols](../symbols.md)).
+A PocketMage app is a position-independent xtensa ELF that the host firmware loads into RAM and runs in-process. It links nothing: newlib, libstdc++, and the SDK itself are all left undefined and resolved at load time against the host's export table (see [the ABI](../app-abi.md) and [symbols](../symbols.md)).
 
 ## 1. Scaffold
 
@@ -2248,9 +3223,7 @@ This clones the official template repository into `./myapp`:
 - `myapp_ICON.bin`, the 1-bit app icon (128x128, big-endian row-major) bundled into the delivery tar.
 - `Makefile`, a file that sets `SDK_ROOT` from `PM_SDK_ROOT` and includes the SDK recipe.
 
-The template repository is
-[PocketMage_App](https://github.com/TalismanDesign/PocketMage_App). Set
-`PM_TEMPLATE_REPO` to scaffold from a fork.
+The template repository is [PocketMage_App](https://github.com/TalismanDesign/PocketMage_App). Set `PM_TEMPLATE_REPO` to scaffold from a fork.
 
 App names are `[A-Za-z][A-Za-z0-9_]*`; the name becomes the ELF, tar, icon, and install slot name. For an API walkthrough, open the [rendering guide](rendering.md).
 
@@ -2311,7 +3284,7 @@ pm build myapp --pack     # build + pack
 # or:  make pack
 ```
 
-Produces `build/<name>.tar` containing the stripped ELF and the icon. That tar is what gets installed onto the SD card (see [publishing](../publish.md)).
+Produces `build/<name>.tar` containing the stripped ELF and the icon. That tar is what gets installed onto the SD card (see [publishing](publishing.md)).
 
 ## 6. Run
 
@@ -2320,7 +3293,63 @@ The OS's APPLOADER installs the app and its icon, and menus it on HOME. Launchin
 
 ---
 
-## [Rendering](https://talismandesign.github.io/PocketMage_SDK/docs/guides/rendering/)
+## [Publishing an app](https://talismandesign.github.io/PocketMage_SDK/docs/guides/publishing/) (Guides)
+
+---
+title: "Publishing an app"
+description: "The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device."
+---
+
+# Publishing an app
+
+The delivery unit is a plain `.tar` file placed in `/apps/` on the device SD card and installed through APPLOADER on the device. Not gzipped, not a directory of loose files: one tar.
+
+`make pack` (or `pm pack`) produces it. The tar's top level must hold the members the installer keys off:
+
+| Member            | Required | Meaning                                                        |
+| ----------------- | -------- | -------------------------------------------------------------- |
+| `<name>.app.elf`  | yes      | the app binary (the `*.app.elf` suffix is detected)            |
+| `<name>.elfo`     | yes      | the overlay sidecar paged into exec RAM at load (see [overlay.md](../overlay.md)) |
+| `<name>_ICON.bin` | no       | 40x40 1-bit icon, 200 bytes                                    |
+| `app.properties`  | no       | name/version/author/scope manifest, copied to the slot (see [app-abi.md](../app-abi.md)) |
+
+`<name>` is the base of the ELF filename and becomes the app's display name. Keep it short and unique; it is also the `assets/` subdir name and the slot subdirectory.
+
+## Install behavior (APPLOADER)
+
+1. Extract `/apps/<name>.tar` into `/apps/temp`, skipping macOS `._*` junk.
+2. Find the first `*.app.elf`, derive `base` by stripping `.app.elf`.
+3. Find `<base>_ICON.bin` anywhere in the extracted tree (case-insensitive). A missing icon is non-fatal; the default is shown instead.
+4. If an `assets/` directory is present, copy it into `/assets/<base>` (flattened, best effort).
+5. Install the ELF, its `.elfo` sidecar, the icon, and `app.properties` (when present) into the selected slot (`/apps/slot<n>`, 4 slots) and record metadata for the launcher and app switcher.
+
+Slots are swapped wholesale: installing over a slot replaces its content and clears stale legacy metadata for that slot. After a successful install, delete the tar from `/apps` to free space on the card.
+
+## Icon
+
+`<name>_ICON.bin` is 200 bytes: a 40x40, 1-bit-per-pixel bitmap, 5 bytes per row, 8 pixels per byte, MSB first. A set bit is black ink on the e-ink display. An absent icon shows the OS default; build with one so the launcher looks right.
+
+## Assets
+
+An optional top-level `assets/` directory in the tar is copied flat into `/assets/<name>` at install. Apps read their files from there at runtime. Nested directories and macOS metadata files inside `assets/` are tolerated (metadata is skipped), but a flat layout is the reliable path.
+
+## Before you ship
+
+- Build from a clean checkout with the pinned toolchain: `make --no-print-directory -C <app> clean all check pack`, or `pm build --clean --pack && pm check`.
+- Inspect the artifact before shipping: `tar -tvf build/<name>.tar` and `readelf -h` on the ELF. The tar must list the ELF and the `.elfo` sidecar.
+- Don't create the tar from your mac's Finder copies: `._*` files get skipped by the installer, but they bloat the package. `make pack` avoids it.
+- Don't ship a `.bin` or the old OTA-style package. Production devices only install `/apps/*.tar`.
+
+## See also
+
+- [Overlay format (`.elfo`)](../overlay.md) - what the sidecar contains.
+- [App ABI](../app-abi.md) - the manifest fields and the entry contract.
+- [pm CLI](../cli.md) - the commands that build and pack.
+
+
+---
+
+## [Rendering](https://talismandesign.github.io/PocketMage_SDK/docs/guides/rendering/) (Guides)
 
 ---
 title: "Rendering"
@@ -2373,14 +3402,12 @@ For transient feedback use `pm_oled_sysmsg(text, ms)`; it draws a framed dialog 
 
 ## Full examples
 
-`pm new myapp` gives the text-only skeleton. For draw-heavy apps, start from the
-same template and call the E-Ink and OLED functions directly; see
-[app-abi.md](../app-abi.md) for what the app process owns.
+`pm new myapp` gives the text-only skeleton. For draw-heavy apps, start from the same template and call the E-Ink and OLED functions directly; see [app-abi.md](../app-abi.md) for what the app process owns.
 
 
 ---
 
-## [Internationalization (i18n)](https://talismandesign.github.io/PocketMage_SDK/docs/i18n/)
+## [Internationalization (i18n)](https://talismandesign.github.io/PocketMage_SDK/docs/i18n/) (I18n)
 
 ---
 title: "Internationalization (i18n)"
@@ -2389,10 +3416,7 @@ description: "Translation catalogs, the gen_i18n.py generator, ownership rules, 
 
 # Internationalization (i18n)
 
-The SDK carries the translation engine, the generator tooling, and the base
-catalog of SDK-owned strings. An app brings its own catalog. At build time
-the catalogs merge into a single enum and one set of string tables per
-firmware image.
+The SDK carries the translation engine, the generator tooling, and the base catalog of SDK-owned strings. An app brings its own catalog. At build time the catalogs merge into a single enum and one set of string tables per firmware image.
 
 ## Layout
 
@@ -2421,14 +3445,11 @@ An app adds one catalog directory of its own:
   ...
 ```
 
-A catalog directory has one subdirectory per language, named by the language
-code. `en` is required and defines that catalog's string order.
+A catalog directory has one subdirectory per language, named by the language code. `en` is required and defines that catalog's string order.
 
 ## Catalog format
 
-Standard gettext `.po`. `msgctxt` is the `StringID` enum name; `msgid` is the
-English text; `msgstr` is the translation. The `en` file carries a
-`# Languages:` directive in its leading comment block:
+Standard gettext `.po`. `msgctxt` is the `StringID` enum name; `msgid` is the English text; `msgstr` is the translation. The `en` file carries a `# Languages:` directive in its leading comment block:
 
 ```po
 # PocketMage OS English Translations
@@ -2439,26 +3460,19 @@ msgid "Hello"
 msgstr "Hello"
 ```
 
-That directive, in the base catalog, is where the language list and order
-come from. Each catalog's `en` file defines the order of the strings that
-catalog contributes; the catalog's other languages must list the same
-`msgctxt`s, with the same `msgid`s, in the same order.
+That directive, in the base catalog, is where the language list and order come from. Each catalog's `en` file defines the order of the strings that catalog contributes; the catalog's other languages must list the same `msgctxt`s, with the same `msgid`s, in the same order.
 
-A language missing from a catalog falls back to that catalog's English text,
-so an English-only app catalog is valid without translating anything.
+A language missing from a catalog falls back to that catalog's English text, so an English-only app catalog is valid without translating anything.
 
 ### Aliases
 
-`pocketmage_i18n.aliases` maps folded, lowercase user input to a `StringID`.
-Optional, only defined for non-English languages:
+`pocketmage_i18n.aliases` maps folded, lowercase user input to a `StringID`. Optional, only defined for non-English languages:
 
 ```text
 annuler -> STR_KB_APP_CANCEL
 ```
 
-Folding strips diacritics (`Paramètres -> parametres`). Aliases from all
-catalogs concatenate per language; a key that folds to the same value twice
-is a build error.
+Folding strips diacritics (`Paramètres -> parametres`). Aliases from all catalogs concatenate per language; a key that folds to the same value twice is a build error.
 
 ## Ownership
 
@@ -2467,21 +3481,13 @@ is a build error.
 | SDK base catalog | `STR_KB_*` (incl. `STR_KB_APP_*`, `STR_KB_USB_*`, `STR_KB_INIT_*`), `STR_GRID_*`, `STR_SD_*`, `STR_WIFI_*`, `STR_SYS_*`, `STR_TOUCHPAD_*`, `STR_OLED_*`, `STR_FRAME(S)_*`, `STR_INFO/GOOD/SAVED_*`, `STR_DAY_*`, `STR_MONTH_*`                                  |
 | App catalog      | `STR_TERM_*`, `STR_ONBOARD_*`, `STR_SSH_*`, `STR_SETTINGS_*`, `STR_CAL_*`, `STR_UTILS_*`, `STR_LOCK_*`, `STR_HOME_*`, `STR_TASKS_*`, `STR_FILEWIZ_*`, `STR_APPLOADER_*`, `STR_COMM_*`, `STR_USB_*`, `STR_LEX_*`, `STR_JOURNAL_*`, `STR_TXT_*`, `STR_GOTO_*`, `STR_SAVE_*` |
 
-`msgctxt` names are globally unique across the merged catalogs; reusing one
-the SDK already defines is a build error. SDK code only references SDK
-namespaces, so merging an app catalog never changes how SDK code behaves.
+`msgctxt` names are globally unique across the merged catalogs; reusing one the SDK already defines is a build error. SDK code only references SDK namespaces, so merging an app catalog never changes how SDK code behaves.
 
-Ownership follows the consumer: base if SDK code references the string, app
-otherwise. That keeps a bare SDK checkout building standalone (its base
-catalog contains every string its own modules use), and the merge appends the
-app catalog after the base, so app strings never move base enum values. The
-indexed helper ranges all sit in the base; their relative order is fixed and
-never perturbed by an app catalog.
+Ownership follows the consumer: base if SDK code references the string, app otherwise. That keeps a bare SDK checkout building standalone (its base catalog contains every string its own modules use), and the merge appends the app catalog after the base, so app strings never move base enum values. The indexed helper ranges all sit in the base; their relative order is fixed and never perturbed by an app catalog.
 
 ## Generator
 
-`tools/gen_i18n.py` merges the catalogs in command-line order and writes
-`pocketmage_i18n_gen.h` and `pocketmage_i18n_gen.cpp`:
+`tools/gen_i18n.py` merges the catalogs in command-line order and writes `pocketmage_i18n_gen.h` and `pocketmage_i18n_gen.cpp`:
 
 ```sh
 python3 pocketmage_i18n/tools/gen_i18n.py \
@@ -2490,13 +3496,9 @@ python3 pocketmage_i18n/tools/gen_i18n.py \
     --out-dir <build-dir>
 ```
 
-`--catalog` is repeatable; the first catalog is the base. With no arguments,
-the tool generates the SDK's own base catalog into `pocketmage_i18n/`, so a
-bare SDK checkout builds standalone.
+`--catalog` is repeatable; the first catalog is the base. With no arguments, the tool generates the SDK's own base catalog into `pocketmage_i18n/`, so a bare SDK checkout builds standalone.
 
-The merge keeps base strings first and appends each later catalog in turn.
-Every enum value equals its index in the merged order, so the layout is
-stable: adding an app catalog never changes SDK string values.
+The merge keeps base strings first and appends each later catalog in turn. Every enum value equals its index in the merged order, so the layout is stable: adding an app catalog never changes SDK string values.
 
 ### Validation
 
@@ -2505,16 +3507,13 @@ The generator exits non-zero and aborts the build on any of:
 - a missing `# Languages:` directive in the base `en` file, or `en` not first;
 - a `msgctxt` that is not `[A-Z][A-Z0-9_]*`;
 - a duplicate `msgctxt` within a catalog or across catalogs;
-- a non-`en` file whose `msgctxt` set, order, or `msgid`s differ from that
-  catalog's `en`;
+- a non-`en` file whose `msgctxt` set, order, or `msgid`s differ from that catalog's `en`;
 - a duplicated folded alias;
 - the indexed helper ranges missing, inverted, overlapping, or out of order.
 
 ### Indexed helper ranges
 
-Four ranges are indexed by the runtime helpers (`appName()`, `dayName()`,
-`monthName()`, `kbAppName()`). They must stay contiguous blocks, in this
-order:
+Four ranges are indexed by the runtime helpers (`appName()`, `dayName()`, `monthName()`, `kbAppName()`). They must stay contiguous blocks, in this order:
 
 | Range                                      | Members                               |
 | ------------------------------------------ | ------------------------------------- |
@@ -2523,15 +3522,11 @@ order:
 | `STR_DAY_SUNDAY` .. `STR_DAY_SATURDAY`     | weekdays                              |
 | `STR_MONTH_JAN` .. `STR_MONTH_ERR`         | months (`ERR` is the last member)     |
 
-Their heads are emitted with explicit `= N` enum values as documentation of
-intent; the values always equal the index in the merged order.
+Their heads are emitted with explicit `= N` enum values as documentation of intent; the values always equal the index in the merged order.
 
 ## Build integration
 
-The generator doubles as the build hook. Point `extra_scripts` at it in the
-app's `platformio.ini`; it reads its settings from project options (or
-`POCKETMAGE_I18N_CATALOGS` / `POCKETMAGE_I18N_OUT_DIR`, or the SDK base
-catalog as a last resort):
+The generator doubles as the build hook. Point `extra_scripts` at it in the app's `platformio.ini`; it reads its settings from project options (or `POCKETMAGE_I18N_CATALOGS` / `POCKETMAGE_I18N_OUT_DIR`, or the SDK base catalog as a last resort):
 
 ```ini
 extra_scripts = pre:lib/PocketMage_SDK/pocketmage_i18n/tools/gen_i18n.py
@@ -2542,21 +3537,14 @@ custom_i18n_catalogs =
 custom_i18n_out_dir = .pio/build/${PIOENV}/i18n
 ```
 
-As a hook it regenerates only when a `.po`/`.aliases` file is newer than the
-generated tables, so incremental builds stay cheap.
+As a hook it regenerates only when a `.po`/`.aliases` file is newer than the generated tables, so incremental builds stay cheap.
 
-`custom_i18n_out_dir` must be ahead of any stale copy on the include path.
-The engine includes `"pocketmage_i18n_gen.h"`; the generated files are build
-artifacts, never committed.
+`custom_i18n_out_dir` must be ahead of any stale copy on the include path. The engine includes `"pocketmage_i18n_gen.h"`; the generated files are build artifacts, never committed.
 
 ## Adding a string or a language
 
-- **String:** add the `msgctxt`/`msgid`/`msgstr` to the owning catalog's `en`
-  file and to each language file, in the same position relative to that
-  catalog's other strings. App strings go in the app catalog.
-- **Language:** append the code to the base `en` file's `# Languages:`
-  directive and add that language's directory to each catalog that translates
-  it. Never reorder existing languages: the index is the value stored in NVS.
+- **String:** add the `msgctxt`/`msgid`/`msgstr` to the owning catalog's `en` file and to each language file, in the same position relative to that catalog's other strings. App strings go in the app catalog.
+- **Language:** append the code to the base `en` file's `# Languages:` directive and add that language's directory to each catalog that translates it. Never reorder existing languages: the index is the value stored in NVS.
 
 ## Testing
 
@@ -2564,8 +3552,7 @@ artifacts, never committed.
 python3 -m unittest discover -s pocketmage_i18n/tests
 ```
 
-The suite covers catalog merging, language fallback, alias merging, and every
-validation failure above, using small in-test catalogs.
+The suite covers catalog merging, language fallback, alias merging, and every validation failure above, using small in-test catalogs.
 
 ---
 
@@ -2573,23 +3560,51 @@ validation failure above, using small in-test catalogs.
 
 ---
 title: "PocketMage SDK Documentation"
-description: "Official SDK for building PocketMage apps: guides, the full component API reference, the ELF app contract, and publishing."
+description: "Official SDK for building PocketMage apps: get started, the full component API reference, the ELF app contract, build tooling, and publishing."
 ---
 
 # PocketMage SDK Documentation
 
-PocketMage apps are ELF files the host firmware loads at runtime and runs in-process. These docs cover how to write an app, every component of the app API, the binary contract, the build tooling, the symbol surface, and packaging.
+A PocketMage app is a standalone ELF the host firmware loads at runtime and runs in-process. There is no firmware reflash: you build an ELF, pack it with an overlay sidecar and an icon, copy the tar onto the SD card, and install it through the on-device app loader. These docs cover the whole path, from installing the toolchain to the binary contract the loader enforces.
 
+::: tag "Get Started"
 ::: tag "Guides"
 ::: tag "API reference"
-::: tag "App ABI"
-::: tag "Build tooling"
-::: tag "Symbols"
+::: tag "Binary contract"
+::: tag "Tooling"
 ::: tag "Publishing"
+
+## Get started
+
+New here? Go from an empty directory to a running app in two steps.
+
+::: grids
+::: grid
+::: card "Get Started" icon:rocket
+What a PocketMage app is, what you need installed, and the shortest path to a running ELF.
+
+::: button "Open" ./get-started/index.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Install the toolchain" icon:wrench
+The pinned espressif Xtensa compiler, the `elf_overlay` host tools, and the `pm` CLI.
+
+::: button "Open" ./get-started/toolchain.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Your first app" icon:play
+Scaffold, build, gate, pack, and install a minimal app end to end.
+
+::: button "Open" ./get-started/first-app.md icon:arrow-right
+:::
+:::
+:::
 
 ## Guides
 
-Start here. Walkthroughs of the whole app model.
+Walkthroughs of the whole app model.
 
 ::: grids
 ::: grid
@@ -2614,6 +3629,20 @@ The two-display model, the buffered E-Ink refresh rhythm, and the scroll loop.
 :::
 :::
 ::: grid
+::: card "Internationalization" icon:globe
+Give an app translatable strings: the catalog it ships and the runtime that resolves them.
+
+::: button "Open" ./guides/i18n.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Publishing" icon:package
+The delivery tar, the 40x40 icon, assets, and what APPLOADER does with them.
+
+::: button "Open" ./guides/publishing.md icon:arrow-right
+:::
+:::
+::: grid
 ::: card "Guides overview" icon:book
 Guide index and cross-links into the deep references.
 
@@ -2624,14 +3653,21 @@ Guide index and cross-links into the deep references.
 
 ## API reference
 
-Every header the SDK publishes, with semantics. Start at the overview.
+Every component the SDK publishes, with semantics and its `pm_*` C ABI. Start at the overview.
 
 ::: grids
 ::: grid
 ::: card "API overview" icon:boxes
-The umbrella header, the `PM_TARGET_HOST`/`PM_TARGET_APP` split, and how to read the per-component pages.
+The umbrella header, the `PM_TARGET_HOST`/`PM_TARGET_APP` split, the singleton pattern, and the `pm_*` projection model.
 
 ::: button "Open" ./api/index.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Function index" icon:list
+Every `pm_*` wrapper and its exact signature, grouped by module.
+
+::: button "Open" ./api/functions.md icon:arrow-right
 :::
 :::
 ::: grid
@@ -2659,21 +3695,21 @@ Sys and globals, SD card, Clock, Buzzer, WiFi, i18n runtime.
 
 ## The binary contract
 
-How the framework itself is built and shipped.
+What the loader accepts and how an app's dependencies resolve.
 
 ::: grids
 ::: grid
 ::: card "App ABI" icon:book
-The binary shape the loader accepts: format, entry, load strategy, failure modes.
+The binary shape the loader accepts: format, entry, two-stage load, failure modes.
 
 ::: button "Open" ./app-abi.md icon:arrow-right
 :::
 :::
 ::: grid
-::: card "Building Apps" icon:wrench
-A `Makefile` including `tools/app.mk` is the whole build system. Toolchain, targets, icon.
+::: card "Overlay format (.elfo)" icon:layers
+The overlay sidecar that pages app code into executable RAM, and what it contains.
 
-::: button "Open" ./build.md icon:arrow-right
+::: button "Open" ./overlay.md icon:arrow-right
 :::
 :::
 ::: grid
@@ -2683,22 +3719,55 @@ The host-export surface an app's undefined list resolves against, and how to cha
 ::: button "Open" ./symbols.md icon:arrow-right
 :::
 :::
-::: grid
-::: card "Publishing" icon:package
-The delivery tar, the 40x40 icon, assets, and what APPLOADER does with them.
+:::
 
-::: button "Open" ./publish.md icon:arrow-right
+## Tooling
+
+The build and release tools.
+
+::: grids
+::: grid
+::: card "Building apps" icon:wrench
+A `Makefile` including `tools/app.mk` is the whole build system. Toolchain, targets, icon, overlay.
+
+::: button "Open" ./build.md icon:arrow-right
 :::
 :::
 ::: grid
-::: card "i18n catalogs" icon:terminal
-Catalogs, the generator, and the merge rules that keep string IDs stable.
+::: card "pm CLI" icon:terminal
+Scaffolding, building, the enforcing dependency gate, packing, exports, and release bumps.
+
+::: button "Open" ./cli.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "i18n catalogs" icon:globe
+The generator and the merge rules that keep string IDs stable across the SDK and app catalogs.
 
 ::: button "Open" ./i18n.md icon:arrow-right
 :::
 :::
+:::
+
+## Help
+
+::: grids
 ::: grid
-::: card "Migration" icon:book-open
+::: card "Troubleshooting" icon:alert-triangle
+The failures a build or load hits most, what causes each, and how to fix it.
+
+::: button "Open" ./troubleshooting.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Glossary" icon:book-open
+Every term these docs use, defined once, with links to the page that owns the concept.
+
+::: button "Open" ./glossary.md icon:arrow-right
+:::
+:::
+::: grid
+::: card "Migration" icon:git-branch
 Moving a pre-ELF app to the runtime-load flow.
 
 ::: button "Open" ./migration.md icon:arrow-right
@@ -2710,12 +3779,13 @@ Moving a pre-ELF app to the runtime-load flow.
 
 ::: steps
 
-1. Read the [guides](guides/making-apps.md), then the [API overview](api/index.md).
-2. Read the [App ABI](app-abi.md) contract.
-3. Set up the [build toolchain](build.md).
-4. Check what your app resolves against: [Symbols](symbols.md).
-5. Ship a tar: [Publishing](publish.md).
-6. Port existing code: [Migration](migration.md).
+1. Install the toolchain: [Get Started](get-started/toolchain.md).
+2. Build your first app end to end: [Your first app](get-started/first-app.md).
+3. Learn the model: [Making an app](guides/making-apps.md), then the [API overview](api/index.md).
+4. Read the contract: [App ABI](app-abi.md) and [Overlay format](overlay.md).
+5. Check what your app resolves against: [Symbols](symbols.md).
+6. Ship a tar: [Publishing](guides/publishing.md).
+7. Port existing code: [Migration](migration.md).
 
 :::
 
@@ -2728,7 +3798,7 @@ Moving a pre-ELF app to the runtime-load flow.
 
 ---
 
-## [Migrating an existing app](https://talismandesign.github.io/PocketMage_SDK/docs/migration/)
+## [Migrating an existing app](https://talismandesign.github.io/PocketMage_SDK/docs/migration/) (Migration)
 
 ---
 title: "Migrating an existing app"
@@ -2737,12 +3807,9 @@ description: "Moving a pre-ELF app to the runtime-load flow: what changed, the e
 
 # Migrating an existing app
 
-Production devices no longer run apps built the old way. An app is now a
-runtime-loaded ELF shipped as `/apps/*.tar`; there is no firmware-flashing
-app flow and no OTA-style app package on production.
+Production devices no longer run apps built the old way. An app is now a runtime-loaded ELF shipped as `/apps/*.tar`; there is no firmware-flashing app flow and no OTA-style app package on production.
 
-The short version: if you shipped an app pre-ELF, that package will not launch
-on production firmware. Rebuild it against the ELF contract and re-package.
+The short version: if you shipped an app pre-ELF, that package will not launch on production firmware. Rebuild it against the ELF contract and re-package.
 
 ## What changed
 
@@ -2755,128 +3822,169 @@ on production firmware. Rebuild it against the ELF contract and re-package.
 | Toolchain       | PlatformIO (big-endian)                    | espressif `xtensa-esp-elf`                          |
 | Layout/naming   | app id / metadata                          | derived from the tar base name                       |
 
-The OS keeps app code out of PSRAM by design; code runs from IRAM. That is
-the loader's job, not yours.
+The OS keeps app code out of PSRAM by design; code runs from IRAM. That is the loader's job, not yours.
 
 ## Migration steps
 
-1. **Get the toolchain.** Install the espressif `xtensa-esp-elf` toolchain
-   into `~/.espressif/...` as shown in [build.md](build.md). Do not rely on
-   the PlatformIO toolchain; it emits big-endian ELFs the loader cannot read.
-2. **Scaffold.** Run `pm new myapp`. Its `Makefile`
-   (`include tools/app.mk`) is the whole build system.
-3. **Port the entry.** Wrap your start logic in `extern "C" int
-   main(int, char**)`. The build renames it to `app_main`. Fit the previous
-   app's lifetime to the return-from-`main` model
-   ([app-abi.md](app-abi.md)).
-4. **Replace dependencies.** Every call must resolve at load time. Host
-   exports are the curated surface in [symbols.md](symbols.md) plus the
-   host's newlib/IDF/Arduino globals. That covers display, keyboard, buzzer,
-   clock, IO, and the standard library. If you depended on app-side firmware
-   globals that are not exported, move that dependency to API calls.
-5. **Move assets.** Files the app used at compile time become a top-level
-   `assets/` directory in the tar, read at runtime from `/assets/<name>`
-   ([publish.md](publish.md)).
-6. **Localize.** If the app contained strings, move them into an app catalog
-   (`src/i18n/`, merged per [i18n.md](i18n.md)) instead of hardcoding.
-7. **Verify.** `make clean all check` must succeed, list a sane set of
-   undefined symbols, and the endianness check must pass. Then `make pack`
-   and `tar -tvf build/<name>.tar`.
-8. **Ship.** Copy the tar to `/apps/` on the device, install with APPLOADER
-   into a slot, launch. The launcher shows the name and icon drawn from the
-   package.
+1. **Get the toolchain.** Install the espressif `xtensa-esp-elf` toolchain into `~/.espressif/...` as shown in [build.md](build.md). Do not rely on the PlatformIO toolchain; it emits big-endian ELFs the loader cannot read.
+2. **Scaffold.** Run `pm new myapp`. Its `Makefile` (`include tools/app.mk`) is the whole build system.
+3. **Port the entry.** Wrap your start logic in `extern "C" int main(int, char**)`. The build renames it to `app_main`. Fit the previous app's lifetime to the return-from-`main` model ([app-abi.md](app-abi.md)).
+4. **Replace dependencies.** Every call must resolve at load time. Host exports are the curated surface in [symbols.md](symbols.md) plus the host's newlib/IDF/Arduino globals. That covers display, keyboard, buzzer, clock, IO, and the standard library. If you depended on app-side firmware globals that are not exported, move that dependency to API calls.
+5. **Move assets.** Files the app used at compile time become a top-level `assets/` directory in the tar, read at runtime from `/assets/<name>` ([publishing](guides/publishing.md)).
+6. **Localize.** If the app contained strings, move them into an app catalog (`src/i18n/`, merged per [i18n.md](i18n.md)) instead of hardcoding.
+7. **Verify.** `make clean all check` must succeed, list a sane set of undefined symbols, and the endianness check must pass. Then `make pack` and `tar -tvf build/<name>.tar`.
+8. **Ship.** Copy the tar to `/apps/` on the device, install with APPLOADER into a slot, launch. The launcher shows the name and icon drawn from the package.
 
 ## Gotchas
 
-- **Big-endian artifacts.** The classic failure. The loader does no byte
-  swapping, so a PlatformIO-built app faults at load with a section or
-  instruction fault. `readelf -h` shows `big endian` before you ship.
+- **Big-endian artifacts.** The classic failure. The loader does no byte swapping, so a PlatformIO-built app faults at load with a section or instruction fault. `readelf -h` shows `big endian` before you ship.
 - **Statically linked runtime.** Symbols collide or bloat; keep `-nostdlib`.
-- **Relying on slot directories.** After install the ELF lives in the slot
-  dir, but the app should treat `/assets/<name>` (copied at install) as its
-  data home and never assume the slot path.
-- **Long-lived loops.** The app shares the device. Cooperative lifetimes
-  (render, yield via the SDK API, return) beat spin loops on the 16 KB run
-  stack.
+- **Relying on slot directories.** After install the ELF lives in the slot dir, but the app should treat `/assets/<name>` (copied at install) as its data home and never assume the slot path.
+- **Long-lived loops.** The app shares the device. Cooperative lifetimes (render, yield via the SDK API, return) beat spin loops on the 16 KB run stack.
 
 ## Announcement
 
-If you maintained published apps pre-ELF, publish a migration notice: existing
-packages targeting production will not launch on the new firmware, and step 8
-above is the path forward.
+If you maintained published apps pre-ELF, publish a migration notice: existing packages targeting production will not launch on the new firmware, and step 8 above is the path forward.
 
 ---
 
-## [Publishing an app](https://talismandesign.github.io/PocketMage_SDK/docs/publish/)
+## [Overlay format (.elfo)](https://talismandesign.github.io/PocketMage_SDK/docs/overlay/) (Overlay)
+
+---
+title: "Overlay format (.elfo)"
+description: "The ELFO overlay blob that ships beside every app ELF: why it exists, its on-disk layout, and how the host pages overlay bodies into executable RAM."
+---
+
+# Overlay format (`.elfo`)
+
+Every packed app carries two artifacts: the relocatable `<name>.app.elf` and a sidecar `<name>.elfo`. The ELF is the program; the ELFO blob is the overlay image the host pages into executable RAM at load time. The build produces the `.elfo` automatically (see [build.md](build.md)); this page documents what it contains and how the loader consumes it, so the format is pinned contract rather than an implementation detail.
+
+The overlay runtime lives in the `elf_overlay` component, an ISA-abstracted overlay loader that sits next to the ELF loader (`esp_elf`) and handles the parts of loading that a plain relocating loader cannot: paging `.text` bodies into a fixed pool of executable frames and patching ISA-specific PC-relative literal loads once the resident addresses are known.
+
+## Why it exists
+
+An ELF app links `-nostdlib -shared` and resolves every symbol from the host at load time (see [app-abi.md](app-abi.md) and [symbols.md](symbols.md)). On the ESP32-S3 the loader must place executable code in memory that the instruction bus can fetch (`MALLOC_CAP_EXEC`), which is scarce. Mapping an entire app image into exec RAM wastes that budget on code paths that may never run.
+
+The overlay model solves this. Instead of loading all `.text` up front, the host relocates the base image with `esp_elf`, then pages individual overlay bodies into a small pool of exec-RAM frames on demand. A function that is never called is never paged in. The `.elfo` blob is the pre-chewed form the device needs for that: the overlay bodies, the stub block that enters and leaves them, and the relocation patch tables the host applies once it knows where each frame landed.
+
+PC-relative literal loads (`l32r` on Xtensa, `auipc` on RISC-V) cannot be left to the base relocator, because the literal's absolute address is not known until the overlay body is resident. `elf_overlay` patches those in place at page-in. The base relocator never touches them.
+
+## On-disk layout
+
+The blob begins with the four-byte magic `ELFO`, format version 1, and an ISA tag. All multi-byte fields are little-endian, matching the app ELF. The header is followed by fixed-shape tables and two data regions:
+
+```mermaid
+flowchart TB
+    H["elf_overlay_header_t<br>magic ELFO, version, ISA tag, table counts"]
+    O["overlay entries<br>id, offset, length (one per overlay body)"]
+    S["stub entries<br>canonical vaddr, overlay_id, body_offset, stub_off"]
+    R["redirect entries<br>call site, stub_off"]
+    P["patch entries<br>overlay_id, blob_offset, insn_offset"]
+    SP["stub_patch entries<br>overlay_id, blob_offset, insn_offset"]
+    HR["host_ref entries<br>overlay_id, blob_offset, insn_offset, name_off"]
+    ST["string table<br>null-terminated host symbol names"]
+    SB["stub block<br>enter/leave slots plus stub code"]
+    B["overlay bodies<br>verbatim .text images"]
+    H --> O --> S --> R --> P --> SP --> HR --> ST --> SB --> B
+```
+
+| Table        | What it records                                                         |
+| ------------ | ----------------------------------------------------------------------- |
+| overlay      | Each overlay body's id, its offset into the bodies region, and length.  |
+| stub         | Maps a canonical `.text` virtual address to the stub that enters it.    |
+| redirect     | Resident call sites that must be patched to jump through a stub.        |
+| patch        | ISA literal-load sites inside overlay bodies, patched at page-in.       |
+| stub_patch   | ISA literal-load sites inside the stub block.                           |
+| host_ref     | Overlay references to host symbols, resolved by name via the resolver.  |
+| string table | The host symbol names the `host_ref` entries point into.                |
+
+All tables are fixed-size records, so parsing and page-in do no heap allocation beyond the frame pool itself.
+
+## ISA abstraction
+
+ISA-specific patching lives behind `elf_overlay_isa_ops_t`. Two backends are registered:
+
+- `xtensa` - `l32r` PC-relative literal patching, validated against the Xtensa ISA reference. This is the backend PocketMage uses on the S3.
+- `riscv` - `auipc` PC-relative literal patching.
+
+The ISA tag in the header selects the backend at load time. A blob built for one ISA will not load on another.
+
+## How the host consumes it
+
+The in-process runner (`src/elf_runner.cpp`) loads an app in two stages: the base relocation with `esp_elf`, then the overlay with `elf_overlay`. The exact sequence, matching the code:
+
+1. Install the scoped symbol resolver (see [symbols.md](symbols.md)), then `esp_elf_init` and `esp_elf_relocate_source` relocate the base image. The image is streamed by offset from the SD file rather than held whole in RAM.
+2. Locate the `.elfo` sidecar next to the ELF and `elf_overlay_load` it.
+3. `elf_overlay_set_active` makes it the active overlay for the run.
+4. `elf_overlay_esp_elf_set_section_map` copies the relocated section table (canonical virtual address to resident address) from the `esp_elf_t` into the overlay's section map.
+5. `elf_overlay_apply_redirects` patches the resident call sites so calls into paged functions go through their stubs.
+6. `elf_overlay_set_symbol_resolver` wires host-reference resolution back through the scoped resolver, so an overlay body calling a `pm_*` or runtime symbol resolves against the host export table.
+7. The entry point is redirected: the runner finds the stub for the entry's canonical virtual address and rewrites `elf.entry` to the stub address, so even the first call pages the entry body in.
+8. `esp_elf_request` runs the entry. On return, the overlay is unloaded and the base image deinitialized.
+
+```mermaid
+sequenceDiagram
+    participant R as elf_runner
+    participant E as esp_elf
+    participant O as elf_overlay
+    participant SD as SD card
+    R->>R: install scoped symbol resolver
+    R->>E: esp_elf_init
+    E->>SD: esp_elf_relocate_source (stream by offset)
+    R->>SD: locate name.elfo sidecar
+    R->>O: elf_overlay_load
+    R->>O: elf_overlay_set_active
+    E-->>O: elf_overlay_esp_elf_set_section_map (section table)
+    R->>O: elf_overlay_apply_redirects (patch call sites)
+    R->>O: elf_overlay_set_symbol_resolver (host refs)
+    R->>O: redirect elf.entry to entry stub
+    R->>E: esp_elf_request (run entry)
+    E-->>R: entry returns
+    R->>O: elf_overlay unload
+    R->>E: esp_elf deinit
+```
+
+If the sidecar is absent, the app runs unredirected from the base relocation alone. Apps packed with `make pack` always ship the sidecar; see the pack contract in [publishing](guides/publishing.md).
+
+### The frame pool
+
+A fixed pool of executable-RAM frames holds overlay bodies, paged in on demand. A stub's `enter` bumps the target frame's refcount and `leave` drops it; a frame stays resident while its refcount is above zero. Literals are patched in place inside the `.text` image at page-in, once resident addresses are known. The PC-relative instructions themselves (`l32r` / `auipc`) are never rewritten.
+
+The pool is sized by compile-time constants in the overlay component (`ELF_OVERLAY_MAX_FRAMES`, default 4; `ELF_OVERLAY_DEFAULT_FRAME_SIZE`, default 16384 bytes). A single overlay body must fit in one frame.
+
+## Building the blob
+
+`tools/app.mk` emits the `.elfo` in two steps from the unstripped link output (`<name>.app.tool`):
+
+```text
+elf_overlay_relink <name>.app.tool <name>.relk   # scan .text, classify relocs
+elf_overlay_emit   <name>.relk     <name>.elfo   # pack into the ELFO blob
+```
+
+`elf_overlay_relink` reads the ELF32 executable, scans `.text` for ISA patch sites, builds a literal pool, classifies relocations, and writes a `.relk` intermediate. `elf_overlay_emit` packs that into the final ELFO blob. Both tools must be on `PATH`; the SDK build expects them from an `elf_overlay` checkout (CI builds them with CMake and prepends the build dir to `PATH`). Override `ELF_OVERLAY_RELINK` and `ELF_OVERLAY_EMIT` to point at specific binaries.
+
+## Stability
+
+The ELFO magic, version, and table layout are load contract. A format change takes a version bump in the header and a matching host loader that accepts the new version. The `elf_overlay` component is the single source of truth for the format; see its `README.md` and `include/elf_overlay/` headers for the exact record definitions.
+
+
+---
+
+## [Publishing an app](https://talismandesign.github.io/PocketMage_SDK/docs/publish/) (Publish)
 
 ---
 title: "Publishing an app"
-description: "The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with them on the device."
+description: "Moved to Guides > Publishing an app."
 ---
 
 # Publishing an app
 
-The delivery unit is a plain `.tar` file placed in `/apps/` on the device SD
-card and installed through APPLOADER on the device. Not gzipped, not a
-directory of loose files: one tar.
+This page has moved to [Guides > Publishing an app](guides/publishing.md).
 
-`make pack` produces it. The tar's top level must hold the members the
-installer keys off:
-
-| Member            | Required | Meaning                                 |
-| ----------------- | -------- | --------------------------------------- |
-| `<name>.app.elf`  | yes      | the app binary (`*.app.elf` suffix is detected) |
-| `<name>_ICON.bin` | no       | 40x40 1-bit icon, 200 bytes             |
-| `app.properties`  | no       | name/version/author/scope manifest, copied to the slot (see [app-abi.md](app-abi.md)) |
-
-`<name>` is the base of the ELF filename and becomes the app's display name.
-Keep it short and unique; it is also the `assets/` subdir name and the slot
-subdirectory.
-
-## Install behavior (APPLOADER)
-
-1. Extract `/apps/<name>.tar` into `/apps/temp`, skipping macOS `._*` junk.
-2. Find the first `*.app.elf`, derive `base` by stripping `.app.elf`.
-3. Find `<base>_ICON.bin` anywhere in the extracted tree (case-insensitive).
-   A missing icon is non-fatal; the default is shown instead.
-4. If an `assets/` directory is present, copy it into `/assets/<base>`
-   (flattened, best effort).
-5. Install ELF + icon + `app.properties` (when present) into the selected slot
-   (`/apps/slot<n>`, 4 slots) and record metadata for the launcher and app
-   switcher.
-
-Slots are swapped wholesale: installing over a slot replaces its content and
-clears stale legacy metadata for that slot. After a successful install, delete
-the tar from `/apps` to free space on the card.
-
-## Icon
-
-`<name>_ICON.bin` is 200 bytes: a 40x40, 1-bit-per-pixel bitmap, 5 bytes per
-row, 8 pixels per byte, MSB first. A set bit is black ink on the e-ink
-display. An absent icon shows the OS default; build with one so the launcher
-looks right.
-
-## Assets
-
-An optional top-level `assets/` directory in the tar is copied flat into
-`/assets/<name>` at install. Apps read their files from there at runtime.
-Nested directories and macOS metadata files inside `assets/` are tolerated
-(metadata is skipped), but a flat layout is the reliable path.
-
-## Before you ship
-
-- Build from a clean checkout with the pinned toolchain:
-  `make --no-print-directory -C <app> clean all check pack`.
-- Inspect the artifact before shipping: `tar -tvf build/<name>.tar` and
-  `readelf -h` on the ELF.
-- Don't create the tar from your mac's Finder copies: `._*` files get skipped
-  by the installer, but they bloat the package. `make pack` avoids it.
-- Don't ship a `.bin` or the old OTA-style package. Production devices only
-  install `/apps/*.tar`.
 
 ---
 
-## [Symbols and the dependency contract](https://talismandesign.github.io/PocketMage_SDK/docs/symbols/)
+## [Symbols and the dependency contract](https://talismandesign.github.io/PocketMage_SDK/docs/symbols/) (Symbols)
 
 ---
 title: "Symbols and the dependency contract"
@@ -2885,22 +3993,18 @@ description: "The host-export surface apps resolve against, how third-party libr
 
 # Symbols and the dependency contract
 
-Apps link `-nostdlib`. Nothing ships with the binary that satisfies a
-reference; at load time the host resolves every undefined symbol from its own
-live memory. The app's undefined-symbol list is therefore its real dependency
-contract. `make check` prints it; `pm check` interprets it against the host
-surface.
+Apps link `-nostdlib`. Nothing ships with the binary that satisfies a reference; at load time the host resolves every undefined symbol from its own live memory. The app's undefined-symbol list is therefore its real dependency contract. `make check` prints it; `pm check` interprets it against the host surface.
 
 ## The surface
 
-An app can call anything the host exports as a global symbol. The export
-surface has two parts.
+An app can call anything the host exports as a global symbol. The export surface has two curated parts, backed by two committed lists at the SDK root:
 
-**The C and C++ runtime.** `libc`, `libm`, `libgcc`, `libstdc++` and
-`libsupc++` symbols the firmware already links are exported so apps can use
-third-party libraries. `tools/symbols.py` derives this set by reading the
-toolchain archives with `nm` and keeping the symbols that are present in the
-firmware image:
+- `symbols.list` - the PocketMage `pm_*` ABI plus a handful of host primitives. Its `pm_*` block is generated; do not hand edit it (see below).
+- `host_baseline.list` - the C/C++ runtime, newlib, and POSIX symbols the firmware exports unconditionally. Apps may rely on these without listing them. Generated from the firmware's export table; do not hand edit it.
+
+The `pm` gate reads both lists and takes their union as the curated surface (`tools/pm/gate.py:read_curated`). An undefined symbol in an app must appear in that union, or be confirmed present in a supplied host ELF, for the app to pass.
+
+**The C and C++ runtime.** `libc`, `libm`, `libgcc`, `libstdc++` and `libsupc++` symbols the firmware already links are exported so apps can use third-party libraries, and `host_baseline.list` records them. `tools/symbols.py` derives this set by reading the toolchain archives with `nm` and keeping the symbols that are present in the firmware image:
 
 ```sh
 python3 tools/symbols.py --list symbols.list --host-elf <firmware.elf> \
@@ -2917,106 +4021,140 @@ libnewlib    94 symbols   2,478 bytes
 total       602 symbols  15,009 bytes (14.7 KB)
 ```
 
-That total includes the curated `pm_*` entries. The runtime adds about 11.2 KB
-of flash in the firmware image, once. It is not a per-app cost. Apps stay
-small: a hello world is 1.3 KB, an app using `std::vector` and `std::string`
-is 2.3 KB, an app with cJSON linked in is 5.2 KB. `--gc-sections` and
-`--strip-all` in `tools/app.mk` do that work.
+That total includes the curated `pm_*` entries. The runtime adds about 11.2 KB of flash in the firmware image, once. It is not a per-app cost. Apps stay small: a hello world is 1.3 KB, an app using `std::vector` and `std::string` is 2.3 KB, an app with cJSON linked in is 5.2 KB. `--gc-sections` and `--strip-all` in `tools/app.mk` do that work.
 
-A symbol in `symbols.list` that the firmware does not define is reported as a
-warning but still emitted into the table. A newly added wrapper cannot appear
-in `--host-elf` until the host is rebuilt, so dropping it would omit it on the
-one run that adds it. Regenerate once more after building and the warning
-should be gone.
+A symbol in `symbols.list` that the firmware does not define is reported as a warning but still emitted into the table. A newly added wrapper cannot appear in `--host-elf` until the host is rebuilt, so dropping it would omit it on the one run that adds it. Regenerate once more after building and the warning should be gone.
 
-Runtime export is on by default. Pass `--no-runtime` to export only the
-curated SDK list, which restricts apps to the SDK surface and no libraries.
+Runtime export is on by default. Pass `--no-runtime` to export only the curated SDK list, which restricts apps to the SDK surface and no libraries.
 
-Membership is decided by which archive a symbol comes from, not by its name.
-A `_ZN...` prefix also matches the SDK's own C++ classes, so matching on prefix
-shape would export firmware internals by accident.
+Membership is decided by which archive a symbol comes from, not by its name. A `_ZN...` prefix also matches the SDK's own C++ classes, so matching on prefix shape would export firmware internals by accident.
 
-GCC reserves `__atomic_*`, `__sync_*` and `__builtin_*` names as builtins and
-rejects taking their address. Those exports are declared under a private
-`pm_elfsym_` identifier with an asm label, then listed by their literal name in
-the table.
+GCC reserves `__atomic_*`, `__sync_*` and `__builtin_*` names as builtins and rejects taking their address. Those exports are declared under a private `pm_elfsym_` identifier with an asm label, then listed by their literal name in the table.
 
-**The curated SDK table.** `symbols.list` is the hand-maintained promise of
-PocketMage's own exports. Host-side, `src/ELF_SYMS/host_exports.list` tracks a
-superset, validated against the firmware image. Both lists feed the same
-generated `g_customer_elfsyms` table.
+**The curated SDK table.** `symbols.list` is PocketMage's own export promise. Its `pm_*` block is generated by `tools/gen_app_api.py`, which walks the SDK headers, projects each C++ method to a C wrapper, and writes the wrapper names into both `symbols.list` (SDK side) and `src/ELF_SYMS/host_exports.list` (OS side) so the two can never drift. `tools/symbols.py` is a different tool: it derives the runtime baseline above from the toolchain archives. Host-side, `host_exports.list` tracks a superset of `symbols.list`, validated against the firmware image. Both lists feed the same generated `g_customer_elfsyms` table.
+
+Do not hand edit the `pm_*` block of `symbols.list`. To change the app-facing surface, change the SDK header and regenerate with `gen_app_api.py`; it rewrites the generated files together.
 
 ## Linking a third-party library
 
-A vendored library's source is compiled into the app by overriding `APP_SRCS`.
-Anything the library references that is not in the app is resolved by the host
-at load time. Two consequences are worth knowing.
+A vendored library's source is compiled into the app by overriding `APP_SRCS`. Anything the library references that is not in the app is resolved by the host at load time. Two consequences are worth knowing.
 
-Libraries compiled at `-Os` need fewer symbols than the same source at `-O0`.
-A `std::vector<std::string>` app at `-O0` wants 13 symbols including
-`std::allocator<char>` constructors; at `-Os` it wants 7, and all 7 resolve.
+Libraries compiled at `-Os` need fewer symbols than the same source at `-O0`. A `std::vector<std::string>` app at `-O0` wants 13 symbols including `std::allocator<char>` constructors; at `-Os` it wants 7, and all 7 resolve.
 
-`sscanf` is not exported by default. It exists in newlib, but nothing in the
-firmware references it, so it was dropped by `--gc-sections`, and referencing
-it pulls in about 190 KB of stdio reentrancy. A library that needs it must
-either avoid it or the host must export it deliberately.
+`sscanf` is not exported by default. It exists in newlib, but nothing in the firmware references it, so it was dropped by `--gc-sections`, and referencing it pulls in about 190 KB of stdio reentrancy. A library that needs it must either avoid it or the host must export it deliberately.
 
 ## Reading an app's contract
 
 ```sh
 make check   # prints entry + every undefined symbol
-pm check     # classes each symbol and exits non-zero on a broken contract
+pm check     # classifies each symbol and exits non-zero on a broken contract
 ```
 
-Everything in that list must exist in the host's global view when the app
-loads, or the load fails. `pm check` with `--host-elf` is the exact gate: every
-undefined symbol must resolve to a host global.
+Everything in that list must exist in the host's global view when the app loads, or the load fails. `pm check` with `--host-elf` is the exact gate: every undefined symbol must resolve to a host global.
 
-Without a host ELF, `pm check` reads the generated export table that the
-firmware links, which is the same file the loader searches. It does not keep a
-separate allowlist, because a hand-written list drifts from the table and the
-drift shows up only on device. An earlier allowlist claimed `memmove` and
-`sprintf` were resolvable when no table exported them, so those apps passed the
-gate and failed at load with `Can't find common memmove`. Reading the generated
-table makes that class of bug impossible.
+Without a host ELF, `pm check` reads the generated export table that the firmware links, which is the same file the loader searches. It does not keep a separate allowlist, because a hand-written list drifts from the table and the drift shows up only on device. An earlier allowlist claimed `memmove` and `sprintf` were resolvable when no table exported them, so those apps passed the gate and failed at load with `Can't find common memmove`. Reading the generated table makes that class of bug impossible.
 
 ## Editing the surface
 
 Rules for SDK authors:
 
-- Additions only. Removing or renaming an exported symbol breaks every app
-  that references it at runtime.
-- Every added SDK symbol must exist as a `GLOBAL` in the firmware image and be
-  added to both `symbols.list` and the host's `host_exports.list`, then
-  regenerate the host table with `tools/symbols.py --host-elf ...`.
-- Regenerate the host table whenever the firmware's linked symbol set changes.
-  `symbols.py` only exports runtime symbols the firmware already links, so a
-  firmware that starts using a new libc or libstdc++ function makes it
-  available on the next regeneration.
-- Run `pm exports` before committing a surface change. It reconciles
-  `symbols.list` against `host_exports.list` and fails when a curated symbol is
-  not exported.
-- Bump `pocketmage_sdk_version` when the surface changes. It is exported, and
-  stored so the OS can version apps against the surface.
+- Additions only. Removing or renaming an exported symbol breaks every app that references it at runtime.
+- Every added SDK symbol must exist as a `GLOBAL` in the firmware image and be added to both `symbols.list` and the host's `host_exports.list`, then regenerate the host table with `tools/symbols.py --host-elf ...`.
+- Regenerate the host table whenever the firmware's linked symbol set changes. `symbols.py` only exports runtime symbols the firmware already links, so a firmware that starts using a new libc or libstdc++ function makes it available on the next regeneration.
+- Run `pm exports` before committing a surface change. It reconciles `symbols.list` against `host_exports.list` and fails when a curated symbol is not exported.
+- Bump `pocketmage_sdk_version` when the surface changes. It is exported, and stored so the OS can version apps against the surface.
 
-Exporting a broad slice of the firmware binds the ABI to all of it. That is a
-deliberate trade here: it is what lets apps use libraries, and per-app
-restriction is planned as an opt-in scope rather than a default.
+Exporting a broad slice of the firmware binds the ABI to all of it. That is a deliberate trade here: it is what lets apps use libraries.
+
+## Per-app scope
+
+The broad surface is the default, but an app can be narrowed to a subset of the `pm_*` surface through the `scope` field in its `app.properties` manifest (default `all`). At load time the runner parses the scope and installs a scoped resolver: a `pm_*` symbol outside the app's scope resolves to nothing, so the load fails fast with `ELF needs symbols outside its scope` rather than letting the app reach an API it did not declare. Only `pm_*` symbols are gated; the runtime baseline (libc, libstdc++, ESP-IDF) stays reachable for any scope, so libraries keep working. See [app-abi.md](app-abi.md) for the manifest fields and the runner's resolver behavior.
 
 ## Versioning and gating
 
-`pocketmage_sdk_version` is exported so apps can adapt to surface changes.
-`pm check` gates an app against the host export set before release: the mirror
-of `make check`, with the generated table as the reference when no host ELF is
-available.
+`pocketmage_sdk_version` is exported so apps can adapt to surface changes. `pm check` gates an app against the host export set before release: the mirror of `make check`, with the generated table as the reference when no host ELF is available.
 
-Ship a new version with `pm release <major|minor|patch>` (add
-`--message TEXT` for a CHANGELOG bullet). It validates VERSION, the
-`pocketmage_sdk_version` literal in `pocketmage_globals.cpp`,
-`pocketmage_app_version.h`, and `library.json` first, then rewrites all four
-and folds an `[N.N.N]` header at the top of `CHANGELOG.md`. No write happens
-if any file disagrees. The command stages nothing in git; commit the four
-files and the changelog together.
+Ship a new version with `pm release <major|minor|patch>` (add `--message TEXT` for a CHANGELOG bullet). It validates VERSION, the `pocketmage_sdk_version` literal in `pocketmage_globals.cpp`, `pocketmage_app_version.h`, and `library.json` first, then rewrites all four and folds an `[N.N.N]` header at the top of `CHANGELOG.md`. No write happens if any file disagrees. The command stages nothing in git; commit the four files and the changelog together.
+
+
+---
+
+## [Troubleshooting](https://talismandesign.github.io/PocketMage_SDK/docs/troubleshooting/) (Troubleshooting)
+
+---
+title: "Troubleshooting"
+description: "The failures an app build or load hits most, what causes each, and how to fix it."
+---
+
+# Troubleshooting
+
+The failure modes below are the ones an app build or load actually hits. Each entry names the symptom, the cause, and the fix. The deeper references are linked from each.
+
+## Build and toolchain
+
+### `XTENSA_CXX` not found, or the wrong compiler is used
+
+The build probes for the espressif `xtensa-esp32s3-elf-g++` and falls back to the PlatformIO package and `PATH`. If it picks the PlatformIO package, the link output has the wrong byte order and the endianness guard deletes it (see below). Pin the compiler explicitly:
+
+```sh
+make XTENSA_CXX=~/.espressif/tools/xtensa-esp-elf/esp-15.2.0_20251204/xtensa-esp-elf/bin/xtensa-esp32s3-elf-g++
+```
+
+Confirm what the build resolved with `make pm-info`. The install steps are in [toolchain.md](get-started/toolchain.md).
+
+### The build fails with an endianness assertion and deletes the artifact
+
+`app.mk` asserts little-endian output after every link and removes a big-endian artifact so a bad file never ships. This almost always means the wrong toolchain compiled the app. Only the espressif `xtensa-esp-elf` toolchain emits readable output; the PlatformIO Xtensa package does not. Fix the toolchain, not the guard.
+
+### `elf_overlay_relink` or `elf_overlay_emit` not found
+
+The `.elfo` overlay sidecar is built by two host tools that must be on `PATH`. Build them from an `elf_overlay` checkout and add the build directory to `PATH`, or point `ELF_OVERLAY_RELINK` and `ELF_OVERLAY_EMIT` at the binaries. See [toolchain.md](get-started/toolchain.md#install-the-toolchain-elfoverlay-host-tools).
+
+### A single function will not fit in an overlay frame
+
+An overlay body must fit in one frame of the executable-RAM pool (`ELF_OVERLAY_DEFAULT_FRAME_SIZE`, default 16 KB). A single function larger than a frame cannot be paged in. Split the function. See [overlay.md](overlay.md#overlay-format-elfo-how-the-host-consumes-it-the-frame-pool).
+
+## Gating (`pm check`)
+
+### Symbols reported as "broken" / "not resolvable by the host"
+
+The app references a symbol the host does not export. The load would fail. The symbol must be added to the SDK's curated surface before an app can use it, or the app must stop referencing it. The symbol model is in [symbols.md](symbols.md).
+
+### Symbols reported as "unconfirmed"
+
+The symbol sits outside the curated surface (`symbols.list` plus `host_baseline.list`), so `pm check` cannot confirm it without the actual host export table. Re-run with `--host-elf <firmware.elf>` for an exact result.
+
+### Warning: `app_main` is not in the ELF's symbol table
+
+Not a failure. The post-link strip removed the `app_main` name, but the entry is linker-pinned with `-e app_main`, so the loader still finds it. Ignore it.
+
+### Warning: the app has a non-empty `.init_array`
+
+The app links static constructors. The host's `esp_elf` loader does not run relocation-time constructors, so they never execute. Remove the static construction, or move the initialization into `app_main`. The compile flags `-fno-exceptions -fno-rtti -fno-threadsafe-statics` are on by default to keep this from happening; a remaining `.init_array` usually comes from a global with a non-trivial constructor. See [app-abi.md](app-abi.md#app-binary-contract-abi-how-loading-works).
+
+## Load-time (on device)
+
+### `ELF needs symbols outside its scope`
+
+The app's `app.properties` manifest declares a `scope` that does not include a `pm_*` symbol the app actually calls, so the scoped resolver refuses to resolve it and the load fails fast. Widen the `scope` (default `all`) to cover the API the app uses, or stop calling the out-of-scope API. Only `pm_*` symbols are gated by scope; the runtime baseline is always reachable. See [symbols.md](symbols.md#symbols-and-the-dependency-contract-per-app-scope).
+
+### The app loads but runs unredirected / behaves oddly on large code paths
+
+The `.elfo` sidecar was not found next to the ELF, so the app ran from the base relocation alone without the overlay. Confirm the tar shipped the `.elfo` member (`tar -tf build/<name>.tar`) and that the installer placed it in the slot. See [overlay.md](overlay.md#overlay-format-elfo-how-the-host-consumes-it).
+
+### The app never returns control
+
+Returning from `app_main` is how an app exits: the overlay is unloaded, the base image deinitialized, and HOME reopens. An app that never returns leaks the run task. A UI app must hand control back cooperatively and then return. See [app-abi.md](app-abi.md#app-binary-contract-abi-entry-point).
+
+## Packaging and install
+
+### The device will not install the tar
+
+The installer only accepts a plain `.tar` in `/apps`, not a gzip, not a loose directory, not a `.bin`. It keys off the first `*.app.elf` member. Rebuild with `make pack` (or `pm pack`), which produces the correct shape, and verify with `tar -tvf`. See [publishing](guides/publishing.md).
+
+### macOS `._*` junk in the package
+
+Creating the tar from Finder copies pulls in `._*` metadata files. The installer skips them, but they bloat the package. `make pack` avoids them; use it rather than tarring by hand.
 
 
 ---

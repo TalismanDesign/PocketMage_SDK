@@ -7,7 +7,7 @@ path: /api/layout/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.503Z"
+  generated_at: "2026-10-31T22:45:59.832Z"
 ---
 ---
 title: "Layout (pocketmage_layout)"
@@ -145,3 +145,21 @@ void drawBudget(std::vector<String>& lines) {
     if (y > kEinkContentH) break;
   }
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ functions above; they are generated from them by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_layout_eink_row_pitch(int a0);
+size_t pm_layout_slice_that_fits(const char* a0, size_t a1, int a2, int a3);
+const char* pm_layout_truncate_with_ellipsis(const char* a0, int a1, int a2, int a3);
+int pm_layout_word_wrap_count(const char* a0, int a1, int a2);
+int pm_layout_word_wrap_get(const char* a0, int a1, int a2, int index, char* out, size_t out_size);
+```
+
+- `pm_layout_eink_row_pitch(a0)` is `einkRowPitch(s)`; `a0` is a `pm_style` value as int. Returns the canonical row height for that style.
+- `pm_layout_slice_that_fits(a0, a1, a2, a3)` is `sliceThatFits(s, n, maxTextWidth, style)`; `a0` is the string, `a1` is the byte length, `a2` is the pixel budget, `a3` is a `pm_style`. Returns the byte length of the longest prefix that fits, or 0 when nothing fits.
+- `pm_layout_truncate_with_ellipsis(a0, a1, a2, a3)` is `truncateWithEllipsis(text, maxWidthPx, style, target)`; `a0` is the text, `a1` is the pixel budget, `a2` is a `pm_style`, `a3` is a `pm_target` value as int. Returns a pointer into the rotating string pool.
+- `pm_layout_word_wrap_count` / `pm_layout_word_wrap_get` project `wordWrap()`, which returns `std::vector<String>`. Call `pm_layout_word_wrap_count(a0, a1, a2)` for the line count, then `pm_layout_word_wrap_get(a0, a1, a2, index, out, out_size)` per index to copy a wrapped line into the caller buffer `out` (at most `out_size` bytes). `a0` is the text, `a1` is the pixel budget, `a2` is a `pm_style`. `_get` returns the line length or -1 for a bad index. These write into the caller buffer, not the rotating pool.

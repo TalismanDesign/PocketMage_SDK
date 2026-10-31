@@ -7,7 +7,7 @@ path: /api/font/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.500Z"
+  generated_at: "2026-10-31T22:45:59.831Z"
 ---
 ---
 title: "Fonts & Text (pocketmage_font)"
@@ -147,4 +147,28 @@ void drawTitle() {
 }
 ```
 
-Remember `y` is the baseline. `kOledWordBaseline` (16) and the
+Remember `y` is the baseline, not the top of the glyph. The layout constants give the standard baselines: `kOledWordBaseline` (16) for the `oledWord`/`sysMessage` cascade, `kOledWordLargeBaseline` (21) for the `allowLarge` (`Heading2`) variant, and `kOledEditBaseline` (20) for the `oledLine` input row. They are defined in `pocketmage_layout.h`; see [layout](layout.md).
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+int pm_font_engine_char_width(int a0, uint16_t a1, int a2);
+int pm_font_engine_font_ascent(int a0, int a1);
+int pm_font_engine_font_descent(int a0, int a1);
+int pm_font_engine_font_height_txt(uint8_t a0, uint8_t a1, uint8_t a2);
+int pm_text_width(int a0, const char* a1, int a2);
+int pm_font_height(int a0, int a1);
+void pm_text_color(int a0, uint16_t a1);
+```
+
+These project the static `FontEngine` methods. In every signature `a0` (the first `int`) is a `pm_target` value as int (`PM_TARGET_OLED` or `PM_TARGET_EINK`) except for `pm_font_engine_font_height_txt`, which takes no target. A trailing `int` carrying a style is a `pm_style` value as int.
+
+- `pm_font_engine_char_width(a0, a1, a2)` is `charWidth(target, unicode, style)`; `a1` is the codepoint, `a2` is a `pm_style`. Returns the advance width in pixels.
+- `pm_font_engine_font_ascent(a0, a1)` is `fontAscent(target, style)`; `a1` is a `pm_style`.
+- `pm_font_engine_font_descent(a0, a1)` is `fontDescent(target, style)`; `a1` is a `pm_style`.
+- `pm_font_engine_font_height_txt(a0, a1, a2)` is `fontHeightTxt(family, sizeIdx, variant)` with the TXT matrix indices; no target argument.
+- `pm_text_width(a0, a1, a2)` is `textWidth(target, text, style)`; `a1` is the UTF-8 text, `a2` is a `pm_style`. Returns the measured pixel width.
+- `pm_font_height(a0, a1)` is `fontHeight(target, style)`; `a1` is a `pm_style`.
+- `pm_text_color(a0, a1)` is `setTextColor(target, color)`; `a1` is the 16-bit color (0 = black, 1 = white), touching only the given target.

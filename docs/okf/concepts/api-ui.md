@@ -7,7 +7,7 @@ path: /api/ui/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.505Z"
+  generated_at: "2026-10-31T22:45:59.833Z"
 ---
 ---
 title: "UI helpers (pocketmage_ui)"
@@ -92,3 +92,22 @@ extern "C" int main(int, char**) {
   endEinkScreen("Settings");
   return 0;
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ functions above; they are generated from them by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_ui_draw_scrollbar(int a0, int a1, int a2, int a3, int a4, int a5, int a6, bool a7, uint16_t a8, uint16_t a9);
+void pm_ui_begin_eink_screen(bool a0);
+void pm_ui_end_eink_screen(const char* a0, int a1);
+void pm_ui_draw_list_item(int a0, int a1, const char* a2, int a3);
+int pm_ui_draw_chip_text(int a0, int a1, const char* a2, int a3, int a4, bool a5, int a6, int a7, int a8, int a9);
+```
+
+- `pm_ui_draw_scrollbar(a0..a9)` is `drawScrollbar(total, visible, index, barX, barY, barH, barW, clearBg, fg, bg)`; `a0..a6` are the int geometry args, `a7` is `clearBg`, and `a8`/`a9` are the 16-bit `fg`/`bg` colors.
+- `pm_ui_begin_eink_screen(a0)` is `beginEinkScreen(preserveBg)`.
+- `pm_ui_end_eink_screen(a0, a1)` is `endEinkScreen(statusText, mode)`; `a0` is the status text, `a1` is a `pm_refresh` value as int (`PM_REFRESH_NORMAL` or `PM_REFRESH_FORCE_FULL`).
+- `pm_ui_draw_list_item(a0, a1, a2, a3)` is `drawListItem(x, y, text, maxWidth)`; `a2` is the row text, `a3` is the max width (-1 to disable truncation).
+- `pm_ui_draw_chip_text(a0..a9)` is `drawChipText(x, baselineY, text, style, maxTextW, inverted, chipMaxW, padX, chipH, bottomPad)`; `a2` is the text, `a3` is a `pm_style` value as int, `a5` is `inverted`, and the rest are the int geometry args. Returns the chip width in pixels.

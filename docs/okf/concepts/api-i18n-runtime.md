@@ -7,7 +7,7 @@ path: /api/i18n-runtime/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.501Z"
+  generated_at: "2026-10-31T22:45:59.831Z"
 ---
 ---
 title: "Internationalization (i18n)"
@@ -79,4 +79,40 @@ So both `"réglages"` and `"reglages"` resolve to settings, while file arguments
 
 ## Adding a language
 
-The string tables are generated (see `pocketmage_i18n/README`): add a `.po` catalog and re-run the generator, and the `Lang` enum, `StringID`-ordered table, and string block for `appName`/`kbAppName`/months/days all follow. Fallback rules: a missing id in a non-English table falls back to the
+The string tables are generated (see `pocketmage_i18n/README`): add a `.po` catalog and re-run the generator, and the `Lang` enum, `StringID`-ordered table, and string block for `appName`/`kbAppName`/months/days all follow. Fallback rules: a missing (empty `msgstr`) id in a non-English table falls back to the English string at generation time, so every `StringID` always resolves to a non-empty string. An out-of-range language index clamps to English; an out-of-range `StringID` returns the empty string.
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+void pm_i18n_set_language(int a0);
+bool pm_i18n_set_language_by_code(const char* a0);
+int pm_i18n_language();
+int pm_i18n_language_count();
+const char* pm_i18n_code();
+const char* pm_i18n_code_at(int a0);
+const char* pm_i18n_native_name();
+const char* pm_i18n_native_name_at(int a0);
+const char* pm_i18n_get(int a0);
+const char* pm_i18n_month_name(int a0);
+const char* pm_i18n_day_name(int a0);
+const char* pm_i18n_app_name(int a0);
+const char* pm_i18n_kb_app_name(int a0);
+const char* pm_i18n_normalize_command(const char* a0);
+```
+
+These project the static `I18n` methods. Every `const char*` return points into the rotating string pool; copy it before the next SDK call if it must outlive four further string-returning calls.
+
+- `pm_i18n_set_language(a0)` is `setLanguage(lang)`; `a0` is a `pm_lang` value as int, out-of-range clamping to English.
+- `pm_i18n_set_language_by_code(a0)` is `setLanguageByCode(code)`; `a0` is a two-letter code. Returns false and leaves the language unchanged for an unknown code.
+- `pm_i18n_language()` is `language()`. Returns the active `pm_lang` as int.
+- `pm_i18n_language_count()` is `languageCount()`.
+- `pm_i18n_code()` / `pm_i18n_code_at(a0)` are `code()` / `code(idx)`; `a0` is the catalog index.
+- `pm_i18n_native_name()` / `pm_i18n_native_name_at(a0)` are `nativeName()` / `nativeName(idx)`.
+- `pm_i18n_get(a0)` is `get(id)`; `a0` is a `StringID` value as int (for example `STR_INVALID`). This is the `TR()` lookup.
+- `pm_i18n_month_name(a0)` is `monthName(month)`; `a0` is 1..12.
+- `pm_i18n_day_name(a0)` is `dayName(idx)`; `a0` is 0..6, Sunday-first.
+- `pm_i18n_app_name(a0)` is `appName(idx)`; `a0` is the home-grid index 0..10.
+- `pm_i18n_kb_app_name(a0)` is `kbAppName(idx)`; `a0` is the app-switcher index 0..11.
+- `pm_i18n_normalize_command(a0)` is `normalizeCommand(raw)`; `a0` is the raw command line. Returns the canonical English verb with argument bytes preserved.

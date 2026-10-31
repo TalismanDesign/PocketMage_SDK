@@ -7,7 +7,7 @@ path: /api/bz/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.498Z"
+  generated_at: "2026-10-31T22:45:59.830Z"
 ---
 ---
 title: "Buzzer (pocketmage_bz)"
@@ -47,7 +47,7 @@ namespace Jingles {
 }
 ```
 
-Built-in melodies use `NOTE_A8` / `NOTE_B8` / `NOTE_C8` / `NOTE_D8` constants from the include set. A custom jingle is just a new `constexpr` note array plus a `Jingle`:
+Built-in melodies use `NOTE_A8` / `NOTE_B8` / `NOTE_C8` / `NOTE_D8` constants from the include set. A custom jingle is a new `constexpr` note array plus a `Jingle`:
 
 ```cpp
 constexpr static const Note myNotes[] = {
@@ -80,3 +80,18 @@ public:
 void announce() {
   BZ().playJingle(Jingles::Startup);
 }
+```
+
+## C ABI (`pm_*`)
+
+External ELF apps call these C wrappers rather than the C++ class above; they are generated from it by `gen_app_api.py` and declared in `pm_sdk_app.h` (pulled in via `pm_app_api.h`). See the [function index](functions.md) and the [projection model](index.md#api-reference-the-c-abi-pm) for the general rules.
+
+```c
+bool pm_bz_begin(int a0);
+void pm_bz_end();
+void pm_bz_play_jingle(int a0);
+```
+
+- `pm_bz_begin(a0)` is `PocketmageBZ::begin(channel)` on `BZ()`; `a0` is the PWM channel. Returns true on success.
+- `pm_bz_end()` is `end()`.
+- `pm_bz_play_jingle(a0)` is `playJingle()`; `a0` is a `pm_jingle` value as int (`PM_JINGLE_STARTUP` or `PM_JINGLE_SHUTDOWN`) selecting a built-in melody. Plays synchronously.

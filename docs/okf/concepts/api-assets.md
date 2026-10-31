@@ -7,7 +7,7 @@ path: /api/assets/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.497Z"
+  generated_at: "2026-10-31T22:45:59.829Z"
 ---
 ---
 title: "Built-in asset bitmaps (libAssets.h)"
@@ -16,7 +16,7 @@ description: "Compiled-in PROGMEM bitmaps for the status bar, screensavers, and 
 
 # Built-in assets
 
-The SDK ships small PROGMEM bitmaps for the OS status line and screensavers. Apps can draw them directly with the E-Ink/OLED bitmap primitives, or they can draw custom assets from the SD card (`/assets/...`, see [publishing](../publish.md)) instead.
+The SDK ships small PROGMEM bitmaps for the OS status line and screensavers. Apps can draw them directly with the E-Ink/OLED bitmap primitives, or they can draw custom assets from the SD card (`/assets/...`, see [publishing](../guides/publishing.md)) instead.
 
 ```cpp
 #include <pocketmage.h>
@@ -78,3 +78,4 @@ void drawOwnBatteryGauge(int x, int y) {
   FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
   EINK().drawBitmap(x, y, batt_allArray[battState], 10, 6, GxEPD_BLACK);
 }
+```

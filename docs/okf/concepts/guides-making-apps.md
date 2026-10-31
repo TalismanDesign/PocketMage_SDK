@@ -7,7 +7,7 @@ path: /guides/making-apps/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T06:06:57.509Z"
+  generated_at: "2026-10-31T22:45:59.836Z"
 ---
 ---
 title: "Making an app"
@@ -16,7 +16,7 @@ description: "Scaffold, build, pack, and run your first PocketMage app."
 
 # Making an app
 
-A PocketMage app is a position-independent xtensa ELF that the host firmware loads into RAM and runs in-process. It links nothing: newlib, libstdc++, and the SDK itself are all left undefined and resolved at load time against the host's export table (see [the ABI](app-abi.md) and [symbols](../symbols.md)).
+A PocketMage app is a position-independent xtensa ELF that the host firmware loads into RAM and runs in-process. It links nothing: newlib, libstdc++, and the SDK itself are all left undefined and resolved at load time against the host's export table (see [the ABI](../app-abi.md) and [symbols](../symbols.md)).
 
 ## 1. Scaffold
 
@@ -30,9 +30,7 @@ This clones the official template repository into `./myapp`:
 - `myapp_ICON.bin`, the 1-bit app icon (128x128, big-endian row-major) bundled into the delivery tar.
 - `Makefile`, a file that sets `SDK_ROOT` from `PM_SDK_ROOT` and includes the SDK recipe.
 
-The template repository is
-[PocketMage_App](https://github.com/TalismanDesign/PocketMage_App). Set
-`PM_TEMPLATE_REPO` to scaffold from a fork.
+The template repository is [PocketMage_App](https://github.com/TalismanDesign/PocketMage_App). Set `PM_TEMPLATE_REPO` to scaffold from a fork.
 
 App names are `[A-Za-z][A-Za-z0-9_]*`; the name becomes the ELF, tar, icon, and install slot name. For an API walkthrough, open the [rendering guide](rendering.md).
 
@@ -93,7 +91,7 @@ pm build myapp --pack     # build + pack
 # or:  make pack
 ```
 
-Produces `build/<name>.tar` containing the stripped ELF and the icon. That tar is what gets installed onto the SD card (see [publishing](../publish.md)).
+Produces `build/<name>.tar` containing the stripped ELF and the icon. That tar is what gets installed onto the SD card (see [publishing](publishing.md)).
 
 ## 6. Run
 
