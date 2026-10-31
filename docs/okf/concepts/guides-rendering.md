@@ -7,7 +7,7 @@ path: /guides/rendering/
 updated: 2026-10-31
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T05:13:24.176Z"
+  generated_at: "2026-10-31T05:39:42.005Z"
 ---
 ---
 title: "Rendering"
