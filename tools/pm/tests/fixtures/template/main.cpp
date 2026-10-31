@@ -19,8 +19,8 @@ extern "C" int main(int argc, char **argv) {
   printf("pocketmage app starting: %s (%s)\n", app_name, elf_path);
 
   if (pm_app_abi() != PM_APP_API_ABI) {
-    printf("host ABI mismatch: app %u, host %u; this build is stale\n",
-           PM_APP_API_ABI, pm_app_abi());
+    printf("host ABI mismatch: app %u, host %u; this build is stale\n", PM_APP_API_ABI,
+           pm_app_abi());
     pm_oled_sysmsg("SDK ABI mismatch", 2000);
     return 1;
   }
@@ -29,7 +29,7 @@ extern "C" int main(int argc, char **argv) {
   printf("built against sdk %s, host reports %s\n", PM_SDK_VERSION,
          host_version ? host_version : "unknown");
 
-  pm_bz_play_jingle(0);  
+  pm_bz_play_jingle(0);
 
   const int w = pm_eink_width();
   const int h = pm_eink_height();
@@ -49,15 +49,13 @@ extern "C" int main(int argc, char **argv) {
 
   pm_eink_clear();
   pm_text_color(PM_TARGET_EINK, 1);
-  pm_text(PM_TARGET_EINK, center_x(w, title, PM_STYLE_HEADING2),
-          8 + title_h, title, PM_STYLE_HEADING2);
-  pm_text(PM_TARGET_EINK, 8, 8 + 2 * title_h, "A PocketMage app",
-          PM_STYLE_BODY);
-  pm_text(PM_TARGET_EINK, 8, 8 + 2 * title_h + body_h + 4, time_line,
-          PM_STYLE_MONO);
-  pm_eink_rect(8, h - 30, w - 8, h - 30, true, true);  
-  pm_text(PM_TARGET_EINK, center_x(w, "any key to quit", PM_STYLE_CAPTION),
-          h - 8, "any key to quit", PM_STYLE_CAPTION);
+  pm_text(PM_TARGET_EINK, center_x(w, title, PM_STYLE_HEADING2), 8 + title_h, title,
+          PM_STYLE_HEADING2);
+  pm_text(PM_TARGET_EINK, 8, 8 + 2 * title_h, "A PocketMage app", PM_STYLE_BODY);
+  pm_text(PM_TARGET_EINK, 8, 8 + 2 * title_h + body_h + 4, time_line, PM_STYLE_MONO);
+  pm_eink_rect(8, h - 30, w - 8, h - 30, true, true);
+  pm_text(PM_TARGET_EINK, center_x(w, "any key to quit", PM_STYLE_CAPTION), h - 8,
+          "any key to quit", PM_STYLE_CAPTION);
   pm_eink_refresh();
 
   pm_oled_sysmsg("app loaded", 1200);
@@ -72,7 +70,7 @@ extern "C" int main(int argc, char **argv) {
       pm_bz_play_jingle(1);
       return 0;
     }
-    const int state = pm_kb_state();  
+    const int state = pm_kb_state();
     if (state != old_state) {
       printf("kb state %d\n", state);
       old_state = state;

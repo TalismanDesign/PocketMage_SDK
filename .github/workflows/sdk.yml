@@ -73,13 +73,13 @@ jobs:
           pm check "app-template"
 
       - name: Assert artifact little-endian and complete
-        working-directory: app-template/build
+        working-directory: app-template
         run: |
           set -euo pipefail
-          xtensa-esp-elf-readelf -h app-template.app.elf | grep -q 'little endian'
+          xtensa-esp-elf-readelf -h build/app-template.app.elf | grep -q 'little endian'
           test 200 -eq "$(stat -c %s app-template_ICON.bin)"
-          tar -tf app-template.tar | grep -q -- 'app-template.app.elf'
-          tar -tf app-template.tar | grep -q -- 'app-template_ICON.bin'
+          tar -tf build/app-template.tar | grep -q -- 'app-template.app.elf'
+          tar -tf build/app-template.tar | grep -q -- 'app-template_ICON.bin'
 
       - name: Build and reject the negative fixture
         run: |
@@ -110,11 +110,11 @@ jobs:
           set -euo pipefail
           V="$(tr -d '[:space:]' < VERSION)"
           grep -Eq "pocketmage_sdk_version\[\] = \"$V\"" pocketmage_globals.cpp
-          IFS=. read -r VMAJ VMIN VPAT <<< "$V"
-          grep -Eq "#define POCKETMAGE_SDK_VERSION_MAJOR $VMAJ([^0-9]|$)" pocketmage_app_version.h
-          grep -Eq "#define POCKETMAGE_SDK_VERSION_MINOR $VMIN([^0-9]|$)" pocketmage_app_version.h
-          grep -Eq "#define POCKETMAGE_SDK_VERSION_PATCH $VPAT([^0-9]|$)" pocketmage_app_version.h
-          ! grep -Eq '^version = ' pyproject.toml
+          grep -Eq "#define POCKETMAGE_SDK_VERSION_MAJOR PM_SDK_VERSION_MAJOR" pocketmage_app_version.h
+          grep -Eq "#define POCKETMAGE_SDK_VERSION_MINOR PM_SDK_VERSION_MINOR" pocketmage_app_version.h
+          grep -Eq "#define POCKETMAGE_SDK_VERSION_PATCH PM_SDK_VERSION_PATCH" pocketmage_app_version.h
+          grep -Eq '^version = \{file = \["VERSION"\]\}' pyproject.toml
+          ! grep -Eq '^version = "' pyproject.toml
           python3 - "$V" <<'PY'
           import json
           import sys
@@ -189,6 +189,13 @@ jobs:
 
       - name: Install the SDK
         run: pip install .
+
+      - name: Generate i18n tables
+        run: |
+          set -euo pipefail
+          python pocketmage_i18n/tools/gen_i18n.py --force \
+            --catalog pocketmage_i18n/languages \
+            --out-dir pocketmage_i18n
 
       - name: pm reports the SDK version
         run: |

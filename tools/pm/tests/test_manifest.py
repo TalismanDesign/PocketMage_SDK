@@ -10,6 +10,10 @@ OS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__),
 SOURCE = os.path.join(OS_ROOT, "src", "elf_app_manifest.cpp")
 HEADER = os.path.join(OS_ROOT, "include", "elf_app_manifest.h")
 
+# The manifest parser lives in the firmware, which is present only when the
+# SDK is checked out inside PocketMageOS.
+HAVE_FIRMWARE_SOURCE = os.path.isfile(SOURCE) and os.path.isfile(HEADER)
+
 HARNESS = r"""
 #include <elf_app_manifest.h>
 #include <stdio.h>
@@ -97,6 +101,8 @@ class ManifestHarness:
         raise AssertionError("no %s line in harness output" % tag)
 
 
+@unittest.skipUnless(HAVE_FIRMWARE_SOURCE,
+                     "firmware elf_app_manifest source not in this checkout")
 class ManifestParsing(unittest.TestCase):
     def test_all_fields_are_read(self):
         h = ManifestHarness(
@@ -169,6 +175,8 @@ class ManifestParsing(unittest.TestCase):
         self.assertEqual(h.name, "Notes")
 
 
+@unittest.skipUnless(HAVE_FIRMWARE_SOURCE,
+                     "firmware elf_app_manifest source not in this checkout")
 class ScopeParsing(unittest.TestCase):
     def test_all_is_unrestricted(self):
         h = ManifestHarness("scope=all\n")
@@ -214,6 +222,8 @@ class ScopeParsing(unittest.TestCase):
         self.assertEqual(h.prefixes, ["pm_eink_"])
 
 
+@unittest.skipUnless(HAVE_FIRMWARE_SOURCE,
+                     "firmware elf_app_manifest source not in this checkout")
 class ScopeGating(unittest.TestCase):
     def allows(self, scope, probes):
         return ManifestHarness("scope=%s\n" % scope, probes).allows
