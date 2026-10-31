@@ -127,7 +127,10 @@ def host_exports_candidates(sdk_root: str) -> list[str]:
 
 
 def read_curated(sdk_root: str) -> set[str]:
-    paths = [os.path.join(sdk_root, "symbols.list")]
+    paths = [
+        os.path.join(sdk_root, "symbols.list"),
+        os.path.join(sdk_root, "host_baseline.list"),
+    ]
     for candidate in host_exports_candidates(sdk_root):
         if os.path.isfile(candidate):
             paths.append(candidate)
