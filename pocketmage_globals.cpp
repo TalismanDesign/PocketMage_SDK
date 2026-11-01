@@ -65,4 +65,4 @@ void recoverFromCrash() {
 // release with the SDK they were built against (see symbols.list).
 // Must match the VERSION file at the repo root: CI fails the build when the
 // two drift.
-extern "C" const char pocketmage_sdk_version[] = "0.1.0";
+extern "C" const char pocketmage_sdk_version[] = "0.2.0";
