@@ -1,6 +1,6 @@
 import sys
 
-from tools.pm.cli import main
+from tools.pm.launcher import main
 
 if __name__ == "__main__":
     sys.exit(main())

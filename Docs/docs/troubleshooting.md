@@ -49,6 +49,34 @@ Not a failure. The post-link strip removed the `app_main` name, but the entry is
 
 The app links static constructors. The host's `esp_elf` loader does not run relocation-time constructors, so they never execute. Remove the static construction, or move the initialization into `app_main`. The compile flags `-fno-exceptions -fno-rtti -fno-threadsafe-statics` are on by default to keep this from happening; a remaining `.init_array` usually comes from a global with a non-trivial constructor. See [app-abi.md](app-abi.md#app-binary-contract-abi-how-loading-works).
 
+## pm tooling
+
+### `ModuleNotFoundError: No module named 'tools'` when running `pm`
+
+The `pm` command was installed editable (`pip install -e`) against a checkout that has since moved or been deleted, so its link to the `tools` package is dead. A common trigger is installing from a temporary scaffold directory that the OS later cleaned up. Current `pm` builds detect this and offer to reinstall; if you see the raw error, the installed CLI predates the resilient launcher. Reinstall against a live checkout:
+
+```sh
+pm update-sdk --sdk /path/to/PocketMage_SDK
+```
+
+If `pm` itself will not start, run the equivalent reinstall directly with the interpreter that owns the `pm` script:
+
+```sh
+/path/to/that/python -m pip install -e /path/to/PocketMage_SDK
+```
+
+Run [`pm doctor`](cli.md#pm-cli-commands-pm-doctor) afterward to confirm the install is healthy.
+
+### `pm` behaves differently from the SDK checkout you are editing
+
+The installed CLI is a different version from the checkout. `pm doctor` reports the version skew. Reinstall to re-sync:
+
+```sh
+pm update-sdk
+```
+
+An editable install avoids this in the first place, because the CLI tracks the checkout it was linked to. See [the install notes](cli.md#pm-cli-install).
+
 ## Load-time (on device)
 
 ### `ELF needs symbols outside its scope`

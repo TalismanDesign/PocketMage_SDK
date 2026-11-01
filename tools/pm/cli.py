@@ -7,6 +7,7 @@ import sys
 
 from tools import symbols as symbols_mod
 from tools.pm import app as app_mod
+from tools.pm import env as env_mod
 from tools.pm import gate as gate_mod
 from tools.pm import release as release_mod
 from tools.pm.app import PmError, sdk_version
@@ -121,6 +122,88 @@ def cmd_version(ui: UI, args) -> int:
     return 0
 
 
+def cmd_doctor(ui: UI, args) -> int:
+    ui.section("pm environment")
+    info = env_mod.inspect_install()
+    ui.result("python", sys.executable)
+    ui.result(
+        "pocketmage-sdk",
+        f"{info.version} (installed)" if info.installed else "not installed",
+    )
+    ui.result("install mode", "editable" if info.editable else "regular")
+
+    try:
+        checkout = app_mod.sdk_root()
+    except PmError:
+        checkout = None
+    ui.result("sdk checkout", checkout or "not found")
+    if checkout:
+        ui.result("checkout VERSION", env_mod.checkout_version(checkout) or "unreadable")
+
+    problems = 0
+
+    if info.editable and info.editable_target is not None:
+        ui.result("editable target", info.editable_target)
+        if info.target_exists is False:
+            ui.error("editable target no longer exists; the install is orphaned")
+            problems += 1
+
+    if not info.importable:
+        ui.error("the 'tools' package is not importable in this interpreter")
+        problems += 1
+
+    if (
+        info.installed
+        and checkout is not None
+        and info.version
+        and info.version != env_mod.checkout_version(checkout)
+    ):
+        ui.warning(
+            f"installed CLI is {info.version} but the checkout is "
+            f"{env_mod.checkout_version(checkout)}; run `pm update-sdk`"
+        )
+        problems += 1
+
+    if problems:
+        target = checkout or env_mod.discover_sdk_root()
+        if target:
+            cmd = " ".join(env_mod.pip_install_command(target, editable=True))
+            ui.section("suggested fix")
+            ui.command(cmd.split())
+            ui.info("or run `pm update-sdk`")
+        else:
+            ui.info("set PM_SDK_ROOT to a PocketMage_SDK checkout and run `pm update-sdk`")
+        return 1
+
+    ui.success("pm is healthy")
+    return 0
+
+
+def cmd_update_sdk(ui: UI, args) -> int:
+    sdk_root = env_mod.discover_sdk_root(args.sdk)
+    if not sdk_root:
+        if args.sdk:
+            ui.error(f"{args.sdk} is not a PocketMage SDK root")
+        else:
+            ui.error(
+                "no SDK checkout found; pass --sdk <path>, set PM_SDK_ROOT, or run from "
+                "inside a PocketMage_SDK checkout"
+            )
+        return 1
+
+    editable = not args.no_editable
+    cmd = env_mod.pip_install_command(sdk_root, editable=editable)
+    ui.section(f"reinstalling pocketmage-sdk from {sdk_root}")
+    ui.command(cmd)
+    code = env_mod.run_pip_install(sdk_root, editable=editable)
+    if code != 0:
+        ui.error(f"pip install failed (exit {code})")
+        return code
+    ui.success(f"pm now points at {sdk_root}")
+    ui.info("re-run your original pm command; this process still holds the old import state")
+    return 0
+
+
 def cmd_exports(ui: UI, args) -> int:
     root = app_mod.sdk_root()
     sdk_symbols = os.path.join(root, "symbols.list")
@@ -222,6 +305,22 @@ def _build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("version", help="print pocketmage_sdk_version")
 
+    sub.add_parser("doctor", help="diagnose the pm install and the SDK checkout it points at")
+
+    for name, help_text in (
+        ("update-sdk", "reinstall pm against a live SDK checkout"),
+        ("update-self", "alias for update-sdk"),
+    ):
+        p_update = sub.add_parser(name, help=help_text)
+        p_update.add_argument(
+            "--sdk", default=None,
+            help="SDK checkout to install from (default: PM_SDK_ROOT or cwd ancestor)",
+        )
+        p_update.add_argument(
+            "--no-editable", action="store_true",
+            help="copy install into site-packages instead of an editable link",
+        )
+
     return parser
 
 
@@ -244,6 +343,10 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_release(ui, args)
         if args.command == "version":
             return cmd_version(ui, args)
+        if args.command == "doctor":
+            return cmd_doctor(ui, args)
+        if args.command in ("update-sdk", "update-self"):
+            return cmd_update_sdk(ui, args)
     except PmError as exc:
         ui.error(str(exc))
         sys.stderr.write(f"\nhint: {_PROG} --help\n")

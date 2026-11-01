@@ -23,7 +23,7 @@ target-version = "py310"
 select = ["E", "F", "I"]
 
 [project.scripts]
-pm = "tools.pm.cli:main"
+pm = "tools.pm.launcher:main"
 
 [tool.setuptools.packages.find]
 include = ["tools", "tools.pm*"]

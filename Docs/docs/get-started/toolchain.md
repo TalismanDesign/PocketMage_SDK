@@ -48,12 +48,14 @@ Override the tool paths instead of using `PATH` with `ELF_OVERLAY_RELINK` and `E
 
 ## pm CLI
 
-The `pm` CLI ships with the SDK as the `pocketmage_sdk` package:
+The `pm` CLI ships with the SDK as the `pocketmage-sdk` distribution. Install it editable from the SDK repo root so `pm` tracks the checkout:
 
 ```sh
-pip install .        # from the SDK repo root
+pip install -e .     # editable: pm tracks the checkout it was installed from
 pm --help
 ```
+
+A plain `pip install .` copies the package into `site-packages` instead; use that when you do not have a persistent checkout to track. If an editable checkout is later moved or deleted, `pm` detects the orphaned install and offers to reinstall rather than failing with an import error (see [`pm doctor`](../cli.md#pm-cli-commands-pm-doctor)).
 
 `pm` wraps the same `make` contract and adds the enforcing dependency gate. The full command surface is in [cli.md](../cli.md). Icon validation uses Pillow, so install it if you want `pm check` to validate the icon:
 
@@ -64,10 +66,11 @@ pip install Pillow
 ## Verify
 
 ```sh
+pm doctor
 pm new hello
 cd hello
 pm build --pack
 pm check
 ```
 
-A green `pm check` means every symbol the app references resolves against the host surface, and the app is ready to install. If any of these steps fail, see [Troubleshooting](../troubleshooting.md).
+`pm doctor` confirms the install is healthy and resolves a live SDK checkout before you build. A green `pm check` means every symbol the app references resolves against the host surface, and the app is ready to install. If any of these steps fail, see [Troubleshooting](../troubleshooting.md).
