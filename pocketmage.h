@@ -7,6 +7,7 @@
 #include <pocketmage_kb/pocketmage_kb.h>
 #include <pocketmage_bz/pocketmage_bz.h>
 #include <pocketmage_audio/pocketmage_audio.h>
+#include <pocketmage_image/pocketmage_image.h>
 #include <pocketmage_touch/pocketmage_touch.h>
 #include <pocketmage_clock/pocketmage_clock.h>
 #include <pocketmage_wifi/pocketmage_wifi.h>

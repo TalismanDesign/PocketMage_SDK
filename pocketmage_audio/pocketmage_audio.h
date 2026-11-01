@@ -17,6 +17,12 @@ enum class AudioState {
   Stopping  // Teardown in progress
 };
 
+// Output sink selection
+enum class AudioOutput {
+  Piezo,  // PWM on piezo / buzzer
+  Usb,    // USB UAC host speaker
+};
+
 // pwm_audio shares the piezo (BZ_PIN) with the buzzer; both drive LEDC. The
 // sink is torn down when playback ends so the buzzer can reclaim the pin.
 typedef std::function<void(void)> AudioEventCallback;

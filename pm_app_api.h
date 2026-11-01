@@ -56,6 +56,19 @@ bool pm_sd_dir_entry(int i, char* name_out, size_t name_size, bool* is_dir);
 // Release the open enumeration and its entry table.
 void pm_sd_dir_close(void);
 
+// Image decode (JPEG via esp_new_jpeg, PNG via vendored PNGdec). Writes to a
+// 1-bit e-ink framebuffer with Floyd-Steinberg dither and nearest-neighbour
+// scale. buf is packed MSB-first per byte (bit 7 = leftmost pixel).
+//
+// Decode path at SD path to 1-bit buffer at (outX,outY) scaled to fit maxSize.
+// Returns true on success.
+bool pm_image_decode_to_1bit(const char* path, uint8_t* buf, int buf_w, int buf_h,
+                            int out_x, int out_y, int max_size);
+
+// Probe image file. Returns true if recognized, fills width/height/format
+// (0=none, 1=jpeg, 2=png).
+bool pm_image_probe(const char* path, int* width, int* height, int* format);
+
 // Clock fields. nowDT returns a DateTime by value, which has no C spelling.
 
 // UNIX epoch in seconds (UTC).

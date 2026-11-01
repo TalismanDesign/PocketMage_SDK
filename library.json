@@ -43,6 +43,9 @@
         "gmarty2000/Buzzer": "^1.0.0",
         "pwm_audio": "*",
         "esp_audio_codec": "*",
+        "esp_new_jpeg": "*",
+        "PNGdec": "https://github.com/bitbank2/PNGdec.git",
+        "usb_stream_wrapper": "*",
         "TalismanDesign/U8g2_for_Adafruit_GFX": "https://github.com/TalismanDesign/U8g2_for_Adafruit_GFX.git",
         "ashtf8/GxEPD2_Editable_useFastFullUpdate": "https://github.com/ashtf8/GxEPD2_Editable_useFastFullUpdate",
         "TalismanDesign/MP2722_Arduino": "https://github.com/TalismanDesign/MP2722_Arduino.git",
@@ -63,7 +66,8 @@
             "-I../esp-adf-libs/esp_audio_codec/include/decoder",
             "-I../esp-adf-libs/esp_audio_codec/include/decoder/impl",
             "-I../esp-adf-libs/esp_audio_codec/include/simple_dec",
-            "-I../esp-adf-libs/esp_audio_codec/include/simple_dec/impl"
+            "-I../esp-adf-libs/esp_audio_codec/include/simple_dec/impl",
+            "-I../esp-adf-libs/esp_new_jpeg/include"
         ]
     }
 }
