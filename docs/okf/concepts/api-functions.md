@@ -7,7 +7,7 @@ path: /api/functions/
 updated: 2026-11-01
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T00:02:39.173Z"
+  generated_at: "2026-11-01T01:09:38.802Z"
 ---
 ---
 title: "Function index (pm_*)"
