@@ -7,7 +7,7 @@ path: /symbols/
 updated: 2026-11-01
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T01:09:38.818Z"
+  generated_at: "2026-11-01T03:55:48.231Z"
 ---
 ---
 title: "Symbols and the dependency contract"
@@ -30,19 +30,28 @@ The `pm` gate reads both lists and takes their union as the curated surface (`to
 **The C and C++ runtime.** `libc`, `libm`, `libgcc`, `libstdc++` and `libsupc++` symbols the firmware already links are exported so apps can use third-party libraries, and `host_baseline.list` records them. `tools/symbols.py` derives this set by reading the toolchain archives with `nm` and keeping the symbols that are present in the firmware image:
 
 ```sh
-python3 tools/symbols.py --list symbols.list --host-elf <firmware.elf> \
+python3 tools/symbols.py --list symbols.list --baseline host_baseline.list \
+  --host-elf <firmware.elf> --cpp \
+  --include-header pm_app_api.h --include-header pm_sdk_app.h \
+  --output-file ../../src/ELF_SYMS/esp_all_symbol.cpp \
+  --toolchain-lib-dir <toolchain>/xtensa-esp-elf/lib/esp32s3/no-rtti \
+  --framework-lib-dir <framework-libs>/esp32s3/lib \
   --print-cost
 ```
 
 ```
-libc        250 symbols   4,467 bytes
-libm         15 symbols     262 bytes
+libc        248 symbols   4,434 bytes
+libm         14 symbols     238 bytes
 libstdc++    87 symbols   3,403 bytes
 libsupc++    58 symbols   2,362 bytes
 libgcc       65 symbols   1,552 bytes
 libnewlib    94 symbols   2,478 bytes
-total       602 symbols  15,009 bytes (14.7 KB)
+total       620 symbols  15,468 bytes (15.1 KB)
 ```
+
+`--toolchain-lib-dir` must point at the full newlib archives (`xtensa-esp-elf/lib/<target>/no-rtti`), not the picolibc stubs under `picolibc/...`: the picolibc `libm.a` is empty and its `libc.a` omits the dtoa and stdio-reentrancy helpers. `libgcc.a` is found by ascending to the toolchain root, so any lib dir below it resolves.
+
+`--baseline host_baseline.list` folds the recorded baseline back in as runtime externs. Its only effect beyond the archive scan is the POSIX directory calls (`opendir`, `readdir`, `closedir`, `rewinddir`, `seekdir`), which the firmware exports from the IDF VFS layer rather than from any scanned archive.
 
 That total includes the curated `pm_*` entries. The runtime adds about 11.2 KB of flash in the firmware image, once. It is not a per-app cost. Apps stay small: a hello world is 1.3 KB, an app using `std::vector` and `std::string` is 2.3 KB, an app with cJSON linked in is 5.2 KB. `--gc-sections` and `--strip-all` in `tools/app.mk` do that work.
 

@@ -7,7 +7,7 @@ path: /api/eink/
 updated: 2026-11-01
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T01:09:38.801Z"
+  generated_at: "2026-11-01T03:55:48.223Z"
 ---
 ---
 title: "E-Ink (pocketmage_eink)"
