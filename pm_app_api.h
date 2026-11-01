@@ -40,6 +40,22 @@ bool pm_sd_write_binary_file(const char* path, const uint8_t* buf, size_t len);
 // Create path (one level, like POSIX mkdir). True if it exists afterwards.
 bool pm_sd_mkdir(const char* path);
 
+// Directory enumeration. pm_sd_list_dir is flat and capped at MAX_FILES; this
+// walks an arbitrary directory with no cap and reports subdirectories, so apps
+// can recurse. One enumeration is live at a time, held in host memory.
+//
+// Open path for enumeration. Returns the entry count, or -1 on error. A prior
+// open is discarded.
+int pm_sd_dir_open(const char* path);
+
+// Copy entry i's leaf name (no directory prefix) into name_out, set *is_dir to
+// whether it is a directory, and return true. False if i is out of range or no
+// enumeration is open. name_out is always NUL-terminated when true.
+bool pm_sd_dir_entry(int i, char* name_out, size_t name_size, bool* is_dir);
+
+// Release the open enumeration and its entry table.
+void pm_sd_dir_close(void);
+
 // Clock fields. nowDT returns a DateTime by value, which has no C spelling.
 
 // UNIX epoch in seconds (UTC).

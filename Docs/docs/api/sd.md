@@ -149,3 +149,21 @@ All operate on the `PM_SDAUTO()` singleton. Every `const char*` return points in
 - `pm_sd_delete_file(a1)` is `deleteFile(fs, path)`; `a1` is the path, with the `fs::FS&` dropped.
 - `pm_sd_read_binary_file(a0, a1, a2)` is `readBinaryFile(path, buf, len)`; `a0` is the path, `a1` is the caller buffer, `a2` is its size. Returns false on a partial read.
 - `pm_sd_get_file_size(a0)` is `getFileSize(path)`. Returns the byte size.
+
+## Hand-written primitives
+
+Blob storage, directory creation, and directory enumeration have no SDK method to project, so they are hand-written host primitives in `pm_app_api.h` backed by the raw `File`/`FS` API. They are not part of the generated wrapper block.
+
+```c
+bool pm_sd_write_binary_file(const char* path, const uint8_t* buf, size_t len);
+bool pm_sd_mkdir(const char* path);
+int  pm_sd_dir_open(const char* path);
+bool pm_sd_dir_entry(int i, char* name_out, size_t name_size, bool* is_dir);
+void pm_sd_dir_close(void);
+```
+
+- `pm_sd_write_binary_file(path, buf, len)` writes `len` bytes verbatim, truncating any existing file. The generated `pm_sd_write_file` text path stops at the first NUL, so binary data needs this one. Returns true on a full write.
+- `pm_sd_mkdir(path)` creates one path level, like POSIX `mkdir`. Returns true if the path exists afterwards.
+- `pm_sd_dir_open(path)` opens `path` for enumeration and returns the entry count, or -1 on error. Unlike `pm_sd_list_dir` it has no `MAX_FILES` cap and it reports subdirectories, so an app can recurse. One enumeration is live at a time, held in host memory; a new open discards the previous one.
+- `pm_sd_dir_entry(i, name_out, name_size, is_dir)` copies entry `i`'s leaf name (no directory prefix) into `name_out`, sets `*is_dir`, and returns true. False when `i` is out of range or no enumeration is open. Copy the names you need before opening the next directory.
+- `pm_sd_dir_close()` releases the open enumeration and its table.
