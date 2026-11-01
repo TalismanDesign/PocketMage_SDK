@@ -209,6 +209,56 @@ class ValidationTests(CatalogCase):
             self.gen([base])
 
 
+class StalenessTests(CatalogCase):
+    def _generate(self, catalogs, out):
+        gen_i18n.generate(catalogs, out)
+
+    def test_fresh_output_is_not_stale(self):
+        out = os.path.join(self.root, "out")
+        catalogs = [self.make_base()]
+        self._generate(catalogs, out)
+        self.assertFalse(gen_i18n.is_stale(catalogs, out))
+
+    def test_missing_output_is_stale(self):
+        out = os.path.join(self.root, "out")
+        self.assertTrue(gen_i18n.is_stale([self.make_base()], out))
+
+    def test_edited_source_marks_stale(self):
+        out = os.path.join(self.root, "out")
+        base = self.make_base()
+        self._generate([base], out)
+        self.write("base/en/pocketmage_i18n.po",
+                   BASE_EN + '\nmsgctxt "STR_EXTRA"\nmsgid "x"\nmsgstr "x"\n')
+        self.assertTrue(gen_i18n.is_stale([base], out))
+
+    def test_added_catalog_marks_stale_despite_old_mtimes(self):
+        out = os.path.join(self.root, "out")
+        base = self.make_base()
+        self._generate([base], out)
+        app = self.make_app()
+        old = os.path.getmtime(os.path.join(out, gen_i18n.GEN_H_NAME))
+        for root, _dirs, names in os.walk(app):
+            for name in names:
+                path = os.path.join(root, name)
+                os.utime(path, (old - 100, old - 100))
+        self.assertTrue(gen_i18n.is_stale([base, app], out))
+
+    def test_header_without_signature_is_stale(self):
+        out = os.path.join(self.root, "out")
+        base = self.make_base()
+        self._generate([base], out)
+        header_path = os.path.join(out, gen_i18n.GEN_H_NAME)
+        with open(header_path, encoding="utf-8") as fh:
+            text = fh.read()
+        stripped = "\n".join(
+            line for line in text.splitlines()
+            if not line.startswith(gen_i18n.SIGNATURE_PREFIX)
+        )
+        with open(header_path, "w", encoding="utf-8") as fh:
+            fh.write(stripped)
+        self.assertTrue(gen_i18n.is_stale([base], out))
+
+
 class ParseTests(unittest.TestCase):
     def test_parse_quoted_unescapes(self):
         self.assertEqual(gen_i18n.parse_quoted('"a\\nb\\"c"'), 'a\nb"c')
