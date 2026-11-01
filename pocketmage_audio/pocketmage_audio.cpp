@@ -15,6 +15,7 @@ extern "C" {
 #include "esp_audio_types.h"
 #include "pwm_audio.h"
 }
+#include <usb_stream.h>
 
 static const char* TAG = "PocketMageAudio";
 
@@ -28,6 +29,15 @@ static constexpr ledc_timer_bit_t AUDIO_DUTY_RES = LEDC_TIMER_10_BIT;
 // Base decoders register once per boot; the register-default calls are
 // idempotent-guarded by this flag since there is no host unregister path.
 static bool s_decodersRegistered = false;
+
+// USB audio device state callback (static: passed to usb_streaming_state_register).
+// Runs in the usb_stream task context; only sets a flag and wakes the audio
+// task via publishEvent().
+void PocketMageAudio::usbStateCb(usb_stream_state_t state, void* user_ptr) {
+  auto* audio = static_cast<PocketMageAudio*>(user_ptr);
+  audio->_usbConnected = (state == STREAM_CONNECTED);
+  audio->publishEvent();
+}
 
 PocketMageAudio& PocketMageAudio::getInstance() {
   static PocketMageAudio instance;
@@ -48,7 +58,11 @@ PocketMageAudio::PocketMageAudio()
       _pinOwned(false),
       _eventPending(false),
       _stopRequested(false),
-      _paused(false) {
+      _paused(false),
+      _output(AudioOutput::Piezo),
+      _usbConnected(false),
+      _usbConfigured(false),
+      _usbStarted(false) {
   _currentPath[0] = 0;
   _pendingPath[0] = 0;
   _lastError[0] = 0;
@@ -65,6 +79,9 @@ PocketMageAudio::~PocketMageAudio() {
 void PocketMageAudio::begin() {
   if (_initialized)
     return;
+  // Register USB audio device state callback before the USB host is started
+  // so we see connect/disconnect events for UAC speaker selection.
+  usb_streaming_state_register(usbStateCb, this);
   _commandQueue = xQueueCreate(4, sizeof(Command));
   xTaskCreatePinnedToCore(audioTaskFunc, "pmaudio", TASK_STACK_BYTES, this, TASK_PRIORITY,
                           &_taskHandle, TASK_CORE);
@@ -155,6 +172,24 @@ String PocketMageAudio::getLastError() const {
 
 int8_t PocketMageAudio::getVolume() const {
   return _volume;
+}
+
+void PocketMageAudio::setOutput(AudioOutput output) {
+  xSemaphoreTakeRecursive(_mutex, portMAX_DELAY);
+  _output = output;
+  xSemaphoreGiveRecursive(_mutex);
+  publishEvent();
+}
+
+AudioOutput PocketMageAudio::getOutput() const {
+  xSemaphoreTakeRecursive(_mutex, portMAX_DELAY);
+  AudioOutput o = _output;
+  xSemaphoreGiveRecursive(_mutex);
+  return o;
+}
+
+bool PocketMageAudio::usbConnected() const {
+  return _usbConnected;
 }
 
 void PocketMageAudio::setEventCallback(AudioEventCallback cb) {
@@ -266,9 +301,63 @@ void PocketMageAudio::releasePin() {
   BZ().drainPending();
 }
 
+// Configure and start the USB UAC host speaker sink. Called from the audio
+// task when the first PCM chunk is ready and the USB sink is selected.
+// Blocks until usb_stream is started; device enumeration happens asynchronously
+// and is reported via usbStateCb().
+bool PocketMageAudio::acquireUsb(int sampleRate, int bits, int channels) {
+  if (_usbStarted)
+    return true;
+  if (!_usbConnected) {
+    setError("no usb audio device");
+    return false;
+  }
+  uac_config_t cfg = {};
+  cfg.spk_ch_num = (uint8_t)channels;
+  cfg.spk_bit_resolution = (uint16_t)bits;
+  cfg.spk_samples_frequence = (uint32_t)sampleRate;
+  cfg.spk_buf_size = SINK_RINGBUF_LEN;
+  cfg.mic_buf_size = 0;
+  cfg.mic_cb = nullptr;
+  cfg.mic_cb_arg = nullptr;
+  // Optional descriptor fields left at 0: driver parses them from the device.
+  cfg.spk_interface = 0;
+  cfg.spk_ep_addr = 0;
+  cfg.spk_ep_mps = 0;
+  cfg.ac_interface = 0;
+  cfg.spk_fu_id = 0;
+  cfg.flags = 0;
+
+  esp_err_t err = uac_streaming_config(&cfg);
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "acquireUsb: uac_streaming_config -> %s", esp_err_to_name(err));
+    setError("usb sink config failed");
+    return false;
+  }
+  err = usb_streaming_start();
+  if (err != ESP_OK) {
+    ESP_LOGE(TAG, "acquireUsb: usb_streaming_start -> %s", esp_err_to_name(err));
+    setError("usb sink start failed");
+    return false;
+  }
+  _usbConfigured = true;
+  _usbStarted = true;
+  ESP_LOGI(TAG, "acquireUsb: usb sink started (%d Hz, %d bit, %d ch)", sampleRate, bits, channels);
+  return true;
+}
+
+void PocketMageAudio::releaseUsb() {
+  if (!_usbStarted)
+    return;
+  usb_streaming_stop();
+  _usbStarted = false;
+  _usbConfigured = false;
+  ESP_LOGI(TAG, "releaseUsb: usb sink stopped");
+}
+
 void PocketMageAudio::doPlay() {
   // Drain any clip in flight before starting the new one.
-  if (_pinOwned)
+  if (_pinOwned || _usbStarted)
     doStop();
 
   if (!s_decodersRegistered) {
@@ -413,7 +502,12 @@ void PocketMageAudio::decodeLoop() {
             rate = (int)info.sample_rate;
             ch = info.channel ? info.channel : DEFAULT_CHANNELS;
           }
-          if (!acquirePin(rate, DEFAULT_BITS, ch)) {
+          if (_output == AudioOutput::Usb && _usbConnected) {
+            if (!acquireUsb(rate, DEFAULT_BITS, ch)) {
+              ok = false;
+              break;
+            }
+          } else if (!acquirePin(rate, DEFAULT_BITS, ch)) {
             ok = false;
             break;
           }
@@ -423,7 +517,17 @@ void PocketMageAudio::decodeLoop() {
         }
 
         size_t written = 0;
-        pwm_audio_write(out.buffer, out.decoded_size, &written, portMAX_DELAY);
+        if (_output == AudioOutput::Usb && _usbConnected && _usbStarted) {
+          esp_err_t err = uac_spk_streaming_write(out.buffer, out.decoded_size, portMAX_DELAY);
+          if (err != ESP_OK && err != ESP_ERR_TIMEOUT) {
+            ESP_LOGE(TAG, "usb write -> %s", esp_err_to_name(err));
+            setError("usb sink write failed");
+            ok = false;
+            break;
+          }
+        } else {
+          pwm_audio_write(out.buffer, out.decoded_size, &written, portMAX_DELAY);
+        }
       }
 
       offset += raw.consumed;
@@ -447,6 +551,8 @@ void PocketMageAudio::doStop() {
   _paused = false;
   if (_pinOwned)
     releasePin();
+  if (_usbStarted)
+    releaseUsb();
   if (_state != AudioState::Idle) {
     _state = AudioState::Idle;
     _currentPath[0] = 0;

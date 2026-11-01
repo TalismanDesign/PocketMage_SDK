@@ -124,6 +124,7 @@ bool pm_audio_owns_pin();
 const char* pm_audio_get_current_path();
 const char* pm_audio_get_last_error();
 int8_t pm_audio_get_volume();
+bool pm_audio_usb_connected();
 void pm_audio_dispatch_events();
 
 // bz

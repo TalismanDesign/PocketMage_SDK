@@ -69,6 +69,11 @@ bool pm_image_decode_to_1bit(const char* path, uint8_t* buf, int buf_w, int buf_
 // (0=none, 1=jpeg, 2=png).
 bool pm_image_probe(const char* path, int* width, int* height, int* format);
 
+// Audio output sink selection. 0=piezo (PWM on BZ_PIN, default), 1=usb
+// (UAC host speaker via usb_stream). When usb is selected but no USB audio
+// device is plugged, playback falls back to piezo.
+void pm_audio_set_output(int output);
+
 // Clock fields. nowDT returns a DateTime by value, which has no C spelling.
 
 // UNIX epoch in seconds (UTC).

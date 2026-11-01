@@ -179,6 +179,7 @@ HOST_PRIMITIVES = {
     "pm_clock_timestamp", "pm_sd_write_binary_file", "pm_sd_mkdir",
     "pm_sd_dir_open", "pm_sd_dir_entry", "pm_sd_dir_close",
     "pm_image_decode_to_1bit", "pm_image_probe",
+    "pm_audio_set_output",
     "delay", "pm_app_abi", "pm_host_sdk_version",
 }
 

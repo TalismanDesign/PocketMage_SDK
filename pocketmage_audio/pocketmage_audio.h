@@ -8,6 +8,8 @@
 
 #include <functional>
 
+#include <usb_stream.h>
+
 // Playback state machine
 enum class AudioState {
   Idle,     // No clip loaded
@@ -50,6 +52,13 @@ class PocketMageAudio {
   String getLastError() const;
   int8_t getVolume() const;
 
+  // Output sink selection. Piezo is the default and fallback when no USB
+  // audio device is plugged in. Usb routes decoded PCM to a USB UAC host
+  // speaker (usb_stream) instead of the piezo.
+  void setOutput(AudioOutput output);
+  AudioOutput getOutput() const;
+  bool usbConnected() const;
+
   // Event callback (fired on state change: use to trigger a display update)
   void setEventCallback(AudioEventCallback cb);
   void dispatchEvents();
@@ -72,6 +81,13 @@ class PocketMageAudio {
   // Pin arbitration against the buzzer
   bool acquirePin(int sampleRate, int bits, int channels);
   void releasePin();
+
+  // USB UAC host speaker sink
+  bool acquireUsb(int sampleRate, int bits, int channels);
+  void releaseUsb();
+
+  // USB device state callback (static: passed to usb_streaming_state_register)
+  static void usbStateCb(usb_stream_state_t state, void* user_ptr);
 
   // Helpers
   void setError(const char* msg);
@@ -109,6 +125,12 @@ class PocketMageAudio {
   volatile bool _eventPending;
   volatile bool _stopRequested;
   volatile bool _paused;
+
+  // Output sink selection
+  volatile AudioOutput _output;
+  volatile bool _usbConnected;
+  bool _usbConfigured;
+  bool _usbStarted;
 
   // Decode task stack: the simple decoder plus file I/O needs headroom.
   static constexpr uint32_t TASK_STACK_BYTES = 20480;
