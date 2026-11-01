@@ -41,6 +41,8 @@
         "adafruit/Adafruit MPR121": "^1.1.3",
         "adafruit/Adafruit TCA8418": "^1.0.2",
         "gmarty2000/Buzzer": "^1.0.0",
+        "pwm_audio": "*",
+        "esp_audio_codec": "*",
         "TalismanDesign/U8g2_for_Adafruit_GFX": "https://github.com/TalismanDesign/U8g2_for_Adafruit_GFX.git",
         "ashtf8/GxEPD2_Editable_useFastFullUpdate": "https://github.com/ashtf8/GxEPD2_Editable_useFastFullUpdate",
         "TalismanDesign/MP2722_Arduino": "https://github.com/TalismanDesign/MP2722_Arduino.git",
@@ -54,6 +56,14 @@
             "-<examples/>",
             "-<tools/>",
             "-<docs/>"
+        ],
+        "flags": [
+            "-I../esp-iot-solution/components/audio/pwm_audio/include",
+            "-I../esp-adf-libs/esp_audio_codec/include",
+            "-I../esp-adf-libs/esp_audio_codec/include/decoder",
+            "-I../esp-adf-libs/esp_audio_codec/include/decoder/impl",
+            "-I../esp-adf-libs/esp_audio_codec/include/simple_dec",
+            "-I../esp-adf-libs/esp_audio_codec/include/simple_dec/impl"
         ]
     }
 }

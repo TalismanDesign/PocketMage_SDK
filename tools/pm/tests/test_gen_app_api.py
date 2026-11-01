@@ -105,7 +105,7 @@ class EnumParsing(unittest.TestCase):
         tables = gen.load_enums(SDK_ROOT)
         names = {c_name for c_name, _host, _v, _t in tables}
         self.assertEqual(names, {"pm_target", "pm_style", "pm_lang",
-                                 "pm_refresh", "pm_jingle"})
+                                 "pm_refresh", "pm_audio_state", "pm_jingle"})
 
     def test_refresh_enum_comes_from_the_ui_header(self):
         modes = dict((c, v) for c, _h, values, _t in gen.load_enums(SDK_ROOT)

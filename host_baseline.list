@@ -282,6 +282,7 @@ _read_r
 _realloc_r
 _reclaim_reent
 _rename_r
+_rewind_r
 _sbrk_r
 _sfread_r
 _stat_r
@@ -312,6 +313,7 @@ bzero
 calloc
 ceil
 cfree
+clearerr
 clock_gettime
 close
 closedir
@@ -400,6 +402,7 @@ read
 readdir
 realloc
 rename
+rewind
 rewinddir
 roundf
 scalbnf

@@ -337,8 +337,10 @@ void PocketMage_INIT() {
     BZ().playJingle(Jingles::Startup);
 
   // WiFi task (radio stays off until a wifi* or ssh command enables it)
+  // Audio task (piezo stays with the buzzer until a clip is played)
 #if PM_TARGET_HOST
   P_WIFI.begin();
+  P_AUDIO.begin();
 #endif
 
   // Clear any excess keystrokes

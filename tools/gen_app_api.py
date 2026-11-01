@@ -22,6 +22,7 @@ ACCESSORS = {
     "PocketmageOled": ("object", "OLED()"),
     "PocketmageBZ": ("object", "BZ()"),
     "PocketmageTOUCH": ("object", "TOUCH()"),
+    "PocketMageAudio": ("object", "P_AUDIO"),
 }
 
 HOST_OWNED = set(ACCESSORS)
@@ -34,6 +35,7 @@ ENUM_SOURCES = [
     ("pm_style", "PM_STYLE", "pocketmage_font/pocketmage_font.h", "FontStyle"),
     ("pm_lang", "PM_LANG", "pocketmage_i18n/pocketmage_i18n_gen.h", "Lang"),
     ("pm_refresh", "PM_REFRESH", "pocketmage_ui/pocketmage_ui.h", "EinkRefresh"),
+    ("pm_audio_state", "PM_AUDIO_STATE", "pocketmage_audio/pocketmage_audio.h", "AudioState"),
 ]
 
 NAMESPACE_CONST_SOURCES = [
@@ -129,7 +131,7 @@ def load_enums(root):
 
 
 ENUM_TYPES = {"DisplayTarget", "FontStyle", "Lang", "Mode", "WifiRadioState",
-              "StringID", "Jingle", "EinkRefresh"}
+              "StringID", "Jingle", "EinkRefresh", "AudioState"}
 
 SCALARS = {"bool", "char", "int", "unsigned", "long", "short", "float",
            "double", "size_t", "ulong", "unsigned long", "int8_t", "int16_t",

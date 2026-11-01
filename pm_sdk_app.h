@@ -66,6 +66,15 @@ enum pm_refresh {
   PM_REFRESH_FORCE_FULL = 1,
 };
 
+// Mirrors AudioState, values read from the SDK header.
+enum pm_audio_state {
+  PM_AUDIO_STATE_IDLE = 0,
+  PM_AUDIO_STATE_OPENING = 1,
+  PM_AUDIO_STATE_PLAYING = 2,
+  PM_AUDIO_STATE_PAUSED = 3,
+  PM_AUDIO_STATE_STOPPING = 4,
+};
+
 // Mirrors Jingles, values read from the SDK header.
 enum pm_jingle {
   PM_JINGLE_STARTUP = 0,
@@ -100,12 +109,30 @@ void delay(unsigned long ms);
 }  // extern "C"
 #endif
 
+// audio
+
+void pm_audio_begin();
+void pm_audio_stop();
+void pm_audio_play(const char* a0);
+void pm_audio_stop_playback();
+void pm_audio_pause();
+void pm_audio_resume();
+void pm_audio_set_volume(int8_t a0);
+int pm_audio_get_state();
+bool pm_audio_is_playing();
+bool pm_audio_owns_pin();
+const char* pm_audio_get_current_path();
+const char* pm_audio_get_last_error();
+int8_t pm_audio_get_volume();
+void pm_audio_dispatch_events();
+
 // bz
 
 bool pm_bz_begin(int a0);
 void pm_bz_end();
 // Defined by hand in pm_app_api.cpp.
 void pm_bz_play_jingle(int a0);
+void pm_bz_drain_pending();
 
 // clock
 

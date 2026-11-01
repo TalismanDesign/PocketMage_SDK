@@ -58,10 +58,19 @@ class PocketmageBZ {
 
   void playJingle(const Jingle& jingle);
 
+  // When the audio sink owns the piezo, jingles are queued here instead of
+  // being dropped. drainPending() replays them once the pin is released.
+  void drainPending();
+
  private:
+  // Small ring of jingles deferred while the audio sink holds the pin.
+  static constexpr size_t PENDING_CAPACITY = 4;
+
   Buzzer buzzer_;
   int channel_ = 0;
   bool begun_ = false;
+  Jingle pending_[PENDING_CAPACITY];
+  size_t pendingCount_ = 0;
 };
 
 void setupBZ();

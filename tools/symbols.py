@@ -74,14 +74,21 @@ def read_archive_symbols(nm, archive):
 
 
 def find_gcc_archive(lib_dir, name):
-    toolchain_root = os.path.normpath(
-        os.path.join(lib_dir, os.pardir, os.pardir))
-    roots = [os.path.join(toolchain_root, prefix, 'lib', 'gcc')
-             for prefix in ('lib', 'picolibc')]
+    roots = []
+    current = os.path.normpath(os.path.abspath(lib_dir))
+    while True:
+        for prefix in ('lib', 'picolibc'):
+            candidate = os.path.join(current, prefix, 'lib', 'gcc')
+            if os.path.isdir(candidate):
+                roots.append(candidate)
+        if roots:
+            break
+        parent = os.path.dirname(current)
+        if parent == current:
+            break
+        current = parent
     matches = []
     for root in roots:
-        if not os.path.isdir(root):
-            continue
         for dirpath, _dirnames, filenames in os.walk(root):
             if f'{name}.a' in filenames:
                 matches.append(os.path.join(dirpath, f'{name}.a'))
@@ -258,6 +265,13 @@ def main():
         help='Path to the curated symbol list (one symbol per line, # comments allowed)',
     )
     parser.add_argument(
+        '--baseline',
+        default=None,
+        help='Path to host_baseline.list. Its symbols are added to the table as '
+             'unmangled runtime externs, covering POSIX entry points (opendir and '
+             'the other dir calls) that live in archives outside the scanned set.',
+    )
+    parser.add_argument(
         '--host-elf',
         default=None,
         help='Host firmware ELF to validate the curated list against. Symbols missing '
@@ -345,6 +359,10 @@ def main():
     if not curated:
         sys.exit(f'no symbols found in curated list {args.list}')
 
+    baseline_symbols = set()
+    if args.baseline:
+        baseline_symbols = set(read_curated_list(args.baseline))
+
     readelf = args.readelf or os.environ.get('XTENSA_READELF') or 'xtensa-esp32s3-elf-readelf'
     runtime_categories = {}
     if args.runtime:
@@ -363,7 +381,7 @@ def main():
         runtime_symbols = set()
         for category, names in runtime_categories.items():
             runtime_symbols.update(names)
-        curated = sorted(set(curated) | runtime_symbols)
+        curated = sorted(set(curated) | runtime_symbols | baseline_symbols)
 
     if args.host_elf:
         host_globals = get_host_globals(readelf, args.host_elf)
@@ -373,7 +391,7 @@ def main():
                   'rebuild the host if it is a new export')
 
     exclude = ['elf_find_sym', 'g_customer_elfsyms'] + args.exclude
-    runtime_union = set()
+    runtime_union = set(baseline_symbols)
     for names in runtime_categories.values():
         runtime_union.update(names)
     save_c_file(curated, args.output_file, args.symbol_table,

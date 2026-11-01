@@ -68,6 +68,18 @@ void PocketmageBZ::playJingle(const Jingle& jingle) {
     return;  // No valid notes to play
   }
 
+  // The audio sink and the buzzer share BZ_PIN. While audio owns it, queue the
+  // jingle (dropping the oldest if full) and let drainPending() replay it.
+  if (P_AUDIO.ownsPin()) {
+    if (pendingCount_ < PENDING_CAPACITY) {
+      pending_[pendingCount_++] = jingle;
+    } else {
+      for (size_t i = 1; i < PENDING_CAPACITY; ++i) pending_[i - 1] = pending_[i];
+      pending_[PENDING_CAPACITY - 1] = jingle;
+    }
+    return;
+  }
+
   if (!begun_) {
     begin(channel_);
   }
@@ -79,4 +91,11 @@ void PocketmageBZ::playJingle(const Jingle& jingle) {
   buzzer_.sound(0, 80);  // End the sound
   buzzer_.end(channel_);        // Stop the buzzer
   begun_ = false;
+}
+
+void PocketmageBZ::drainPending() {
+  if (pendingCount_ == 0) return;
+  size_t count = pendingCount_;
+  pendingCount_ = 0;
+  for (size_t i = 0; i < count; ++i) playJingle(pending_[i]);
 }
