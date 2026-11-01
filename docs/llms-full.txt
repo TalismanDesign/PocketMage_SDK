@@ -2702,14 +2702,18 @@ description: "The pm developer tool: scaffolding, building, gating, packing, exp
 
 ## Install
 
-The CLI ships with the SDK as the `pocketmage_sdk` package:
+The CLI ships with the SDK as the `pocketmage-sdk` distribution. Install it from the SDK repo root:
 
 ```sh
-pip install .        # from the SDK repo root
+pip install -e .     # editable: pm tracks the checkout it was installed from
 pm --help
 ```
 
+An editable install (`-e`) links `pm` to the checkout so edits to `tools/` take effect without reinstalling. A plain `pip install .` copies the package into `site-packages` instead; use that when you do not have a persistent checkout to track.
+
 It shells out to `make` and the Xtensa toolchain, so an app build still needs the pinned espressif toolchain on the machine (see [get-started/toolchain](get-started/toolchain.md)).
+
+If the editable checkout is later moved or deleted, the next `pm` invocation detects the orphaned install, locates a live checkout, and offers to reinstall rather than failing with an import error. See [`pm doctor`](#pm-cli-commands-pm-doctor) and [`pm update-sdk`](#pm-cli-commands-pm-update-sdk-pm-update-self) below.
 
 ## Global options
 
@@ -2761,6 +2765,44 @@ Bumps the SDK release version. Updates `VERSION`, `pocketmage_globals.cpp`, `lib
 ### `pm version`
 
 Prints `pocketmage_sdk_version`, the version string the host exports and apps compare against at startup.
+
+### `pm doctor`
+
+Reports the health of the `pm` install and the SDK checkout it resolves. It prints the interpreter running `pm`, the installed distribution version and mode (editable or regular), the resolved SDK checkout and its `VERSION`, and, for an editable install, the directory the install is linked to. It flags three failures and exits non-zero on any of them:
+
+- The editable target no longer exists; the install is orphaned.
+- The `tools` package is not importable in this interpreter.
+- The installed CLI version does not match the checkout's `VERSION`.
+
+When it finds a problem it prints the exact reinstall command and points at `pm update-sdk`. Run `pm doctor` first whenever `pm` behaves unexpectedly.
+
+### `pm update-sdk` / `pm update-self`
+
+Reinstalls `pm` against a live SDK checkout, repairing an orphaned editable install or clearing version skew. The two names are the same command. It resolves the checkout from `--sdk <path>`, then `PM_SDK_ROOT`, then an upward walk from the current directory, and reinstalls with the same interpreter that runs `pm`, so the fix lands in the environment the `pm` command belongs to. `--no-editable` copies the package into `site-packages` instead of linking the checkout.
+
+The running process keeps the stale import state, so re-run the original command after the reinstall completes.
+
+```sh
+pm update-sdk --sdk /path/to/PocketMage_SDK
+```
+
+## Recovering a broken install
+
+The `pm` console-script is a resilient launcher. If importing its own code fails because the `tools` package is gone (the usual cause is an editable install whose checkout was moved or deleted), it does not emit a raw traceback. It diagnoses the orphaned install, finds a live checkout via the same resolution order as `pm update-sdk`, prints the exact `pip install -e` command, and in an interactive shell offers to run it:
+
+```text
+pm cannot import its own code: the 'tools' package is not available to this Python.
+the pocketmage-sdk install is editable against a path that no longer exists:
+    /tmp/old-checkout/sdk
+found a live SDK checkout at:
+    /path/to/PocketMage_SDK
+fix it by running:
+    /path/to/python -m pip install -e /path/to/PocketMage_SDK
+
+reinstall now? [y/N]
+```
+
+In a non-interactive shell (CI, or `CI`/`NO_COLOR` set) it prints the command and exits non-zero without running `pip`. When no live checkout can be found, it prints a manual fix with a placeholder path to fill in. After the reinstall, re-run the original command.
 
 ## Relationship to make
 
@@ -2942,12 +2984,14 @@ Override the tool paths instead of using `PATH` with `ELF_OVERLAY_RELINK` and `E
 
 ## pm CLI
 
-The `pm` CLI ships with the SDK as the `pocketmage_sdk` package:
+The `pm` CLI ships with the SDK as the `pocketmage-sdk` distribution. Install it editable from the SDK repo root so `pm` tracks the checkout:
 
 ```sh
-pip install .        # from the SDK repo root
+pip install -e .     # editable: pm tracks the checkout it was installed from
 pm --help
 ```
+
+A plain `pip install .` copies the package into `site-packages` instead; use that when you do not have a persistent checkout to track. If an editable checkout is later moved or deleted, `pm` detects the orphaned install and offers to reinstall rather than failing with an import error (see [`pm doctor`](../cli.md#pm-cli-commands-pm-doctor)).
 
 `pm` wraps the same `make` contract and adds the enforcing dependency gate. The full command surface is in [cli.md](../cli.md). Icon validation uses Pillow, so install it if you want `pm check` to validate the icon:
 
@@ -2958,13 +3002,14 @@ pip install Pillow
 ## Verify
 
 ```sh
+pm doctor
 pm new hello
 cd hello
 pm build --pack
 pm check
 ```
 
-A green `pm check` means every symbol the app references resolves against the host surface, and the app is ready to install. If any of these steps fail, see [Troubleshooting](../troubleshooting.md).
+`pm doctor` confirms the install is healthy and resolves a live SDK checkout before you build. A green `pm check` means every symbol the app references resolves against the host surface, and the app is ready to install. If any of these steps fail, see [Troubleshooting](../troubleshooting.md).
 
 
 ---
@@ -4131,6 +4176,34 @@ Not a failure. The post-link strip removed the `app_main` name, but the entry is
 ### Warning: the app has a non-empty `.init_array`
 
 The app links static constructors. The host's `esp_elf` loader does not run relocation-time constructors, so they never execute. Remove the static construction, or move the initialization into `app_main`. The compile flags `-fno-exceptions -fno-rtti -fno-threadsafe-statics` are on by default to keep this from happening; a remaining `.init_array` usually comes from a global with a non-trivial constructor. See [app-abi.md](app-abi.md#app-binary-contract-abi-how-loading-works).
+
+## pm tooling
+
+### `ModuleNotFoundError: No module named 'tools'` when running `pm`
+
+The `pm` command was installed editable (`pip install -e`) against a checkout that has since moved or been deleted, so its link to the `tools` package is dead. A common trigger is installing from a temporary scaffold directory that the OS later cleaned up. Current `pm` builds detect this and offer to reinstall; if you see the raw error, the installed CLI predates the resilient launcher. Reinstall against a live checkout:
+
+```sh
+pm update-sdk --sdk /path/to/PocketMage_SDK
+```
+
+If `pm` itself will not start, run the equivalent reinstall directly with the interpreter that owns the `pm` script:
+
+```sh
+/path/to/that/python -m pip install -e /path/to/PocketMage_SDK
+```
+
+Run [`pm doctor`](cli.md#pm-cli-commands-pm-doctor) afterward to confirm the install is healthy.
+
+### `pm` behaves differently from the SDK checkout you are editing
+
+The installed CLI is a different version from the checkout. `pm doctor` reports the version skew. Reinstall to re-sync:
+
+```sh
+pm update-sdk
+```
+
+An editable install avoids this in the first place, because the CLI tracks the checkout it was linked to. See [the install notes](cli.md#pm-cli-install).
 
 ## Load-time (on device)
 

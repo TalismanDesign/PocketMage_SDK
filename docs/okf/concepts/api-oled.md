@@ -4,10 +4,10 @@ title: "OLED (pocketmage_oled)"
 description: "The 256x32 SSD1326 OLED: PocketmageOled class, the u8g2 object, and the status line."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/"
 path: /api/oled/
-updated: 2026-10-31
+updated: 2026-11-01
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T22:45:59.832Z"
+  generated_at: "2026-11-01T00:02:39.175Z"
 ---
 ---
 title: "OLED (pocketmage_oled)"

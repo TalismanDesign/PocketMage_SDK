@@ -4,10 +4,10 @@ title: "pm CLI"
 description: "The pm developer tool: scaffolding, building, gating, packing, exports reconciliation, and release bumps."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/cli/"
 path: /cli/
-updated: 2026-10-31
+updated: 2026-11-01
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T22:45:59.834Z"
+  generated_at: "2026-11-01T00:02:39.178Z"
 ---
 ---
 title: "pm CLI"
@@ -20,14 +20,18 @@ description: "The pm developer tool: scaffolding, building, gating, packing, exp
 
 ## Install
 
-The CLI ships with the SDK as the `pocketmage_sdk` package:
+The CLI ships with the SDK as the `pocketmage-sdk` distribution. Install it from the SDK repo root:
 
 ```sh
-pip install .        # from the SDK repo root
+pip install -e .     # editable: pm tracks the checkout it was installed from
 pm --help
 ```
 
+An editable install (`-e`) links `pm` to the checkout so edits to `tools/` take effect without reinstalling. A plain `pip install .` copies the package into `site-packages` instead; use that when you do not have a persistent checkout to track.
+
 It shells out to `make` and the Xtensa toolchain, so an app build still needs the pinned espressif toolchain on the machine (see [get-started/toolchain](get-started/toolchain.md)).
+
+If the editable checkout is later moved or deleted, the next `pm` invocation detects the orphaned install, locates a live checkout, and offers to reinstall rather than failing with an import error. See [`pm doctor`](#pm-cli-commands-pm-doctor) and [`pm update-sdk`](#pm-cli-commands-pm-update-sdk-pm-update-self) below.
 
 ## Global options
 
@@ -79,6 +83,44 @@ Bumps the SDK release version. Updates `VERSION`, `pocketmage_globals.cpp`, `lib
 ### `pm version`
 
 Prints `pocketmage_sdk_version`, the version string the host exports and apps compare against at startup.
+
+### `pm doctor`
+
+Reports the health of the `pm` install and the SDK checkout it resolves. It prints the interpreter running `pm`, the installed distribution version and mode (editable or regular), the resolved SDK checkout and its `VERSION`, and, for an editable install, the directory the install is linked to. It flags three failures and exits non-zero on any of them:
+
+- The editable target no longer exists; the install is orphaned.
+- The `tools` package is not importable in this interpreter.
+- The installed CLI version does not match the checkout's `VERSION`.
+
+When it finds a problem it prints the exact reinstall command and points at `pm update-sdk`. Run `pm doctor` first whenever `pm` behaves unexpectedly.
+
+### `pm update-sdk` / `pm update-self`
+
+Reinstalls `pm` against a live SDK checkout, repairing an orphaned editable install or clearing version skew. The two names are the same command. It resolves the checkout from `--sdk <path>`, then `PM_SDK_ROOT`, then an upward walk from the current directory, and reinstalls with the same interpreter that runs `pm`, so the fix lands in the environment the `pm` command belongs to. `--no-editable` copies the package into `site-packages` instead of linking the checkout.
+
+The running process keeps the stale import state, so re-run the original command after the reinstall completes.
+
+```sh
+pm update-sdk --sdk /path/to/PocketMage_SDK
+```
+
+## Recovering a broken install
+
+The `pm` console-script is a resilient launcher. If importing its own code fails because the `tools` package is gone (the usual cause is an editable install whose checkout was moved or deleted), it does not emit a raw traceback. It diagnoses the orphaned install, finds a live checkout via the same resolution order as `pm update-sdk`, prints the exact `pip install -e` command, and in an interactive shell offers to run it:
+
+```text
+pm cannot import its own code: the 'tools' package is not available to this Python.
+the pocketmage-sdk install is editable against a path that no longer exists:
+    /tmp/old-checkout/sdk
+found a live SDK checkout at:
+    /path/to/PocketMage_SDK
+fix it by running:
+    /path/to/python -m pip install -e /path/to/PocketMage_SDK
+
+reinstall now? [y/N]
+```
+
+In a non-interactive shell (CI, or `CI`/`NO_COLOR` set) it prints the command and exits non-zero without running `pip`. When no live checkout can be found, it prints a manual fix with a placeholder path to fill in. After the reinstall, re-run the original command.
 
 ## Relationship to make
 

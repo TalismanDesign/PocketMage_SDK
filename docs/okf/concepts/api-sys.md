@@ -4,10 +4,10 @@ title: "System (pocketmage_sys, pocketmage_globals)"
 description: "Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/"
 path: /api/sys/
-updated: 2026-10-31
+updated: 2026-11-01
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T22:45:59.833Z"
+  generated_at: "2026-11-01T00:02:39.176Z"
 ---
 ---
 title: "System (pocketmage_sys, pocketmage_globals)"

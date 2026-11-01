@@ -4,10 +4,10 @@ title: Glossary
 description: "The terms the SDK docs use, defined once, with links to the page that owns each concept."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/glossary/"
 path: /glossary/
-updated: 2026-10-31
+updated: 2026-11-01
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-10-31T22:45:59.835Z"
+  generated_at: "2026-11-01T00:02:39.179Z"
 ---
 ---
 title: "Glossary"

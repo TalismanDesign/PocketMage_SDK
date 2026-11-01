@@ -102,11 +102,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../../assets/favicon.png?v=mvwzpk2z">
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mvwzpk2z">
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.png?v=mvx2g4lq">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mvx2g4lq">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mvwzpk2z" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mvwzpk2z" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mvx2g4lq" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mvx2g4lq" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The pinned espressif Xtensa compiler, the elf_overlay host tools, and the pm CLI an app build needs.">
@@ -125,13 +125,13 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mvwzpk2z" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mvwzpk2z" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mvwzpk2z" >
-<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mvwzpk2z" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mvx2g4lq" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mvx2g4lq" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mvx2g4lq" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mvx2g4lq" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mvwzpk2z">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mvx2g4lq">
     
     
   </head>
@@ -1922,7 +1922,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Install%20the%20toolchain%22%0Adescription%3A%20%22The%20pinned%20espressif%20Xtensa%20compiler%2C%20the%20elf_overlay%20host%20tools%2C%20and%20the%20pm%20CLI%20an%20app%20build%20needs.%22%0A---%0A%0A%23%20Install%20the%20toolchain%0A%0AAn%20app%20build%20needs%20three%20things%20on%20the%20machine%3A%20the%20espressif%20Xtensa%20compiler%2C%20the%20%60elf_overlay%60%20host%20tools%2C%20and%20the%20%60pm%60%20CLI.%20Only%20the%20espressif%20toolchain%20produces%20output%20the%20loader%20can%20read%3B%20the%20PlatformIO%20Xtensa%20package%20emits%20the%20wrong%20byte%20order%20and%20is%20unusable%20for%20apps.%0A%0A%23%23%20Xtensa%20compiler%0A%0AThe%20build%20targets%20the%20espressif%20%60xtensa-esp32s3-elf-g%2B%2B%60%20toolchain.%20%60app.mk%60%20probes%20for%20it%20in%20the%20espressif%20install%20directory%2C%20newest%20to%20oldest%2C%20then%20the%20PlatformIO%20package%2C%20then%20%60PATH%60%3A%0A%0A%60%60%60text%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-15.2.0_20251204%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20251107%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20241119%2Fxtensa-esp-elf%2Fbin%0A~%2F.platformio%2Fpackages%2Ftoolchain-xtensa-esp32s3%2Fbin%0A%60%60%60%0A%0AThe%20pinned%20release%20is%20%60esp-15.2.0_20251204%60.%20The%20simplest%20way%20to%20get%20it%20is%20through%20ESP-IDF&#039;s%20installer%2C%20which%20places%20it%20under%20%60~%2F.espressif%60.%20If%20you%20have%20an%20existing%20install%20elsewhere%2C%20point%20the%20build%20at%20it%3A%0A%0A%60%60%60sh%0Amake%20XTENSA_CXX%3D%2Fpath%2Fto%2Fxtensa-esp32s3-elf-g%2B%2B%0A%60%60%60%0A%0A%60XTENSA_STRIP%60%20and%20%60XTENSA_READELF%60%20are%20derived%20from%20%60XTENSA_CXX%60%20unless%20set.%0A%0AVerify%20the%20compiler%20resolves%3A%0A%0A%60%60%60sh%0Amake%20-C%20%3Capp%3E%20pm-info%20%20%20%20%20%23%20prints%20the%20resolved%20toolchain%20and%20paths%0A%60%60%60%0A%0A%23%23%20elf_overlay%20host%20tools%0A%0AThe%20build%20emits%20the%20%60.elfo%60%20overlay%20sidecar%20with%20two%20host%20tools%2C%20%60elf_overlay_relink%60%20and%20%60elf_overlay_emit%60%2C%20which%20must%20be%20on%20%60PATH%60.%20Build%20them%20from%20an%20%5Belf_overlay%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2Felf_overlay)%20checkout%3A%0A%0A%60%60%60sh%0Agit%20clone%20https%3A%2F%2Fgithub.com%2FTalismanDesign%2Felf_overlay%0Acd%20elf_overlay%0Acmake%20-S%20.%20-B%20build%0Acmake%20--build%20build%20--target%20elf_overlay_relink%20elf_overlay_emit%0Aexport%20PATH%3D%22%24PWD%2Fbuild%3A%24PATH%22%0A%60%60%60%0A%0AOverride%20the%20tool%20paths%20instead%20of%20using%20%60PATH%60%20with%20%60ELF_OVERLAY_RELINK%60%20and%20%60ELF_OVERLAY_EMIT%60.%20The%20overlay%20format%20itself%20is%20documented%20in%20%5Boverlay.md%5D(..%2Foverlay.md).%0A%0A%23%23%20pm%20CLI%0A%0AThe%20%60pm%60%20CLI%20ships%20with%20the%20SDK%20as%20the%20%60pocketmage_sdk%60%20package%3A%0A%0A%60%60%60sh%0Apip%20install%20.%20%20%20%20%20%20%20%20%23%20from%20the%20SDK%20repo%20root%0Apm%20--help%0A%60%60%60%0A%0A%60pm%60%20wraps%20the%20same%20%60make%60%20contract%20and%20adds%20the%20enforcing%20dependency%20gate.%20The%20full%20command%20surface%20is%20in%20%5Bcli.md%5D(..%2Fcli.md).%20Icon%20validation%20uses%20Pillow%2C%20so%20install%20it%20if%20you%20want%20%60pm%20check%60%20to%20validate%20the%20icon%3A%0A%0A%60%60%60sh%0Apip%20install%20Pillow%0A%60%60%60%0A%0A%23%23%20Verify%0A%0A%60%60%60sh%0Apm%20new%20hello%0Acd%20hello%0Apm%20build%20--pack%0Apm%20check%0A%60%60%60%0A%0AA%20green%20%60pm%20check%60%20means%20every%20symbol%20the%20app%20references%20resolves%20against%20the%20host%20surface%2C%20and%20the%20app%20is%20ready%20to%20install.%20If%20any%20of%20these%20steps%20fail%2C%20see%20%5BTroubleshooting%5D(..%2Ftroubleshooting.md).%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22Install%20the%20toolchain%22%0Adescription%3A%20%22The%20pinned%20espressif%20Xtensa%20compiler%2C%20the%20elf_overlay%20host%20tools%2C%20and%20the%20pm%20CLI%20an%20app%20build%20needs.%22%0A---%0A%0A%23%20Install%20the%20toolchain%0A%0AAn%20app%20build%20needs%20three%20things%20on%20the%20machine%3A%20the%20espressif%20Xtensa%20compiler%2C%20the%20%60elf_overlay%60%20host%20tools%2C%20and%20the%20%60pm%60%20CLI.%20Only%20the%20espressif%20toolchain%20produces%20output%20the%20loader%20can%20read%3B%20the%20PlatformIO%20Xtensa%20package%20emits%20the%20wrong%20byte%20order%20and%20is%20unusable%20for%20apps.%0A%0A%23%23%20Xtensa%20compiler%0A%0AThe%20build%20targets%20the%20espressif%20%60xtensa-esp32s3-elf-g%2B%2B%60%20toolchain.%20%60app.mk%60%20probes%20for%20it%20in%20the%20espressif%20install%20directory%2C%20newest%20to%20oldest%2C%20then%20the%20PlatformIO%20package%2C%20then%20%60PATH%60%3A%0A%0A%60%60%60text%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-15.2.0_20251204%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20251107%2Fxtensa-esp-elf%2Fbin%0A~%2F.espressif%2Ftools%2Fxtensa-esp-elf%2Fesp-14.2.0_20241119%2Fxtensa-esp-elf%2Fbin%0A~%2F.platformio%2Fpackages%2Ftoolchain-xtensa-esp32s3%2Fbin%0A%60%60%60%0A%0AThe%20pinned%20release%20is%20%60esp-15.2.0_20251204%60.%20The%20simplest%20way%20to%20get%20it%20is%20through%20ESP-IDF&#039;s%20installer%2C%20which%20places%20it%20under%20%60~%2F.espressif%60.%20If%20you%20have%20an%20existing%20install%20elsewhere%2C%20point%20the%20build%20at%20it%3A%0A%0A%60%60%60sh%0Amake%20XTENSA_CXX%3D%2Fpath%2Fto%2Fxtensa-esp32s3-elf-g%2B%2B%0A%60%60%60%0A%0A%60XTENSA_STRIP%60%20and%20%60XTENSA_READELF%60%20are%20derived%20from%20%60XTENSA_CXX%60%20unless%20set.%0A%0AVerify%20the%20compiler%20resolves%3A%0A%0A%60%60%60sh%0Amake%20-C%20%3Capp%3E%20pm-info%20%20%20%20%20%23%20prints%20the%20resolved%20toolchain%20and%20paths%0A%60%60%60%0A%0A%23%23%20elf_overlay%20host%20tools%0A%0AThe%20build%20emits%20the%20%60.elfo%60%20overlay%20sidecar%20with%20two%20host%20tools%2C%20%60elf_overlay_relink%60%20and%20%60elf_overlay_emit%60%2C%20which%20must%20be%20on%20%60PATH%60.%20Build%20them%20from%20an%20%5Belf_overlay%5D(https%3A%2F%2Fgithub.com%2FTalismanDesign%2Felf_overlay)%20checkout%3A%0A%0A%60%60%60sh%0Agit%20clone%20https%3A%2F%2Fgithub.com%2FTalismanDesign%2Felf_overlay%0Acd%20elf_overlay%0Acmake%20-S%20.%20-B%20build%0Acmake%20--build%20build%20--target%20elf_overlay_relink%20elf_overlay_emit%0Aexport%20PATH%3D%22%24PWD%2Fbuild%3A%24PATH%22%0A%60%60%60%0A%0AOverride%20the%20tool%20paths%20instead%20of%20using%20%60PATH%60%20with%20%60ELF_OVERLAY_RELINK%60%20and%20%60ELF_OVERLAY_EMIT%60.%20The%20overlay%20format%20itself%20is%20documented%20in%20%5Boverlay.md%5D(..%2Foverlay.md).%0A%0A%23%23%20pm%20CLI%0A%0AThe%20%60pm%60%20CLI%20ships%20with%20the%20SDK%20as%20the%20%60pocketmage-sdk%60%20distribution.%20Install%20it%20editable%20from%20the%20SDK%20repo%20root%20so%20%60pm%60%20tracks%20the%20checkout%3A%0A%0A%60%60%60sh%0Apip%20install%20-e%20.%20%20%20%20%20%23%20editable%3A%20pm%20tracks%20the%20checkout%20it%20was%20installed%20from%0Apm%20--help%0A%60%60%60%0A%0AA%20plain%20%60pip%20install%20.%60%20copies%20the%20package%20into%20%60site-packages%60%20instead%3B%20use%20that%20when%20you%20do%20not%20have%20a%20persistent%20checkout%20to%20track.%20If%20an%20editable%20checkout%20is%20later%20moved%20or%20deleted%2C%20%60pm%60%20detects%20the%20orphaned%20install%20and%20offers%20to%20reinstall%20rather%20than%20failing%20with%20an%20import%20error%20(see%20%5B%60pm%20doctor%60%5D(..%2Fcli.md%23pm-cli-commands-pm-doctor)).%0A%0A%60pm%60%20wraps%20the%20same%20%60make%60%20contract%20and%20adds%20the%20enforcing%20dependency%20gate.%20The%20full%20command%20surface%20is%20in%20%5Bcli.md%5D(..%2Fcli.md).%20Icon%20validation%20uses%20Pillow%2C%20so%20install%20it%20if%20you%20want%20%60pm%20check%60%20to%20validate%20the%20icon%3A%0A%0A%60%60%60sh%0Apip%20install%20Pillow%0A%60%60%60%0A%0A%23%23%20Verify%0A%0A%60%60%60sh%0Apm%20doctor%0Apm%20new%20hello%0Acd%20hello%0Apm%20build%20--pack%0Apm%20check%0A%60%60%60%0A%0A%60pm%20doctor%60%20confirms%20the%20install%20is%20healthy%20and%20resolves%20a%20live%20SDK%20checkout%20before%20you%20build.%20A%20green%20%60pm%20check%60%20means%20every%20symbol%20the%20app%20references%20resolves%20against%20the%20host%20surface%2C%20and%20the%20app%20is%20ready%20to%20install.%20If%20any%20of%20these%20steps%20fail%2C%20see%20%5BTroubleshooting%5D(..%2Ftroubleshooting.md).%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -2043,20 +2043,22 @@ cmake <span class="hljs-operator">--</span>build build <span class="hljs-operato
 </code></pre>
 <p>Override the tool paths instead of using <code>PATH</code> with <code>ELF_OVERLAY_RELINK</code> and <code>ELF_OVERLAY_EMIT</code>. The overlay format itself is documented in <a href="../../overlay/">overlay.md</a>.</p>
 <h2 id="install-the-toolchain-pm-cli" class="docmd-heading"><a href="#install-the-toolchain-pm-cli" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>pm CLI</h2>
-<p>The <code>pm</code> CLI ships with the SDK as the <code>pocketmage_sdk</code> package:</p>
-<pre class="hljs"><code class="language-sh">pip install .        <span class="hljs-comment"># from the SDK repo root</span>
+<p>The <code>pm</code> CLI ships with the SDK as the <code>pocketmage-sdk</code> distribution. Install it editable from the SDK repo root so <code>pm</code> tracks the checkout:</p>
+<pre class="hljs"><code class="language-sh">pip install <span class="hljs-operator">-</span>e .     <span class="hljs-comment"># editable: pm tracks the checkout it was installed from</span>
 pm <span class="hljs-operator">--</span>help
 </code></pre>
+<p>A plain <code>pip install .</code> copies the package into <code>site-packages</code> instead; use that when you do not have a persistent checkout to track. If an editable checkout is later moved or deleted, <code>pm</code> detects the orphaned install and offers to reinstall rather than failing with an import error (see <a href="../../cli/#pm-cli-commands-pm-doctor"><code>pm doctor</code></a>).</p>
 <p><code>pm</code> wraps the same <code>make</code> contract and adds the enforcing dependency gate. The full command surface is in <a href="../../cli/">cli.md</a>. Icon validation uses Pillow, so install it if you want <code>pm check</code> to validate the icon:</p>
 <pre class="hljs"><code class="language-sh">pip install Pillow
 </code></pre>
 <h2 id="install-the-toolchain-verify" class="docmd-heading"><a href="#install-the-toolchain-verify" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Verify</h2>
-<pre class="hljs"><code class="language-sh">pm <span class="hljs-keyword">new</span> hello
+<pre class="hljs"><code class="language-sh">pm doctor
+pm <span class="hljs-keyword">new</span> hello
 <span class="hljs-keyword">cd</span> hello
 pm build <span class="hljs-operator">--</span>pack
 pm check
 </code></pre>
-<p>A green <code>pm check</code> means every symbol the app references resolves against the host surface, and the app is ready to install. If any of these steps fail, see <a href="../../troubleshooting/">Troubleshooting</a>.</p>
+<p><code>pm doctor</code> confirms the install is healthy and resolves a live SDK checkout before you build. A green <code>pm check</code> means every symbol the app references resolves against the host surface, and the app is ready to install. If any of these steps fail, see <a href="../../troubleshooting/">Troubleshooting</a>.</p>
 
                 
                   <div class="page-navigation">
@@ -2170,13 +2172,13 @@ pm check
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1793486742000">
+                <span class="git-last-updated" data-timestamp="1793491340000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1793486742000"></span>
+                  <span class="git-time" data-timestamp="1793491340000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2189,10 +2191,10 @@ pm check
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="Docs">Docs</div>
+                            <div class="git-commit-message" title="pm improvements">pm improvements</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1793486742000"></span>
+                              <span class="git-commit-date" data-timestamp="1793491340000"></span>
                             </div>
                           </div>
                         </li>
@@ -2313,14 +2315,14 @@ pm check
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mvwzpk2z"></script>
+      <script src="../../assets/js/docmd-main.js?v=mvx2g4lq"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mvwzpk2z"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mvwzpk2z" ></script>
-<script src="../../assets/js/vendor/minisearch.js?v=mvwzpk2z" ></script>
-<script src="../../assets/js/docmd-search.js?v=mvwzpk2z" ></script>
-<script src="../../assets/js/docmd-git.js?v=mvwzpk2z" ></script>
-<script src="../../assets/js/docmd-ai.js?v=mvwzpk2z" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mvx2g4lq"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mvx2g4lq" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mvx2g4lq" ></script>
+<script src="../../assets/js/docmd-search.js?v=mvx2g4lq" ></script>
+<script src="../../assets/js/docmd-git.js?v=mvx2g4lq" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mvx2g4lq" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
