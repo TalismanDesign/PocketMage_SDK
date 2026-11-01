@@ -51,6 +51,7 @@ class PocketMageAudio {
   String getCurrentPath() const;
   String getLastError() const;
   int8_t getVolume() const;
+  uint32_t getPosition() const;  // Bytes decoded so far in the current clip
 
   // Output sink selection. Piezo is the default and fallback when no USB
   // audio device is plugged in. Usb routes decoded PCM to a USB UAC host
@@ -110,6 +111,7 @@ class PocketMageAudio {
   char _pendingPath[128];
   char _lastError[64];
   volatile int8_t _volume;
+  volatile uint32_t _bytesDecoded;
 
   // FreeRTOS handles
   TaskHandle_t _taskHandle;
@@ -133,7 +135,11 @@ class PocketMageAudio {
   bool _usbStarted;
 
   // Decode task stack: the simple decoder plus file I/O needs headroom.
+#ifdef BOARD_HAS_PSRAM
   static constexpr uint32_t TASK_STACK_BYTES = 20480;
+#else
+  static constexpr uint32_t TASK_STACK_BYTES = 8192;
+#endif
   static constexpr int TASK_PRIORITY = 2;
   static constexpr int TASK_CORE = 0;
 

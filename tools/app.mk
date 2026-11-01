@@ -68,7 +68,7 @@ APP_OVERLAY_RELK ?= $(APP_BUILD_DIR)/$(APP_NAME).relk
 # compile / link
 
 # -Dmain=app_main and -e app_main wire the C entry point to the ELF entry.
-APP_CXXFLAGS := -std=gnu++17 -fPIC -Dmain=app_main
+APP_CXXFLAGS := -std=gnu++17 -Os -fPIC -Dmain=app_main
 APP_CXXFLAGS += -fdata-sections -ffunction-sections -fvisibility=hidden
 APP_CXXFLAGS += -fno-exceptions -fno-rtti -fno-threadsafe-statics
 APP_CXXFLAGS += -Wall -Wextra

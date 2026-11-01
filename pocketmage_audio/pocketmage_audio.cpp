@@ -62,7 +62,8 @@ PocketMageAudio::PocketMageAudio()
       _output(AudioOutput::Piezo),
       _usbConnected(false),
       _usbConfigured(false),
-      _usbStarted(false) {
+      _usbStarted(false),
+      _bytesDecoded(0) {
   _currentPath[0] = 0;
   _pendingPath[0] = 0;
   _lastError[0] = 0;
@@ -83,10 +84,8 @@ void PocketMageAudio::begin() {
   // so we see connect/disconnect events for UAC speaker selection.
   usb_streaming_state_register(usbStateCb, this);
   _commandQueue = xQueueCreate(4, sizeof(Command));
-  xTaskCreatePinnedToCore(audioTaskFunc, "pmaudio", TASK_STACK_BYTES, this, TASK_PRIORITY,
-                          &_taskHandle, TASK_CORE);
   _initialized = true;
-  ESP_LOGI(TAG, "begin(): pmaudio task created");
+  ESP_LOGI(TAG, "begin(): pmaudio task will be created lazily on first play()");
 }
 
 void PocketMageAudio::stop() {
@@ -106,6 +105,11 @@ void PocketMageAudio::stop() {
 void PocketMageAudio::play(const char* path) {
   if (path == nullptr)
     return;
+  // Lazy task creation: create the decode task on first play()
+  if (!_taskHandle) {
+    xTaskCreatePinnedToCore(audioTaskFunc, "pmaudio", TASK_STACK_BYTES, this, TASK_PRIORITY,
+                            &_taskHandle, TASK_CORE);
+  }
   xSemaphoreTakeRecursive(_mutex, portMAX_DELAY);
   strncpy(_pendingPath, path, sizeof(_pendingPath));
   _pendingPath[sizeof(_pendingPath) - 1] = 0;
@@ -172,6 +176,13 @@ String PocketMageAudio::getLastError() const {
 
 int8_t PocketMageAudio::getVolume() const {
   return _volume;
+}
+
+uint32_t PocketMageAudio::getPosition() const {
+  xSemaphoreTakeRecursive(_mutex, portMAX_DELAY);
+  uint32_t pos = _bytesDecoded;
+  xSemaphoreGiveRecursive(_mutex);
+  return pos;
 }
 
 void PocketMageAudio::setOutput(AudioOutput output) {
@@ -381,6 +392,7 @@ void PocketMageAudio::doPlay() {
   _stopRequested = false;
   _paused = false;
   _lastError[0] = 0;
+  _bytesDecoded = 0;
   _state = AudioState::Opening;
   publishEvent();
 
@@ -525,8 +537,10 @@ void PocketMageAudio::decodeLoop() {
             ok = false;
             break;
           }
+          _bytesDecoded += out.decoded_size;
         } else {
           pwm_audio_write(out.buffer, out.decoded_size, &written, portMAX_DELAY);
+          _bytesDecoded += written;
         }
       }
 
