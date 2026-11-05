@@ -1,12 +1,12 @@
 # Host runtime baseline: C/C++ runtime, newlib and POSIX symbols the
 # PocketMage firmware exports unconditionally. Apps may rely on these
-# without listing them. Generated from the firmware's ELF_SYMS export
-# table (src/ELF_SYMS/esp_all_symbol.cpp); regenerate alongside
-# symbols.list when the host export surface changes. Do not hand edit.
+# without listing them. Generated from the firmware export surface by
+# tools/symbols.py --write-baseline; regenerate alongside the export
+# table whenever the host surface changes. Do not hand edit.
 #
 # The gate treats these as resolvable when no --host-elf is supplied, so
 # a standalone app checkout can be gated without the firmware tree.
-
+#
 _Balloc
 _Bfree
 _Unwind_Backtrace
@@ -104,6 +104,24 @@ __ascii_mbtowc
 __ascii_wctomb
 __ashldi3
 __assert_func
+__atomic_compare_exchange_1
+__atomic_compare_exchange_4
+__atomic_exchange_4
+__atomic_fetch_add_2
+__atomic_fetch_add_4
+__atomic_fetch_and_4
+__atomic_fetch_and_8
+__atomic_fetch_or_4
+__atomic_fetch_or_8
+__atomic_fetch_sub_4
+__atomic_s32c1i_compare_exchange_1
+__atomic_s32c1i_compare_exchange_4
+__atomic_s32c1i_exchange_4
+__atomic_s32c1i_fetch_add_2
+__atomic_s32c1i_fetch_add_4
+__atomic_s32c1i_fetch_and_4
+__atomic_s32c1i_fetch_or_4
+__atomic_s32c1i_fetch_sub_4
 __b2d
 __bswapdi2
 __bswapsi2
@@ -215,6 +233,7 @@ __sseek
 __ssprint_r
 __ssrefill_r
 __ssvfiscanf_r
+__ssvfscanf_r
 __stack_chk_fail
 __strtok_r
 __subdf3
@@ -236,31 +255,17 @@ __xtensa_libgcc_window_spill
 __xtensa_nonlocal_goto
 __xtensa_sync_caches
 _calloc_r
-_close_r
 _dtoa_r
 _exit
-_fclose_r
-_fcntl_r
-_fdopen_r
 _fflush_r
-_fgets_r
 _findenv_r
-_fopen_r
-_fputc_r
-_fputs_r
-_fread_r
 _free_r
-_fseek_r
-_fseeko_r
 _fstat_r
-_ftello_r
 _fwalk_sglue
-_fwrite_r
 _getenv_r
 _getpid_r
 _gettimeofday_r
 _kill_r
-_link_r
 _localeconv_r
 _lock_acquire
 _lock_acquire_recursive
@@ -274,20 +279,18 @@ _lock_try_acquire_recursive
 _lseek_r
 _malloc_r
 _mbrtowc_r
-_open_r
 _putc_r
 _puts_r
 _raise_r
 _read_r
 _realloc_r
 _reclaim_reent
-_rename_r
-_rewind_r
+_remove_r
 _sbrk_r
 _sfread_r
-_stat_r
 _strerror_r
 _strtod_l
+_strtod_r
 _strtol_r
 _strtoll_r
 _strtoul_r
@@ -295,11 +298,9 @@ _strtoull_r
 _sungetc_r
 _svfiprintf_r
 _svfprintf_r
-_system_r
 _times_r
 _tzset_unlocked
 _tzset_unlocked_r
-_unlink_r
 _user_strerror
 _vfprintf_r
 _vsnprintf_r
@@ -313,10 +314,7 @@ bzero
 calloc
 ceil
 cfree
-clearerr
 clock_gettime
-close
-closedir
 cosf
 div
 esp_libc_include_assert_impl
@@ -345,26 +343,12 @@ esp_time_impl_set_boot_time
 exit
 explicit_bzero
 fabsf
-fclose
-fcntl
-fdopen
-feof
 fflush
-fgets
-fileno
 floorf
-fopen
 fprintf
-fputc
-fputs
-fread
 free
 frexp
-fseek
-fstat
 fsync
-ftell
-fwrite
 getenv
 getopt_long
 gettimeofday
@@ -390,23 +374,16 @@ memmove
 memset
 mktime
 nan
-open
-opendir
+nanf
 printf
 putchar
 puts
 pvalloc
 qsort
 rand
-read
-readdir
 realloc
-rename
-rewind
-rewinddir
 roundf
 scalbnf
-seekdir
 setjmp
 settimeofday
 setvbuf
@@ -418,7 +395,7 @@ snprintf
 sprintf
 sqrtf
 srand
-stat
+sscanf
 strcasecmp
 strcasestr
 strcat
@@ -454,11 +431,9 @@ strtoull
 time
 tolower
 toupper
-unlink
 usleep
 utoa
 valloc
 vfprintf
 vprintf
 vsnprintf
-write

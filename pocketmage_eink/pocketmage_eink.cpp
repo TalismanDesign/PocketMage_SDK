@@ -9,10 +9,10 @@
 #include <pocketmage.h>
 #include <pocketmage_globals.h>
 
-static constexpr const char* tag = "EINK";
+static constexpr const char *tag = "EINK";
 
 GxEPD2_BW<GxEPD2_310_GDEQ031T10, GxEPD2_310_GDEQ031T10::HEIGHT>
-  display(GxEPD2_310_GDEQ031T10(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY));
+    display(GxEPD2_310_GDEQ031T10(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY));
 
 U8G2_FOR_ADAFRUIT_GFX u8g2f;
 
@@ -27,7 +27,9 @@ volatile bool GxEPD2_310_GDEQ031T10::useFastFullUpdate = true;
 
 static PocketmageEink pm_eink(display);
 
-PocketmageEink& EINK() { return pm_eink; }
+PocketmageEink &EINK() {
+  return pm_eink;
+}
 
 void PocketmageEink::refresh() {
   lockPanel();
@@ -44,9 +46,9 @@ void PocketmageEink::refresh() {
       partialCounter_ = 0;
       setFastFullRefresh(true);
       display_.display(false);
-      #if POCKETMAGE_HW_VERSION != 2
-        display_.display(true);
-      #endif
+#if POCKETMAGE_HW_VERSION != 2
+      display_.display(true);
+#endif
     } else if ((partialCounter_ >= FAST_REFRESH_AFTER) || forceSlowFullUpdate_) {
       forceSlowFullUpdate_ = false;
       partialCounter_ = 0;
@@ -55,9 +57,9 @@ void PocketmageEink::refresh() {
       // by a beta-only same-frame partial refresh.
       setFastFullRefresh(false);
       display_.display(false);
-      #if POCKETMAGE_HW_VERSION != 2
-        display_.display(true);
-      #endif
+#if POCKETMAGE_HW_VERSION != 2
+      display_.display(true);
+#endif
     } else {
       // Fast full-screen partial update (~0.65s).  GxEPD2's display() keeps the
       // panel's previous-image RAM (0x10) in sync, so the differential update
@@ -91,11 +93,13 @@ void PocketmageEink::refresh() {
 }
 
 void PocketmageEink::lockPanel() {
-  if (einkMutex) xSemaphoreTakeRecursive(einkMutex, portMAX_DELAY);
+  if (einkMutex)
+    xSemaphoreTakeRecursive(einkMutex, portMAX_DELAY);
 }
 
 void PocketmageEink::unlockPanel() {
-  if (einkMutex) xSemaphoreGiveRecursive(einkMutex);
+  if (einkMutex)
+    xSemaphoreGiveRecursive(einkMutex);
 }
 
 void PocketmageEink::setFastFullRefresh(bool setting) {
@@ -104,17 +108,12 @@ void PocketmageEink::setFastFullRefresh(bool setting) {
   }
 }
 
-void PocketmageEink::statusBar(const String& input, bool fullWindow) {
-  if (!fullWindow) {
-    display_.setPartialWindow(0, display_.height() - 20, display_.width(), 20);
-    drawStatusBar(input);
-  } else {
-    drawStatusBar(input);
-  }
+void PocketmageEink::statusBar(const String &input, bool fullWindow) {
+  drawStatusBar(input);
   display_.drawRect(display_.width() - 30, display_.height() - 20, 30, 20, GxEPD_BLACK);
 }
 
-void PocketmageEink::drawStatusBar(const String& input) {
+void PocketmageEink::drawStatusBar(const String &input) {
   FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
   u8g2f.setBackgroundColor(GxEPD_WHITE);
   display_.fillRect(0, display_.height() - 26, display_.width(), 26, GxEPD_WHITE);
@@ -134,30 +133,34 @@ void PocketmageEink::drawStatusBar(const String& input) {
 void PocketmageEink::resetDisplay(bool clearScreen, uint16_t color) {
   display_.setRotation(3);
   display_.setFullWindow();
-  if (clearScreen) display_.fillScreen(color);
+  if (clearScreen)
+    display_.fillScreen(color);
 }
 
-int PocketmageEink::countLines(const String& input, size_t maxLineLength) {
-  if (maxLineLength == 0) return 1;
+int PocketmageEink::countLines(const String &input, size_t maxLineLength) {
+  if (maxLineLength == 0)
+    return 1;
   size_t inputLength = input.length();
   size_t charCounter = 0;
   uint16_t lineCounter = 1;
   for (size_t c = 0; c < inputLength; c++) {
     if (input[c] == '\n') {
-        charCounter = 0;
-        lineCounter++;
-        continue;
+      charCounter = 0;
+      lineCounter++;
+      continue;
     }
     if (charCounter >= maxLineLength) {
-        charCounter = 0;
-        lineCounter++;
+      charCounter = 0;
+      lineCounter++;
     }
     charCounter++;
   }
   return lineCounter;
 }
 
-void PocketmageEink::forceSlowFullUpdate(bool force) { forceSlowFullUpdate_ = force; }
+void PocketmageEink::forceSlowFullUpdate(bool force) {
+  forceSlowFullUpdate_ = force;
+}
 
 // UC8253 controller is rated to 20MHz SPI; keep well under it. The default
 // 4MHz upload time is small next to the 1-3s panel refresh, so this mostly
@@ -166,8 +169,7 @@ static const uint32_t kEinkSpiClockHz = 16000000UL;
 
 void setupEink() {
   einkMutex = xSemaphoreCreateRecursiveMutex();
-  display.init(115200, true, 10, false,
-               SPI, SPISettings(kEinkSpiClockHz, MSBFIRST, SPI_MODE0));
+  display.init(115200, true, 10, false, SPI, SPISettings(kEinkSpiClockHz, MSBFIRST, SPI_MODE0));
   pm_eink.markPanelNeedsFullRefresh();
   display.setRotation(3);
   display.setFullWindow();
@@ -177,26 +179,19 @@ void setupEink() {
   u8g2f.setFontMode(1);
   display.fillScreen(GxEPD_WHITE);
 
-  xTaskCreatePinnedToCore(
-    einkHandler,
-    "einkHandlerTask",
-    10000,
-    NULL,
-    1,
-    &einkHandlerTaskHandle,
-    0
-  );
+  xTaskCreatePinnedToCore(einkHandler, "einkHandlerTask", 10000, NULL, 1, &einkHandlerTaskHandle,
+                          0);
 }
 
 // E-ink refresh task.
-void einkHandler(void* parameter) {
+void einkHandler(void *parameter) {
   vTaskDelay(pdMS_TO_TICKS(250));
   for (;;) {
-    #if PM_TARGET_APP
-      einkHandler_APP();
-    #else
-      applicationEinkHandler();
-    #endif
+#if PM_TARGET_APP
+    einkHandler_APP();
+#else
+    applicationEinkHandler();
+#endif
 
     vTaskDelay(pdMS_TO_TICKS(50));
     yield();
@@ -207,6 +202,6 @@ uint8_t PocketmageEink::getFontHeight() {
   return FontEngine::fontHeight(DisplayTarget::EINK, FontStyle::Body);
 }
 
-uint16_t PocketmageEink::getEinkTextWidth(const String& s) {
+uint16_t PocketmageEink::getEinkTextWidth(const String &s) {
   return FontEngine::textWidth(DisplayTarget::EINK, s, FontStyle::Body);
 }

@@ -7,7 +7,6 @@
 // these symbols are defined here once and nowhere else.
 SPIClass *vspi = nullptr;
 SPIClass *hspi = nullptr;
-fs::FS *global_fs = nullptr;
 
 Preferences prefs;
 AppState CurrentAppState = HOME;

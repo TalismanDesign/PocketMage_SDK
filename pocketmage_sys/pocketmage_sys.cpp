@@ -6,13 +6,12 @@
 //  dP        `88888P' `88888P' dP   `YP `88888P'   dP   dP  dP  dP `88888P8 `8888P88 `88888P'  //
 //                                                                                .88           //
 //                                                                            d8888P            //
-// AUDIT 1
 
 #include <Preferences.h>
 #include <RTClib.h>
-#include <SD.h>
-#include <SD_MMC.h>
-#include <SPI.h>
+#include <pocketmage_sd/pocketmage_sd.h>
+
+void setupSD();
 #include <config.h>
 #include <esp_log.h>
 #include <pocketmage_globals.h>
@@ -23,14 +22,14 @@
 #include "esp_system.h"
 #include "esp_task_wdt.h"
 
-static constexpr const char* TAG = "SYSTEM";
+static constexpr const char *TAG = "SYSTEM";
 
 volatile bool PWR_BTN_event = false;
-bool noTimeout = false;  // Disable timeout
+bool noTimeout = false; // Disable timeout
 bool mscEnabled = false;
 bool sinkEnabled = false;
 volatile bool SDActive = false;
-volatile int battState = 0;  // Battery state
+volatile int battState = 0; // Battery state
 
 namespace pocketmage {
 void setCpuSpeed(int newFreq) {
@@ -78,26 +77,20 @@ void deepSleep(bool alternateScreenSaver) {
 
   if (alternateScreenSaver == false) {
     SDActive = true;
-    pocketmage::setCpuSpeed(240);
-    delay(50);
 
     // Screensavers are authored for the canonical rotation; HOME_INIT() may have
     // left the panel at rotation 1 (180 degrees off), so force rotation 3 here.
     display.setRotation(3);
 
     // Check if there are custom screensavers
-    File dir = global_fs->open("/assets/backgrounds");
+    std::vector<PocketmageSD::DirItem> items;
     std::vector<String> binFiles;
 
-    if (dir) {
-      File file;
-      while ((file = dir.openNextFile())) {
-        String name = file.name();
-        if (name.endsWith(".bin"))
-          binFiles.push_back(name);
-        file.close();
+    if (PM_SD().listDirItems("/assets/backgrounds", items)) {
+      for (const auto &item : items) {
+        if (item.name.endsWith(".bin"))
+          binFiles.push_back(item.name);
       }
-      dir.close();
     }
 
     display.setFullWindow();
@@ -106,26 +99,18 @@ void deepSleep(bool alternateScreenSaver) {
     if (!binFiles.empty()) {
       int fileIndex = esp_random() % binFiles.size();
       String path = "/assets/backgrounds/" + binFiles[fileIndex];
-      File f = global_fs->open(path);
-      if (f) {
-        size_t fSize = f.size();
-        if (fSize == 9600) {
-          uint8_t* buf = (uint8_t*)malloc(9600);
-          if (buf) {
-            if (f.read(buf, 9600) == 9600) {
-              f.close();
-              display.drawBitmap(0, 0, buf, 320, 240, GxEPD_BLACK);
-              FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
-              FontEngine::drawText(DisplayTarget::EINK, 5, display.height() - 5,
-                                   binFiles[fileIndex], FontStyle::MonoBold);
-            } else {
-              f.close();
-            }
-            free(buf);
-            buf = nullptr;
+      if (PM_SD().getFileSize(path.c_str()) == 9600) {
+        uint8_t *buf = (uint8_t *)malloc(9600);
+        if (buf) {
+          if (PM_SD().readBinaryFile(path.c_str(), buf, 9600)) {
+            display.drawBitmap(0, 0, buf, 320, 240, GxEPD_BLACK);
+            FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
+            FontEngine::drawText(DisplayTarget::EINK, 5, display.height() - 5, binFiles[fileIndex],
+                                 FontStyle::MonoBold);
           }
+          free(buf);
+          buf = nullptr;
         }
-        f.close();
       }
     }
     // Use standard screensavers
@@ -136,8 +121,6 @@ void deepSleep(bool alternateScreenSaver) {
       display.drawBitmap(0, 0, ScreenSaver_allArray[randomScreenSaver_], 320, 240, GxEPD_BLACK);
     }
 
-    if (SAVE_POWER)
-      pocketmage::setCpuSpeed(POWER_SAVE_FREQ);
     SDActive = false;
 
     EINK().forceSlowFullUpdate(true);
@@ -176,7 +159,7 @@ void IRAM_ATTR PWR_BTN_irq() {
 }
 
 // Hard reset to home
-void hardReset(void* parameter) {
+void hardReset(void *parameter) {
   vTaskDelay(pdMS_TO_TICKS(250));
   unsigned long heldSince = millis();
   for (;;) {
@@ -190,13 +173,13 @@ void hardReset(void* parameter) {
 
       resetRequested = true;
 
-      heldSince = millis();  // Reset so it doesn't constantly trigger
+      heldSince = millis(); // Reset so it doesn't constantly trigger
     }
 
     vTaskDelay(pdMS_TO_TICKS(50));
   }
 }
-}
+} // namespace pocketmage
 
 volatile bool resetRequested = false;
 
@@ -243,7 +226,7 @@ void PocketMage_INIT() {
 // Initialize Second I2C Bus (prod only)
 #if POCKETMAGE_HW_VERSION == 2
   Wire1.begin(SWITCHED_I2C_SDA,
-              SWITCHED_I2C_SCL);  // Note: Devices on Wire1 - Cap Touch, Expansion Port
+              SWITCHED_I2C_SCL); // Note: Devices on Wire1 - Cap Touch, Expansion Port
 #endif
 
   // Use the global SPI instance pinned to the dedicated bus pins.
@@ -289,13 +272,13 @@ void PocketMage_INIT() {
   }
 
   // Start hardreset task
-  xTaskCreatePinnedToCore(pocketmage::hardReset,  // Function name
-                          "hardReset",            // Task name
-                          2048,                   // Stack size
-                          NULL,                   // Parameters
-                          0,                      // Priority
-                          NULL,                   // Task handle
-                          1                       // Core ID
+  xTaskCreatePinnedToCore(pocketmage::hardReset, // Function name
+                          "hardReset",           // Task name
+                          2048,                  // Stack size
+                          NULL,                  // Parameters
+                          0,                     // Priority
+                          NULL,                  // Task handle
+                          1                      // Core ID
   );
 
   // SET CPU CLOCK FOR POWER SAVE MODE
@@ -379,8 +362,8 @@ void setLoadSwitch(bool state) {
 }
 
 // ===================== GLOBAL TEXT HELPERS =====================
-volatile bool newLineAdded = true;  // New line added in TXT
-std::vector<String> allLines;       // All lines in TXT
+volatile bool newLineAdded = true; // New line added in TXT
+std::vector<String> allLines;      // All lines in TXT
 
 String vectorToString() {
   String result;
@@ -418,7 +401,7 @@ void stringToVector(String inputText) {
           String partialWord = currentLine_.substring(lastSpace + 1);
           currentLine_ = currentLine_.substring(0, lastSpace);
           allLines.push_back(currentLine_);
-          currentLine_ = partialWord;  // Start new line with partial word
+          currentLine_ = partialWord; // Start new line with partial word
         } else {
           // No spaces, whole line is a single word
           allLines.push_back(currentLine_);

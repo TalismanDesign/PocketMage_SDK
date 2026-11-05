@@ -12,17 +12,17 @@
 
 // Playback state machine
 enum class AudioState {
-  Idle,     // No clip loaded
-  Opening,  // Decoder is opening the file
-  Playing,  // Actively decoding and feeding the sink
-  Paused,   // Decode suspended, pin still owned
-  Stopping  // Teardown in progress
+  Idle,    // No clip loaded
+  Opening, // Decoder is opening the file
+  Playing, // Actively decoding and feeding the sink
+  Paused,  // Decode suspended, pin still owned
+  Stopping // Teardown in progress
 };
 
 // Output sink selection
 enum class AudioOutput {
-  Piezo,  // PWM on piezo / buzzer
-  Usb,    // USB UAC host speaker
+  Piezo, // PWM on piezo / buzzer
+  Usb,   // USB UAC host speaker
 };
 
 // pwm_audio shares the piezo (BZ_PIN) with the buzzer; both drive LEDC. The
@@ -30,28 +30,28 @@ enum class AudioOutput {
 typedef std::function<void(void)> AudioEventCallback;
 
 class PocketMageAudio {
- public:
-  static PocketMageAudio& getInstance();
+public:
+  static PocketMageAudio &getInstance();
 
   // Lifecycle
-  void begin();  // Call once at startup to create the decode task
-  void stop();   // Call at shutdown to cleanly stop the service
+  void begin(); // Call once at startup to create the decode task
+  void stop();  // Call at shutdown to cleanly stop the service
 
   // Control methods (all non-blocking, dispatch to the decode task)
-  void play(const char* path);  // Decode and play a file from the active FS
-  void stopPlayback();          // Stop the current clip and release the pin
-  void pause();                 // Suspend decode, keep the pin owned
-  void resume();                // Resume a paused clip
-  void setVolume(int8_t vol);   // -16..16, see pwm_audio_set_volume
+  void play(const char *path); // Decode and play a file from the active FS
+  void stopPlayback();         // Stop the current clip and release the pin
+  void pause();                // Suspend decode, keep the pin owned
+  void resume();               // Resume a paused clip
+  void setVolume(int8_t vol);  // -16..16, see pwm_audio_set_volume
 
   // Status queries (thread-safe)
   AudioState getState() const;
   bool isPlaying() const;
-  bool ownsPin() const;  // True while the sink holds BZ_PIN
+  bool ownsPin() const; // True while the sink holds BZ_PIN
   String getCurrentPath() const;
   String getLastError() const;
   int8_t getVolume() const;
-  uint32_t getPosition() const;  // Bytes decoded so far in the current clip
+  uint32_t getPosition() const; // Bytes decoded so far in the current clip
 
   // Output sink selection. Piezo is the default and fallback when no USB
   // audio device is plugged in. Usb routes decoded PCM to a USB UAC host
@@ -64,14 +64,14 @@ class PocketMageAudio {
   void setEventCallback(AudioEventCallback cb);
   void dispatchEvents();
 
- private:
+private:
   PocketMageAudio();
   ~PocketMageAudio();
-  PocketMageAudio(const PocketMageAudio&) = delete;
-  PocketMageAudio& operator=(const PocketMageAudio&) = delete;
+  PocketMageAudio(const PocketMageAudio &) = delete;
+  PocketMageAudio &operator=(const PocketMageAudio &) = delete;
 
   // Task function
-  static void audioTaskFunc(void* param);
+  static void audioTaskFunc(void *param);
   void taskLoop();
 
   // Internal operations (run in task context)
@@ -88,21 +88,14 @@ class PocketMageAudio {
   void releaseUsb();
 
   // USB device state callback (static: passed to usb_streaming_state_register)
-  static void usbStateCb(usb_stream_state_t state, void* user_ptr);
+  static void usbStateCb(usb_stream_state_t state, void *user_ptr);
 
   // Helpers
-  void setError(const char* msg);
+  void setError(const char *msg);
   void publishEvent();
 
   // Command queue types
-  enum class Command : uint8_t {
-    None = 0,
-    Play,
-    Stop,
-    Pause,
-    Resume,
-    Shutdown
-  };
+  enum class Command : uint8_t { None = 0, Play, Stop, Pause, Resume, Shutdown };
 
   // Thread-safe state
   mutable SemaphoreHandle_t _mutex;
@@ -120,6 +113,12 @@ class PocketMageAudio {
 
   // Event callback
   AudioEventCallback _eventCallback;
+
+  // Pre-allocated decode buffers
+  uint8_t *_inBuf;
+  uint8_t *_outBuf;
+  uint32_t _outCap;
+  uint32_t _leftoverLen;
 
   // Flags
   bool _initialized;
@@ -146,7 +145,7 @@ class PocketMageAudio {
   // Ring buffer and read-chunk sizes (bytes).
   static constexpr uint32_t SINK_RINGBUF_LEN = 8 * 1024;
   static constexpr uint32_t READ_CHUNK = 4 * 1024;
-  static constexpr uint32_t PCM_OUT_CHUNK = 4 * 1024;
+  static constexpr uint32_t PCM_OUT_CHUNK = 4608; // 1152 samples × 2 ch × 2 bytes
 
   // Default sink parameters until the decoder reports the real format.
   static constexpr int DEFAULT_SAMPLE_RATE = 44100;
@@ -156,4 +155,4 @@ class PocketMageAudio {
 };
 
 // Global accessor for convenience
-extern PocketMageAudio& P_AUDIO;
+extern PocketMageAudio &P_AUDIO;

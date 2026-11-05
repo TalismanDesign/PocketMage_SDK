@@ -6,7 +6,7 @@
 //  dP        `88888P' `88888P' dP   `YP `88888P'   dP   dP  dP  dP `88888P8 `8888P88 `88888P'  //
 //                                                                                .88           //
 //                                                                            d8888P            //
-                                                     
+
 #pragma once
 #include <Arduino.h>
 #include <vector>
@@ -16,24 +16,25 @@ class String;
 extern bool mscEnabled;
 extern bool sinkEnabled;
 extern volatile bool SDActive;
-extern volatile int battState;       // Battery state
-extern volatile bool PWR_BTN_event;  // Power button event **shared with library**
+extern volatile int battState;      // Battery state
+extern volatile bool PWR_BTN_event; // Power button event **shared with library**
 
-namespace pocketmage{
-  void setCpuSpeed(int newFreq);
-  void deepSleep(bool alternateScreenSaver = false);
-  void IRAM_ATTR PWR_BTN_irq();
+namespace pocketmage {
+void setCpuSpeed(int newFreq);
+void deepSleep(bool alternateScreenSaver = false);
+void IRAM_ATTR PWR_BTN_irq();
 
-  class ScopedCpuBoost {
-  public:
-    ScopedCpuBoost();
-    ~ScopedCpuBoost();
-    ScopedCpuBoost(const ScopedCpuBoost&) = delete;
-    ScopedCpuBoost& operator=(const ScopedCpuBoost&) = delete;
-  private:
-    int prevFreq_ = 240;
-  };
-}
+class ScopedCpuBoost {
+public:
+  ScopedCpuBoost();
+  ~ScopedCpuBoost();
+  ScopedCpuBoost(const ScopedCpuBoost &) = delete;
+  ScopedCpuBoost &operator=(const ScopedCpuBoost &) = delete;
+
+private:
+  int prevFreq_ = 240;
+};
+} // namespace pocketmage
 
 // ===================== SYSTEM SETUP =====================
 void PocketMage_INIT();
@@ -42,7 +43,7 @@ String vectorToString();
 void stringToVector(String inputText);
 
 extern volatile bool resetRequested;
-extern volatile bool newLineAdded;           // New line added in TXT
-extern std::vector<String> allLines;                // All lines in TXT
+extern volatile bool newLineAdded;   // New line added in TXT
+extern std::vector<String> allLines; // All lines in TXT
 extern bool noTimeout;               // Disable timeout
 extern void setLoadSwitch(bool state);

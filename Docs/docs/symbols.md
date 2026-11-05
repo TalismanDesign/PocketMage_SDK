@@ -12,7 +12,8 @@ Apps link `-nostdlib`. Nothing ships with the binary that satisfies a reference;
 An app can call anything the host exports as a global symbol. The export surface has two curated parts, backed by two committed lists at the SDK root:
 
 - `symbols.list` - the PocketMage `pm_*` ABI plus a handful of host primitives. Its `pm_*` block is generated; do not hand edit it (see below).
-- `host_baseline.list` - the C/C++ runtime, newlib, and POSIX symbols the firmware exports unconditionally. Apps may rely on these without listing them. Generated from the firmware's export table; do not hand edit it.
+- `host_baseline.list` - the C/C++ runtime, newlib, and POSIX symbols the firmware exports unconditionally. Apps may rely on these without listing them. Generated from the firmware's export surface by `symbols.py --write-baseline`; do not hand edit it.
+- `host_exclusions.list` - symbols deliberately withheld from the export surface: the raw stdio, dirent and POSIX file calls plus their newlib reentrant forms. All card access goes through the `pm_sd_*` gateway API, so an app referencing an excluded symbol fails the gate and the load. Exclusions are applied at generation (`--exclude-file`) and the baseline is rewritten to match (`--write-baseline`), so regenerating the table can never silently restore them. Kept on the surface: stdout-only calls (`fflush`, `setvbuf`) and the newlib-internal plumbing printf chains need (`_fstat_r`, `_write_r`, `_read_r`, `_lseek_r`, `_putc_r`, `_fflush_r`, `_sfread_r`, `__seofread`), none of which can reach the card once `fopen`/`open` are unobtainable.
 
 The `pm` gate reads both lists and takes their union as the curated surface (`tools/pm/gate.py:read_curated`). An undefined symbol in an app must appear in that union, or be confirmed present in a supplied host ELF, for the app to pass.
 
@@ -23,6 +24,8 @@ python3 tools/symbols.py --list symbols.list --baseline host_baseline.list \
   --host-elf <firmware.elf> --cpp \
   --include-header pm_app_api.h --include-header pm_sdk_app.h \
   --output-file ../../src/ELF_SYMS/esp_all_symbol.cpp \
+  --exclude-file host_exclusions.list \
+  --write-baseline host_baseline.list \
   --toolchain-lib-dir <toolchain>/xtensa-esp-elf/lib/esp32s3/no-rtti \
   --framework-lib-dir <framework-libs>/esp32s3/lib \
   --print-cost
@@ -40,7 +43,7 @@ total       620 symbols  15,468 bytes (15.1 KB)
 
 `--toolchain-lib-dir` must point at the full newlib archives (`xtensa-esp-elf/lib/<target>/no-rtti`), not the picolibc stubs under `picolibc/...`: the picolibc `libm.a` is empty and its `libc.a` omits the dtoa and stdio-reentrancy helpers. `libgcc.a` is found by ascending to the toolchain root, so any lib dir below it resolves.
 
-`--baseline host_baseline.list` folds the recorded baseline back in as runtime externs. Its only effect beyond the archive scan is the POSIX directory calls (`opendir`, `readdir`, `closedir`, `rewinddir`, `seekdir`), which the firmware exports from the IDF VFS layer rather than from any scanned archive.
+`--baseline host_baseline.list` folds the recorded baseline back in as runtime externs, so VFS-level POSIX calls that live outside the scanned archives stay exported.
 
 That total includes the curated `pm_*` entries. The runtime adds about 11.2 KB of flash in the firmware image, once. It is not a per-app cost. Apps stay small: a hello world is 1.3 KB, an app using `std::vector` and `std::string` is 2.3 KB, an app with cJSON linked in is 5.2 KB. `--gc-sections` and `--strip-all` in `tools/app.mk` do that work.
 
