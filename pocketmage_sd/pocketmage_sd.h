@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+#include "driver/sdmmc_host.h"
+
 // forward-declaration to avoid including U8g2lib.h, GxEPD2_BW.h, pocketmage_oled.h, and
 // pocketmage_eink.h
 class PocketmageOled;
@@ -164,3 +166,7 @@ private:
 // Global singleton accessor
 PocketmageSD &PM_SD();
 PocketmageSD &PM_SDAUTO();
+
+// Mount the SD card via SDMMC
+bool mountSdmmc();
+sdmmc_card_t *getSdCard();

@@ -14,12 +14,15 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cerrno>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <vector>
 
 #include <Arduino.h>
 #include <microtar.h>
+#include "driver/sdmmc_host.h"
+#include "esp_vfs_fat.h"
 
 #include "pocketmage_sd.h"
 
@@ -57,7 +60,8 @@ static FILE *s_streams[kStreamSlots] = {};
 static SnapEntry *s_snapshot = nullptr;
 static int s_snapshotCount = 0;
 
-static bool g_audioActive = false;
+static int s_openStreams = 0;
+static bool s_needRemount = false;
 
 static const char *resolve(const char *path, char *buf, size_t size) {
   constexpr const char *kMount = PocketmageSD::kSdMountPoint;
@@ -68,12 +72,13 @@ static const char *resolve(const char *path, char *buf, size_t size) {
 }
 
 static void exec(Request *r);
+static void remount();
 
 static void taskFunc(void *) {
   for (;;) {
     Request *r;
     if (xQueueReceive(s_queue, &r, 0) != pdPASS) {
-      if (!g_audioActive && SAVE_POWER && getCpuFrequencyMhz() != POWER_SAVE_FREQ)
+      if (s_openStreams == 0 && SAVE_POWER && getCpuFrequencyMhz() != POWER_SAVE_FREQ)
         pocketmage::setCpuSpeed(POWER_SAVE_FREQ);
       xQueueReceive(s_queue, &r, portMAX_DELAY);
     }
@@ -136,6 +141,10 @@ void snapshotFree() {
   free(s_snapshot);
   s_snapshot = nullptr;
   s_snapshotCount = 0;
+}
+
+bool streamsOpen() {
+  return s_openStreams > 0;
 }
 
 static FILE *openResolved(const char *path, const char *mode) {
@@ -505,7 +514,26 @@ static void extractTarInner(Request *r) {
   r->ok = ok;
 }
 
+static void remount() {
+  // Close every open stream: a remount invalidates all existing FILE handles.
+  for (int i = 0; i < kStreamSlots; i++) {
+    if (s_streams[i]) {
+      fclose(s_streams[i]);
+      s_streams[i] = nullptr;
+    }
+  }
+  s_openStreams = 0;
+
+  esp_vfs_fat_sdcard_unmount("/sdcard", getSdCard());
+  bool ok = mountSdmmc();
+  ESP_LOGW(TAG, "remount %s", ok ? "ok" : "FAILED");
+  s_needRemount = false;
+}
+
 static void exec(Request *r) {
+  if (s_needRemount) {
+    remount();
+  }
   switch (r->op) {
   case Op::Stat: {
     char full[PocketmageSD::kMaxPathLen];
@@ -623,6 +651,8 @@ static void exec(Request *r) {
     char full[PocketmageSD::kMaxPathLen];
     FILE *f = fopen(resolve(r->path, full, sizeof(full)), "r");
     if (!f) {
+      if (errno == EIO)
+        s_needRemount = true;
       ESP_LOGE(TAG, "Failed to open file: %s", r->path);
       r->ok = false;
       break;
@@ -682,15 +712,17 @@ static void exec(Request *r) {
     char mode[2] = {(char)r->whence, '\0'};
     FILE *f = openResolved(r->path, mode);
     if (!f) {
+      if (errno == EIO)
+        s_needRemount = true;
       ESP_LOGE(TAG, "stream: open failed: %s", r->path);
       r->retVal = (size_t)-1;
       r->ok = false;
       break;
     }
     s_streams[slot] = f;
+    s_openStreams++;
     r->retVal = (size_t)slot;
     r->ok = true;
-    g_audioActive = true;
     break;
   }
 
@@ -759,8 +791,9 @@ static void exec(Request *r) {
     }
     fclose(f);
     s_streams[r->slot] = nullptr;
+    if (s_openStreams > 0)
+      s_openStreams--;
     r->ok = true;
-    g_audioActive = false;
     break;
   }
   }

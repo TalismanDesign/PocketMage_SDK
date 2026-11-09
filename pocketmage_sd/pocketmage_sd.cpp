@@ -16,6 +16,7 @@
 #include "driver/sdspi_host.h"
 #include "esp_vfs_fat.h"
 
+#include "pocketmage_sd.h"
 #include "sd_gateway.h"
 
 static constexpr const char *TAG = "SD";
@@ -23,6 +24,12 @@ static constexpr const char *TAG = "SD";
 extern bool SAVE_POWER;
 
 static PocketmageSD pm_sd;
+
+static sdmmc_card_t *s_card = nullptr;
+
+sdmmc_card_t *getSdCard() {
+  return s_card;
+}
 
 PocketmageSD &PM_SD() {
   return pm_sd;
@@ -314,6 +321,52 @@ static void provisionFilesystem() {
   }
 }
 
+bool mountSdmmc() {
+  pocketmage::setCpuSpeed(240);
+
+  sdmmc_host_t host = SDMMC_HOST_DEFAULT();
+  host.command_timeout_ms = 500;
+
+  sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
+#if POCKETMAGE_HW_VERSION == 2
+  slot_config.width = 4;
+  slot_config.clk = (gpio_num_t)SD_CLK;
+  slot_config.cmd = (gpio_num_t)SD_CMD;
+  slot_config.d0 = (gpio_num_t)SD_D0;
+  slot_config.d1 = (gpio_num_t)SD_D1;
+  slot_config.d2 = (gpio_num_t)SD_D2;
+  slot_config.d3 = (gpio_num_t)SD_D3;
+#else
+  slot_config.width = 1;
+  slot_config.clk = (gpio_num_t)SD_CLK;
+  slot_config.cmd = (gpio_num_t)SD_CMD;
+  slot_config.d0 = (gpio_num_t)SD_D0;
+  slot_config.d1 = (gpio_num_t)-1;
+  slot_config.d2 = (gpio_num_t)-1;
+  slot_config.d3 = (gpio_num_t)-1;
+#endif
+
+  esp_vfs_fat_sdmmc_mount_config_t mount_config = {};
+  mount_config.format_if_mount_failed = false;
+  mount_config.max_files = 8;
+  mount_config.allocation_unit_size = 16 * 1024;
+
+  for (int attempt = 1; attempt <= 5; attempt++) {
+    sdmmc_card_t *card = nullptr;
+    esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
+    if (ret == ESP_OK) {
+      s_card = card;
+      delay(120);
+      return true;
+    }
+    esp_vfs_fat_sdmmc_unmount();
+    s_card = nullptr;
+    delay(200);
+  }
+  s_card = nullptr;
+  return false;
+}
+
 void setupSD() {
   prefs.begin("PocketMage", true);
   SD_SPI_COMPATIBILITY = prefs.getBool("SD_SPI_CMPT", false);
@@ -325,49 +378,7 @@ void setupSD() {
   if (!SD_SPI_COMPATIBILITY) {
     PM_SD().setMode(PocketmageSD::SDMMC);
 
-    pocketmage::setCpuSpeed(240);
-
-    sdmmc_host_t host = SDMMC_HOST_DEFAULT();
-    host.command_timeout_ms = 500;
-
-    sdmmc_slot_config_t slot_config = SDMMC_SLOT_CONFIG_DEFAULT();
-#if POCKETMAGE_HW_VERSION == 2
-    slot_config.width = 4;
-    slot_config.clk = (gpio_num_t)SD_CLK;
-    slot_config.cmd = (gpio_num_t)SD_CMD;
-    slot_config.d0 = (gpio_num_t)SD_D0;
-    slot_config.d1 = (gpio_num_t)SD_D1;
-    slot_config.d2 = (gpio_num_t)SD_D2;
-    slot_config.d3 = (gpio_num_t)SD_D3;
-#else
-    slot_config.width = 1;
-    slot_config.clk = (gpio_num_t)SD_CLK;
-    slot_config.cmd = (gpio_num_t)SD_CMD;
-    slot_config.d0 = (gpio_num_t)SD_D0;
-    slot_config.d1 = (gpio_num_t)-1;
-    slot_config.d2 = (gpio_num_t)-1;
-    slot_config.d3 = (gpio_num_t)-1;
-#endif
-
-    esp_vfs_fat_sdmmc_mount_config_t mount_config = {};
-    mount_config.format_if_mount_failed = false;
-    mount_config.max_files = 5;
-    mount_config.allocation_unit_size = 16 * 1024;
-
-    bool sdOK = false;
-    for (int attempt = 1; attempt <= 25; attempt++) {
-      sdmmc_card_t *card = nullptr;
-      esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
-      if (ret == ESP_OK) {
-        delay(120);
-        sdOK = true;
-        break;
-      }
-      esp_vfs_fat_sdmmc_unmount();
-      delay(200);
-    }
-
-    if (!sdOK) {
+    if (!mountSdmmc()) {
       ESP_LOGE(TAG, "MOUNT FAILED");
       delay(5000);
       if (ALLOW_NO_MICROSD) {
@@ -418,7 +429,7 @@ void setupSD() {
 
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {};
     mount_config.format_if_mount_failed = false;
-    mount_config.max_files = 5;
+    mount_config.max_files = 8;
     mount_config.allocation_unit_size = 16 * 1024;
 
     sdmmc_card_t *card = nullptr;

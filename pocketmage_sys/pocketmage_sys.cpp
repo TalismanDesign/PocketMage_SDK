@@ -10,6 +10,7 @@
 #include <Preferences.h>
 #include <RTClib.h>
 #include <pocketmage_sd/pocketmage_sd.h>
+#include <pocketmage_sd/sd_gateway.h>
 
 void setupSD();
 #include <config.h>
@@ -34,9 +35,13 @@ volatile int battState = 0; // Battery state
 namespace pocketmage {
 void setCpuSpeed(int newFreq) {
   // WiFi stalls below 240MHz on the S3, so ignore any power-save drop while
-  // the radio is active. Runs before the frequency check so a redundant drop
-  // attempt still gets blocked.
+  // the radio is active
   if (newFreq < WIFI_CPU_FREQ_MHZ && P_WIFI.getState() != WifiRadioState::Off)
+    return;
+
+  // SDMMC stalls below 80MHz on the S3, so ignore any power-save drop while
+  // the device is active
+  if (newFreq < 80 && pm_sd_gateway::streamsOpen())
     return;
 
   // Return early if the frequency is already set

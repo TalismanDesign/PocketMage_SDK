@@ -12,6 +12,9 @@ extern "C" {
 
 // OLED framebuffer
 
+// Reinitialize the OLED (call if the panel was put to sleep by another subsystem).
+void pm_oled_init(void);
+
 // Commit the framebuffer. Draw with pm_text(PM_TARGET_OLED, ...) first.
 void pm_oled_send(void);
 
@@ -75,6 +78,20 @@ bool pm_image_decode_to_1bit(const char *path, uint8_t *buf, int buf_w, int buf_
 // Probe image file. Returns true if recognized, fills width/height/format
 // (0=none, 1=jpeg, 2=png).
 bool pm_image_probe(const char *path, int *width, int *height, int *format);
+
+// Decode an image region [off, off+len) of path straight to a 1-bit buffer.
+// buf is packed MSB-first per byte (bit 7 = leftmost pixel)
+bool pm_image_decode_region_to_1bit(const char *path, uint32_t off, uint32_t len,
+                                    uint8_t *buf, int buf_w, int buf_h, int out_x,
+                                    int out_y, int max_size, bool fill);
+
+// SD stream primitives. Open a handle for reading, read/seek through it, then
+// close it. Lets an app walk large frames (e.g. ID3 APIC covers) without
+// buffering the whole frame in RAM. Returns -1 from open on error.
+int pm_sd_stream_open(const char *path);
+size_t pm_sd_stream_read(int s, void *buf, size_t n);
+bool pm_sd_stream_seek(int s, uint32_t off);
+void pm_sd_stream_close(int s);
 
 // Audio output sink selection. 0=piezo (PWM on BZ_PIN, default), 1=usb
 // (UAC host speaker via usb_stream). When usb is selected but no USB audio

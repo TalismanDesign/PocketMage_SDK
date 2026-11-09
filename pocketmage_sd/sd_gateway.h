@@ -73,5 +73,6 @@ bool submit(Request *r);
 int snapshotCount();
 bool snapshotEntry(int i, char *name_out, size_t name_size, bool *is_dir);
 void snapshotFree();
+bool streamsOpen();
 
 } // namespace pm_sd_gateway

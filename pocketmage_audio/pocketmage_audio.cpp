@@ -273,11 +273,6 @@ static esp_audio_simple_dec_type_t typeFromPath(const char *path) {
 bool PocketMageAudio::acquirePin(int sampleRate, int bits, int channels) {
   if (_pinOwned)
     return true;
-  // Take the pin away from the buzzer: stop any tone and free its LEDC
-  // channel so pwm_audio can claim the GPIO cleanly.
-  noTone(BZ_PIN);
-  ledcDetach(BZ_PIN);
-
   pwm_audio_config_t cfg = {};
   cfg.gpio_num_left = BZ_PIN;
   cfg.gpio_num_right = -1;
