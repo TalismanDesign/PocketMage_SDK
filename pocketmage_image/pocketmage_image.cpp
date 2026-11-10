@@ -67,7 +67,7 @@ bool PocketMageImage::probe(const char *path, ImageInfo &out, uint32_t off, uint
 bool PocketMageImage::decodeRegionTo1Bit(const char *path, uint32_t off, uint32_t len,
                                          uint8_t *buf, int bufW, int bufH, int outX, int outY,
                                          int maxSize, bool fill) {
-  if (!path || !buf)
+  if (!path || !buf || bufW <= 0 || bufH <= 0 || maxSize <= 0)
     return false;
   switch (readFormat_(path, off, len)) {
   case ImageFormat::JPEG:

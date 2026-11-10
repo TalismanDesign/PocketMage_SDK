@@ -7,40 +7,35 @@
 
 #include <pocketmage.h>
 #include <pocketmage_globals.h>
+#include <atomic>
 
 #pragma region usb keyboard
 // =========================================== USB Keyboard
 // =========================================== //
 
-#include "driver/gpio.h"
-#include "usb/usb_host.h"
+#include "usb_keyboard.h"
+#include <pocketmage_sys/usb_role.h>
 
 #include "hid_host.h"
 #include "hid_usage_keyboard.h"
 #include "hid_usage_mouse.h"
 
 static constexpr const char *TAG = "KB";
-/* GPIO Pin number for quit from example logic */
-#define APP_QUIT_PIN GPIO_NUM_0
-#define MAX_USB_KB_CHARS 64
+static constexpr size_t kUsbInputQueueLength = 64;
 
-static QueueHandle_t usb_kb_queue = nullptr;
+// The app task can poll input while the control task first enables USB HID.
+static std::atomic<QueueHandle_t> usb_kb_queue{nullptr};
 
-QueueHandle_t hid_host_event_queue;
-bool user_shutdown = false;
-static bool HIDInitialized = false;
-static TaskHandle_t usb_lib_task_handle = NULL;  // MOD: store handle to usb_lib_task
-static TaskHandle_t hid_host_task_handle = NULL; // MOD: store handle to hid_host_task
+static uint8_t prev_keys[HID_KEYBOARD_KEY_MAX] = {};
 
 // Adds a character to the queue (thread-safe via FreeRTOS queue)
-void push_USB_char(char c) {
-  if (!usb_kb_queue)
-    usb_kb_queue = xQueueCreate(MAX_USB_KB_CHARS, 1);
-  xQueueSend(usb_kb_queue, &c, 0);
+static void push_USB_char(char c) {
+  if (!usb_kb_queue || xQueueSend(usb_kb_queue, &c, 0) != pdTRUE)
+    ESP_LOGW(TAG, "USB input queue full or unavailable");
 }
 
 // Removes and returns the first character (FIFO, thread-safe)
-char pop_USB_char() {
+static char pop_USB_char() {
   if (!usb_kb_queue)
     return '\0';
   char c;
@@ -48,22 +43,6 @@ char pop_USB_char() {
     return c;
   return '\0';
 }
-
-/**
- * @brief HID Host event
- *
- * This event is used for delivering the HID Host event from callback to a task.
- */
-typedef struct {
-  hid_host_device_handle_t hid_device_handle;
-  hid_host_driver_event_t event;
-  void *arg;
-} hid_host_event_queue_t;
-
-/**
- * @brief HID Protocol string names
- */
-static const char *hid_proto_name_str[] = {"NONE", "KEYBOARD", "MOUSE"};
 
 /**
  * @brief Key event
@@ -202,16 +181,16 @@ static inline bool hid_keyboard_get_char(uint8_t modifier, uint8_t key_code,
     // Check for arrow keys and map to PocketMage controls
     switch (key_code) {
     case HID_KEY_LEFT:
-      *key_char = 19;
+      *key_char = KeyLeft;
       break; // <-
     case HID_KEY_RIGHT:
-      *key_char = 21;
+      *key_char = KeyRight;
       break; // ->
     case HID_KEY_DOWN:
-      *key_char = 20;
+      *key_char = KeySelect;
       break; // SEL
     case HID_KEY_UP:
-      *key_char = 20;
+      *key_char = KeySelect;
       break; // SEL
     default:
       return false; // All other keys pressed
@@ -226,10 +205,8 @@ static inline bool hid_keyboard_get_char(uint8_t modifier, uint8_t key_code,
  *
  * @param[in] key_char  Keyboard char to stdout
  */
-static inline void hid_keyboard_print_char(unsigned int key_char) {
-  if (!!key_char) {
-    // putchar(key_char);
-    // OLED().oledWord(String(key_char));
+static inline void hid_keyboard_print_char(unsigned char key_char) {
+  if (key_char) {
     push_USB_char(key_char);
     fflush(stdout);
   }
@@ -276,14 +253,13 @@ static inline bool key_found(const uint8_t *const src, uint8_t key, unsigned int
  * @param[in] data    Pointer to input report data buffer
  * @param[in] length  Length of input report data buffer
  */
-static void hid_host_keyboard_report_callback(const uint8_t *const data, const int length) {
-  hid_keyboard_input_report_boot_t *kb_report = (hid_keyboard_input_report_boot_t *)data;
-
+static void hid_host_keyboard_report_callback(const uint8_t *const data, const size_t length) {
   if (length < sizeof(hid_keyboard_input_report_boot_t)) {
     return;
   }
-
-  static uint8_t prev_keys[HID_KEYBOARD_KEY_MAX] = {0};
+  hid_keyboard_input_report_boot_t report;
+  memcpy(&report, data, sizeof(report));
+  const auto *kb_report = &report;
   key_event_t key_event;
 
   for (int i = 0; i < HID_KEYBOARD_KEY_MAX; i++) {
@@ -316,23 +292,19 @@ static void hid_host_keyboard_report_callback(const uint8_t *const data, const i
  * @param[in] data    Pointer to input report data buffer
  * @param[in] length  Length of input report data buffer
  */
-static void hid_host_mouse_report_callback(const uint8_t *const data, const int length) {
-  hid_mouse_input_report_boot_t *mouse_report = (hid_mouse_input_report_boot_t *)data;
-
+static void hid_host_mouse_report_callback(const uint8_t *const data, const size_t length) {
   if (length < sizeof(hid_mouse_input_report_boot_t)) {
     return;
   }
 
-  static int x_pos = 0;
-  static int y_pos = 0;
-
-  // Calculate absolute position from displacement
-  x_pos += mouse_report->x_displacement;
-  y_pos += mouse_report->y_displacement;
+  hid_mouse_input_report_boot_t report;
+  memcpy(&report, data, sizeof(report));
+  const auto *mouse_report = &report;
 
   hid_print_new_device_report_header(HID_PROTOCOL_MOUSE);
 
-  printf("X: %06d\tY: %06d\t|%c|%c|\r", x_pos, y_pos, (mouse_report->buttons.button1 ? 'o' : ' '),
+  printf("dX: %d\tdY: %d\t|%c|%c|\r", mouse_report->x_displacement,
+         mouse_report->y_displacement, (mouse_report->buttons.button1 ? 'o' : ' '),
          (mouse_report->buttons.button2 ? 'o' : ' '));
   fflush(stdout);
 }
@@ -345,9 +317,9 @@ static void hid_host_mouse_report_callback(const uint8_t *const data, const int 
  * @param[in] data    Pointer to input report data buffer
  * @param[in] length  Length of input report data buffer
  */
-static void hid_host_generic_report_callback(const uint8_t *const data, const int length) {
+static void hid_host_generic_report_callback(const uint8_t *const data, const size_t length) {
   hid_print_new_device_report_header(HID_PROTOCOL_NONE);
-  for (int i = 0; i < length; i++) {
+  for (size_t i = 0; i < length; i++) {
     printf("%02X", data[i]);
   }
   putchar('\r');
@@ -355,278 +327,30 @@ static void hid_host_generic_report_callback(const uint8_t *const data, const in
   fflush(stdout);
 }
 
-/**
- * @brief USB HID Host interface callback
- *
- * @param[in] hid_device_handle  HID Device handle
- * @param[in] event              HID Host interface event
- * @param[in] arg                Pointer to arguments, does not used
- */
-void hid_host_interface_callback(hid_host_device_handle_t hid_device_handle,
-                                 const hid_host_interface_event_t event, void *arg) {
-  uint8_t data[64] = {0};
-  size_t data_length = 0;
-  hid_host_dev_params_t dev_params;
-  ESP_ERROR_CHECK(hid_host_device_get_params(hid_device_handle, &dev_params));
-
-  switch (event) {
-  case HID_HOST_INTERFACE_EVENT_INPUT_REPORT:
-    ESP_ERROR_CHECK(
-        hid_host_device_get_raw_input_report_data(hid_device_handle, data, 64, &data_length));
-
-    if (HID_SUBCLASS_BOOT_INTERFACE == dev_params.sub_class) {
-      if (HID_PROTOCOL_KEYBOARD == dev_params.proto) {
-        hid_host_keyboard_report_callback(data, data_length);
-      } else if (HID_PROTOCOL_MOUSE == dev_params.proto) {
-        hid_host_mouse_report_callback(data, data_length);
-      }
-    } else {
-      hid_host_generic_report_callback(data, data_length);
-    }
-
-    break;
-  case HID_HOST_INTERFACE_EVENT_DISCONNECTED:
-    ESP_LOGI(TAG, "HID Device, protocol '%s' DISCONNECTED", hid_proto_name_str[dev_params.proto]);
-    ESP_ERROR_CHECK(hid_host_device_close(hid_device_handle));
-    break;
-  case HID_HOST_INTERFACE_EVENT_TRANSFER_ERROR:
-    ESP_LOGI(TAG, "HID Device, protocol '%s' TRANSFER_ERROR", hid_proto_name_str[dev_params.proto]);
-    break;
-  default:
-    ESP_LOGE(TAG, "HID Device, protocol '%s' Unhandled event",
-             hid_proto_name_str[dev_params.proto]);
-    break;
-  }
+bool pm_keyboard::prepareInput() {
+  if (!usb_kb_queue)
+    usb_kb_queue = xQueueCreate(kUsbInputQueueLength, sizeof(char));
+  return usb_kb_queue != nullptr;
 }
 
-/**
- * @brief USB HID Host Device event
- *
- * @param[in] hid_device_handle  HID Device handle
- * @param[in] event              HID Host Device event
- * @param[in] arg                Pointer to arguments, does not used
- */
-void hid_host_device_event(hid_host_device_handle_t hid_device_handle,
-                           const hid_host_driver_event_t event, void *arg) {
-  hid_host_dev_params_t dev_params;
-  ESP_ERROR_CHECK(hid_host_device_get_params(hid_device_handle, &dev_params));
-  const hid_host_device_config_t dev_config = {.callback = hid_host_interface_callback,
-                                               .callback_arg = NULL};
-
-  switch (event) {
-  case HID_HOST_DRIVER_EVENT_CONNECTED:
-    ESP_LOGI(TAG, "HID Device, protocol '%s' CONNECTED", hid_proto_name_str[dev_params.proto]);
-
-    ESP_ERROR_CHECK(hid_host_device_open(hid_device_handle, &dev_config));
-    if (HID_SUBCLASS_BOOT_INTERFACE == dev_params.sub_class) {
-      ESP_ERROR_CHECK(hid_class_request_set_protocol(hid_device_handle, HID_REPORT_PROTOCOL_BOOT));
-      if (HID_PROTOCOL_KEYBOARD == dev_params.proto) {
-        ESP_ERROR_CHECK(hid_class_request_set_idle(hid_device_handle, 0, 0));
-      }
-    }
-    ESP_ERROR_CHECK(hid_host_device_start(hid_device_handle));
-    break;
-  default:
-    break;
-  }
+void pm_keyboard::resetInput() {
+  if (usb_kb_queue && xQueueReset(usb_kb_queue) != pdPASS)
+    ESP_LOGE(TAG, "USB input queue reset failed");
+  memset(prev_keys, 0, sizeof(prev_keys));
 }
 
-/**
- * @brief Start USB Host install and handle common USB host library events while
- * app pin not low
- *
- * @param[in] arg  Not used
- */
-static void usb_lib_task(void *arg) {
-  const gpio_config_t input_pin = {
-      .pin_bit_mask = BIT64(APP_QUIT_PIN),
-      .mode = GPIO_MODE_INPUT,
-      .pull_up_en = GPIO_PULLUP_ENABLE,
-  };
-  ESP_ERROR_CHECK(gpio_config(&input_pin));
-
-  const usb_host_config_t host_config = {
-      .skip_phy_setup = false,
-      .intr_flags = ESP_INTR_FLAG_LEVEL1,
-  };
-
-  ESP_ERROR_CHECK(usb_host_install(&host_config));
-  xTaskNotifyGive((TaskHandle_t)arg);
-
-  while (gpio_get_level(APP_QUIT_PIN) != 0) {
-    uint32_t event_flags;
-    usb_host_lib_handle_events(portMAX_DELAY, &event_flags);
-
-    // Release devices once all clients has deregistered
-    if (event_flags & USB_HOST_LIB_EVENT_FLAGS_NO_CLIENTS) {
-      usb_host_device_free_all();
-      ESP_LOGI(TAG, "USB Event flags: NO_CLIENTS");
-    }
-    // All devices were removed
-    if (event_flags & USB_HOST_LIB_EVENT_FLAGS_ALL_FREE) {
-      ESP_LOGI(TAG, "USB Event flags: ALL_FREE");
-    }
-  }
-  // App Button was pressed, trigger the flag
-  user_shutdown = true;
-  ESP_LOGI(TAG, "USB shutdown");
-  // Clean up USB Host
-  vTaskDelay(10); // Short delay to allow clients clean-up
-  ESP_ERROR_CHECK(usb_host_uninstall());
-  vTaskDelete(NULL);
-}
-
-/**
- * @brief HID Host main task
- *
- * Creates queue and get new event from the queue
- *
- * @param[in] pvParameters Not used
- */
-void hid_host_task(void *pvParameters) {
-  hid_host_event_queue_t evt_queue;
-  // Create queue
-  hid_host_event_queue = xQueueCreate(10, sizeof(hid_host_event_queue_t));
-
-  // Wait queue
-  while (!user_shutdown) {
-    if (xQueueReceive(hid_host_event_queue, &evt_queue, pdMS_TO_TICKS(50))) {
-      hid_host_device_event(evt_queue.hid_device_handle, evt_queue.event, evt_queue.arg);
-    }
-  }
-
-  xQueueReset(hid_host_event_queue);
-  vQueueDelete(hid_host_event_queue);
-  vTaskDelete(NULL);
-}
-
-/**
- * @brief HID Host Device callback
- *
- * Puts new HID Device event to the queue
- *
- * @param[in] hid_device_handle HID Device handle
- * @param[in] event             HID Device event
- * @param[in] arg               Not used
- */
-void hid_host_device_callback(hid_host_device_handle_t hid_device_handle,
-                              const hid_host_driver_event_t event, void *arg) {
-  const hid_host_event_queue_t evt_queue = {
-      .hid_device_handle = hid_device_handle, .event = event, .arg = arg};
-  xQueueSend(hid_host_event_queue, &evt_queue, 0);
-}
-
-void init_USBHID(void) {
-  BaseType_t task_created;
-  ESP_LOGI(TAG, "Init USB HID");
-
-  /*
-   * Create usb_lib_task to:
-   * - initialize USB Host library
-   * - Handle USB Host events while APP pin is in HIGH state
-   */
-  task_created = xTaskCreatePinnedToCore(usb_lib_task, "usb_events", 4096,
-                                         xTaskGetCurrentTaskHandle(), 2, &usb_lib_task_handle, 1);
-  assert(task_created == pdTRUE);
-
-  // Wait for notification from usb_lib_task to proceed
-  ulTaskNotifyTake(false, 1000);
-
-  /*
-   * HID host driver configuration
-   * - create background task for handling low level event inside the HID driver
-   * - provide the device callback to get new HID Device connection event
-   */
-  const hid_host_driver_config_t hid_host_driver_config = {.create_background_task = true,
-                                                           .task_priority = 5,
-                                                           .stack_size = 4096,
-                                                           .core_id = 0,
-                                                           .callback = hid_host_device_callback,
-                                                           .callback_arg = NULL};
-
-  ESP_ERROR_CHECK(hid_host_install(&hid_host_driver_config));
-
-  // Task is working until the devices are gone (while 'user_shutdown' is false)
-  user_shutdown = false;
-
-  /*
-   * Create HID Host task process for handle events
-   * IMPORTANT: Task is necessary here while there is no possibility to interact
-   * with USB device from the callback.
-   */
-  task_created = xTaskCreate(&hid_host_task, "hid_task", 4 * 1024, NULL, 2, &hid_host_task_handle);
-  assert(task_created == pdTRUE);
-}
-
-void close_USBHID(void) {
-  ESP_LOGI(TAG, "Closing USB HID...");
-
-  // Signal shutdown
-  user_shutdown = true;
-
-  // Give tasks a moment to process shutdown
-  vTaskDelay(pdMS_TO_TICKS(100));
-
-  // --- Step 1: Request HID Host to stop ---
-  esp_err_t err = hid_host_uninstall();
-  if (err != ESP_OK) {
-    ESP_LOGW(TAG, "Failed to uninstall HID host: %s", esp_err_to_name(err));
+void pm_keyboard::handleReport(const hid_host_dev_params_t &params,
+                               const uint8_t *data, size_t length) {
+  if (!data)
+    return;
+  if (params.sub_class == HID_SUBCLASS_BOOT_INTERFACE) {
+    if (params.proto == HID_PROTOCOL_KEYBOARD)
+      hid_host_keyboard_report_callback(data, length);
+    else if (params.proto == HID_PROTOCOL_MOUSE)
+      hid_host_mouse_report_callback(data, length);
   } else {
-    ESP_LOGI(TAG, "HID host uninstalled");
+    hid_host_generic_report_callback(data, length);
   }
-
-  // --- Step 2: Notify USB library to finish events ---
-  usb_host_lib_handle_events(0, 0); // Force event loop one more time
-
-  // --- Step 3: Wait for all clients to detach ---
-  bool all_clients_gone = false;
-  for (int i = 0; i < 50; i++) { // wait up to ~5s
-    uint32_t event_flags;
-    if (usb_host_lib_handle_events(1, &event_flags) == ESP_OK) {
-      if (event_flags & USB_HOST_LIB_EVENT_FLAGS_NO_CLIENTS) {
-        all_clients_gone = true;
-        break;
-      }
-    }
-    vTaskDelay(pdMS_TO_TICKS(100));
-  }
-
-  if (!all_clients_gone) {
-    ESP_LOGW(TAG, "USB clients did not detach in time");
-  } else {
-    ESP_LOGI(TAG, "All USB clients detached");
-  }
-
-  // --- Step 4: Uninstall USB host ---
-  err = usb_host_uninstall();
-  if (err != ESP_OK) {
-    ESP_LOGW(TAG, "Failed to uninstall USB host: %s", esp_err_to_name(err));
-  } else {
-    ESP_LOGI(TAG, "USB host uninstalled");
-  }
-
-  // --- Step 5: Cleanup event queue ---
-  if (hid_host_event_queue) {
-    xQueueReset(hid_host_event_queue);
-    vQueueDelete(hid_host_event_queue);
-    hid_host_event_queue = NULL;
-    ESP_LOGI(TAG, "HID host event queue deleted");
-  }
-
-  // --- Step 6: Delete leftover tasks (if still alive) ---
-  if (hid_host_task_handle) {
-    vTaskDelete(hid_host_task_handle);
-    hid_host_task_handle = NULL;
-  }
-  if (usb_lib_task_handle) {
-    vTaskDelete(usb_lib_task_handle);
-    usb_lib_task_handle = NULL;
-  }
-
-  // Reset flag for next re-init
-  user_shutdown = false;
-
-  ESP_LOGI(TAG, "USB HID closed successfully");
 }
 
 #pragma region keymaps
@@ -635,20 +359,20 @@ char keysArray[4][10] = {
     {'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'},
     {'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 8}, // 8:BKSP
     {9, 'z', 'x', 'c', 'v', 'b', 'n', 'm', '.', 13},  // 9:TAB, 13:CR
-    {0, 17, 18, ' ', ' ', ' ', 19, 20, 21, 0}         // 17:SHFT, 18:FN, 19:<-, 20:SEL, 21:->
+    {KeyNone, KeyShift, KeyFn, ' ', ' ', ' ', KeyLeft, KeySelect, KeyRight, KeyNone}
 };
 char keysArraySHFT[4][10] = {{'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'},
                              {'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 8},
                              {14, 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '\'', 13},
-                             {0, 17, 18, ' ', ' ', ' ', 28, 29, 30, 0}};
+                             {KeyNone, KeyShift, KeyFn, ' ', ' ', ' ', KeyShiftLeft, KeyShiftSelect, KeyShiftRight, KeyNone}};
 char keysArrayFN[4][10] = {{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'},
                            {'#', '!', '$', ':', ';', '(', ')', '&', '\"', 8},
                            {14, '%', '_', '+', '-', '*', '/', '?', ',', 13},
-                           {0, 17, 18, ' ', ' ', ' ', 12, 7, 6, 0}};
+                           {KeyNone, KeyShift, KeyFn, ' ', ' ', ' ', KeyEscape, KeyFnSelect, KeyFnRight, KeyNone}};
 char keysArrayFN_SHFT[4][10] = {{'!', '@', '#', '$', '%', '^', '&', '*', '(', ')'},
                                 {'~', '`', '|', '[', ']', '{', '}', '<', '>', 8},
                                 {14, ';', '=', '+', '-', '*', '\\', '?', ',', 13},
-                                {0, 17, 18, ' ', ' ', ' ', 24, 25, 26, 0}};
+                                {KeyNone, KeyShift, KeyFn, ' ', ' ', ' ', KeyUp, KeyDown, KeyFnShiftRight, KeyNone}};
 #pragma endregion
 
 Adafruit_TCA8418 keypad;
@@ -1162,6 +886,11 @@ char PocketmageKB::updateKeypress() {
 }
 
 void PocketmageKB::checkUSBKB() {
+  pm_usb::Lock usbLock;
+  // File transfer owns the connector, VBUS policy, and device controller.
+  // Polling the host role here would disconnect MSC every 500ms.
+  if (CurrentAppState == USB_APP || pm_usb::owner() == pm_usb::Owner::Storage)
+    return;
   // Throttle polling to 500ms to prevent flooding the I2C bus during tight loops
   static unsigned long lastPollTime = 0;
   if (millis() - lastPollTime < 500) {
@@ -1169,49 +898,25 @@ void PocketmageKB::checkUSBKB() {
   }
   lastPollTime = millis();
 
-  // Check if USB Keyboard has been connected
   bool needBoost = false;
   if (!PowerSystem.getOTGNeed(needBoost)) {
     return;
   }
 
-  if (needBoost) {
-    // Enable boost if not already on
-    bool boostOn;
-    if (PowerSystem.getBoostState(boostOn) && !boostOn) {
-      PowerSystem.setBoost(true);
-    }
+  if ((!needBoost || pm_keyboard::stopping()) && !pm_keyboard::stopUsb())
+    return;
 
-    // Connect D+/D− to ESP so USB host can enumerate keyboard
-    PowerSystem.setUSBControlESP();
+  // Retry HID teardown before audio can probe the shared PHY.
+  if (P_AUDIO.pollUsb())
+    return;
 
-    // Initialize USB HID
-    if (!HIDInitialized) {
-      init_USBHID();
-      HIDInitialized = true;
-    }
-
-    // Set tags
-    mscEnabled = true;
-    sinkEnabled = true;
-
-  } else {
-
-    // #pragma message "TODO: Should probably add shutdown script here but it does not work..."
-    // close_USBHID();
-
-    // Disable boost if not already off
-    bool boostOn;
-    if (PowerSystem.getBoostState(boostOn) && boostOn) {
-      PowerSystem.setBoost(false);
-      detachInterrupt(digitalPinToInterrupt(PWR_BTN));
-      attachInterrupt(digitalPinToInterrupt(PWR_BTN), pocketmage::PWR_BTN_irq, FALLING);
-    }
-
-    PowerSystem.setUSBControlBMS();
-
-    // Set tags
-    mscEnabled = false;
-    sinkEnabled = false;
+  if (!pm_usb::updatePower(needBoost)) {
+    ESP_LOGW(TAG, "USB power update failed");
+    return;
   }
+  if (pm_usb::owner() == pm_usb::Owner::Audio)
+    return;
+
+  if (needBoost && !pm_keyboard::beginUsb())
+    ESP_LOGW(TAG, "USB keyboard unavailable; cleanup will retry on the next poll");
 }

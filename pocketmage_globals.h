@@ -83,6 +83,9 @@ void processKB();
 void TXT_INIT(String inPath = "");
 void FILEWIZ_INIT();
 void USB_INIT();
+/** Drain USB card I/O and revoke media before reset or deep sleep. */
+void USBAppShutdown();
+void USB_EXIT();
 void COMM_INIT();
 void SETTINGS_INIT();
 void TASKS_INIT();

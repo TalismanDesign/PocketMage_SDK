@@ -1,4 +1,3 @@
-"""Resilient console-script entry point for pm."""
 from __future__ import annotations
 
 import sys
@@ -15,7 +14,6 @@ def _non_interactive() -> bool:
 
 
 def _repair(missing_root_package: str) -> int:
-    """Diagnose and, with consent, fix an orphaned editable install."""
     sys.stderr.write(
         f"pm cannot import its own code: the '{missing_root_package}' package is not "
         "available to this Python.\n"

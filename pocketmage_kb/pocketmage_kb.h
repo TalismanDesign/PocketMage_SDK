@@ -6,6 +6,7 @@
 // dP     dP  88888888P    dP     88888888P  `8888P'  88     88   dP     dP 8888888P  //
 
 #pragma once
+#include "key_codes.h"
 #include <Adafruit_TCA8418.h>
 #include <Arduino.h>
 

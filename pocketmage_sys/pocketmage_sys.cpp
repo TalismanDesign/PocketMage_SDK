@@ -9,6 +9,7 @@
 
 #include <Preferences.h>
 #include <RTClib.h>
+#include <pocketmage_kb/usb_keyboard.h>
 #include <pocketmage_sd/pocketmage_sd.h>
 #include <pocketmage_sd/sd_gateway.h>
 
@@ -17,6 +18,7 @@ void setupSD();
 #include <esp_log.h>
 #include <pocketmage_globals.h>
 #include <pocketmage_wifi/pocketmage_wifi.h>
+#include "idle_timer.h"
 
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
@@ -33,7 +35,20 @@ volatile bool SDActive = false;
 volatile int battState = 0; // Battery state
 
 namespace pocketmage {
+static IdleTimer idleTimer;
+
+void reportActivity() {
+  idleTimer.activity(millis());
+}
+
+bool idleSleepDue(bool inhibited) {
+  return idleTimer.poll(millis(), TIMEOUT, inhibited);
+}
+
 void setCpuSpeed(int newFreq) {
+  // USB raw I/O bypasses stream handles and still needs the SDMMC clock.
+  if (newFreq < 80 && (CurrentAppState == USB_APP || pm_sd_gateway::usbAccessActive()))
+    return;
   // WiFi stalls below 240MHz on the S3, so ignore any power-save drop while
   // the radio is active
   if (newFreq < WIFI_CPU_FREQ_MHZ && P_WIFI.getState() != WifiRadioState::Off)
@@ -48,23 +63,31 @@ void setCpuSpeed(int newFreq) {
   if (getCpuFrequencyMhz() == newFreq)
     return;
 
-  int validFreqs[] = {240, 160, 80, 40, 20, 10};
+  constexpr int validFreqs[] = {240, 160, 80, 40, 20, 10};
   bool isValid = false;
 
-  for (int i = 0; i < sizeof(validFreqs) / sizeof(validFreqs[0]); i++) {
-    if (newFreq == validFreqs[i]) {
+  for (int frequency : validFreqs) {
+    if (newFreq == frequency) {
       isValid = true;
       break;
     }
   }
 
   if (isValid) {
-    setCpuFrequencyMhz(newFreq);
+    if (!setCpuFrequencyMhz(newFreq)) {
+      ESP_LOGE(TAG, "CPU speed change to %d MHz failed", newFreq);
+      return;
+    }
     ESP_LOGV(TAG, "CPU Speed changed to: %d MHz", newFreq);
   }
 }
 
 void deepSleep(bool alternateScreenSaver) {
+  if (!P_AUDIO.stopChecked() || !pm_keyboard::stopUsb()) {
+    ESP_LOGE(TAG, "Sleep postponed: USB or audio cleanup incomplete");
+    OLED().sysMessage(TR(STR_USB_DEVICE_FAIL), 1000);
+    return;
+  }
   // Put OLED to sleep
   u8g2.setPowerSave(1);
 
@@ -159,7 +182,7 @@ void deepSleep(bool alternateScreenSaver) {
   esp_deep_sleep_start();
 }
 
-void IRAM_ATTR PWR_BTN_irq() {
+void PWR_BTN_irq() {
   PWR_BTN_event = true;
 }
 
@@ -275,6 +298,7 @@ void PocketMage_INIT() {
   if (!PowerSystem.init(I2C_SDA, I2C_SCL, MP2722_ADDR, USB_MUX_PIN)) {
     ESP_LOGV(TAG, "MP2722 Failed to Init");
   }
+  PowerSystem.setUSBControlESP();
 
   // Start hardreset task
   xTaskCreatePinnedToCore(pocketmage::hardReset, // Function name
@@ -325,10 +349,8 @@ void PocketMage_INIT() {
     BZ().playJingle(Jingles::Startup);
 
   // WiFi task (radio stays off until a wifi* or ssh command enables it)
-  // Audio task (piezo stays with the buzzer until a clip is played)
 #if PM_TARGET_HOST
   P_WIFI.begin();
-  P_AUDIO.begin();
 #endif
 
   // Clear any excess keystrokes

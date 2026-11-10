@@ -12,10 +12,12 @@
 #include <pocketmage_globals.h>
 
 #include <cstdio>
+#include <atomic>
 #include <cstdlib>
 #include <cstring>
 #include <cerrno>
 #include <dirent.h>
+#include <mutex>
 #include <sys/stat.h>
 #include <vector>
 
@@ -23,6 +25,8 @@
 #include <microtar.h>
 #include "driver/sdmmc_host.h"
 #include "esp_vfs_fat.h"
+#include "ff.h"
+#include "diskio_sdmmc.h"
 
 #include "pocketmage_sd.h"
 
@@ -57,11 +61,17 @@ struct SnapEntry {
 static QueueHandle_t s_queue = nullptr;
 static TaskHandle_t s_task = nullptr;
 static FILE *s_streams[kStreamSlots] = {};
+static TaskHandle_t s_streamOwners[kStreamSlots] = {};
+static TaskHandle_t s_snapshotOwner = nullptr;
 static SnapEntry *s_snapshot = nullptr;
 static int s_snapshotCount = 0;
 
-static int s_openStreams = 0;
+static std::atomic<int> s_openStreams{0};
+static std::atomic<bool> s_usbAccess{false};
 static bool s_needRemount = false;
+// Also serialize the inline fallback if the gateway task could not be created.
+// https://docs.espressif.com/projects/esp-idf/en/release-v5.5/esp32s3/api-reference/system/pthread.html
+static std::recursive_mutex s_executionMutex;
 
 static const char *resolve(const char *path, char *buf, size_t size) {
   constexpr const char *kMount = PocketmageSD::kSdMountPoint;
@@ -123,28 +133,128 @@ bool submit(Request *r) {
 }
 
 int snapshotCount() {
-  return s_snapshotCount;
+  Request request{};
+  request.op = Op::DirEnumCount;
+  return submit(&request) ? static_cast<int>(request.retVal) : 0;
 }
 
 bool snapshotEntry(int i, char *name_out, size_t name_size, bool *is_dir) {
-  if (!s_snapshot || i < 0 || i >= s_snapshotCount || !name_out || name_size == 0)
+  Request request{};
+  request.op = Op::DirEnumEntry;
+  request.slot = i;
+  request.nameOut = name_out;
+  request.len = name_size;
+  request.isDirOut = is_dir;
+  return submit(&request);
+}
+
+static bool copySnapshotEntry(Request *r) {
+  if (!s_snapshot || r->slot < 0 || r->slot >= s_snapshotCount || !r->nameOut || r->len == 0)
     return false;
-  const SnapEntry &e = s_snapshot[i];
-  strncpy(name_out, e.name, name_size - 1);
-  name_out[name_size - 1] = '\0';
-  if (is_dir)
-    *is_dir = e.is_dir;
+  const SnapEntry &e = s_snapshot[r->slot];
+  strncpy(r->nameOut, e.name, r->len - 1);
+  r->nameOut[r->len - 1] = '\0';
+  if (r->isDirOut)
+    *r->isDirOut = e.is_dir;
   return true;
 }
 
-void snapshotFree() {
+static void snapshotFree() {
   free(s_snapshot);
   s_snapshot = nullptr;
   s_snapshotCount = 0;
+  s_snapshotOwner = nullptr;
+}
+
+static bool canAccessResources(const Request *r) {
+  switch (r->op) {
+  case Op::StreamRead:
+  case Op::StreamWrite:
+  case Op::StreamSeek:
+  case Op::StreamTell:
+  case Op::StreamSize:
+  case Op::StreamClose:
+    return r->caller && r->slot >= 0 && r->slot < kStreamSlots &&
+           s_streams[r->slot] && s_streamOwners[r->slot] == r->caller;
+  case Op::DirEnum:
+  case Op::DirEnumCount:
+  case Op::DirEnumEntry:
+  case Op::DirEnumClose:
+    return r->caller && (!s_snapshotOwner || s_snapshotOwner == r->caller);
+  case Op::StreamOpen:
+    return r->caller != nullptr;
+  default:
+    return true;
+  }
+}
+
+static bool closeStream(int slot) {
+  if (slot < 0 || slot >= kStreamSlots || !s_streams[slot])
+    return false;
+  const bool closed = fclose(s_streams[slot]) == 0;
+  // fclose invalidates the handle even if flushing fails.
+  s_streams[slot] = nullptr;
+  s_streamOwners[slot] = nullptr;
+  --s_openStreams;
+  return closed;
+}
+
+static bool closeOwnedResources(TaskHandle_t owner) {
+  if (!owner)
+    return false;
+  bool ok = true;
+  for (int slot = 0; slot < kStreamSlots; ++slot) {
+    if (s_streams[slot] && s_streamOwners[slot] == owner && !closeStream(slot))
+      ok = false;
+  }
+  if (s_snapshotOwner == owner)
+    snapshotFree();
+  return ok;
+}
+
+bool closeCallerResources() {
+  Request request{};
+  request.op = Op::CloseCallerResources;
+  return submit(&request);
 }
 
 bool streamsOpen() {
   return s_openStreams > 0;
+}
+
+bool beginUsbAccess() {
+  // USB handoff requires the queue's serialization against other tasks.
+  if (!s_queue)
+    return false;
+  Request request{};
+  request.op = Op::BeginUsbAccess;
+  return submit(&request);
+}
+
+bool usbAccessActive() {
+  return s_usbAccess;
+}
+
+static bool unmountForUsb() {
+  if (s_usbAccess)
+    return true;
+  if (streamsOpen() || !getSdCard())
+    return false;
+  const BYTE drive = ff_diskio_get_pdrv_card(getSdCard());
+  if (drive >= FF_VOLUMES || drive > 9)
+    return false;
+  const char path[] = {static_cast<char>('0' + drive), ':', '\0'};
+  // f_mount(nullptr) unregisters FAT without destroying the SDMMC/SDSPI host.
+  // No filesystem operation may follow host writes; USB exits through reboot.
+  // http://elm-chan.org/fsw/ff/doc/mount.html
+  const FRESULT result = f_mount(nullptr, path, 0);
+  if (result != FR_OK) {
+    ESP_LOGE(TAG, "USB FAT unmount failed: %d", static_cast<int>(result));
+    return false;
+  }
+  s_needRemount = false;
+  s_usbAccess = true;
+  return true;
 }
 
 static FILE *openResolved(const char *path, const char *mode) {
@@ -276,11 +386,11 @@ static void dirEnumInner(Request *r) {
   snapshotFree();
 
   char full[PocketmageSD::kMaxPathLen];
-  resolve(r->path, full, sizeof(full));
+  const char *path = resolve(r->path, full, sizeof(full));
 
-  DIR *dir = opendir(full);
+  DIR *dir = opendir(path);
   if (!dir) {
-    ESP_LOGE(TAG, "dir enum: open failed: %s", full);
+    ESP_LOGE(TAG, "dir enum: open failed: %s", path);
     r->retVal = (size_t)-1;
     r->ok = false;
     return;
@@ -322,6 +432,7 @@ static void dirEnumInner(Request *r) {
   }
   closedir(dir);
   r->retVal = (size_t)s_snapshotCount;
+  s_snapshotOwner = r->caller;
   r->ok = true;
 }
 
@@ -517,10 +628,8 @@ static void extractTarInner(Request *r) {
 static void remount() {
   // Close every open stream: a remount invalidates all existing FILE handles.
   for (int i = 0; i < kStreamSlots; i++) {
-    if (s_streams[i]) {
-      fclose(s_streams[i]);
-      s_streams[i] = nullptr;
-    }
+    if (s_streams[i] && !closeStream(i))
+      ESP_LOGE(TAG, "stream flush failed before remount: %d", i);
   }
   s_openStreams = 0;
 
@@ -531,10 +640,34 @@ static void remount() {
 }
 
 static void exec(Request *r) {
+  std::lock_guard<std::recursive_mutex> lock(s_executionMutex);
+  // Reject foreign handles before recovery can invalidate any live resources.
+  if (!canAccessResources(r)) {
+    r->ok = false;
+    r->retVal = 0;
+    return;
+  }
+  if (r->op == Op::CloseCallerResources) {
+    r->ok = closeOwnedResources(r->caller);
+    return;
+  }
+  if (r->op == Op::BeginUsbAccess) {
+    r->ok = unmountForUsb();
+    return;
+  }
+  if (s_usbAccess) {
+    r->ok = false;
+    r->retVal = 0;
+    return;
+  }
   if (s_needRemount) {
     remount();
   }
   switch (r->op) {
+  case Op::CloseCallerResources:
+  case Op::BeginUsbAccess:
+    // Handled before filesystem access and remount recovery above.
+    break;
   case Op::Stat: {
     char full[PocketmageSD::kMaxPathLen];
     struct stat st;
@@ -672,14 +805,24 @@ static void exec(Request *r) {
       r->ok = false;
       break;
     }
-    size_t n = fwrite(r->wbuf, 1, r->len, f);
-    fclose(f);
-    r->ok = n == r->len;
+    const size_t n = r->len ? fwrite(r->wbuf, 1, r->len, f) : 0;
+    const bool closed = fclose(f) == 0;
+    r->retVal = n;
+    r->ok = n == r->len && closed;
     break;
   }
 
   case Op::DirEnum:
     dirEnumInner(r);
+    break;
+
+  case Op::DirEnumCount:
+    r->retVal = static_cast<size_t>(s_snapshotCount);
+    r->ok = true;
+    break;
+
+  case Op::DirEnumEntry:
+    r->ok = copySnapshotEntry(r);
     break;
 
   case Op::DirList:
@@ -720,6 +863,7 @@ static void exec(Request *r) {
       break;
     }
     s_streams[slot] = f;
+    s_streamOwners[slot] = r->caller;
     s_openStreams++;
     r->retVal = (size_t)slot;
     r->ok = true;
@@ -762,8 +906,9 @@ static void exec(Request *r) {
 
   case Op::StreamTell: {
     FILE *f = (r->slot >= 0 && r->slot < kStreamSlots) ? s_streams[r->slot] : nullptr;
-    r->retVal = f ? (size_t)ftell(f) : 0;
-    r->ok = f != nullptr;
+    const long position = f ? ftell(f) : -1;
+    r->retVal = position >= 0 ? static_cast<size_t>(position) : 0;
+    r->ok = position >= 0;
     break;
   }
 
@@ -775,25 +920,20 @@ static void exec(Request *r) {
       break;
     }
     long cur = ftell(f);
-    fseek(f, 0, SEEK_END);
+    if (cur < 0 || fseek(f, 0, SEEK_END) != 0) {
+      r->retVal = 0;
+      r->ok = false;
+      break;
+    }
     long size = ftell(f);
-    fseek(f, cur, SEEK_SET);
-    r->retVal = (size_t)size;
-    r->ok = true;
+    const bool restored = fseek(f, cur, SEEK_SET) == 0;
+    r->ok = size >= 0 && restored;
+    r->retVal = r->ok ? static_cast<size_t>(size) : 0;
     break;
   }
 
   case Op::StreamClose: {
-    FILE *f = (r->slot >= 0 && r->slot < kStreamSlots) ? s_streams[r->slot] : nullptr;
-    if (!f) {
-      r->ok = false;
-      break;
-    }
-    fclose(f);
-    s_streams[r->slot] = nullptr;
-    if (s_openStreams > 0)
-      s_openStreams--;
-    r->ok = true;
+    r->ok = closeStream(r->slot);
     break;
   }
   }

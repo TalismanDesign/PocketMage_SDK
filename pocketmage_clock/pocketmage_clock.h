@@ -8,6 +8,7 @@
 #pragma once
 #include <Arduino.h>
 #include <RTClib.h>
+#include <pocketmage_sys/pocketmage_sys.h>
 
 // Real-time clock
 class PocketmageCLOCK {
@@ -18,6 +19,10 @@ public:
   bool begin();
   void setTimeFromString(String timeStr);
   bool isValid();
+  /** Return the RTC's UNIX epoch seconds. */
+  int64_t epoch();
+  /** Return the RTC calendar as YYYY-MM-DD HH:MM:SS. */
+  String timestamp();
 
   void setToCompileTimeUTC() {
     rtc_.adjust(DateTime(F(__DATE__), F(__TIME__)));
@@ -29,22 +34,25 @@ public:
   RTC_PCF8563 &getRTC() {
     return rtc_;
   }
-  // To Do: create a task on core 1 that checks for timeout and sets a flag for OS
   long getTimeDiff() {
     return timeoutMillis_ - prevTimeMillis_;
   }
-  volatile long getTimeoutMillis() const {
+  long getTimeoutMillis() const {
     return timeoutMillis_;
   }
 
-  volatile long getPrevTimeMillis() const {
+  long getPrevTimeMillis() const {
     return prevTimeMillis_;
   }
   void setTimeoutMillis(long t) {
     timeoutMillis_ = t;
   }
+  /** Set the native redraw timestamp and report input to the shared idle timer.
+   * Redraw callers may pass millis()+1; sleep always uses the actual clock.
+   */
   void setPrevTimeMillis(long t) {
     prevTimeMillis_ = t;
+    pocketmage::reportActivity();
   }
 
 private:

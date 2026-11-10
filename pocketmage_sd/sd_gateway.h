@@ -41,6 +41,10 @@ enum class Op : uint8_t {
   StreamTell,     // slot -> retVal = position
   StreamSize,     // slot -> retVal = file size
   StreamClose,    // slot -> ok; frees the handle slot
+  BeginUsbAccess, // drain prior work, unmount FAT, retain the card for raw MSC I/O
+  CloseCallerResources, // close streams and snapshot opened by the submitting task
+  DirEnumCount,   // retVal = this task's snapshot count
+  DirEnumEntry,   // slot = index, nameOut/len = name output, isDirOut = entry type
 };
 
 struct Request {
@@ -50,6 +54,7 @@ struct Request {
   const char *text = nullptr;    // WriteFile / AppendFile payload
   const uint8_t *wbuf = nullptr; // binary write payload
   uint8_t *rbuf = nullptr;       // read target buffer
+  char *nameOut = nullptr;      // DirEnumEntry name output buffer
   size_t len = 0;
   long off = 0;                     // StreamSeek offset
   int whence = 0;                   // StreamSeek SEEK_* or StreamOpen mode char
@@ -70,9 +75,26 @@ void start();
 
 bool submit(Request *r);
 
+/** Return this task's snapshot count through the gateway, or zero if unavailable. */
 int snapshotCount();
+/** Copy entry i into name_out (name_size includes NUL) and optional is_dir.
+ * Serialized with replacement/close; false leaves outputs unchanged on invalid
+ * input, a foreign snapshot, or gateway failure.
+ */
 bool snapshotEntry(int i, char *name_out, size_t name_size, bool *is_dir);
-void snapshotFree();
 bool streamsOpen();
+
+/** Unmount FAT after queued I/O completes and reserve the card until reboot.
+ * Return false if files remain open, no card is mounted, or unmount fails.
+ * The card and host remain owned by the SD service; raw clients must not free them.
+ */
+bool beginUsbAccess();
+/** Return whether USB owns the card and filesystem requests are blocked. */
+bool usbAccessActive();
+
+/** Close this task's streams and directory snapshot through the serialized gateway.
+ * Return false if any stream failed to flush; all matching handles are still released.
+ */
+bool closeCallerResources();
 
 } // namespace pm_sd_gateway

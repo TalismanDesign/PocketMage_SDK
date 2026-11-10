@@ -5,8 +5,10 @@ import os
 import re
 import subprocess
 from dataclasses import dataclass
+from pathlib import Path
 
 from tools import symbols as symbols_mod
+from tools.pm.compiled_exports import parse_compiled_exports
 
 _EXPORT_LINE = re.compile(r"ESP_ELFSYM_EXPORT\(\s*(\w+)\s*\)")
 
@@ -150,8 +152,12 @@ def reconcile_exports(sdk_symbols: str, host_exports: str,
     return sorted(curated - host), sorted(host - curated)
 
 
-def host_globals(readelf: str, host_elf: str) -> set[str]:
-    return symbols_mod.get_host_globals(readelf, host_elf, symbol_types=("FUNC", "OBJECT"))
+def host_exports(host_elf: str) -> set[str]:
+    """Return linked resolver names; report unreadable or unsupported firmware with context."""
+    try:
+        return set(parse_compiled_exports(Path(host_elf).read_bytes()))
+    except (OSError, ValueError) as error:
+        raise RuntimeError(f"Cannot read compiled exports from {host_elf}: {error}") from error
 
 
 def generated_table_symbols(path: str) -> set[str]:
@@ -191,7 +197,7 @@ def classify(und: list[str], curated: set[str], host_view: set[str] | None,
     broken: list[str] = []
     for name in und:
         if host_view is not None:
-            if name in available or name in host_view:
+            if name in host_view:
                 ok.append(name)
             else:
                 broken.append(name)
@@ -238,7 +244,7 @@ def check_app(info, readelf: str | None, host_elf: str | None) -> GateResult:
 
     und = parse_undefined(syms_out)
     curated = read_curated(info.sdk_root)
-    host_view = host_globals(tool, host_elf) if host_elf else None
+    host_view = host_exports(host_elf) if host_elf else None
     table_path = find_export_table(info.sdk_root)
     result = classify(und, curated, host_view, entry=header.entry,
                       available_table=generated_table_symbols(table_path))

@@ -29,17 +29,19 @@ Drop `build/hello.tar` in `/apps/` on the device SD card and install it through 
 
 The SDK ships its own DocMD site (`Docs/`): build it with `cd Docs && npm install && npm run build` and preview `Docs/site/`. Published at `https://talismandesign.github.io/PocketMage_SDK/docs`. Entry points:
 
-| Doc                                         | Covers                                                        |
-| ------------------------------------------- | ------------------------------------------------------------- |
-| [Get Started](Docs/docs/get-started/index.md) | Toolchain install and a first app end to end                |
-| [API Reference](Docs/docs/api/index.md)     | Every component, the `pm_*` C ABI, and the projection model   |
-| [App ABI](Docs/docs/app-abi.md)             | The ELF binary contract and the two-stage load                |
-| [Overlay format](Docs/docs/overlay.md)      | The `.elfo` sidecar that pages app code into executable RAM   |
-| [Building](Docs/docs/build.md)              | Toolchain, project layout, `make` targets                     |
-| [Symbols](Docs/docs/symbols.md)             | The curated export surface and the dependency contract        |
-| [Publishing](Docs/docs/guides/publishing.md) | Packaging the delivery tar and what the installer expects    |
-| [i18n](Docs/docs/i18n.md)                   | Translation catalogs, the generator, and string ownership     |
-| [Migration](Docs/docs/migration.md)         | Moving an existing app to the ELF flow                        |
+| Doc                                            | Covers                                                        |
+| ---------------------------------------------- | ------------------------------------------------------------- |
+| [Get Started](Docs/docs/get-started/index.md)  | Toolchain install and a first app end to end                  |
+| [API Reference](Docs/docs/api/index.md)        | Every component, the `pm_*` C ABI, and the projection model   |
+| [App ABI](Docs/docs/app-abi.md)                | The ELF binary contract and the two-stage load                |
+| [App lifecycle](Docs/docs/guides/lifecycle.md) | Resident finalization, task-owned cleanup, and idle policy    |
+| [Audio and media](Docs/docs/api/audio.md)      | Shared playback, tags, preferences, and connector ownership   |
+| [Overlay format](Docs/docs/overlay.md)         | The `.elfo` sidecar that pages app code into executable RAM   |
+| [Building](Docs/docs/build.md)                 | Toolchain, project layout, `make` targets                     |
+| [Symbols](Docs/docs/symbols.md)                | The curated export surface and the dependency contract        |
+| [Publishing](Docs/docs/guides/publishing.md)   | Packaging the delivery tar and what the installer expects     |
+| [i18n](Docs/docs/i18n.md)                      | Translation catalogs, the generator, and string ownership     |
+| [Migration](Docs/docs/migration.md)            | Moving an existing app to the ELF flow                        |
 
 ## Layout
 
@@ -52,12 +54,12 @@ PocketMage_SDK/
     pm/               # the pm CLI (pyproject-driven), with tests/fixtures/
   pyproject.toml      # pip install ., entry point `pm`
   symbols.list        # curated host-export surface the SDK commits to
-  host_baseline.list  # the C/C++ runtime + POSIX symbols the host always exports
+  host_baseline.list  # selected runtime symbols emitted into the customer table
   pocketmage_*/       # the SDK modules: eink, oled, sd, kb, touch, clock, bz,
-                      # wifi, font, layout, ui, i18n, sys, globals
+                      # wifi, font, layout, ui, i18n, sys, globals, app, audio, media
   pocketmage.h        # umbrella header an app includes first
   pocketmage_i18n/    # translation engine, base catalog, generator
-  docs/               # DocMD docs site (config, pages, lockfile)
+  Docs/               # DocMD docs site (config, pages, lockfile)
   .github/workflows/  # SDK CI (app-template build, version sync, i18n,
                       # lint, pm CLI tests, docs deploy)
 ```
@@ -65,6 +67,24 @@ PocketMage_SDK/
 The SDK has no `examples/` directory. The runnable reference app is the external [PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template; CI checks it out and builds it against the SDK on every push. Test fixtures (a negative `broken_app`, a golden `hello_app.app.elf`, a callgraph case, and a scaffold template) live under `tools/pm/tests/fixtures/`.
 
 ## CI
+
+Run the local tool and API-generation regression suite with:
+
+```sh
+python3 -m unittest discover -s tools/pm/tests -t .
+```
+
+The generator tests cover handwritten exports, duplicate ownership, signature
+drift, multiline declarations, C consumer compilation, and repeatable output.
+The C compilation check requires a C11 compiler; other tests require Python 3.
+See [App ABI](Docs/docs/app-abi.md) for regeneration and `--verify` commands.
+
+Hardware-bound service regressions live in the consuming OS checkout. From
+`PocketMage_PDA/Code/PocketMageOS`, run
+`python3 -m unittest discover -s tests/host -p 'test_*.py'`. These require a C++17
+compiler with AddressSanitizer/UBSan, and the input-report test uses the HID
+headers installed by the PlatformIO build. They cover USB ownership and retry,
+PCM timing/gain, media parsing, app finalization, and task-scoped SD cleanup.
 
 `.github/workflows/sdk.yml` runs five jobs on a fresh runner that installs the pinned espressif Xtensa toolchain itself:
 

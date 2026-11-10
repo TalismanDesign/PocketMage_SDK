@@ -1,4 +1,3 @@
-"""Environment introspection and self-repair primitives for the pm CLI."""
 
 from __future__ import annotations
 
@@ -29,7 +28,6 @@ def _ancestors(path: str) -> list[str]:
 
 
 def discover_sdk_root(explicit: str | None = None) -> str | None:
-    """Resolve a live SDK checkout without importing `tools`."""
     for candidate in (explicit, os.environ.get("PM_SDK_ROOT")):
         if candidate:
             resolved = os.path.abspath(os.path.expanduser(candidate))
@@ -52,7 +50,6 @@ def _read_version(sdk_root: str) -> str | None:
 
 @dataclass
 class InstallInfo:
-    """What the running interpreter believes about the pocketmage-sdk install."""
 
     installed: bool
     version: str | None
@@ -63,7 +60,6 @@ class InstallInfo:
 
 
 def _editable_target() -> str | None:
-    """The directory an editable install maps the `tools` package to."""
     try:
         import importlib.metadata as md
 
@@ -86,14 +82,12 @@ def _editable_target() -> str | None:
                 line = (dist.locate_file(entry)).read_text(encoding="utf-8").strip()
             except OSError:
                 return None
-            # A .pth may contain an import hook line; only a bare path is useful.
             if line and not line.startswith("import ") and os.path.isabs(line):
                 return line
     return None
 
 
 def _parse_mapping_target(finder_source: str, package: str) -> str | None:
-    """Pull MAPPING['<package>'] out of a setuptools editable finder module."""
     import ast
 
     try:
@@ -101,8 +95,6 @@ def _parse_mapping_target(finder_source: str, package: str) -> str | None:
     except SyntaxError:
         return None
     for node in ast.walk(tree):
-        # The finder spells MAPPING with a type annotation, so it parses as an
-        # AnnAssign; accept a plain Assign too in case the format changes.
         if isinstance(node, ast.AnnAssign):
             name = node.target.id if isinstance(node.target, ast.Name) else None
             targets = [name] if name else []
@@ -124,7 +116,6 @@ def _parse_mapping_target(finder_source: str, package: str) -> str | None:
 
 
 def inspect_install() -> InstallInfo:
-    """Describe the current pocketmage-sdk install from the running interpreter."""
     try:
         import importlib.metadata as md
 
@@ -135,8 +126,6 @@ def inspect_install() -> InstallInfo:
         installed = False
 
     target = _editable_target()
-    # Strip a trailing /tools so the reported target is the SDK root the user
-    # can act on, matching what --sdk expects.
     editable_root = target
     if target and os.path.basename(os.path.normpath(target)) == _ROOT_PACKAGE:
         editable_root = os.path.dirname(os.path.normpath(target))
@@ -169,7 +158,6 @@ def pip_install_command(sdk_root: str, *, editable: bool = True) -> list[str]:
 
 
 def run_pip_install(sdk_root: str, *, editable: bool = True) -> int:
-    """Reinstall the SDK package; returns the pip exit code."""
     return subprocess.run(pip_install_command(sdk_root, editable=editable)).returncode
 
 

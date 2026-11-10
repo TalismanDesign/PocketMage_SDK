@@ -102,18 +102,30 @@ public:
   bool removeTree(const char *path); // recursive delete
   bool renamePath(const char *path1, const char *path2);
   bool copyFileRaw(const char *src, const char *dst); // binary, 4KB chunks
+  /** Replace path with len bytes from buf; return false on write/close failure.
+   * Null/empty paths and null buffers with nonzero len are rejected.
+   */
   bool writeBinaryFile(const char *path, const uint8_t *buf, size_t len);
 
   // Handle-based streaming for decoders and loaders. Slots come from
   // streamOpen and must be released with streamClose. These are the only
   // disk-streaming entry points in the OS; nothing else reads files
   // incrementally.
-  int streamOpen(const char *path, char mode); // 'r' 'w' 'a'; slot or -1
+  /** Open path in mode 'r', 'w', or 'a'; return a slot or -1 on failure.
+   * An open stream inhibits idle sleep and CPU-frequency changes until closed.
+   */
+  int streamOpen(const char *path, char mode);
+  /** Read up to len bytes into buf; return bytes read, or zero on EOF/error. */
   size_t streamRead(int slot, void *buf, size_t len);
+  /** Write len bytes from buf; return bytes accepted (possibly short on error). */
   size_t streamWrite(int slot, const void *buf, size_t len);
+  /** Seek offset relative to SEEK_SET, SEEK_CUR, or SEEK_END; false on failure. */
   bool streamSeek(int slot, long offset, int whence);
+  /** Return the byte position, or zero on failure. */
   size_t streamTell(int slot);
+  /** Return file size while restoring the position, or zero on failure. */
   size_t streamSize(int slot);
+  /** Release slot and return whether close/flush succeeded; false for invalid slots. */
   bool streamClose(int slot);
 
   // Directory enumeration backed by a gateway snapshot. One enumeration is

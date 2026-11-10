@@ -21,6 +21,12 @@ extern volatile bool PWR_BTN_event; // Power button event **shared with library*
 
 namespace pocketmage {
 void setCpuSpeed(int newFreq);
+/** Record native or ELF input activity using the OS monotonic clock. */
+void reportActivity();
+/** Poll the shared TIMEOUT interval; inhibition restarts the inactivity clock. */
+bool idleSleepDue(bool inhibited);
+/** OS idle manager: preserve editing state and enter the configured deep sleep. */
+void checkIdleSleep();
 void deepSleep(bool alternateScreenSaver = false);
 void IRAM_ATTR PWR_BTN_irq();
 

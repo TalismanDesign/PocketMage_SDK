@@ -37,6 +37,20 @@ public:
     fullRefreshAfter_ = fullRefreshAfter;
   };
 
+  /** Return the canvas width in pixels. */
+  int width() const;
+  /** Return the canvas height in pixels. */
+  int height() const;
+  /** Clear the canvas to white without refreshing the panel. */
+  void clear();
+  /** Set one canvas pixel to black (ink=true) or white; off-panel input is ignored. */
+  void pixel(int x, int y, bool ink);
+  /** Draw an inclusive rectangle; corner order is immaterial.
+   * Coordinates and spans outside the driver's signed-16-bit range are ignored.
+   */
+  void rect(int x0, int y0, int x1, int y1, bool fill, bool ink);
+  /** Draw a triangle in black or white; ignore vertices outside signed-16-bit range. */
+  void triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool fill, bool ink);
   void refresh();
   void setFastFullRefresh(bool setting);
   void statusBar(const String &input, bool fullWindow = false);

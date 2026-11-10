@@ -22,6 +22,7 @@
 # The Arduino-style API (setup/loop) is layered on top by the app-runtime shim.
 
 APP_SRCS    ?= main.cpp
+APP_RUNTIME := $(SDK_ROOT)/tools/runtime/exit.cpp
 APP_NAME    ?= $(notdir $(CURDIR))
 APP_BUILD_DIR ?= build
 APP_OUT     := $(APP_BUILD_DIR)/$(APP_NAME).app.elf
@@ -115,8 +116,8 @@ pm-info:
 	@echo "APP_OVERLAY_ELFO=$(APP_OVERLAY_ELFO)"
 	@echo "APP_OVERLAY_RELK=$(APP_OVERLAY_RELK)"
 
-$(APP_TOOL): $(APP_SRCS) | $(APP_BUILD_DIR)
-	$(XTENSA_CXX) $(APP_CPPFLAGS) $(APP_CXXFLAGS) $(APP_SRCS) $(APP_LDFLAGS) -o $@
+$(APP_TOOL): $(APP_SRCS) $(APP_RUNTIME) | $(APP_BUILD_DIR)
+	$(XTENSA_CXX) $(APP_CPPFLAGS) $(APP_CXXFLAGS) $(APP_SRCS) $(APP_RUNTIME) $(APP_LDFLAGS) -o $@
 
 $(APP_OUT): $(APP_TOOL)
 	$(XTENSA_STRIP) $(APP_STRIP_FLAGS) $< -o $@

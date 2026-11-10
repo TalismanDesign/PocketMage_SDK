@@ -23,6 +23,26 @@ public:
   }
 
   // Main methods
+  /** Reinitialize the OLED controller after another subsystem puts it to sleep. */
+  void init();
+  /** Commit the framebuffer to the OLED panel. */
+  void send();
+  /** Clear the framebuffer before composing a frame. */
+  void clear();
+  /** Return the framebuffer width in pixels. */
+  int width() const;
+  /** Return the framebuffer height in pixels. */
+  int height() const;
+  /** Draw a filled box or outline using the current draw color.
+   * Nonpositive dimensions or coordinates outside the driver range are ignored.
+   * See https://github.com/olikraus/u8g2/wiki/u8g2reference#drawbox
+   */
+  void box(int x, int y, int w, int h, bool fill);
+  /** Draw a filled triangle or outline in the current draw color.
+   * Vertices must be nonnegative signed-16-bit coordinates; invalid input is ignored.
+   * See https://github.com/olikraus/u8g2/wiki/u8g2reference#drawtriangle
+   */
+  void triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool fill);
   void oledWord(String word, bool allowLarge = false, bool showInfo = true, String bottomText = "");
   // deferSend: caller draws into the buffer after oledLine and sends once itself
   void oledLine(String line, int input_pos, bool doProgressBar = true, String bottomMsg = "",

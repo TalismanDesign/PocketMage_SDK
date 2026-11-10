@@ -47,6 +47,9 @@ _ZNKSt11logic_error4whatEv
 _ZNKSt13runtime_error4whatEv
 _ZNKSt17bad_function_call4whatEv
 _ZNKSt20bad_array_new_length4whatEv
+_ZNKSt3_V214error_category10_M_messageB5cxx11Ei
+_ZNKSt3_V214error_category10equivalentERKSt10error_codei
+_ZNKSt3_V214error_category23default_error_conditionEi
 _ZNKSt9bad_alloc4whatEv
 _ZNKSt9type_info14__is_pointer_pEv
 _ZNKSt9type_info15__is_function_pEv
@@ -55,6 +58,10 @@ _ZNSt11logic_errorC2EPKc
 _ZNSt11logic_errorD0Ev
 _ZNSt11logic_errorD1Ev
 _ZNSt11logic_errorD2Ev
+_ZNSt12__cow_stringC1EPKcj
+_ZNSt12__cow_stringC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+_ZNSt12__cow_stringC2EPKcj
+_ZNSt12__cow_stringC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
 _ZNSt12length_errorC1EPKc
 _ZNSt12length_errorC2EPKc
 _ZNSt12length_errorD0Ev
@@ -65,6 +72,14 @@ _ZNSt12out_of_rangeC2EPKc
 _ZNSt12out_of_rangeD0Ev
 _ZNSt12out_of_rangeD1Ev
 _ZNSt12out_of_rangeD2Ev
+_ZNSt12system_errorD0Ev
+_ZNSt12system_errorD1Ev
+_ZNSt12system_errorD2Ev
+_ZNSt13runtime_errorC1ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+_ZNSt13runtime_errorC2ERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE
+_ZNSt13runtime_errorD0Ev
+_ZNSt13runtime_errorD1Ev
+_ZNSt13runtime_errorD2Ev
 _ZNSt17bad_function_callD0Ev
 _ZNSt17bad_function_callD1Ev
 _ZNSt17bad_function_callD2Ev
@@ -87,6 +102,7 @@ _ZSt17__throw_bad_allocv
 _ZSt19__throw_logic_errorPKc
 _ZSt20__throw_length_errorPKc
 _ZSt20__throw_out_of_rangePKc
+_ZSt20__throw_system_errori
 _ZSt24__throw_out_of_range_fmtPKcz
 _ZSt25__throw_bad_function_callv
 _ZSt28__throw_bad_array_new_lengthv
@@ -106,6 +122,7 @@ __ashldi3
 __assert_func
 __atomic_compare_exchange_1
 __atomic_compare_exchange_4
+__atomic_exchange_1
 __atomic_exchange_4
 __atomic_fetch_add_2
 __atomic_fetch_add_4
@@ -116,6 +133,7 @@ __atomic_fetch_or_8
 __atomic_fetch_sub_4
 __atomic_s32c1i_compare_exchange_1
 __atomic_s32c1i_compare_exchange_4
+__atomic_s32c1i_exchange_1
 __atomic_s32c1i_exchange_4
 __atomic_s32c1i_fetch_add_2
 __atomic_s32c1i_fetch_add_4
@@ -175,6 +193,7 @@ __hexdig_fun
 __hexnan
 __hi0bits
 __i2b
+__ieee754_powf
 __ieee754_rem_pio2f
 __ieee754_sqrtf
 __kernel_cosf
@@ -344,6 +363,7 @@ exit
 explicit_bzero
 fabsf
 fflush
+finitef
 floorf
 fprintf
 free
@@ -375,6 +395,7 @@ memset
 mktime
 nan
 nanf
+powf
 printf
 putchar
 puts

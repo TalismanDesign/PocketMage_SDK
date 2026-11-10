@@ -177,3 +177,17 @@ bool PocketmageCLOCK::isValid() {
       t.year() >= 2020 && t.year() < 2099; // check for reasonable year for DateTime t
   return saneYear;
 }
+
+int64_t PocketmageCLOCK::epoch() {
+  return static_cast<int64_t>(nowDT().unixtime());
+}
+
+String PocketmageCLOCK::timestamp() {
+  char buffer[32];
+  const DateTime dt = nowDT();
+  snprintf(buffer, sizeof(buffer), "%04u-%02u-%02u %02u:%02u:%02u",
+           static_cast<unsigned>(dt.year()), static_cast<unsigned>(dt.month()),
+           static_cast<unsigned>(dt.day()), static_cast<unsigned>(dt.hour()),
+           static_cast<unsigned>(dt.minute()), static_cast<unsigned>(dt.second()));
+  return String(buffer);
+}

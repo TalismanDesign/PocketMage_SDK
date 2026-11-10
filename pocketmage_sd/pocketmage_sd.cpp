@@ -457,6 +457,7 @@ void setupSD() {
       }
     }
 
+    s_card = card;
     PM_SD().setNoSD(false);
     OLED().oledWord(TR(STR_SD_COMPAT_STARTED));
 
@@ -906,6 +907,8 @@ bool PocketmageSD::readBinaryFile(const char *path, uint8_t *buf, size_t len) {
 }
 
 bool PocketmageSD::appendBinaryFile(const char *path, const uint8_t *buf, size_t len) {
+  if (!path || !path[0] || (!buf && len > 0))
+    return false;
   if (noSD_) {
     OLED().sysMessage(TR(STR_SD_OP_FAILED), 5000);
     return false;
@@ -959,6 +962,8 @@ bool PocketmageSD::statPath(const char *path, size_t *sizeOut, bool *isDirOut) {
 }
 
 bool PocketmageSD::mkdirPath(const char *path) {
+  if (!path || !path[0])
+    return false;
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::Mkdir;
   r.path = path;
@@ -1001,6 +1006,8 @@ bool PocketmageSD::copyFileRaw(const char *src, const char *dst) {
 }
 
 bool PocketmageSD::writeBinaryFile(const char *path, const uint8_t *buf, size_t len) {
+  if (!path || !path[0] || (!buf && len > 0))
+    return false;
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::WriteBinary;
   r.path = path;
@@ -1011,6 +1018,8 @@ bool PocketmageSD::writeBinaryFile(const char *path, const uint8_t *buf, size_t 
 }
 
 int PocketmageSD::streamOpen(const char *path, char mode) {
+  if (!path || !path[0] || (mode != 'r' && mode != 'w' && mode != 'a'))
+    return -1;
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::StreamOpen;
   r.path = path;
@@ -1020,6 +1029,8 @@ int PocketmageSD::streamOpen(const char *path, char mode) {
 }
 
 size_t PocketmageSD::streamRead(int slot, void *buf, size_t len) {
+  if (!buf || len == 0)
+    return 0;
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::StreamRead;
   r.slot = slot;
@@ -1030,6 +1041,8 @@ size_t PocketmageSD::streamRead(int slot, void *buf, size_t len) {
 }
 
 size_t PocketmageSD::streamWrite(int slot, const void *buf, size_t len) {
+  if (!buf || len == 0)
+    return 0;
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::StreamWrite;
   r.slot = slot;
@@ -1040,6 +1053,8 @@ size_t PocketmageSD::streamWrite(int slot, const void *buf, size_t len) {
 }
 
 bool PocketmageSD::streamSeek(int slot, long offset, int whence) {
+  if (whence != SEEK_SET && whence != SEEK_CUR && whence != SEEK_END)
+    return false;
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::StreamSeek;
   r.slot = slot;
@@ -1074,6 +1089,8 @@ bool PocketmageSD::streamClose(int slot) {
 }
 
 int PocketmageSD::dirEnumOpen(const char *path) {
+  if (!path || !path[0])
+    return -1;
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::DirEnum;
   r.path = path;
