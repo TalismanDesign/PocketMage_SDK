@@ -105,7 +105,9 @@ class EnumParsing(unittest.TestCase):
         tables = gen.load_enums(SDK_ROOT)
         names = {c_name for c_name, _host, _v, _t in tables}
         self.assertEqual(names, {"pm_target", "pm_style", "pm_lang",
-                                 "pm_refresh", "pm_audio_state", "pm_jingle"})
+                                 "pm_refresh", "pm_audio_state", "pm_jingle",
+                                 "pm_audio_output", "pm_audio_result", "pm_image_format",
+                                 "pm_key", "pm_transport_icon"})
 
     def test_refresh_enum_comes_from_the_ui_header(self):
         modes = dict((c, v) for c, _h, values, _t in gen.load_enums(SDK_ROOT)
@@ -186,7 +188,7 @@ class FreeFunctionParsing(unittest.TestCase):
         self.assertEqual(self.names("pocketmage_ui/pocketmage_ui.h"),
                          {"drawScrollbar", "beginEinkScreen", "endEinkScreen",
                           "drawListItem", "drawChipText",
-                          "drawCyclePickerOLED"})
+                      "drawCyclePickerOLED", "drawTransportIcon"})
 
     def test_enum_definition_is_not_a_function(self):
         entries = gen.parse_free_functions(
@@ -198,7 +200,7 @@ class FreeFunctionParsing(unittest.TestCase):
         entry = next(e for e in gen.parse_free_functions(
             os.path.join(SDK_ROOT, "pocketmage_ui/pocketmage_ui.h"))
             if e["name"] == "endEinkScreen")
-        self.assertEqual([p["type"] for p in entry["params"]],
+        self.assertEqual([gen.normalize_type(p["type"]) for p in entry["params"]],
                          ["const char*", "EinkRefresh"])
 
     def test_template_arguments_are_not_comparisons(self):

@@ -15,13 +15,13 @@
 
 // WiFi radio state machine
 enum class WifiRadioState {
-  Off,         // Radio is off
-  TurningOn,   // Radio is initializing
-  On,          // Radio is on but not connected
-  Scanning,    // Scanning for networks
-  Connecting,  // Connection attempt in progress
-  Connected,   // Connected to an AP
-  TurningOff   // Radio is shutting down
+  Off,        // Radio is off
+  TurningOn,  // Radio is initializing
+  On,         // Radio is on but not connected
+  Scanning,   // Scanning for networks
+  Connecting, // Connection attempt in progress
+  Connected,  // Connected to an AP
+  TurningOff  // Radio is shutting down
 };
 
 // The S3 radio stalls below 240MHz (scan/connect never complete), so the CPU
@@ -40,20 +40,20 @@ struct WifiApInfo {
 typedef std::function<void(void)> WifiEventCallback;
 
 class PocketMageWifi {
- public:
-  static PocketMageWifi& getInstance();
+public:
+  static PocketMageWifi &getInstance();
 
   // Lifecycle
-  void begin();  // Call once at startup to initialize the service
-  void stop();   // Call at shutdown to cleanly stop the service
+  void begin(); // Call once at startup to initialize the service
+  void stop();  // Call at shutdown to cleanly stop the service
 
   // Control methods (all non-blocking, dispatch to task)
-  void enable();                                                           // Turn on WiFi radio
-  void disable();                                                          // Turn off WiFi radio
-  void scan();                                                             // Start a scan
-  void connect(const char* ssid, const char* password, bool save = true);  // Connect to AP
-  void disconnect();  // Disconnect from current AP
-  void reconnect();   // Retry connection with saved creds
+  void enable();                                                          // Turn on WiFi radio
+  void disable();                                                         // Turn off WiFi radio
+  void scan();                                                            // Start a scan
+  void connect(const char *ssid, const char *password, bool save = true); // Connect to AP
+  void disconnect(); // Disconnect from current AP
+  void reconnect();  // Retry connection with saved creds
 
   // Status queries (thread-safe)
   WifiRadioState getState() const;
@@ -67,31 +67,31 @@ class PocketMageWifi {
 
   // Scan results
   uint16_t getScanResultCount() const;
-  bool getScanResult(uint16_t index, WifiApInfo& out) const;
+  bool getScanResult(uint16_t index, WifiApInfo &out) const;
 
   // Saved credentials management
-  bool hasSavedCredentials(const char* ssid) const;
-  bool loadSavedCredentials(const char* ssid, char* password, size_t maxLen) const;
-  void clearSavedCredentials(const char* ssid);
+  bool hasSavedCredentials(const char *ssid) const;
+  bool loadSavedCredentials(const char *ssid, char *password, size_t maxLen) const;
+  void clearSavedCredentials(const char *ssid);
 
   // Event callback (called when state changes: use to trigger display update)
   void setEventCallback(WifiEventCallback cb);
   void dispatchEvents();
 
- private:
+private:
   PocketMageWifi();
   ~PocketMageWifi();
-  PocketMageWifi(const PocketMageWifi&) = delete;
-  PocketMageWifi& operator=(const PocketMageWifi&) = delete;
+  PocketMageWifi(const PocketMageWifi &) = delete;
+  PocketMageWifi &operator=(const PocketMageWifi &) = delete;
 
   // Task function
-  static void wifiTaskFunc(void* param);
+  static void wifiTaskFunc(void *param);
   void taskLoop();
 
   // ESP event handler
-  static void espEventHandler(void* arg, esp_event_base_t base, int32_t id, void* data);
-  void handleWifiEvent(int32_t id, void* data);
-  void handleIpEvent(int32_t id, void* data);
+  static void espEventHandler(void *arg, esp_event_base_t base, int32_t id, void *data);
+  void handleWifiEvent(int32_t id, void *data);
+  void handleIpEvent(int32_t id, void *data);
 
   // Internal operations (run in task context)
   void doEnable();
@@ -102,10 +102,10 @@ class PocketMageWifi {
   void doAutoConnect();
 
   // Helpers
-  void setStatus(const char* msg);
+  void setStatus(const char *msg);
   void publishEvent();
-  void saveCredentials(const char* ssid, const char* password);
-  bool findSavedNetwork(char* ssid, char* password);
+  void saveCredentials(const char *ssid, const char *password);
+  bool findSavedNetwork(char *ssid, char *password);
 
   // Command queue types
   enum class Command : uint8_t {
@@ -141,7 +141,7 @@ class PocketMageWifi {
   char _connectError[64];
 
   // Scan results
-  wifi_ap_record_t* _scanResults;
+  wifi_ap_record_t *_scanResults;
   uint16_t _scanResultCount;
   static constexpr uint16_t MAX_SCAN_RESULTS = 20;
 
@@ -150,13 +150,13 @@ class PocketMageWifi {
   QueueHandle_t _commandQueue;
   SemaphoreHandle_t _shutdownSem;
   // ESP handles
-  esp_netif_t* _staNetif;
+  esp_netif_t *_staNetif;
   esp_event_handler_instance_t _wifiEventHandler;
   esp_event_handler_instance_t _ipEventHandler;
 
   // Preferences
   mutable Preferences _prefs;
-  static constexpr const char* PREFS_NAMESPACE = "pmwifi";
+  static constexpr const char *PREFS_NAMESPACE = "pmwifi";
 
   // Event callback
   WifiEventCallback _eventCallback;
@@ -172,4 +172,4 @@ class PocketMageWifi {
 };
 
 // Global accessor for convenience
-extern PocketMageWifi& P_WIFI;
+extern PocketMageWifi &P_WIFI;

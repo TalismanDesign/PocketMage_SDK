@@ -8,7 +8,7 @@
 #include "pocketmage.h"
 #include <pocketmage_globals.h>
 
-static constexpr const char* TAG = "CLOCK";
+static constexpr const char *TAG = "CLOCK";
 
 RTC_PCF8563 rtc;
 
@@ -16,20 +16,20 @@ RTC_PCF8563 rtc;
 static PocketmageCLOCK pm_clock(rtc);
 
 // Setup for Clock Class
-void setupClock(){
+void setupClock() {
   pinMode(RTC_INT, INPUT);
   if (!CLOCK().begin()) {
     ESP_LOGE(TAG, "Couldn't find RTC");
     delay(1000);
   }
 
-  // Check if there was a power loss. App builds use the SDK hook;
-  // the host has its own
-  #if PM_TARGET_APP
-    pocketmage::checkRTCPowerLoss();
-  #else
-    checkRTCPowerLoss();
-  #endif
+// Check if there was a power loss. App builds use the SDK hook;
+// the host has its own
+#if PM_TARGET_APP
+  pocketmage::checkRTCPowerLoss();
+#else
+  checkRTCPowerLoss();
+#endif
 
   CLOCK().getRTC().start();
   wireClock();
@@ -46,33 +46,38 @@ void checkRTCPowerLoss() {
   CLOCK().setToCompileTimeUTC();
 }
 
-}  // namespace pocketmage
+} // namespace pocketmage
 
 // Wire function  for Clock class
 // add any global references here + add set function to class header file
-void wireClock(){
-    
+void wireClock() {
 }
 
 // Access for other apps
-PocketmageCLOCK& CLOCK() { return pm_clock; }
+PocketmageCLOCK &CLOCK() {
+  return pm_clock;
+}
 
 bool PocketmageCLOCK::begin() {
-  if (!rtc_.begin()) { begun_ = false; return false; }
+  if (!rtc_.begin()) {
+    begun_ = false;
+    return false;
+  }
   begun_ = true;
   return true;
 }
 
 // Helper to prevent silent 0 parsing on invalid strings
-static bool isNumeric(const String& str) {
+static bool isNumeric(const String &str) {
   for (size_t i = 0; i < str.length(); i++) {
-    if (!isdigit(str[i])) return false;
+    if (!isdigit(str[i]))
+      return false;
   }
   return true;
 }
 
-PocketmageCLOCK::TimeParseResult PocketmageCLOCK::parseTimeString(const String& timeStr,
-                                                                  int& outHours, int& outMinutes) {
+PocketmageCLOCK::TimeParseResult PocketmageCLOCK::parseTimeString(const String &timeStr,
+                                                                  int &outHours, int &outMinutes) {
   String s = timeStr;
   s.trim();
 
@@ -112,7 +117,7 @@ PocketmageCLOCK::TimeParseResult PocketmageCLOCK::parseTimeString(const String& 
     if (mStr.length() != 2 || hStr.length() < 1 || hStr.length() > 2)
       return TIME_INVALID_FORMAT;
 
-    if (!isNumeric(hStr) || !isNumeric(mStr)) 
+    if (!isNumeric(hStr) || !isNumeric(mStr))
       return TIME_INVALID_FORMAT;
 
     outHours = hStr.toInt();
@@ -122,7 +127,7 @@ PocketmageCLOCK::TimeParseResult PocketmageCLOCK::parseTimeString(const String& 
     if (s.length() < 3 || s.length() > 4)
       return TIME_INVALID_FORMAT;
 
-    if (!isNumeric(s)) 
+    if (!isNumeric(s))
       return TIME_INVALID_FORMAT;
 
     int value = s.toInt();
@@ -165,8 +170,24 @@ void PocketmageCLOCK::setTimeFromString(String timeStr) {
 }
 
 bool PocketmageCLOCK::isValid() {
-  if (!begun_) return false;
+  if (!begun_)
+    return false;
   DateTime t = rtc_.now();
-  const bool saneYear = t.year() >= 2020 && t.year() < 2099;  // check for reasonable year for DateTime t
+  const bool saneYear =
+      t.year() >= 2020 && t.year() < 2099; // check for reasonable year for DateTime t
   return saneYear;
+}
+
+int64_t PocketmageCLOCK::epoch() {
+  return static_cast<int64_t>(nowDT().unixtime());
+}
+
+String PocketmageCLOCK::timestamp() {
+  char buffer[32];
+  const DateTime dt = nowDT();
+  snprintf(buffer, sizeof(buffer), "%04u-%02u-%02u %02u:%02u:%02u",
+           static_cast<unsigned>(dt.year()), static_cast<unsigned>(dt.month()),
+           static_cast<unsigned>(dt.day()), static_cast<unsigned>(dt.hour()),
+           static_cast<unsigned>(dt.minute()), static_cast<unsigned>(dt.second()));
+  return String(buffer);
 }

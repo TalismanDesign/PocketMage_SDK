@@ -4,7 +4,7 @@
 //  888      888  888          888oooo8     888      888  //
 //  888      888  888          888    "     888      888  //
 //  `88b    d88'  888       o  888       o  888     d88'  //
-//   `Y8bood8P'  o888ooooood8 o888ooooood8 o888bood8P'    //     
+//   `Y8bood8P'  o888ooooood8 o888ooooood8 o888bood8P'    //
 
 #pragma once
 #include <Arduino.h>
@@ -13,29 +13,52 @@
 #pragma region fonts
 #pragma endregion
 
-// OLED 
+// OLED
 extern U8G2_SSD1326_ER_256X32_F_4W_HW_SPI u8g2;
 
 // ===================== OLED CLASS =====================
 class PocketmageOled {
 public:
-  explicit PocketmageOled(U8G2 &u8) : u8g2_(u8), OLEDPowerSave_(false) {}
+  explicit PocketmageOled(U8G2 &u8) : u8g2_(u8), OLEDPowerSave_(false) {
+  }
 
-  
   // Main methods
+  /** Reinitialize the OLED controller after another subsystem puts it to sleep. */
+  void init();
+  /** Commit the framebuffer to the OLED panel. */
+  void send();
+  /** Clear the framebuffer before composing a frame. */
+  void clear();
+  /** Return the framebuffer width in pixels. */
+  int width() const;
+  /** Return the framebuffer height in pixels. */
+  int height() const;
+  /** Draw a filled box or outline using the current draw color.
+   * Nonpositive dimensions or coordinates outside the driver range are ignored.
+   * See https://github.com/olikraus/u8g2/wiki/u8g2reference#drawbox
+   */
+  void box(int x, int y, int w, int h, bool fill);
+  /** Draw a filled triangle or outline in the current draw color.
+   * Vertices must be nonnegative signed-16-bit coordinates; invalid input is ignored.
+   * See https://github.com/olikraus/u8g2/wiki/u8g2reference#drawtriangle
+   */
+  void triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool fill);
   void oledWord(String word, bool allowLarge = false, bool showInfo = true, String bottomText = "");
   // deferSend: caller draws into the buffer after oledLine and sends once itself
-  void oledLine(String line, int input_pos, bool doProgressBar = true, String bottomMsg = "", bool deferSend = false);
+  void oledLine(String line, int input_pos, bool doProgressBar = true, String bottomMsg = "",
+                bool deferSend = false);
   void sysMessage(String msg, int showTime = 1500);
   void oledScroll();
   void infoBar();
   void setPowerSave(bool enable);
-  bool getPowerSave() const                                   { return OLEDPowerSave_; }
+  bool getPowerSave() const {
+    return OLEDPowerSave_;
+  }
 
 private:
-  U8G2                  &u8g2_;        // class reference to hardware oled object
+  U8G2 &u8g2_; // class reference to hardware oled object
   volatile bool OLEDPowerSave_;
 };
 
 void setupOled();
-PocketmageOled& OLED();
+PocketmageOled &OLED();

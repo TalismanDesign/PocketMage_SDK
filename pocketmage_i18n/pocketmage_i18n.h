@@ -23,38 +23,38 @@ public:
 
   // Switch by two-letter code ("en" / "fr" / "es").  Returns false and leaves
   // the current language unchanged when the code is unknown.
-  static bool setLanguageByCode(const char* code);
+  static bool setLanguageByCode(const char *code);
 
   static Lang language();
   static int languageCount();
 
   // Two-letter code of the active (or indexed) language.
-  static const char* code();
-  static const char* code(int idx);
+  static const char *code();
+  static const char *code(int idx);
 
   // Native display name ("English" / "Français" / "Español").
-  static const char* nativeName();
-  static const char* nativeName(int idx);
+  static const char *nativeName();
+  static const char *nativeName(int idx);
 
   // Look up the active-language text for a string ID.
-  static const char* get(StringID id);
+  static const char *get(StringID id);
 
   // Indexed helpers backed by the active table (enum blocks in the catalog).
-  static const char* monthName(int month);   // 1..12, else the ERR entry
-  static const char* dayName(int idx);       // 0..6, Sunday-first
-  static const char* appName(int idx);       // home grid label, 0..10
-  static const char* kbAppName(int idx);     // app-switcher badge, 0..11
+  static const char *monthName(int month); // 1..12, else the ERR entry
+  static const char *dayName(int idx);     // 0..6, Sunday-first
+  static const char *appName(int idx);     // home grid label, 0..10
+  static const char *kbAppName(int idx);   // app-switcher badge, 0..11
 
   // Resolve native-language command aliases.  Folds diacritics, replaces the
   // first word (or the whole line, for multi-word aliases such as the easter
   // eggs) with the canonical English command, and preserves any argument text
   // byte-for-byte.  Returns the input unchanged when nothing matches.
-  static String normalizeCommand(const String& raw);
+  static String normalizeCommand(const String &raw);
 
 private:
   static Lang lang_;
-  static const char* aliasFor(const char* folded);
-  static String fold(const String& s);
+  static const char *aliasFor(const char *folded);
+  static String fold(const String &s);
 };
 
 // Shorthand for call sites: TR(STR_X) == I18n::get(STR_X).

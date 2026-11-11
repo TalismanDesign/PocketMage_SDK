@@ -124,6 +124,7 @@ export default {
         { title: "Keyboard", path: "/api/kb", icon: "keyboard" },
         { title: "Touch", path: "/api/touch", icon: "hand" },
         { title: "Buzzer", path: "/api/bz", icon: "volume" },
+        { title: "Audio and media", path: "/api/audio", icon: "volume" },
         { title: "Clock", path: "/api/clock", icon: "clock" },
         { title: "WiFi", path: "/api/wifi", icon: "wifi" },
         { title: "System", path: "/api/sys", icon: "cpu" },

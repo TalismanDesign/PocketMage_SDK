@@ -13,8 +13,6 @@
 #define PWM_CHANNEL LEDC_CHANNEL_1
 #define PWM_RESOLUTION LEDC_TIMER_10_BIT // 10-bit resolution (0-1023)
 
-
-
 // To Do: copy instructions to readme
 /* ADDING NEW JINGLES
 
@@ -31,7 +29,7 @@ struct Note {
 };
 
 struct Jingle {
-  const Note* notes;  // const because we don't want to modify the tune
+  const Note *notes; // const because we don't want to modify the tune
   size_t len;
 };
 
@@ -45,24 +43,24 @@ constexpr static const Note shutdownNotes[] = {
 const Jingle Startup = {startupNotes, sizeof(startupNotes) / sizeof(startupNotes[0])};
 const Jingle Shutdown = {shutdownNotes, sizeof(shutdownNotes) / sizeof(shutdownNotes[0])};
 
-};  // namespace jingle
+}; // namespace Jingles
 
 // ===================== BZ CLASS =====================
 class PocketmageBZ {
- public:
+public:
   PocketmageBZ();
 
   // Main methods
   bool begin(int channel = 0);
   void end();
 
-  void playJingle(const Jingle& jingle);
+  void playJingle(const Jingle &jingle);
 
   // When the audio sink owns the piezo, jingles are queued here instead of
   // being dropped. drainPending() replays them once the pin is released.
   void drainPending();
 
- private:
+private:
   // Small ring of jingles deferred while the audio sink holds the pin.
   static constexpr size_t PENDING_CAPACITY = 4;
 
@@ -74,4 +72,4 @@ class PocketmageBZ {
 };
 
 void setupBZ();
-PocketmageBZ& BZ();
+PocketmageBZ &BZ();

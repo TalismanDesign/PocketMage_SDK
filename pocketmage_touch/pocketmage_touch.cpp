@@ -1,34 +1,36 @@
-#include <pocketmage.h> 
 #include <Adafruit_MPR121.h>
+#include <pocketmage.h>
 
-Adafruit_MPR121 cap =  Adafruit_MPR121(); // Touch slider
+Adafruit_MPR121 cap = Adafruit_MPR121(); // Touch slider
 
 // Initialization of capacative touch class
 static PocketmageTOUCH pm_touch(cap);
 
-static constexpr const char* TAG = "TOUCH";
+static constexpr const char *TAG = "TOUCH";
 
 // Setup for Touch Class
-void setupTouch(){
-  // Production Device Setup
-  #if POCKETMAGE_HW_VERSION == 2
-    if (!cap.begin(MPR121_ADDR, &Wire1)) {
-      ESP_LOGE(TAG, "TouchPad Failed");
-      OLED().sysMessage(TR(STR_TOUCHPAD_FAILED),1000);
-    }
-    cap.setAutoconfig(true);
-  #else
-    // MPR121 / SLIDER
-    if (!cap.begin(MPR121_ADDR)) {
-      ESP_LOGE(TAG, "TouchPad Failed");
-      OLED().sysMessage(TR(STR_TOUCHPAD_FAILED),1000);
-    }
-    cap.setAutoconfig(true);
-  #endif
+void setupTouch() {
+// Production Device Setup
+#if POCKETMAGE_HW_VERSION == 2
+  if (!cap.begin(MPR121_ADDR, &Wire1)) {
+    ESP_LOGE(TAG, "TouchPad Failed");
+    OLED().sysMessage(TR(STR_TOUCHPAD_FAILED), 1000);
+  }
+  cap.setAutoconfig(true);
+#else
+  // MPR121 / SLIDER
+  if (!cap.begin(MPR121_ADDR)) {
+    ESP_LOGE(TAG, "TouchPad Failed");
+    OLED().sysMessage(TR(STR_TOUCHPAD_FAILED), 1000);
+  }
+  cap.setAutoconfig(true);
+#endif
 }
 
 // Access for other apps
-PocketmageTOUCH& TOUCH() { return pm_touch; }
+PocketmageTOUCH &TOUCH() {
+  return pm_touch;
+}
 
 void PocketmageTOUCH::updateScrollFromTouch() {
   uint16_t touched = cap_.touched();
@@ -36,9 +38,9 @@ void PocketmageTOUCH::updateScrollFromTouch() {
 
   // Prioritize lowest pad index to cleanly handle physical finger overlap
   for (int i = 0; i < 9; ++i) {
-    if (touched & (1 << i)) { 
-      newTouch = i; 
-      break; 
+    if (touched & (1 << i)) {
+      newTouch = i;
+      break;
     }
   }
 
@@ -71,12 +73,13 @@ void PocketmageTOUCH::updateScrollFromTouch() {
 int PocketmageTOUCH::readTouchPad() {
   uint16_t touched = cap_.touched();
   for (int i = 0; i < 9; i++) {
-    if (touched & (1 << i)) return i;
+    if (touched & (1 << i))
+      return i;
   }
   return -1;
 }
 
-bool PocketmageTOUCH::updateScroll(int maxScroll, ulong& lineScroll, int stepSize) {
+bool PocketmageTOUCH::updateScroll(int maxScroll, ulong &lineScroll, int stepSize) {
 
   bool updateScreen = false;
   unsigned long currentTime = millis();

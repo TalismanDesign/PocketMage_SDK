@@ -2,11 +2,7 @@
 #define POCKETMAGE_GLOBALS_H
 
 #include <Arduino.h>
-#include <FS.h>
 #include <Preferences.h>
-#include <SD.h>
-#include <SD_MMC.h>
-#include <SPI.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <pocketmage.h>
@@ -16,19 +12,33 @@
 // ===================== SPI BUSES =====================
 extern SPIClass *vspi;
 extern SPIClass *hspi;
-extern fs::FS *global_fs;
 
 // ===================== PERSISTENT STORAGE =====================
 extern Preferences prefs;
 
 // ===================== SYSTEM STATE =====================
-extern TaskHandle_t einkHandlerTaskHandle;  // E-ink refresh task (defined in pocketmage_eink.cpp)
+extern TaskHandle_t einkHandlerTaskHandle; // E-ink refresh task (defined in pocketmage_eink.cpp)
 
 // ===================== KEYBOARD STATE =====================
 enum KBState { NORMAL, SHIFT, FUNC, FN_SHIFT };
 
 // ===================== APP STATES =====================
-enum AppState { HOME, TXT, FILEWIZ, USB_APP, COMM, SETTINGS, TASKS, CALENDAR, JOURNAL, LEXICON, APPLOADER, TERMINAL, ONBOARDING, ELFAPP };
+enum AppState {
+  HOME,
+  TXT,
+  FILEWIZ,
+  USB_APP,
+  COMM,
+  SETTINGS,
+  TASKS,
+  CALENDAR,
+  JOURNAL,
+  LEXICON,
+  APPLOADER,
+  TERMINAL,
+  ONBOARDING,
+  ELFAPP
+};
 extern AppState CurrentAppState;
 
 // ===================== BATTERY HELPER =====================
@@ -49,7 +59,7 @@ void recoverFromCrash();
 // Baseline the RTC when it has lost power.
 void checkRTCPowerLoss();
 
-}  // namespace pocketmage
+} // namespace pocketmage
 
 // Entry points supplied by the linked app.
 #if PM_TARGET_APP
@@ -73,6 +83,9 @@ void processKB();
 void TXT_INIT(String inPath = "");
 void FILEWIZ_INIT();
 void USB_INIT();
+/** Drain USB card I/O and revoke media before reset or deep sleep. */
+void USBAppShutdown();
+void USB_EXIT();
 void COMM_INIT();
 void SETTINGS_INIT();
 void TASKS_INIT();
@@ -87,4 +100,4 @@ void APPLOADER_INIT();
 // with VERSION at the repo root (pm release does).
 extern "C" const char pocketmage_sdk_version[];
 
-#endif  // POCKETMAGE_GLOBALS_H
+#endif // POCKETMAGE_GLOBALS_H

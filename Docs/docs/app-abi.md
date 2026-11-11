@@ -20,7 +20,7 @@ Only the espressif `xtensa-esp-elf` toolchain emits output the loader can read. 
 
 ## Entry point
 
-The host looks up `app_main` by name and runs it on core 1 in a dedicated task with a 16 KB stack:
+The host uses the ELF entry address, pinned to `app_main` by the linker, and runs it on core 1 in a dedicated task with a 16 KB stack. The stripped file need not retain the `app_main` symbol name:
 
 ```c
 int main(int argc, char **argv);   // renamed to app_main at build time
@@ -41,7 +41,7 @@ The runner passes four arguments, taken from the install record and the `app.pro
 | `argv[2]` | app version string (manifest `version`)    |
 | `argv[3]` | author string (manifest `author`)          |
 
-Returning from `main` tears the app down: the overlay is unloaded, the base image is deinitialized, and control returns to the OS, which reopens HOME. There is no run-forever semantics. A UI app hands control back through the SDK/host API cooperatively, then returns. A `main` that never returns leaks the run task.
+Returning from `main` starts checked cleanup: audio stops, finalizers and app-local exit hooks run, and task-owned SD resources close while the code remains resident. Only then are the overlay and base image released and HOME reopened. See [App lifecycle](guides/lifecycle.md) for ordering, callback ownership, and retry behavior.
 
 ## How loading works
 
@@ -51,9 +51,9 @@ Loading is two stages: a base relocation with `esp_elf`, then an overlay pass wi
 2. Relocated `.text` lands in `MALLOC_CAP_EXEC` memory so code is executable on the S3; data and rodata land in `MALLOC_CAP_8BIT` DRAM. Code in PSRAM is not executable on the ESP32-S3, app or firmware.
 3. The `<name>.elfo` sidecar is located next to the ELF and loaded by `elf_overlay`, which pages overlay `.text` bodies into a pool of exec-RAM frames on demand, patches ISA-specific literal loads at page-in, applies redirects so resident calls route through stubs, and redirects the entry point through its stub. If no sidecar is present the app runs unredirected from the base relocation. The blob format and the full page-in sequence are in [overlay.md](overlay.md).
 
-The `esp_elf` loader does not run relocation-time constructors, so any `.init_array` the app links in is never executed. Keep the app free of constructor sections (`-fno-exceptions -fno-rtti -fno-threadsafe-statics` are on by default in `app.mk`); `pm check` warns if a `.init_array` slips in. Do not rely on static-construction order at load time.
+The pinned `esp_elf_request()` runs preinit/init arrays once before entry. The runner opens the app session before that call, so compiler-emitted destructor registrations belong to the app. `-fno-exceptions -fno-rtti -fno-threadsafe-statics` remain the app build defaults. Finalizer arrays run before deallocation, followed by any remaining session callbacks.
 
-Apps link `-nostdlib`: no newlib, no libstdc++, no SDK copy in the ELF. Everything an app references must resolve at load time from the host. Linking newlib into the app is wasteful and collides with host globals. Don't.
+Apps link `-nostdlib`: runtime and SDK services resolve from the host. The small image-local exit-hook bridge is compiled into the app to keep C/C++ exit registrations out of the firmware's process-wide registry. Do not link a second newlib or libstdc++ into the app.
 
 ## Third-party libraries
 
@@ -79,21 +79,28 @@ An app includes one header and calls plain C functions:
 #include <pm_app_api.h>
 
 pm_i18n_set_language(PM_LANG_ENGLISH);
-int w = pm_text_width(2, "Hello", 2);
+int w = pm_text_width(PM_TARGET_EINK, "Hello", PM_STYLE_BODY);
 pm_oled_sysmsg("saved", 1500);
 ```
 
 `pm_app_api.h` pulls in `pm_sdk_app.h`, which is generated from the SDK headers by `tools/gen_app_api.py`. Regenerate it after any SDK header change:
 
 ```sh
-python3 tools/gen_app_api.py
+python3 tools/gen_app_api.py --root . --host-root ../..
+python3 tools/gen_app_api.py --root . --host-root ../.. --verify
 ```
 
 Names are `pm_<module>_<method>` with the method converted from camelCase: `Eink::refresh` becomes `pm_eink_refresh()`. Enums are plain integers in the app, named `PM_TARGET_*`, `PM_STYLE_*` and `PM_LANG_*`, and they are generated in the SDK's own declaration order, so a value always means the same language or target. `PM_APP_API_ABI` in the generated header changes when a signature does.
 
 C++ types are projected at the boundary. `String` arguments become `const char*`, returned strings and `const char*` point into a small rotating pool that is overwritten by later calls, and an SDK method that needs the filesystem gets the host's global handle rather than taking one. Methods returning an SDK type an app cannot construct, such as `DateTime` or `WifiApInfo`, have no wrapper. Where the value matters, the accessor is flattened into plain fields instead: `pm_clock_epoch()` and `pm_clock_timestamp()` rather than a `DateTime` return.
 
-Blob storage and directory creation have no SDK method to project. The text `writeFile` path truncates on the first NUL and the read pool is 256 bytes, so `pm_sd_write_binary_file()` and `pm_sd_mkdir()` are hand-written host primitives in `pm_app_api.h`, backed by raw `File::write` and `FS::mkdir`, and `pm_sd_read_binary_file()` reads back arbitrary sizes.
+Native SDK services own behavior and validation. Binary file I/O, directory enumeration, playback queries, image-region decoding, and OLED/e-ink canvas operations are generated wrappers over those services. SD access goes through the gateway task. The text `writeFile` path truncates on the first NUL and the string pool is 256 bytes; use the binary or stream APIs for larger data.
+
+The full native stream contract is available as `pm_sd_stream_open_mode(path, mode)` (`'r'`, `'w'`, or `'a'`), `pm_sd_stream_read`, `pm_sd_stream_write`, `pm_sd_stream_seek_from(slot, offset, whence)` (`SEEK_SET`, `SEEK_CUR`, or `SEEK_END` from `<stdio.h>`), and `pm_sd_stream_close_checked(slot)`. Close reports flush/close errors. The slot is released even if close returns false. `pm_sd_stream_tell` and `pm_sd_stream_size` return zero on error.
+
+New apps should use those generated functions. ABI 2's read-only `pm_sd_stream_open`, absolute `pm_sd_stream_seek`, and void `pm_sd_stream_close` remain compatibility adapters. The absolute adapter rejects offsets larger than `LONG_MAX`. `pm_image_decode` takes an explicit fit/fill choice; the older `pm_image_decode_to_1bit` retains fit-only behavior.
+
+`pm_app_api.h` owns the remaining C adapters: checked font-enum conversion, legacy ink-color semantics, jingle indices, flattened clock/image values, activity reporting, and compatibility signatures. `pm_overlay_api.h` owns the OS overlay-provider declarations. The generator reads their declarations directly into both export manifests; there is no separate handwritten symbol registry. `ADOPTED` validates projected adapter signatures and `GENERATED_NAMES` selects stable C names for ordinary wrappers. Conflicting owners and ambiguous overloads fail generation.
 
 A function returning `std::vector<String>`, such as word wrapping, becomes a count call and an indexed getter, matching how the SDK already hands out scan results:
 
@@ -108,7 +115,7 @@ for (int i = 0; i < lines; i++) {
 
 The getter writes into a buffer the caller owns rather than the string pool, because a wrapped paragraph can be far longer than the pool holds, and it returns `-1` for an out of range index. A function taking `const std::vector<String>&` takes a C array and a count instead: `pm_io_join_string(const char* const* items, int count, char delimiter)`.
 
-The generated wrappers are exported through `symbols.list`, so an app that links against `pm_sdk_app.h` resolves every symbol it names. A new wrapper belongs in that list before any app can call it; a name that is missing fails at load with `Can't find common <name>` rather than at link time.
+Regeneration updates `pm_sdk_app.h`, the OS wrapper source, `symbols.list`, and `host_exports.list`. `--verify` checks all four without writing and fails on stale signatures or exports. `--check` prints the projected and skipped surface. After changing exports, regenerate the firmware's `esp_all_symbol.cpp` with `tools/symbols.py` as described in [symbols.md](symbols.md), then rebuild the OS. A symbol must appear in the loader's compiled export table to resolve at runtime; a firmware global alone is insufficient.
 
 ## SDK version stamp
 
