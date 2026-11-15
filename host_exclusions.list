@@ -1,0 +1,65 @@
+# Host export exclusions: symbols deliberately NOT exported to ELF apps.
+# Raw file and directory I/O is removed from the app surface so the SD
+# card is reachable only through the PM_SD gateway (pocketmage_sd): the
+# gateway task serializes all card access and ramps the CPU to 240 MHz
+# per op, which the card requires on this board. An app that references
+# any of these fails the pm gate (the baseline no longer lists them) and
+# fails to load at runtime; apps migrate to the pm_sd_* API instead.
+#
+# Kept on the surface (stdout-only or newlib-internal plumbing that
+# cannot reach the card once streams and descriptors are unobtainable):
+#   fflush, setvbuf
+#   __seofread, _fflush_r, _fstat_r, _lseek_r, _putc_r, _read_r,
+#   _sfread_r, _write_r
+#
+# Regenerate the export table with --exclude-file host_exclusions.list
+# so a future symbols.py run cannot silently restore these.
+_close_r
+_fclose_r
+_fcntl_r
+_fdopen_r
+_fgets_r
+_fopen_r
+_fputc_r
+_fputs_r
+_fread_r
+_fseek_r
+_fseeko_r
+_ftello_r
+_fwrite_r
+_link_r
+_open_r
+_rename_r
+_rewind_r
+_stat_r
+_system_r
+_unlink_r
+clearerr
+close
+closedir
+fclose
+fcntl
+fdopen
+feof
+fgets
+fileno
+fopen
+fputc
+fputs
+fread
+fseek
+fstat
+ftell
+fwrite
+open
+opendir
+read
+readdir
+rename
+remove
+rewind
+rewinddir
+seekdir
+stat
+unlink
+write

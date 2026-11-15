@@ -41,7 +41,7 @@ void checkUSBKB();
 
 - `updateKeypress()` returns the next character from either the USB HID FIFO (checked first) or the TCA8418 event FIFO, draining one key per call. It never blocks. The TCA8418 overflow register is cleared after each read so keys are not lost on a burst; the hardware FIFO is drained until empty before the `TCA8418_event_` flag clears.
 - `acceptKey()` gating: returns true only if at least `KB_COOLDOWN` ms passed since the last accepted press. Use it before handling a key that must not auto-repeat.
-- `checkUSBKB()` services the USB HID connection (call periodically).
+- `checkUSBKB()` services the USB HID connection (call periodically). If the attached device is not a keyboard (a USB speaker, for example), the keyboard host lets go of it after 5 s and frees about 25 KB of memory until the device is unplugged. The OS also calls it while an ELF app runs, so keyboards and speakers plugged in later work without the app doing anything.
 
 The interrupt flag is exposed as a member (`TCA8418_event_`) and set by `setTCA8418Event()`; apps typically rely on the FIFO-drain behavior of `updateKeypress()` instead of the flag.
 

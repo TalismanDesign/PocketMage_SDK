@@ -1,6 +1,5 @@
-// Host primitives the generator cannot produce. The SDK class surface lives in
-// the generated pm_sdk_app.h, which this header includes.
-
+// C adapters whose semantics or types differ from the native SDK surface.
+// Ordinary service calls and drawing primitives live in generated pm_sdk_app.h.
 #ifndef PM_APP_API_H
 #define PM_APP_API_H
 
@@ -10,46 +9,33 @@
 extern "C" {
 #endif
 
-// OLED framebuffer
+/** Draw UTF-8 text with y as its baseline; invalid target/style is a no-op. */
+void pm_text(int target, int x, int y, const char *text, int style);
+/** Measure text in pixels; return zero for an invalid target/style. */
+int pm_text_width(int target, const char *text, int style);
+/** Return font height in pixels, or zero for an invalid target/style. */
+int pm_font_height(int target, int style);
+/** Select black ink (nonzero) or white (zero); ignore invalid targets.
+ * This legacy ink convention differs from FontEngine::setTextColor.
+ */
+void pm_text_color(int target, uint16_t color);
 
-// Commit the framebuffer. Draw with pm_text(PM_TARGET_OLED, ...) first.
-void pm_oled_send(void);
+/** Probe path; fill width, height, and format (0=none, 1=JPEG, 2=PNG) on success. */
+bool pm_image_probe(const char *path, int *width, int *height, int *format);
+/** Legacy fit-only decoder; new callers use pm_image_decode with explicit fill. */
+bool pm_image_decode_to_1bit(const char *path, uint8_t *buf, int buf_w, int buf_h,
+                            int out_x, int out_y, int max_size);
 
-// e-ink canvas. These reach the panel driver directly, so there is no SDK
-// method for the generator to read.
+/** Legacy read-only open; new callers use pm_sd_stream_open_mode(path, 'r'). */
+int pm_sd_stream_open(const char *path);
+/** Legacy absolute seek; offsets exceeding LONG_MAX fail rather than wrap. */
+bool pm_sd_stream_seek(int slot, uint32_t offset);
+/** Legacy close without a result; use pm_sd_stream_close_checked to detect errors. */
+void pm_sd_stream_close(int slot);
 
-int pm_eink_width(void);
-int pm_eink_height(void);
-
-// Fill the whole panel white.
-void pm_eink_clear(void);
-
-// Set one pixel. ink=true draws black, false white.
-void pm_eink_pixel(int x, int y, bool ink);
-
-// Rectangle including both corners; corner order does not matter.
-void pm_eink_rect(int x0, int y0, int x1, int y1, bool fill, bool ink);
-
-// Draw UTF-8 text with y as the baseline. Out of range target or style is
-// ignored rather than trapping: FontEngine indexes its font tables unchecked.
-void pm_text(int target, int x, int y, const char* text, int style);
-
-// Write len bytes verbatim, truncating any existing file. True on full write.
-bool pm_sd_write_binary_file(const char* path, const uint8_t* buf, size_t len);
-
-// Create path (one level, like POSIX mkdir). True if it exists afterwards.
-bool pm_sd_mkdir(const char* path);
-
-// Clock fields. nowDT returns a DateTime by value, which has no C spelling.
-
-// UNIX epoch in seconds (UTC).
-int64_t pm_clock_epoch(void);
-
-// Local time as "YYYY-MM-DD HH:MM:SS". Valid until the next call.
-const char* pm_clock_timestamp(void);
 
 #ifdef __cplusplus
-}  // extern "C"
+}
 #endif
 
-#endif  // PM_APP_API_H
+#endif

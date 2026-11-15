@@ -126,7 +126,8 @@ def parse_header(path: str) -> tuple[list[dict], str]:
             stop = re.search(r"\n\s*(private|protected)\s*:", body)
             if stop:
                 body = body[: stop.start()]
-            for line in body.splitlines():
+            for line in re.sub(r"\([^;{}]*\)",
+                               lambda m: " ".join(m.group().split()), body).splitlines():
                 stripped = line.strip()
                 if not stripped or stripped.startswith(("#", "//", "*", "}")):
                     continue

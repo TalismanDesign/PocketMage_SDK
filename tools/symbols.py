@@ -51,6 +51,18 @@ ESLSYM_ENTRY_BYTES = 8
 
 BUILTIN_PREFIXES = ('__atomic', '__sync', '__builtin')
 
+BASELINE_HEADER = (
+    '# Host runtime baseline: C/C++ runtime, newlib and POSIX symbols the\n'
+    '# PocketMage firmware exports unconditionally. Apps may rely on these\n'
+    '# without listing them. Generated from the firmware export surface by\n'
+    '# tools/symbols.py --write-baseline; regenerate alongside the export\n'
+    '# table whenever the host surface changes. Do not hand edit.\n'
+    '#\n'
+    '# The gate treats these as resolvable when no --host-elf is supplied, so\n'
+    '# a standalone app checkout can be gated without the firmware tree.\n'
+    '#\n'
+)
+
 
 def is_gcc_builtin(name):
     return name.startswith(BUILTIN_PREFIXES)
@@ -313,6 +325,22 @@ def main():
         help='Additional symbols to exclude from the generated table',
     )
     parser.add_argument(
+        '--exclude-file',
+        default=None,
+        help='Path to a symbol exclusion list (one symbol per line, # comments '
+             'allowed). Excluded symbols are never emitted into the table, so '
+             'an app referencing one fails the load; used to keep raw file and '
+             'directory I/O off the app surface so the card is reachable only '
+             'through the SD gateway (see host_exclusions.list)',
+    )
+    parser.add_argument(
+        '--write-baseline',
+        default=None,
+        help='Rewrite the baseline list at this path to match the generated '
+             'surface: runtime archive symbols plus the folded baseline, minus '
+             'the curated list and minus the exclusions.',
+    )
+    parser.add_argument(
         '--extra-extern',
         action='append',
         default=[],
@@ -358,6 +386,7 @@ def main():
     curated = read_curated_list(args.list)
     if not curated:
         sys.exit(f'no symbols found in curated list {args.list}')
+    curated_set = set(curated)
 
     baseline_symbols = set()
     if args.baseline:
@@ -390,7 +419,11 @@ def main():
             print(f'warning: {name} is not a GLOBAL symbol in {args.host_elf}; '
                   'rebuild the host if it is a new export')
 
-    exclude = ['elf_find_sym', 'g_customer_elfsyms'] + args.exclude
+    excluded = set()
+    if args.exclude_file:
+        excluded = set(read_curated_list(args.exclude_file))
+    exclude = (['elf_find_sym', 'g_customer_elfsyms'] + args.exclude
+               + sorted(excluded))
     runtime_union = set(baseline_symbols)
     for names in runtime_categories.values():
         runtime_union.update(names)
@@ -400,6 +433,16 @@ def main():
                 runtime_symbols=runtime_union,
                 extra_externs=set(args.extra_extern))
     print(f'saved {len(curated)} exported symbols to {args.output_file}')
+
+    if args.write_baseline:
+        if not args.runtime:
+            sys.exit('--write-baseline requires --runtime and --host-elf')
+        baseline_out = sorted(runtime_union - curated_set - set(exclude))
+        with open(args.write_baseline, 'w') as f:
+            f.write(BASELINE_HEADER)
+            for name in baseline_out:
+                f.write(f'{name}\n')
+        print(f'rewrote {args.write_baseline} with {len(baseline_out)} symbols')
 
     if args.print_cost:
         for category, names in runtime_categories.items():
