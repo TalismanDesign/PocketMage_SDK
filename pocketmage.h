@@ -1,6 +1,7 @@
 #ifdef PM_TARGET_APP
 #include <pocketmage_app_version.h>
 #endif
+#include <pocketmage_log/pocketmage_log.h>
 #include <pocketmage_oled/pocketmage_oled.h>
 #include <pocketmage_eink/pocketmage_eink.h>
 #include <pocketmage_sd/pocketmage_sd.h>

@@ -239,6 +239,10 @@ bool usbAccessActive() {
   return s_usbAccess;
 }
 
+bool onGatewayTask() {
+  return s_task && xTaskGetCurrentTaskHandle() == s_task;
+}
+
 static bool unmountForUsb() {
   if (s_usbAccess)
     return true;

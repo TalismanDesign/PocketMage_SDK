@@ -100,6 +100,8 @@ bool streamsOpen();
 bool beginUsbAccess();
 /** Return whether USB owns the card and filesystem requests are blocked. */
 bool usbAccessActive();
+/** Return whether the caller is the gateway task itself. */
+bool onGatewayTask();
 
 /** Close this task's streams, directory cursors, and snapshot through the serialized gateway.
  * Return false if any close failed; all matching handles are still released.

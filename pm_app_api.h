@@ -4,6 +4,7 @@
 #define PM_APP_API_H
 
 #include <pm_sdk_app.h>
+#include <pocketmage_log/log_api.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,7 +33,6 @@ int pm_sd_stream_open(const char *path);
 bool pm_sd_stream_seek(int slot, uint32_t offset);
 /** Legacy close without a result; use pm_sd_stream_close_checked to detect errors. */
 void pm_sd_stream_close(int slot);
-
 
 #ifdef __cplusplus
 }

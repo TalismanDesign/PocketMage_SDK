@@ -85,6 +85,7 @@
 // Persistent preferences
 extern int TIMEOUT;           // Auto sleep timeout (seconds)
 extern bool DEBUG_VERBOSE;    // Extra debug output
+extern bool LOG_TO_FILE;      // Copy log lines to /logs/system.txt
 extern bool SYSTEM_CLOCK;     // Show clock on screen
 extern bool SHOW_YEAR;        // Show year in clock
 extern bool SAVE_POWER;       // Enable power saving mode

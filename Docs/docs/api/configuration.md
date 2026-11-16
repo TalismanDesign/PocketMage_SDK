@@ -65,6 +65,7 @@ The SPI pins overlap the SDMMC pins (`SD_CLK` is also `SPI_SCK`). The two SD mod
 ```c
 extern int TIMEOUT;          // auto sleep timeout, seconds
 extern bool DEBUG_VERBOSE;   // extra debug output
+extern bool LOG_TO_FILE;     // copy log lines to /logs/system.txt (default off)
 extern bool SYSTEM_CLOCK;    // show clock on the OLED status line
 extern bool SHOW_YEAR;       // show year in clock
 extern bool SAVE_POWER;      // CPU frequency power saving
@@ -77,7 +78,7 @@ extern bool MUTE_BUZZER;
 extern bool SD_SPI_COMPATIBILITY;
 ```
 
-`pocketmage::loadSettings()` (see [sys](sys.md)) loads them from NVS with these defaults. Changing a value writes it back through `prefs.begin(...)` in the `"PocketMage"` namespace.
+`pocketmage::loadSettings()` (see [sys](sys.md)) loads them from NVS with these defaults. Changing a value writes it back through `prefs.begin(...)` in the `"PocketMage"` namespace. `LOG_TO_FILE` only takes effect through `pm_log::setFileEnabled`, which the Settings app calls for you; see [Logging](log.md).
 
 ## App version stamping
 

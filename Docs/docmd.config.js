@@ -128,6 +128,7 @@ export default {
         { title: "Clock", path: "/api/clock", icon: "clock" },
         { title: "WiFi", path: "/api/wifi", icon: "wifi" },
         { title: "System", path: "/api/sys", icon: "cpu" },
+        { title: "Logging", path: "/api/log", icon: "scroll-text" },
         { title: "i18n (runtime)", path: "/api/i18n-runtime", icon: "languages" },
         { title: "Text utilities", path: "/api/io", icon: "type" },
         { title: "Frames", path: "/api/frames", icon: "frame" },

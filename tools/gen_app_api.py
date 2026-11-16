@@ -239,7 +239,7 @@ OVERRIDES = {
     ("PocketmageEink", "unlockPanel"): "skip",
 }
 
-MANUAL_HEADERS = ("pm_app_api.h", "pm_overlay_api.h")
+MANUAL_HEADERS = ("pm_app_api.h", "pm_overlay_api.h", "pocketmage_log/log_api.h")
 
 EXTERN_DECLS = {
     "delay": "void delay(unsigned long ms)",
@@ -980,7 +980,7 @@ def manual_declarations(root):
             params = [] if args.strip() in ("", "void") else sm.split_args(args)
             declarations[symbol] = (
                 normalize_type(ret),
-                tuple(normalize_type(sm.classify_param(p)["type"]) for p in params))
+                tuple(normalize_type(sm.classify_param(p).get("type", "...")) for p in params))
     return declarations
 
 

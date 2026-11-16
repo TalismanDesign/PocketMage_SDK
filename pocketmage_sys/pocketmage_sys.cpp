@@ -26,6 +26,7 @@ void setupSD();
 #include "esp_task_wdt.h"
 
 static constexpr const char *TAG = "SYSTEM";
+static constexpr uint32_t kSleepLogFlushMs = 500;
 
 volatile bool PWR_BTN_event = false;
 bool noTimeout = false; // Disable timeout
@@ -178,6 +179,9 @@ void deepSleep(bool alternateScreenSaver) {
   setLoadSwitch(false);
 #endif
 
+  // Deep sleep skips shutdown handlers, so queued log lines are written here.
+  pm_log::flush(kSleepLogFlushMs);
+
   // Sleep the ESP32
   esp_deep_sleep_start();
 }
@@ -249,6 +253,7 @@ void PocketMage_INIT() {
 
   // Serial, I2C, SPI
   Serial.begin(115200);
+  pm_log::begin();
   Wire.begin(I2C_SDA, I2C_SCL);
 
 // Initialize Second I2C Bus (prod only)
@@ -333,6 +338,7 @@ void PocketMage_INIT() {
 #else
   loadState();
 #endif
+  pm_log::setFileEnabled(LOG_TO_FILE);
   ESP_LOGD(TAG, "loaded state");
 
   // Recover persisted state after an abnormal reset.
