@@ -21,6 +21,10 @@ extern volatile bool PWR_BTN_event; // Power button event **shared with library*
 
 namespace pocketmage {
 void setCpuSpeed(int newFreq);
+/** Hold off CPU clock changes while the e-ink panel owns the SPI bus. */
+void beginDisplayRefresh();
+void endDisplayRefresh();
+bool displayRefreshing();
 /** Record native or ELF input activity using the OS monotonic clock. */
 void reportActivity();
 /** Poll the shared TIMEOUT interval; inhibition restarts the inactivity clock. */

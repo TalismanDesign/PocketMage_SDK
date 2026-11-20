@@ -24,8 +24,11 @@ void setupSD();
 #include "esp_system.h"
 #include "esp_task_wdt.h"
 
+#include <atomic>
+
 static constexpr const char *TAG = "SYSTEM";
 static constexpr uint32_t kSleepLogFlushMs = 500;
+static std::atomic<bool> s_displayRefreshing{false};
 
 volatile bool PWR_BTN_event = false;
 bool noTimeout = false; // Disable timeout
@@ -45,7 +48,22 @@ bool idleSleepDue(bool inhibited) {
   return idleTimer.poll(millis(), TIMEOUT, inhibited);
 }
 
+void beginDisplayRefresh() {
+  s_displayRefreshing.store(true, std::memory_order_release);
+}
+
+void endDisplayRefresh() {
+  s_displayRefreshing.store(false, std::memory_order_release);
+}
+
+bool displayRefreshing() {
+  return s_displayRefreshing.load(std::memory_order_acquire);
+}
+
 void setCpuSpeed(int newFreq) {
+  // A clock change during a panel refresh re-times the shared SPI bus mid-waveform.
+  if (displayRefreshing())
+    return;
   // USB raw I/O bypasses stream handles and still needs the SDMMC clock.
   if (newFreq < 80 && (CurrentAppState == USB_APP || pm_sd_gateway::usbAccessActive()))
     return;

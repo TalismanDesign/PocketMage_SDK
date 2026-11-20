@@ -33,6 +33,7 @@ PocketmageEink &EINK() {
 
 void PocketmageEink::refresh() {
   lockPanel();
+  pocketmage::beginDisplayRefresh();
   if (FAST_REFRESH) {
     // Fast refresh stack (experimental, default off): differential partial
     // redraws with a boot full and a periodic slow clean; each full is followed
@@ -89,6 +90,7 @@ void PocketmageEink::refresh() {
     display_.fillScreen(GxEPD_WHITE);
     display_.hibernate();
   }
+  pocketmage::endDisplayRefresh();
   unlockPanel();
 }
 

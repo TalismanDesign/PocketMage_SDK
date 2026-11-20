@@ -53,6 +53,7 @@ static constexpr const char *TAG = "SD";
 static constexpr size_t kCopyChunk = 4 * 1024;
 static constexpr int kReadRetries = 3;
 static constexpr size_t kDirNameLen = 128;
+static constexpr uint32_t kDisplayWaitPollMs = 10;
 
 static_assert(CONFIG_FREERTOS_TASK_NOTIFICATION_ARRAY_ENTRIES > kCompletionSlot,
               "SD completion needs a task notification slot separate from logger wakeups");
@@ -90,6 +91,12 @@ static const char *resolve(const char *path, char *buf, size_t size) {
 static void exec(Request *r);
 static void remount();
 
+/** Keep card I/O and its clock boost out of an e-ink panel refresh. */
+static void waitForDisplayIdle() {
+  while (pocketmage::displayRefreshing())
+    vTaskDelay(pdMS_TO_TICKS(kDisplayWaitPollMs));
+}
+
 /** FreeRTOS adapter for the completion slot. */
 class GatewayNotify {
  public:
@@ -114,6 +121,7 @@ static void taskFunc(void *) {
     if (!r)
       continue;
 
+    waitForDisplayIdle();
     pocketmage::setCpuSpeed(240);
 
     bool prevTimeout = noTimeout;
@@ -146,6 +154,7 @@ bool submit(Request *r) {
   const TaskHandle_t caller = xTaskGetCurrentTaskHandle();
   r->caller = caller;
   if (!s_queue || !caller || caller == s_task) {
+    waitForDisplayIdle();
     exec(r);
     return r->ok;
   }
@@ -894,7 +903,19 @@ static void exec(Request *r) {
       break;
     }
     const size_t n = r->len ? fwrite(r->wbuf, 1, r->len, f) : 0;
+    const int writeErrno = errno;
+    const bool streamError = ferror(f) != 0;
     const bool closed = fclose(f) == 0;
+    const int closeErrno = errno;
+    if (n != r->len) {
+      PM_LOGE(TAG, "%s write failed for %s: %u of %u bytes errno=%d stream=%d",
+              r->op == Op::WriteBinary ? "Write" : "Append", r->path, (unsigned)n,
+              (unsigned)r->len, writeErrno, streamError ? 1 : 0);
+      if (writeErrno == EIO)
+        s_needRemount = true;
+    }
+    if (!closed)
+      PM_LOGE(TAG, "Close failed for %s errno=%d", r->path, closeErrno);
     r->retVal = n;
     r->ok = n == r->len && closed;
     break;
