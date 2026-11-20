@@ -8,7 +8,6 @@
 
 #include <driver/ledc.h>
 #include <esp_heap_caps.h>
-#include <esp_log.h>
 
 #include <cstdio>
 #include <climits>
@@ -112,7 +111,7 @@ PocketMageAudio::PocketMageAudio()
       _stopRequested(false), _paused(false), _output(AudioOutput::Auto), _usbConnected(false),
       _usbConnectionId(0), _usbConfigured(false), _usbStarted(false) {
   if (!_mutex || !_shutdownSem) {
-    ESP_LOGE(TAG, "Cannot create audio synchronization primitives");
+    PM_LOGE(TAG, "Cannot create audio synchronization primitives");
     std::abort();
   }
   _currentPath[0] = 0;
@@ -123,7 +122,7 @@ PocketMageAudio::PocketMageAudio()
 PocketMageAudio::~PocketMageAudio() {
   stop();
   if (_taskHandle || _usbConfigured) {
-    ESP_LOGE(TAG, "Cannot destroy audio service while workers remain active");
+    PM_LOGE(TAG, "Cannot destroy audio service while workers remain active");
     std::abort();
   }
   if (_mutex)
@@ -140,7 +139,7 @@ void PocketMageAudio::begin() {
   if (_initialized || _shutdownRequested)
     return;
   if (!_settingsLoaded && !loadSettings())
-    ESP_LOGE(TAG, "Audio settings load failed; retaining current settings");
+    PM_LOGE(TAG, "Audio settings load failed; retaining current settings");
   _commandQueue = xQueueCreate(4, sizeof(Command));
   if (!_commandQueue) {
     setError("audio initialization failed");
@@ -149,12 +148,12 @@ void PocketMageAudio::begin() {
   }
   _initialized = true;
   pollUsb();
-  ESP_LOGI(TAG, "begin(): pmaudio task will be created lazily on first play()");
+  PM_LOGI(TAG, "begin(): pmaudio task will be created lazily on first play()");
 }
 
 void PocketMageAudio::stop() {
   if (!stopChecked())
-    ESP_LOGE(TAG, "Audio stop incomplete: %s", getLastError().c_str());
+    PM_LOGE(TAG, "Audio stop incomplete: %s", getLastError().c_str());
 }
 
 bool PocketMageAudio::stopChecked() {
@@ -376,7 +375,7 @@ void PocketMageAudio::taskLoop() {
   // After acknowledgement the control task may release every service resource.
   // https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/system/freertos_idf.html
   if (xSemaphoreGive(_shutdownSem) != pdTRUE)
-    ESP_LOGE(TAG, "Audio shutdown acknowledgement failed");
+    PM_LOGE(TAG, "Audio shutdown acknowledgement failed");
   vTaskDelete(nullptr);
 }
 
@@ -421,17 +420,17 @@ bool PocketMageAudio::acquirePin(int sampleRate, int bits, int channels) {
   cfg.ringbuf_len = SINK_RINGBUF_LEN;
 
   pocketmage::setCpuSpeed(240);
-  ESP_LOGI(TAG, "cpu=%lu MHz apb=%lu Hz init pwm_audio", (unsigned long)getCpuFrequencyMhz(),
+  PM_LOGI(TAG, "cpu=%lu MHz apb=%lu Hz init pwm_audio", (unsigned long)getCpuFrequencyMhz(),
                 (unsigned long)getApbFrequency());
   esp_err_t err = pwm_audio_init(&cfg);
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "acquirePin: pwm_audio_init -> %s", esp_err_to_name(err));
+    PM_LOGE(TAG, "acquirePin: pwm_audio_init -> %s", esp_err_to_name(err));
     setError("audio sink init failed");
     return false;
   }
   err = pwm_audio_set_param(sampleRate, (ledc_timer_bit_t)DEFAULT_BITS, channels);
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "acquirePin: set_param -> %s", esp_err_to_name(err));
+    PM_LOGE(TAG, "acquirePin: set_param -> %s", esp_err_to_name(err));
     pwm_audio_deinit();
     setError("audio sink param failed");
     return false;
@@ -460,10 +459,11 @@ bool PocketMageAudio::beginUsb() {
   pm_usb::Lock usbLock;
   if (_usbConfigured)
     return true;
+  pm_log::setLevel("USB_STREAM", PM_LOG_LEVEL_ERROR);
   const pm_audio::DmaSnapshot dma = dmaSnapshot();
   const uint32_t decodeReserve = pendingDecodeBytes();
   if (!pm_audio::canHostPlay(dma, USB_RINGBUF_LEN, decodeReserve)) {
-    ESP_LOGW(TAG, "USB host start skipped, low DMA heap: free=%u largest=%u",
+    PM_LOGW(TAG, "USB host start skipped, low DMA heap: free=%u largest=%u",
              unsigned(dma.freeBytes), unsigned(dma.largestBlock));
     _usbMemoryRetryStartedAt = millis();
     _usbMemoryBackoff = true;
@@ -500,7 +500,7 @@ bool PocketMageAudio::beginUsb() {
   if (err == ESP_OK)
     err = usb_streaming_start();
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "acquireUsb: usb_streaming_start -> %s", esp_err_to_name(err));
+    PM_LOGE(TAG, "acquireUsb: usb_streaming_start -> %s", esp_err_to_name(err));
     if (pm_usb::release(pm_usb::Owner::Audio))
       setError("usb sink start failed");
     else
@@ -542,7 +542,7 @@ bool PocketMageAudio::pollUsb() {
     return true;
   if (_output == AudioOutput::Piezo) {
     if (!stopUsb())
-      ESP_LOGE(TAG, "USB audio release incomplete; will retry on the next poll");
+      PM_LOGE(TAG, "USB audio release incomplete; will retry on the next poll");
     return pm_usb::owner() == pm_usb::Owner::Audio;
   }
   bool attached = false;
@@ -568,7 +568,7 @@ bool PocketMageAudio::pollUsb() {
     _usbProbeSuppressed = true;
   if (!attached || _usbProbeSuppressed) {
     if (!stopUsb())
-      ESP_LOGE(TAG, "USB audio release incomplete; will retry on the next poll");
+      PM_LOGE(TAG, "USB audio release incomplete; will retry on the next poll");
     return pm_usb::owner() == pm_usb::Owner::Audio;
   }
   if (!_usbConfigured) {
@@ -580,7 +580,7 @@ bool PocketMageAudio::pollUsb() {
       return true;
     if (!beginUsb()) {
       _usbProbeSuppressed = !_usbMemoryBackoff;
-      ESP_LOGE(TAG, "USB audio unavailable; retaining piezo output");
+      PM_LOGE(TAG, "USB audio unavailable; retaining piezo output");
       return _usbMemoryBackoff || pm_usb::owner() == pm_usb::Owner::Audio;
     }
   }
@@ -606,7 +606,7 @@ bool PocketMageAudio::acquireUsb(int sampleRate, int bits, int channels) {
     return false;
   pm_audio::SpeakerFootprint speaker{};
   if (!pm_audio::speakerFootprint(sampleRate, bits, channels, speaker)) {
-    ESP_LOGW(TAG, "USB fallback: unsupported PCM rate=%d bits=%d ch=%d", sampleRate, bits, channels);
+    PM_LOGW(TAG, "USB fallback: unsupported PCM rate=%d bits=%d ch=%d", sampleRate, bits, channels);
     setError("invalid USB PCM format");
     return false;
   }
@@ -622,7 +622,7 @@ bool PocketMageAudio::acquireUsb(int sampleRate, int bits, int channels) {
     const pm_audio::DmaSnapshot dma = dmaSnapshot();
     if (!pm_audio::canResumeSpeaker(dma, speaker) ||
         !pm_audio::trialSpeakerUrbs(speaker, kUrbHeap)) {
-      ESP_LOGW(TAG, "USB fallback: low DMA heap rate=%d ch=%d free=%u largest=%u", sampleRate,
+      PM_LOGW(TAG, "USB fallback: low DMA heap rate=%d ch=%d free=%u largest=%u", sampleRate,
                channels, unsigned(dma.freeBytes), unsigned(dma.largestBlock));
       setError("USB DMA budget unavailable; using piezo");
       _usbMemoryRetryStartedAt = millis();
@@ -632,7 +632,7 @@ bool PocketMageAudio::acquireUsb(int sampleRate, int bits, int channels) {
     err = usb_streaming_control(STREAM_UAC_SPK, CTRL_RESUME, nullptr);
   }
   if (err != ESP_OK) {
-    ESP_LOGE(TAG, "USB fallback: format/resume rate=%d ch=%d -> %s", sampleRate, channels,
+    PM_LOGE(TAG, "USB fallback: format/resume rate=%d ch=%d -> %s", sampleRate, channels,
                   esp_err_to_name(err));
     return false;
   }
@@ -646,7 +646,7 @@ void PocketMageAudio::releaseUsb() {
     return;
   esp_err_t err = usb_streaming_control(STREAM_UAC_SPK, CTRL_SUSPEND, nullptr);
   if (err != ESP_OK && _usbConnected)
-    ESP_LOGE(TAG, "USB suspend failed: %s", esp_err_to_name(err));
+    PM_LOGE(TAG, "USB suspend failed: %s", esp_err_to_name(err));
   _usbStarted = false;
 }
 
@@ -713,7 +713,7 @@ bool PocketMageAudio::writePcm(void *buffer, size_t bytes, int sampleRate, int c
              _usbConnected && _output != AudioOutput::Piezo);
     if (err != ESP_OK && _usbConnected && !_stopRequested && !_paused &&
         _output != AudioOutput::Piezo) {
-      ESP_LOGE(TAG, "usb write -> %s", esp_err_to_name(err));
+      PM_LOGE(TAG, "usb write -> %s", esp_err_to_name(err));
       setError("usb sink write failed");
       return false;
     }
@@ -753,7 +753,7 @@ void PocketMageAudio::doPlay() {
     esp_audio_err_t derr = esp_audio_dec_register_default();
     esp_audio_err_t serr = esp_audio_simple_dec_register_default();
     if (derr != ESP_AUDIO_ERR_OK || serr != ESP_AUDIO_ERR_OK) {
-      ESP_LOGE(TAG, "doPlay: register decoders dec=%d simple=%d", (int)derr, (int)serr);
+      PM_LOGE(TAG, "doPlay: register decoders dec=%d simple=%d", (int)derr, (int)serr);
       setError("decoder register failed");
       xSemaphoreTakeRecursive(_mutex, portMAX_DELAY);
       _playback.finish(false);
@@ -818,7 +818,7 @@ void PocketMageAudio::decodeLoop(uint32_t playbackId) {
   esp_audio_simple_dec_handle_t dec = nullptr;
   const esp_audio_err_t openError = esp_audio_simple_dec_open(&dcfg, &dec);
   if (openError != ESP_AUDIO_ERR_OK || dec == nullptr) {
-    ESP_LOGE(TAG, "decoder open -> %d", int(openError));
+    PM_LOGE(TAG, "decoder open -> %d", int(openError));
     setError("decoder open failed");
     PM_SD().streamClose(slot);
     return;
@@ -888,7 +888,7 @@ void PocketMageAudio::decodeLoop(uint32_t playbackId) {
       if (derr == ESP_AUDIO_ERR_BUFF_NOT_ENOUGH) {
         // PCM_OUT_CHUNK holds the largest MP3 frame; anything bigger is unsupported.
         const uint32_t need = out.needed_size ? out.needed_size : outCap * 2;
-        ESP_LOGE(TAG, "decode: output buffer too small (%u < %u)", unsigned(outCap), unsigned(need));
+        PM_LOGE(TAG, "decode: output buffer too small (%u < %u)", unsigned(outCap), unsigned(need));
             setError(need > outCap ? "out of memory" : "decode error");
         ok = false;
         break;
@@ -899,7 +899,7 @@ void PocketMageAudio::decodeLoop(uint32_t playbackId) {
           derrs = "MEM_LACK";
         else if (derr == ESP_AUDIO_ERR_DATA_LACK)
           derrs = "DATA_LACK";
-        ESP_LOGE(TAG, "decode process -> %s (%d)", derrs, (int)derr);
+        PM_LOGE(TAG, "decode process -> %s (%d)", derrs, (int)derr);
             setError(derr == ESP_AUDIO_ERR_MEM_LACK ? "out of memory" : "decode error");
         ok = false;
         break;

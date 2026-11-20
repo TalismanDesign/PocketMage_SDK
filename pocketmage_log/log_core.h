@@ -146,6 +146,17 @@ inline bool needsRotation(size_t fileSize, size_t incoming, size_t limit) {
   return fileSize > 0 && fileSize + incoming > limit;
 }
 
+/** Context a line was emitted from. Interrupts report the task they interrupted. */
+enum class LogContext : uint8_t { Task, Isr };
+
+/** Return whether a line belongs to a card request made by the logging writer itself.
+ * ISR lines stay eligible: xTaskGetCurrentTaskHandle() reports the interrupted task in an ISR.
+ */
+inline bool lineFromWriterRequest(bool inRequest, LogContext context, bool currentIsWriter,
+                                  bool currentIsGateway) {
+  return inRequest && context == LogContext::Task && (currentIsWriter || currentIsGateway);
+}
+
 /** Per-tag maximum levels, with a fallback for every tag not in the table. */
 template <size_t N> struct TagLevels {
   struct Entry {
@@ -194,10 +205,31 @@ template <size_t N> struct TagLevels {
     return true;
   }
 
+  /** Copy up to N stored entries into out, oldest first, and return the count copied. */
+  size_t copyEntries(Entry *out, size_t capacity) const {
+    const size_t copied = count < capacity ? count : capacity;
+    if (copied && out)
+      std::memcpy(out, entries, copied * sizeof(Entry));
+    return copied;
+  }
+
   Entry entries[N]{};
   size_t count = 0;
   Level fallback;
 };
+
+/** Replay stored tag levels through apply, oldest entry first. ESP-IDF forgets every per-tag
+ * level when the default level changes, so a caller sets the default first and then calls this
+ * to put the entries back. Returns how many were applied.
+ */
+template <size_t N, typename Apply>
+size_t replayLevels(const TagLevels<N> &levels, Apply apply) {
+  typename TagLevels<N>::Entry entries[N];
+  const size_t count = levels.copyEntries(entries, N);
+  for (size_t i = 0; i < count; ++i)
+    apply(entries[i].tag, static_cast<pm_log_level>(entries[i].level));
+  return count;
+}
 
 /** Byte queue of whole lines waiting for the file writer. A line that does not fit is dropped
  * and counted, and the next line that fits is preceded by a note giving the count.

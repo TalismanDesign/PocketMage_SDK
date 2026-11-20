@@ -31,7 +31,7 @@ PM_LOGE(TAG, "Save failed: %d", err);
 
 Both includes bring in `pocketmage_log/log_api.h`, which holds the macros and the one function behind them. `pm_log::begin()` and `pm_log::setFileEnabled()` already run inside `PocketMage_INIT()`, so code only writes messages.
 
-ESP-IDF components (Wi-Fi, the USB host stack, the FAT driver and so on) send their own log lines through the logger as well, keeping their tag and level. Lines from Arduino's `log_e`/`ESP_LOGx` in Arduino-compiled files still go straight to the console for now.
+ESP-IDF components (Wi-Fi, the USB host stack, the FAT driver and so on) send their own log lines through the logger as well, keeping their tag and level. OS and SDK code uses `PM_LOGx`; raw `Serial`/`printf` and IDF early/DRAM logging bypass the hook and stay console-only.
 
 ## Writing messages
 
@@ -45,7 +45,7 @@ PM_LOGV(tag, format, ...);
 
 Each macro formats like `printf` and logs at its level: Error, Warn, Info, Debug or Verbose. A higher level means more detail.
 
-A macro above `PM_LOG_MAX_LEVEL` compiles to nothing, so its arguments are not even evaluated. `PM_LOG_MAX_LEVEL` defaults to `CORE_DEBUG_LEVEL` (3, Info, in the PocketMage builds), or to Info where that is not set, as in ELF apps. Define it before the include to change it for one file. The levels that do get compiled in are then filtered per tag at run time; see `setLevel` below.
+A macro above `PM_LOG_MAX_LEVEL` compiles to nothing, so its arguments are not even evaluated. All five levels are compiled in by default; define `PM_LOG_MAX_LEVEL` before the include to drop the noisier ones from one file or a whole build. Every level that is compiled in is then filtered per tag at run time; see `setLevel` below.
 
 Messages longer than 255 bytes are cut. Line breaks at the end are removed, and other control characters become spaces, so one call always makes one line.
 
@@ -123,7 +123,7 @@ File output is off by default. Turn on **Settings > Log to File** (the `LOG_TO_F
 
 When `system.txt` would grow past 256 KB, it is renamed to `system.1.txt` (replacing the older copy) and a new file is started. So the card holds at most about 512 KB of logs.
 
-Lines are saved in batches about once a second. A warning or an error, or a queue that is half full, saves at once. The queue holds 4 KB; if the card cannot keep up, new lines are dropped and the file shows `-- N log lines dropped --` where they would have been. If a write fails, the writer waits five seconds before trying again. While the card is shared over USB file transfer, lines wait in the queue.
+Lines are saved in batches about once a second. A warning or an error, or a queue that is half full, saves at once. The queue holds 4 KB; if the card cannot keep up, new lines are dropped and the file shows `-- N log lines dropped --` where they would have been. If a write fails, the writer tries again on its next one-second pass. While the card is shared over USB file transfer, lines wait in the queue.
 
 Crash reports are separate and are always saved, to `/logs/crash/`. Each report ends with the last 1 KB of log lines, even when file output is off. See the OS's crash log guide for how to read them.
 
@@ -168,3 +168,12 @@ void pm_log_write(int level, const char *tag, const char *format, ...);
   - `format` and the arguments after it work like `printf`. A null `format` is ignored.
 
 Call it directly only when the level is chosen at run time; otherwise use the macros, which also drop lines above `PM_LOG_MAX_LEVEL` at compile time. The `pm_log::` control functions are not exported; apps cannot change levels or file output.
+
+## Limits
+
+- Arduino's `log_d` and `log_v` compile out entirely at `CORE_DEBUG_LEVEL=3` (the PocketMage build's level), so `PM_LOGD`/`PM_LOGV` are the way to get Debug and Verbose lines.
+- `isr_log_x`, `ESP_EARLY_LOGx` and `ESP_DRAM_LOGx`, and raw `Serial`/`printf` calls (GxEPD2, MP2722, LibSSH, PNGdec, wrench, usb_stream descriptor dumps) bypass the hook and stay console-only.
+- `PM_LOGx` from an interrupt only buffers in RAM; the `pm_log` writer task does the file write later. Use integer-only formats in ISRs: the ISR stack is 2096 bytes and the format buffer is 256 bytes.
+- Do not call IDF v1 `ESP_LOGx` from an interrupt handler. IDF filters the tag before calling our hook, and the call is not ISR-safe.
+- ESP-IDF's `esp_log_level_set("*", x)` clears every per-tag entry, so `setLevel` sets the default first and replays the stored entries (serialized by a mutex).
+- `ESP_LOGD` strings are compiled out unless IDF's tag level allows Debug. `LOG_LOCAL_LEVEL=3` in `build_flags` lets IDF-compiled libraries emit Info lines cheaply. Full IDF Debug coverage needs `CONFIG_LOG_MAXIMUM_LEVEL=4` and a full IDF rebuild; it is deferred.

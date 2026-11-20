@@ -16,7 +16,7 @@ Owner current = Owner::DebugSerial;
 SemaphoreHandle_t roleMutex() {
   static SemaphoreHandle_t mutex = xSemaphoreCreateRecursiveMutex();
   if (!mutex) {
-    ESP_LOGE(TAG, "Cannot create USB role mutex");
+    PM_LOGE(TAG, "Cannot create USB role mutex");
     std::abort();
   }
   return mutex;

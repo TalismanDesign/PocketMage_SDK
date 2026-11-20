@@ -12,7 +12,6 @@ Preferences prefs;
 AppState CurrentAppState = HOME;
 
 int TIMEOUT = 120;
-bool DEBUG_VERBOSE = true;
 bool LOG_TO_FILE = false;
 bool SYSTEM_CLOCK = true;
 bool SHOW_YEAR = true;
@@ -30,7 +29,6 @@ namespace pocketmage {
 void loadSettings() {
   prefs.begin("PocketMage", true);
   TIMEOUT = prefs.getInt("TIMEOUT", 120);
-  DEBUG_VERBOSE = prefs.getBool("DEBUG_VERBOSE", true);
   LOG_TO_FILE = prefs.getBool("LOG_TO_FILE", false);
   SYSTEM_CLOCK = prefs.getBool("SYSTEM_CLOCK", true);
   SHOW_YEAR = prefs.getBool("SHOW_YEAR", true);

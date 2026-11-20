@@ -15,7 +15,6 @@
 
 void setupSD();
 #include <config.h>
-#include <esp_log.h>
 #include <pocketmage_globals.h>
 #include <pocketmage_wifi/pocketmage_wifi.h>
 #include "idle_timer.h"
@@ -76,16 +75,16 @@ void setCpuSpeed(int newFreq) {
 
   if (isValid) {
     if (!setCpuFrequencyMhz(newFreq)) {
-      ESP_LOGE(TAG, "CPU speed change to %d MHz failed", newFreq);
+      PM_LOGE(TAG, "CPU speed change to %d MHz failed", newFreq);
       return;
     }
-    ESP_LOGV(TAG, "CPU Speed changed to: %d MHz", newFreq);
+    PM_LOGV(TAG, "CPU Speed changed to: %d MHz", newFreq);
   }
 }
 
 void deepSleep(bool alternateScreenSaver) {
   if (!P_AUDIO.stopChecked() || !pm_keyboard::stopUsb()) {
-    ESP_LOGE(TAG, "Sleep postponed: USB or audio cleanup incomplete");
+    PM_LOGE(TAG, "Sleep postponed: USB or audio cleanup incomplete");
     OLED().sysMessage(TR(STR_USB_DEVICE_FAIL), 1000);
     return;
   }
@@ -272,7 +271,6 @@ void PocketMage_INIT() {
   // WAKE INTERRUPT SETUP
   pinMode(KB_IRQ, INPUT);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)KB_IRQ, 0);
-  ESP_LOGE(TAG, "set wakeup pin");
 
   // OLED SETUP
   setupOled();
@@ -285,15 +283,12 @@ void PocketMage_INIT() {
 
   // KEYBOARD SETUP
   setupKB(KB_IRQ);
-  ESP_LOGD(TAG, "setup keyboard");
 
   // EINK HANDLER SETUP
   setupEink();
-  ESP_LOGD(TAG, "setup eink");
 
   // SD CARD SETUP
   setupSD();
-  ESP_LOGD(TAG, "setup sd");
 
   // POWER SETUP
   pinMode(PWR_BTN, INPUT_PULLUP);
@@ -301,7 +296,7 @@ void PocketMage_INIT() {
   pinMode(CHRG_SENS, INPUT);
   pinMode(BAT_SENS, INPUT);
   if (!PowerSystem.init(I2C_SDA, I2C_SCL, MP2722_ADDR, USB_MUX_PIN)) {
-    ESP_LOGV(TAG, "MP2722 Failed to Init");
+    PM_LOGE(TAG, "MP2722 failed to init");
   }
   PowerSystem.setUSBControlESP();
 
@@ -323,11 +318,9 @@ void PocketMage_INIT() {
 
   // CAPACATIVE TOUCH SETUP
   setupTouch();
-  ESP_LOGD(TAG, "setup touch");
 
   // RTC SETUP
   setupClock();
-  ESP_LOGD(TAG, "setup clock");
 
   // Set "random" seed
   randomSeed(analogRead(BAT_SENS));
@@ -339,7 +332,6 @@ void PocketMage_INIT() {
   loadState();
 #endif
   pm_log::setFileEnabled(LOG_TO_FILE);
-  ESP_LOGD(TAG, "loaded state");
 
   // Recover persisted state after an abnormal reset.
 #if PM_TARGET_APP
@@ -350,7 +342,6 @@ void PocketMage_INIT() {
 
   // STARTUP JINGLE
   setupBZ();
-  ESP_LOGD(TAG, "setup buzzer");
   if (!seamlessReboot)
     BZ().playJingle(Jingles::Startup);
 

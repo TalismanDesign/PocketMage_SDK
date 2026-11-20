@@ -1,7 +1,7 @@
 #include "usb_keyboard.h"
 
 #include <pocketmage_sys/usb_role.h>
-#include <esp_log.h>
+#include <pocketmage_log/log_api.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/semphr.h>
@@ -36,7 +36,7 @@ bool libraryInstalled = false, driverInstalled = false, rootPowered = false;
 TickType_t poweredAt = 0;
 
 void reportError(const char *operation, esp_err_t error) {
-  ESP_LOGE(TAG, "%s: %s", operation, esp_err_to_name(error));
+  PM_LOGE(TAG, "%s: %s", operation, esp_err_to_name(error));
 }
 
 void acknowledge(SemaphoreHandle_t done) {
@@ -127,7 +127,7 @@ void connectionLoop(void *) {
 void deviceEvent(hid_host_device_handle_t device, hid_host_driver_event_t event, void *) {
   if (event == HID_HOST_DRIVER_EVENT_CONNECTED && !stopRequested.load() &&
       xQueueSend(events, &device, 0) != pdTRUE)
-    ESP_LOGE(TAG, "HID connection queue full");
+    PM_LOGE(TAG, "HID connection queue full");
 }
 
 bool join(TaskHandle_t &task, SemaphoreHandle_t done) {
@@ -168,7 +168,7 @@ void freeSynchronization() {
 bool startFailed(const char *operation, esp_err_t error) {
   reportError(operation, error);
   if (!stopUsb())
-    ESP_LOGE(TAG, "HID startup cleanup incomplete; retaining connector");
+    PM_LOGE(TAG, "HID startup cleanup incomplete; retaining connector");
   return false;
 }
 } // namespace

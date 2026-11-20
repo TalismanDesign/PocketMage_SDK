@@ -29,7 +29,7 @@ SAMPLE_CALLS = """
     pm_io_split_string_count("a,b", ',');
     pm_log_write(PM_LOG_LEVEL_WARN, "APP", "%s", "x");
     PM_LOGI("APP", "count %d", 3);
-    PM_LOGV("APP", "dropped at compile time");
+    PM_LOGV("APP", "included by default");
 """
 
 CPP_SOURCE = f"""#include <pm_app_api.h>

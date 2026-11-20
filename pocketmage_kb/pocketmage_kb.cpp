@@ -18,7 +18,6 @@
 
 #include "hid_host.h"
 #include "hid_usage_keyboard.h"
-#include "hid_usage_mouse.h"
 
 static constexpr const char *TAG = "KB";
 static constexpr size_t kUsbInputQueueLength = 64;
@@ -31,7 +30,7 @@ static uint8_t prev_keys[HID_KEYBOARD_KEY_MAX] = {};
 // Adds a character to the queue (thread-safe via FreeRTOS queue)
 static void push_USB_char(char c) {
   if (!usb_kb_queue || xQueueSend(usb_kb_queue, &c, 0) != pdTRUE)
-    ESP_LOGW(TAG, "USB input queue full or unavailable");
+    PM_LOGW(TAG, "USB input queue full or unavailable");
 }
 
 // Removes and returns the first character (FIFO, thread-safe)
@@ -123,28 +122,6 @@ const uint8_t keycode2ascii[57][2] = {
 };
 
 /**
- * @brief Makes new line depending on report output protocol type
- *
- * @param[in] proto Current protocol to output
- */
-static void hid_print_new_device_report_header(hid_protocol_t proto) {
-  static hid_protocol_t prev_proto_output = HID_PROTOCOL_MAX;
-
-  if (prev_proto_output != proto) {
-    prev_proto_output = proto;
-    printf("\r\n");
-    if (proto == HID_PROTOCOL_MOUSE) {
-      printf("Mouse\r\n");
-    } else if (proto == HID_PROTOCOL_KEYBOARD) {
-      printf("Keyboard\r\n");
-    } else {
-      printf("Generic\r\n");
-    }
-    fflush(stdout);
-  }
-}
-
-/**
  * @brief HID Keyboard modifier verification for capitalization application
  * (right or left shift)
  *
@@ -206,10 +183,8 @@ static inline bool hid_keyboard_get_char(uint8_t modifier, uint8_t key_code,
  * @param[in] key_char  Keyboard char to stdout
  */
 static inline void hid_keyboard_print_char(unsigned char key_char) {
-  if (key_char) {
+  if (key_char)
     push_USB_char(key_char);
-    fflush(stdout);
-  }
 }
 
 /**
@@ -220,8 +195,6 @@ static inline void hid_keyboard_print_char(unsigned char key_char) {
  */
 static void key_event_callback(key_event_t *key_event) {
   unsigned char key_char;
-
-  hid_print_new_device_report_header(HID_PROTOCOL_KEYBOARD);
 
   if (key_event->KEY_STATE_PRESSED == key_event->state) {
     if (hid_keyboard_get_char(key_event->modifier, key_event->key_code, &key_char)) {
@@ -286,47 +259,6 @@ static void hid_host_keyboard_report_callback(const uint8_t *const data, const s
   memcpy(prev_keys, &kb_report->key, HID_KEYBOARD_KEY_MAX);
 }
 
-/**
- * @brief USB HID Host Mouse Interface report callback handler
- *
- * @param[in] data    Pointer to input report data buffer
- * @param[in] length  Length of input report data buffer
- */
-static void hid_host_mouse_report_callback(const uint8_t *const data, const size_t length) {
-  if (length < sizeof(hid_mouse_input_report_boot_t)) {
-    return;
-  }
-
-  hid_mouse_input_report_boot_t report;
-  memcpy(&report, data, sizeof(report));
-  const auto *mouse_report = &report;
-
-  hid_print_new_device_report_header(HID_PROTOCOL_MOUSE);
-
-  printf("dX: %d\tdY: %d\t|%c|%c|\r", mouse_report->x_displacement,
-         mouse_report->y_displacement, (mouse_report->buttons.button1 ? 'o' : ' '),
-         (mouse_report->buttons.button2 ? 'o' : ' '));
-  fflush(stdout);
-}
-
-/**
- * @brief USB HID Host Generic Interface report callback handler
- *
- * 'generic' means anything else than mouse or keyboard
- *
- * @param[in] data    Pointer to input report data buffer
- * @param[in] length  Length of input report data buffer
- */
-static void hid_host_generic_report_callback(const uint8_t *const data, const size_t length) {
-  hid_print_new_device_report_header(HID_PROTOCOL_NONE);
-  for (size_t i = 0; i < length; i++) {
-    printf("%02X", data[i]);
-  }
-  putchar('\r');
-  putchar('\n');
-  fflush(stdout);
-}
-
 bool pm_keyboard::prepareInput() {
   if (!usb_kb_queue)
     usb_kb_queue = xQueueCreate(kUsbInputQueueLength, sizeof(char));
@@ -335,7 +267,7 @@ bool pm_keyboard::prepareInput() {
 
 void pm_keyboard::resetInput() {
   if (usb_kb_queue && xQueueReset(usb_kb_queue) != pdPASS)
-    ESP_LOGE(TAG, "USB input queue reset failed");
+    PM_LOGE(TAG, "USB input queue reset failed");
   memset(prev_keys, 0, sizeof(prev_keys));
 }
 
@@ -343,14 +275,16 @@ void pm_keyboard::handleReport(const hid_host_dev_params_t &params,
                                const uint8_t *data, size_t length) {
   if (!data)
     return;
-  if (params.sub_class == HID_SUBCLASS_BOOT_INTERFACE) {
-    if (params.proto == HID_PROTOCOL_KEYBOARD)
-      hid_host_keyboard_report_callback(data, length);
-    else if (params.proto == HID_PROTOCOL_MOUSE)
-      hid_host_mouse_report_callback(data, length);
-  } else {
-    hid_host_generic_report_callback(data, length);
+  // One line per attached device instead of dumping every report
+  static hid_protocol_t previousProto = HID_PROTOCOL_MAX;
+  const hid_protocol_t proto = static_cast<hid_protocol_t>(params.proto);
+  if (previousProto != proto) {
+    previousProto = proto;
+    PM_LOGD(TAG, "HID device attached: protocol %d, subclass %d", int(proto),
+            int(params.sub_class));
   }
+  if (params.sub_class == HID_SUBCLASS_BOOT_INTERFACE && proto == HID_PROTOCOL_KEYBOARD)
+    hid_host_keyboard_report_callback(data, length);
 }
 
 #pragma region keymaps
@@ -389,7 +323,7 @@ void IRAM_ATTR KB_irq_handler() {
 // Setup for keyboard class
 void setupKB(int KB_irq_pin) {
   if (!keypad.begin(TCA8418_DEFAULT_ADDR, &Wire)) {
-    ESP_LOGE(TAG, "Error Initializing the Keyboard");
+    PM_LOGE(TAG, "Error Initializing the Keyboard");
     OLED().sysMessage(TR(STR_KB_INIT_FAILED), 1000);
     while (1)
       ;
@@ -909,7 +843,7 @@ void PocketmageKB::checkUSBKB() {
   if (!needBoost)
     nonHidAttached = false;
   if (pm_keyboard::probeExpired()) {
-    ESP_LOGI(TAG, "USB device is not HID; releasing keyboard host until unplug");
+    PM_LOGI(TAG, "USB device is not HID; releasing keyboard host until unplug");
     nonHidAttached = true;
   }
 
@@ -921,12 +855,12 @@ void PocketmageKB::checkUSBKB() {
     return;
 
   if (!pm_usb::updatePower(needBoost)) {
-    ESP_LOGW(TAG, "USB power update failed");
+    PM_LOGW(TAG, "USB power update failed");
     return;
   }
   if (pm_usb::owner() == pm_usb::Owner::Audio)
     return;
 
   if (needBoost && !nonHidAttached && !pm_keyboard::beginUsb())
-    ESP_LOGW(TAG, "USB keyboard unavailable; cleanup will retry on the next poll");
+    PM_LOGW(TAG, "USB keyboard unavailable; cleanup will retry on the next poll");
 }

@@ -220,7 +220,6 @@ void einkFramesDynamic(std::vector<Frame *> &frames, bool doFull_) {
     if (doFull_) {
       display.fillRect(frameX, frameY, frameW, frameH, GxEPD_WHITE);
     }
-    // Serial.println("Drawing Text!");
     for (Frame *frame : frames) {
       if (!frame || (!frame->source && !frame->bitmap))
         continue;
@@ -237,7 +236,6 @@ void einkFramesDynamic(std::vector<Frame *> &frames, bool doFull_) {
       }
 
       if (frame->box) {
-        // Serial.println("drawing box!");
         if (frameW > 2 && frameH > 2) {
           drawFrameBox(frame->left + 1, frame->top + 1, frameW - 2, frameH - 2, frame->invert);
         }
@@ -334,9 +332,7 @@ void einkFramesDynamic(std::vector<Frame *> &frames, bool doFull_) {
         }
       }
     }
-    // Serial.println("Stopped Drawing Text!");
   } while (display.nextPage());
-  // Serial.println("Done drawing frames!");
 }
 // DRAW BOX AROUND FRAME !!
 void drawFrameBox(int usableX, int usableY, int usableWidth, int usableHeight, bool invert) {
@@ -387,10 +383,6 @@ void updateScrollFromTouch_Frame() {
   for (int i = 0; i < 9; i++) {
     if (touched & (1 << i)) {
       newTouch = i;
-      Serial.print("Prev pad: ");
-      Serial.print(String(TOUCH().getLastTouch()));
-      Serial.print("   Touched pad: ");
-      Serial.println(newTouch);
       break;
     }
   }
@@ -401,7 +393,6 @@ void updateScrollFromTouch_Frame() {
       if (touchDelta < 2) {
         long total = CurrentFrameState->source ? (long)CurrentFrameState->source->size() - 1 : 0L;
         if (CurrentFrameState->choice == -1) {
-          // Serial.println("Adjusting scroll to clamp non-choice frames");
           total -= CurrentFrameState->maxLines + 1;
         }
         const long maxScroll = max(0L, total);
@@ -411,8 +402,6 @@ void updateScrollFromTouch_Frame() {
           TOUCH().setDynamicScroll(max((long)(TOUCH().getDynamicScroll() - 1), 0L));
         }
         updateScroll(CurrentFrameState, TOUCH().getPrevDynamicScroll(), TOUCH().getDynamicScroll());
-        // Serial.println("updating scroll to: " + String(dynamicScroll));
-        // Serial.println("max scroll is = " + String((int)total));
         if (CurrentFrameState->choice != -1) {
           CurrentFrameState->choice = CurrentFrameState->scroll;
         }

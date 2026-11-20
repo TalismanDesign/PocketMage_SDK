@@ -26,12 +26,9 @@ void pm_log_write(int level, const char *tag, const char *format, ...);
 }
 #endif
 
+// Compile-time cap, separate from CORE_DEBUG_LEVEL
 #ifndef PM_LOG_MAX_LEVEL
-#ifdef CORE_DEBUG_LEVEL
-#define PM_LOG_MAX_LEVEL CORE_DEBUG_LEVEL
-#else
-#define PM_LOG_MAX_LEVEL PM_LOG_LEVEL_INFO
-#endif
+#define PM_LOG_MAX_LEVEL PM_LOG_LEVEL_VERBOSE
 #endif
 
 #define PM_LOG_AT(level, tag, ...)                                                                 \

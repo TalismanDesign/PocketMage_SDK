@@ -48,6 +48,8 @@ void PocketmageSD::endIO() {
 // Resolve a relative path (e.g. "/music") to a full VFS path (e.g. "/sdcard/music").
 // Paths already starting with the mount point are returned as-is.
 const char *PocketmageSD::sdPath(const char *relPath) {
+  if (!relPath)
+    return nullptr;
   static char buf[kMaxPathLen];
   if (strncmp(relPath, kSdMountPoint, strlen(kSdMountPoint)) == 0) {
     return relPath;
@@ -372,14 +374,14 @@ void setupSD() {
   SD_SPI_COMPATIBILITY = prefs.getBool("SD_SPI_CMPT", false);
   ALLOW_NO_MICROSD = prefs.getBool("ALLOW_NO_SD", true);
   prefs.end();
-  Serial.print("SD_SPI_CMPT" + String(SD_SPI_COMPATIBILITY));
+  PM_LOGD(TAG, "SD_SPI_CMPT=%d", SD_SPI_COMPATIBILITY);
   delay(100);
 
   if (!SD_SPI_COMPATIBILITY) {
     PM_SD().setMode(PocketmageSD::SDMMC);
 
     if (!mountSdmmc()) {
-      ESP_LOGE(TAG, "MOUNT FAILED");
+      PM_LOGE(TAG, "MOUNT FAILED");
       delay(5000);
       if (ALLOW_NO_MICROSD) {
         OLED().oledWord(TR(STR_SD_ALL_WORK_LOST), 5000);
@@ -435,7 +437,7 @@ void setupSD() {
     sdmmc_card_t *card = nullptr;
     esp_err_t ret = esp_vfs_fat_sdmmc_mount("/sdcard", &host, &slot_config, &mount_config, &card);
     if (ret != ESP_OK) {
-      ESP_LOGE(TAG, "SPI SD Mount Failed");
+      PM_LOGE(TAG, "SPI SD Mount Failed");
       OLED().oledWord(TR(STR_SD_SPI_NOT_DETECTED), false, false);
       delay(2000);
 
@@ -476,7 +478,6 @@ void PocketmageSD::saveFile() {
   beginIO();
 
   String textToSave = vectorToString();
-  ESP_LOGV(TAG, "Text to save: %s", textToSave.c_str());
 
   if (editingFile_ == "" || editingFile_ == "-")
     editingFile_ = "/temp.txt";
@@ -515,7 +516,7 @@ void PocketmageSD::writeMetadata(const char *path) {
   bool isDir = false;
   if (!statPath(path, &fileSizeBytes, &isDir) || isDir) {
     OLED().sysMessage(TR(STR_SD_META_WRITE_ERR), 1000);
-    ESP_LOGE(TAG, "Invalid file for metadata: %s", path);
+    PM_LOGE(TAG, "Invalid file for metadata: %s", path);
     endIO();
     return;
   }
@@ -562,7 +563,7 @@ void PocketmageSD::writeMetadata(const char *path) {
   w.path = SYS_METADATA_FILE;
   w.text = updatedMeta.c_str();
   pm_sd_gateway::submit(&w);
-  ESP_LOGI(TAG, "Metadata updated");
+  PM_LOGD(TAG, "Metadata updated");
 
   endIO();
 }
@@ -580,7 +581,6 @@ void PocketmageSD::loadFile(bool showOLED) {
   if (!editingFile_.startsWith("/"))
     editingFile_ = "/" + editingFile_;
   String textToLoad = readFileToString(editingFile_.c_str());
-  ESP_LOGV(TAG, "Text to load: %s", textToLoad.c_str());
 
   stringToVector(textToLoad);
   keypad.enableInterrupts();
@@ -635,7 +635,7 @@ void PocketmageSD::deleteMetadata(const char *path) {
   w.path = SYS_METADATA_FILE;
   w.text = updatedMeta.c_str();
   pm_sd_gateway::submit(&w);
-  ESP_LOGI(TAG, "Metadata entry deleted (if it existed).");
+  PM_LOGD(TAG, "Metadata entry deleted");
 
   endIO();
 }
@@ -694,7 +694,7 @@ void PocketmageSD::renMetadata(const char *oldPath, const char *newPath) {
   w.path = SYS_METADATA_FILE;
   w.text = updatedMeta.c_str();
   pm_sd_gateway::submit(&w);
-  ESP_LOGI(TAG, "Metadata updated for renamed file.");
+  PM_LOGD(TAG, "Metadata updated for renamed file");
 
   endIO();
 }
@@ -750,7 +750,7 @@ void PocketmageSD::listDir(const char *dirname) {
     OLED().sysMessage(TR(STR_SD_OP_FAILED), 5000);
     return;
   }
-  ESP_LOGI(tag, "Listing directory %s\r\n", dirname);
+  PM_LOGD(tag, "Listing directory %s", dirname);
 
   fileIndex_ = 0;
   for (int i = 0; i < MAX_FILES; i++) {
@@ -775,10 +775,10 @@ void PocketmageSD::readFile(const char *path) {
     OLED().sysMessage(TR(STR_SD_OP_FAILED), 5000);
     return;
   }
-  ESP_LOGI(tag, "Reading file %s\r\n", path);
+  PM_LOGD(tag, "Reading file %s", path);
 
   if (!exists(path)) {
-    ESP_LOGE(tag, "Failed to open file for reading: %s", path);
+    PM_LOGE(tag, "Failed to open file for reading: %s", path);
   }
 }
 
@@ -787,7 +787,7 @@ String PocketmageSD::readFileToString(const char *path) {
     OLED().sysMessage(TR(STR_SD_OP_FAILED), 5000);
     return "";
   }
-  ESP_LOGI(tag, "Reading file: %s\r\n", path);
+  PM_LOGD(tag, "Reading file: %s", path);
 
   String content;
   pm_sd_gateway::Request r{};
@@ -797,7 +797,7 @@ String PocketmageSD::readFileToString(const char *path) {
   pm_sd_gateway::submit(&r);
 
   if (!r.ok) {
-    ESP_LOGE(tag, "Failed to open file for reading: %s", path);
+    PM_LOGE(tag, "Failed to open file for reading: %s", path);
     OLED().sysMessage(TR(STR_SD_LOAD_FAILED_SHORT), 500);
     return "";
   }
@@ -813,7 +813,7 @@ void PocketmageSD::writeFile(const char *path, const char *message) {
     OLED().sysMessage(TR(STR_SD_OP_FAILED), 5000);
     return;
   }
-  ESP_LOGI(tag, "Writing file: %s\r\n", path);
+  PM_LOGD(tag, "Writing file: %s", path);
 
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::WriteFile;
@@ -822,9 +822,9 @@ void PocketmageSD::writeFile(const char *path, const char *message) {
   pm_sd_gateway::submit(&r);
 
   if (r.ok) {
-    ESP_LOGV(tag, "File written %s", path);
+    PM_LOGD(tag, "File written %s", path);
   } else {
-    ESP_LOGE(tag, "Write failed for %s", path);
+    PM_LOGE(tag, "Write failed for %s", path);
   }
 }
 
@@ -833,7 +833,7 @@ void PocketmageSD::appendFile(const char *path, const char *message) {
     OLED().sysMessage(TR(STR_SD_OP_FAILED), 5000);
     return;
   }
-  ESP_LOGI(tag, "Appending to file: %s\r\n", path);
+  PM_LOGD(tag, "Appending to file: %s", path);
 
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::AppendFile;
@@ -842,9 +842,9 @@ void PocketmageSD::appendFile(const char *path, const char *message) {
   pm_sd_gateway::submit(&r);
 
   if (r.ok) {
-    ESP_LOGV(tag, "Message appended to %s", path);
+    PM_LOGD(tag, "Message appended to %s", path);
   } else {
-    ESP_LOGE(tag, "Append failed: %s", path);
+    PM_LOGE(tag, "Append failed: %s", path);
   }
 }
 
@@ -853,7 +853,7 @@ void PocketmageSD::renameFile(const char *path1, const char *path2) {
     OLED().sysMessage(TR(STR_SD_OP_FAILED), 5000);
     return;
   }
-  ESP_LOGI(tag, "Renaming file %s to %s\r\n", path1, path2);
+  PM_LOGD(tag, "Renaming file %s to %s", path1, path2);
 
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::Rename;
@@ -862,9 +862,9 @@ void PocketmageSD::renameFile(const char *path1, const char *path2) {
   pm_sd_gateway::submit(&r);
 
   if (r.ok) {
-    ESP_LOGV(tag, "Renamed %s to %s\r\n", path1, path2);
+    PM_LOGD(tag, "Renamed %s to %s", path1, path2);
   } else {
-    ESP_LOGE(tag, "Rename failed: %s to %s", path1, path2);
+    PM_LOGE(tag, "Rename failed: %s to %s", path1, path2);
   }
 }
 
@@ -873,7 +873,7 @@ void PocketmageSD::deleteFile(const char *path) {
     OLED().sysMessage(TR(STR_SD_OP_FAILED), 5000);
     return;
   }
-  ESP_LOGI(tag, "Deleting file: %s\r\n", path);
+  PM_LOGD(tag, "Deleting file: %s", path);
 
   pm_sd_gateway::Request r{};
   r.op = pm_sd_gateway::Op::Remove;
@@ -881,9 +881,9 @@ void PocketmageSD::deleteFile(const char *path) {
   pm_sd_gateway::submit(&r);
 
   if (r.ok) {
-    ESP_LOGV(tag, "File deleted: %s", path);
+    PM_LOGD(tag, "File deleted: %s", path);
   } else {
-    ESP_LOGE(tag, "Delete failed for %s", path);
+    PM_LOGE(tag, "Delete failed for %s", path);
   }
 }
 
@@ -901,7 +901,7 @@ bool PocketmageSD::readBinaryFile(const char *path, uint8_t *buf, size_t len) {
   pm_sd_gateway::submit(&r);
 
   if (!r.ok) {
-    ESP_LOGE(tag, "Read failed for %s (%u of %u bytes)", path, (unsigned)r.retVal, (unsigned)len);
+    PM_LOGE(tag, "Read failed for %s (%u of %u bytes)", path, (unsigned)r.retVal, (unsigned)len);
   }
   return r.ok;
 }
@@ -922,7 +922,7 @@ bool PocketmageSD::appendBinaryFile(const char *path, const uint8_t *buf, size_t
   pm_sd_gateway::submit(&r);
 
   if (!r.ok) {
-    ESP_LOGE(tag, "Append failed for %s (%u of %u bytes)", path, (unsigned)r.retVal, (unsigned)len);
+    PM_LOGE(tag, "Append failed for %s (%u of %u bytes)", path, (unsigned)r.retVal, (unsigned)len);
   }
   return r.ok;
 }

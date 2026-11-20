@@ -4,7 +4,7 @@
 #include <cstring>
 #include <new>
 
-#include "esp_log.h"
+#include <pocketmage_log/log_api.h>
 #include "region_stream.h"
 
 static const char *TAG = "PngDecoder";
@@ -52,7 +52,7 @@ bool PngDecoder::decodeTo1Bit(const char *path, uint32_t off, uint32_t len, uint
   regionClear();
   if (rc != PNG_SUCCESS || png->isInterlaced()) {
     if (rc == PNG_TOO_BIG)
-      ESP_LOGW(TAG, "too wide for PNG_MAX_BUFFERED_PIXELS: %s", path);
+      PM_LOGW(TAG, "too wide for PNG_MAX_BUFFERED_PIXELS: %s", path);
     if (rc == PNG_SUCCESS)
       png->close();
     delete png;

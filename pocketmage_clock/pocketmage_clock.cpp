@@ -19,7 +19,7 @@ static PocketmageCLOCK pm_clock(rtc);
 void setupClock() {
   pinMode(RTC_INT, INPUT);
   if (!CLOCK().begin()) {
-    ESP_LOGE(TAG, "Couldn't find RTC");
+    PM_LOGE(TAG, "Couldn't find RTC");
     delay(1000);
   }
 
@@ -158,7 +158,7 @@ void PocketmageCLOCK::setTimeFromString(String timeStr) {
   TimeParseResult res = parseTimeString(timeStr, hours, minutes);
 
   if (res != TIME_OK) {
-    ESP_LOGE(TAG, "Invalid time (%d): %s", res, timeStr.c_str());
+    PM_LOGE(TAG, "Invalid time (%d): %s", res, timeStr.c_str());
     OLED().sysMessage(TR(STR_INVALID), 500);
     return;
   }
@@ -166,7 +166,7 @@ void PocketmageCLOCK::setTimeFromString(String timeStr) {
   DateTime now = rtc_.now();
   rtc_.adjust(DateTime(now.year(), now.month(), now.day(), hours, minutes, 0));
 
-  ESP_LOGI(TAG, "Time updated to %02d:%02d", hours, minutes);
+  PM_LOGI(TAG, "Time updated to %02d:%02d", hours, minutes);
 }
 
 bool PocketmageCLOCK::isValid() {

@@ -13,14 +13,14 @@ void setupTouch() {
 // Production Device Setup
 #if POCKETMAGE_HW_VERSION == 2
   if (!cap.begin(MPR121_ADDR, &Wire1)) {
-    ESP_LOGE(TAG, "TouchPad Failed");
+    PM_LOGE(TAG, "TouchPad Failed");
     OLED().sysMessage(TR(STR_TOUCHPAD_FAILED), 1000);
     return;
   }
 #else
   // MPR121 / SLIDER
   if (!cap.begin(MPR121_ADDR)) {
-    ESP_LOGE(TAG, "TouchPad Failed");
+    PM_LOGE(TAG, "TouchPad Failed");
     OLED().sysMessage(TR(STR_TOUCHPAD_FAILED), 1000);
     return;
   }

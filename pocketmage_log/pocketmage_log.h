@@ -47,9 +47,9 @@ void setFileEnabled(bool enabled);
 bool fileEnabled();
 
 /** Set the most detailed level written for tag. A null tag or "*" sets the default for every
- * tag without its own entry. ESP-IDF tags are updated too. Not for use from interrupts.
- * Returns false for an invalid level, an empty tag, a tag longer than kTagCapacity - 1, or a
- * full table.
+ * tag without its own entry, and keeps the entries already set. ESP-IDF tags are updated too.
+ * Not for use from interrupts. Returns false for an invalid level, an empty tag, a tag longer
+ * than kTagCapacity - 1, or a full table.
  */
 bool setLevel(const char *tag, pm_log_level level);
 /** Return the most detailed level written for tag. */

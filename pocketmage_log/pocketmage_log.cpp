@@ -16,6 +16,7 @@
 #include <esp_rom_sys.h>
 #include <esp_system.h>
 #include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 #include <freertos/task.h>
 
 #include <atomic>
@@ -32,10 +33,9 @@ constexpr size_t kTagSlots = 24;
 constexpr size_t kWriteChunk = 512;
 constexpr size_t kUnknownSize = SIZE_MAX;
 constexpr uint32_t kBatchMs = 1000;
-constexpr uint32_t kRetryMs = 5000;
 constexpr uint32_t kFlushPollMs = 10;
 constexpr uint32_t kShutdownFlushMs = 500;
-constexpr uint32_t kWriterStack = 4096;
+constexpr uint32_t kWriterStack = 8192;
 constexpr UBaseType_t kWriterPriority = 1;
 constexpr BaseType_t kWriterCore = 1;
 constexpr Level kDefaultLevel = Level::Info;
@@ -52,6 +52,10 @@ TaskHandle_t s_writer = nullptr;
 std::atomic<bool> s_writerInRequest{false};
 std::atomic<bool> s_begun{false};
 
+// Serializes level changes.
+StaticSemaphore_t s_levelLockBuffer{};
+SemaphoreHandle_t s_levelLock = xSemaphoreCreateMutexStatic(&s_levelLockBuffer);
+
 // Writer-task state only.
 char s_chunk[kWriteChunk];
 size_t s_fileSize = kUnknownSize;
@@ -65,10 +69,11 @@ uint32_t uptimeMs() {
  * would feed the queue with reports about failing to drain it.
  */
 bool fromWriterRequest() {
-  if (!s_writerInRequest.load(std::memory_order_acquire))
-    return false;
+  const bool inRequest = s_writerInRequest.load(std::memory_order_acquire);
+  const LogContext context = xPortInIsrContext() ? LogContext::Isr : LogContext::Task;
   const TaskHandle_t current = xTaskGetCurrentTaskHandle();
-  return current == s_writer || pm_sd_gateway::onGatewayTask();
+  return lineFromWriterRequest(inRequest, context, current == s_writer,
+                               pm_sd_gateway::onGatewayTask());
 }
 
 /** Notify the writer from either a task or an interrupt. */
@@ -180,7 +185,9 @@ bool drain() {
     portEXIT_CRITICAL(&s_lock);
     if (!length)
       return true;
-    if (!cardAvailable() || !prepareFile(length))
+    const bool cardOk = cardAvailable();
+    const bool prepOk = cardOk ? prepareFile(length) : false;
+    if (!cardOk || !prepOk)
       return false;
     // SAFETY: s_chunk holds length bytes copied by peek.
     const auto *bytes = reinterpret_cast<const uint8_t *>(s_chunk);
@@ -205,15 +212,11 @@ void writerTask(void *) {
       waitMs = kBatchMs;
       continue;
     }
-    // After a failure, wait out the retry delay even if new lines keep arriving.
     if (drain()) {
       waitMs = kBatchMs;
       continue;
     }
-    waitMs = kRetryMs;
-    const TickType_t resume = xTaskGetTickCount() + pdMS_TO_TICKS(kRetryMs);
-    while (static_cast<int32_t>(resume - xTaskGetTickCount()) > 0)
-      ulTaskNotifyTake(pdTRUE, resume - xTaskGetTickCount());
+    waitMs = kBatchMs;
   }
 }
 
@@ -241,6 +244,7 @@ void begin() {
   if (s_begun.exchange(true))
     return;
   esp_log_set_vprintf(idfHook);
+  setLevel("*", PM_LOG_LEVEL_INFO);
   if (esp_register_shutdown_handler(shutdownFlush) != ESP_OK)
     PM_LOGW(kTag, "No shutdown slot left; logs queued at restart may be lost");
 }
@@ -268,11 +272,18 @@ bool fileEnabled() {
 bool setLevel(const char *tag, pm_log_level level) {
   if (level < PM_LOG_LEVEL_NONE || level > PM_LOG_LEVEL_VERBOSE)
     return false;
+  xSemaphoreTake(s_levelLock, portMAX_DELAY);
   portENTER_CRITICAL(&s_lock);
   const bool stored = s_levels.set(tag, static_cast<Level>(level));
   portEXIT_CRITICAL(&s_lock);
-  if (stored)
+  if (stored) {
     esp_log_level_set(tag ? tag : "*", static_cast<esp_log_level_t>(level));
+    if (!tag || std::strcmp(tag, "*") == 0)
+      replayLevels(s_levels, [](const char *name, pm_log_level entryLevel) {
+        esp_log_level_set(name, static_cast<esp_log_level_t>(entryLevel));
+      });
+  }
+  xSemaphoreGive(s_levelLock);
   return stored;
 }
 
