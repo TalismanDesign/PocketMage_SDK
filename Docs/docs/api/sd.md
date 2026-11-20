@@ -149,3 +149,61 @@ All operate on the `PM_SDAUTO()` singleton. Every `const char*` return points in
 - `pm_sd_delete_file(a1)` is `deleteFile(fs, path)`; `a1` is the path, with the `fs::FS&` dropped.
 - `pm_sd_read_binary_file(a0, a1, a2)` is `readBinaryFile(path, buf, len)`; `a0` is the path, `a1` is the caller buffer, `a2` is its size. Returns false on a partial read.
 - `pm_sd_get_file_size(a0)` is `getFileSize(path)`. Returns the byte size.
+
+## Binary, directory, and stream services
+
+Binary storage, directory creation/enumeration, and streams are generated wrappers over `PocketmageSD` methods. Native and ELF callers use the same gateway task, validation, and ownership rules.
+
+```c
+bool pm_sd_write_binary_file(const char* path, const uint8_t* buf, size_t len);
+bool pm_sd_mkdir(const char* path);
+int  pm_sd_dir_open(const char* path);
+bool pm_sd_dir_entry(int i, char* name_out, size_t name_size, bool* is_dir);
+void pm_sd_dir_close(void);
+```
+
+- `pm_sd_write_binary_file(path, buf, len)` writes `len` bytes verbatim, truncating any existing file. The generated `pm_sd_write_file` text path stops at the first NUL, so binary data needs this one. Returns true on a full write.
+- `pm_sd_mkdir(path)` creates one path level, like POSIX `mkdir`. Returns true if the path exists afterwards.
+- `pm_sd_dir_open(path)` opens `path` for enumeration and returns the entry count, or -1 on error. Unlike `pm_sd_list_dir` it has no `MAX_FILES` cap and it reports subdirectories, so an app can recurse. One snapshot is live at a time, owned by the calling task. That task can replace its snapshot; another task cannot read, replace, or close it.
+- `pm_sd_dir_entry(i, name_out, name_size, is_dir)` copies entry `i`'s leaf name (no directory prefix) into `name_out`, sets `*is_dir`, and returns true. False when `i` is out of range or no enumeration is open. Copy the names you need before opening the next directory.
+- `pm_sd_dir_close()` releases the open enumeration and its table.
+
+Entry copies are serialized with snapshot creation, replacement, and cleanup.
+An empty snapshot still belongs to its opening task. A rejected entry read leaves
+the caller's output buffers unchanged; a foreign close leaves the snapshot live.
+
+### Streaming directories
+
+```c
+int pm_sd_dir_iterator_open(const char* path);
+int pm_sd_dir_iterator_read(int handle, char* name_out, size_t name_size, bool* is_dir);
+bool pm_sd_dir_iterator_close(int handle);
+```
+
+These calls list a directory one entry at a time, without loading the whole
+listing into memory like the snapshot does. Open returns a handle, or -1 on
+failure. Up to four directories can be open at once, so you can walk into
+subdirectories while keeping your place in each parent. Only the task that opened
+a handle can read or close it. Handles stop working after cleanup or a remount.
+
+Read copies the next name into `name_out` and returns its length including the
+terminating NUL, zero when there are no more entries, or -1 on error. To find out
+how big the next name is, call it with `name_out` null and `name_size` zero; this
+does not advance. If the buffer is too small, nothing is copied and the entry is
+not skipped. `.`, `..` and macOS metadata files are skipped. Files added or removed
+while you are listing may or may not show up.
+
+Always close the handle when you are done, even after an error. While a directory
+is open, the card is not put to sleep and USB file transfer cannot start.
+
+### File streams
+
+Use `pm_sd_stream_open_mode(path, mode)` with `'r'`, `'w'`, or `'a'`, followed by the generated read/write calls. `pm_sd_stream_seek_from` accepts `SEEK_SET`, `SEEK_CUR`, or `SEEK_END`. `pm_sd_stream_close_checked` reports flush/close errors and releases the slot even on failure. Stream access is restricted to the opening task. The runner closes only the exiting app task's remaining streams, directory cursors, and snapshot.
+
+Keep each stream's operations on its opening task. Foreign read/write/tell/size
+calls return zero, while seek and checked close return false, leaving the stream
+unchanged. Open a separate stream for work on another task.
+
+ABI 2 retains the read-only `pm_sd_stream_open`, absolute `pm_sd_stream_seek`, and void `pm_sd_stream_close` adapters. New code should use the complete generated contract. See [App ABI](../app-abi.md).
+
+USB transfer requires exclusive access. The OS stops audio and HID before claiming Storage, rejects the transition while gateway streams or directory cursors are still open, flushes/unmounts FAT, and then exposes raw sectors to the computer. Firmware file operations remain blocked during transfer.

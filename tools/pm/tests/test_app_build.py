@@ -27,6 +27,9 @@ SAMPLE_CALLS = """
     pm_ui_begin_eink_screen(false);
     pm_ui_end_eink_screen("done", PM_REFRESH_NORMAL);
     pm_io_split_string_count("a,b", ',');
+    pm_log_write(PM_LOG_LEVEL_WARN, "APP", "%s", "x");
+    PM_LOGI("APP", "count %d", 3);
+    PM_LOGV("APP", "included by default");
 """
 
 CPP_SOURCE = f"""#include <pm_app_api.h>
@@ -124,7 +127,7 @@ class GeneratedAppCompiles(unittest.TestCase):
         called = set(re.findall(r'\b(pm_[a-z_0-9]+)\s*\(', SAMPLE_CALLS))
         modules = {name.split('_')[1] for name in called}
         for expected in ('i18n', 'eink', 'text', 'kb', 'sd', 'wifi', 'bz',
-                         'touch', 'clock', 'io', 'layout', 'ui'):
+                         'touch', 'clock', 'io', 'layout', 'ui', 'log'):
             self.assertIn(expected, modules)
 
 

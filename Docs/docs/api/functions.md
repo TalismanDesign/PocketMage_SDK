@@ -124,6 +124,14 @@ int pm_layout_word_wrap_count(const char* a0, int a1, int a2);
 int pm_layout_word_wrap_get(const char* a0, int a1, int a2, int index, char* out, size_t out_size);
 ```
 
+## Logging
+
+Documented on [Logging](log.md). Apps normally call it through the `PM_LOGE` to `PM_LOGV` macros.
+
+```c
+void pm_log_write(int level, const char *tag, const char *format, ...);
+```
+
 ## OLED
 
 Documented on [OLED](oled.md).

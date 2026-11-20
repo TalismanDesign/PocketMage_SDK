@@ -74,6 +74,13 @@ class ParseSymbols(unittest.TestCase):
 
 
 class Classify(unittest.TestCase):
+    def test_compiled_exports_override_curated_and_source_only_names(self):
+        result = gate_mod.classify(
+            ["pm_audio_play", "not_linked", "source_only"], {"not_linked"},
+            host_view={"pm_audio_play"}, available_table={"source_only"})
+        self.assertEqual(result.ok, ["pm_audio_play"])
+        self.assertEqual(result.broken, ["not_linked", "source_only"])
+
     def test_curated_and_table_ok(self):
         curated = {"pm_sdk_version"}
         result = gate_mod.classify(["printf", "pm_sdk_version"], curated,

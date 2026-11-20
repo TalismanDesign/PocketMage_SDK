@@ -7,13 +7,12 @@
 // these symbols are defined here once and nowhere else.
 SPIClass *vspi = nullptr;
 SPIClass *hspi = nullptr;
-fs::FS *global_fs = nullptr;
 
 Preferences prefs;
 AppState CurrentAppState = HOME;
 
 int TIMEOUT = 120;
-bool DEBUG_VERBOSE = true;
+bool LOG_TO_FILE = false;
 bool SYSTEM_CLOCK = true;
 bool SHOW_YEAR = true;
 bool SAVE_POWER = true;
@@ -30,7 +29,7 @@ namespace pocketmage {
 void loadSettings() {
   prefs.begin("PocketMage", true);
   TIMEOUT = prefs.getInt("TIMEOUT", 120);
-  DEBUG_VERBOSE = prefs.getBool("DEBUG_VERBOSE", true);
+  LOG_TO_FILE = prefs.getBool("LOG_TO_FILE", false);
   SYSTEM_CLOCK = prefs.getBool("SYSTEM_CLOCK", true);
   SHOW_YEAR = prefs.getBool("SHOW_YEAR", true);
   SAVE_POWER = prefs.getBool("SAVE_POWER", true);
@@ -65,4 +64,4 @@ void recoverFromCrash() {
 // release with the SDK they were built against (see symbols.list).
 // Must match the VERSION file at the repo root: CI fails the build when the
 // two drift.
-extern "C" const char pocketmage_sdk_version[] = "0.1.0";
+extern "C" const char pocketmage_sdk_version[] = "0.2.0";

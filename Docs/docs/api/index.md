@@ -44,6 +44,7 @@ Most components are owned by a single global instance created inside the SDK and
 | Clock       | `CLOCK()`   | PCF8563 RTC, timeout bookkeeping                   | [clock](clock.md)   |
 | WiFi        | `P_WIFI`    | station radio service (apps may call)              | [wifi](wifi.md)     |
 | System      | (free)      | init, CPU speed, deep sleep                        | [sys](sys.md)       |
+| Logging     | `pm_log`    | console, log file, crash-report log tail           | [log](log.md)       |
 | I18n        | `I18n`      | language tables, command normalization             | [i18n-runtime](i18n-runtime.md) |
 | Text utils  | (free)      | string split/join/parse helpers                    | [io](io.md)         |
 | Frames      | `Frame`     | e-ink text/bitmap frame model, scrolling           | [frames](frames.md) |

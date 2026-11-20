@@ -107,7 +107,7 @@ public:
 ### Measuring
 
 - `textWidth` measures without changing the currently applied font, so layout code can interleave measure/draw freely.
-- `charWidth` uses a per-style cache for codepoints 32 through 255 on the OLED target; other codepoints and the E-Ink target are measured live.
+- `charWidth` uses a per-style cache for codepoints 32 through 255 on the OLED target. Each style's 224-byte table is created the first time that style is measured, and widths are measured live if there is no memory for it. Other codepoints and the E-Ink target are always measured live.
 - `fontHeight` / `fontAscent` / `fontDescent` are measured lazily on first per (target, style) call and cached; layout code never switches fonts merely to measure.
 
 ### `fitStyle`

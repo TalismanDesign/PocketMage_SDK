@@ -10,8 +10,6 @@ OS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__),
 SOURCE = os.path.join(OS_ROOT, "src", "elf_app_manifest.cpp")
 HEADER = os.path.join(OS_ROOT, "include", "elf_app_manifest.h")
 
-# The manifest parser lives in the firmware, which is present only when the
-# SDK is checked out inside PocketMageOS.
 HAVE_FIRMWARE_SOURCE = os.path.isfile(SOURCE) and os.path.isfile(HEADER)
 
 HARNESS = r"""
