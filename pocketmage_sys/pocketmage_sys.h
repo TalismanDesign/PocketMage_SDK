@@ -21,6 +21,10 @@ extern volatile bool PWR_BTN_event; // Power button event **shared with library*
 
 namespace pocketmage {
 void setCpuSpeed(int newFreq);
+/** Return one 32-bit value from the hardware random source. */
+uint32_t randomU32();
+/** Return a value in [min, max], using hardware entropy without modulo bias. */
+uint32_t randomRange(uint32_t min, uint32_t max);
 /** Hold off CPU clock changes while the e-ink panel owns the SPI bus. */
 void beginDisplayRefresh();
 void endDisplayRefresh();

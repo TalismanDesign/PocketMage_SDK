@@ -144,6 +144,8 @@ pm_oled_set_power_save
 pm_oled_sysmsg
 pm_oled_triangle
 pm_oled_width
+pm_random
+pm_random_range
 pm_sd_append_binary_file
 pm_sd_append_file
 pm_sd_append_to_file
@@ -206,7 +208,10 @@ pm_sd_stream_write
 pm_sd_write_binary_file
 pm_sd_write_file
 pm_sd_write_metadata
+pm_sys_begin_display_refresh
 pm_sys_deep_sleep
+pm_sys_display_refreshing
+pm_sys_end_display_refresh
 pm_sys_set_cpu_speed
 pm_text
 pm_text_color

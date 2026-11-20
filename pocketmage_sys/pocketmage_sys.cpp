@@ -25,6 +25,7 @@ void setupSD();
 #include "esp_task_wdt.h"
 
 #include <atomic>
+#include <cstdint>
 
 static constexpr const char *TAG = "SYSTEM";
 static constexpr uint32_t kSleepLogFlushMs = 500;
@@ -42,6 +43,23 @@ static IdleTimer idleTimer;
 
 void reportActivity() {
   idleTimer.activity(millis());
+}
+
+uint32_t randomU32() {
+  return esp_random();
+}
+
+uint32_t randomRange(uint32_t min, uint32_t max) {
+  if (max <= min)
+    return min;
+  if (min == 0 && max == UINT32_MAX)
+    return esp_random();
+  const uint32_t span = max - min + 1;
+  const uint32_t limit = UINT32_MAX - (UINT32_MAX % span);
+  uint32_t value = esp_random();
+  while (value > limit)
+    value = esp_random();
+  return min + value % span;
 }
 
 bool idleSleepDue(bool inhibited) {

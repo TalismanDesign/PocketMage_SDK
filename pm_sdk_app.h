@@ -338,6 +338,11 @@ const char* pm_layout_truncate_with_ellipsis(const char* a0, int a1, int a2, int
 int pm_layout_word_wrap_count(const char* a0, int a1, int a2);
 int pm_layout_word_wrap_get(const char* a0, int a1, int a2, int index, char* out, size_t out_size);
 void pm_sys_set_cpu_speed(int a0);
+uint32_t pm_random(void);
+uint32_t pm_random_range(uint32_t a0, uint32_t a1);
+void pm_sys_begin_display_refresh(void);
+void pm_sys_end_display_refresh(void);
+bool pm_sys_display_refreshing(void);
 void pm_activity(void);
 void pm_sys_deep_sleep(bool a0);
 void pm_ui_draw_transport_icon(int a0, int a1, int a2, int a3, int a4);

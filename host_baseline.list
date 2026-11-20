@@ -362,6 +362,7 @@ esp_time_impl_set_boot_time
 exit
 explicit_bzero
 fabsf
+ferror
 fflush
 finitef
 floorf

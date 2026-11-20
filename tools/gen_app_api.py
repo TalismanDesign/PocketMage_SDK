@@ -205,7 +205,11 @@ FREE_FUNCTION_HEADERS = {
 }
 
 FREE_FUNCTION_NAMESPACES = {"pocketmage_sys.h": "pocketmage"}
-FREE_FUNCTION_NAMES = {("pocketmage_sys.h", "reportActivity"): "pm_activity"}
+FREE_FUNCTION_NAMES = {
+    ("pocketmage_sys.h", "reportActivity"): "pm_activity",
+    ("pocketmage_sys.h", "randomU32"): "pm_random",
+    ("pocketmage_sys.h", "randomRange"): "pm_random_range",
+}
 FREE_FUNCTION_EXCLUDED = {
     ("pocketmage_sys.h", "idleSleepDue"),
     ("pocketmage_sys.h", "checkIdleSleep"),
