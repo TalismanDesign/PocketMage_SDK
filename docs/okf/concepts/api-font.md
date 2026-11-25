@@ -4,10 +4,10 @@ title: "Fonts & Text (pocketmage_font)"
 description: "FontStyle roles, DisplayTarget, the FontEngine static API, and the default font table."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/font/"
 path: /api/font/
-updated: 2026-11-01
+updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T03:55:48.223Z"
+  generated_at: "2026-11-25T08:06:17.933Z"
 ---
 ---
 title: "Fonts & Text (pocketmage_font)"
@@ -118,7 +118,7 @@ public:
 ### Measuring
 
 - `textWidth` measures without changing the currently applied font, so layout code can interleave measure/draw freely.
-- `charWidth` uses a per-style cache for codepoints 32 through 255 on the OLED target; other codepoints and the E-Ink target are measured live.
+- `charWidth` uses a per-style cache for codepoints 32 through 255 on the OLED target. Each style's 224-byte table is created the first time that style is measured, and widths are measured live if there is no memory for it. Other codepoints and the E-Ink target are always measured live.
 - `fontHeight` / `fontAscent` / `fontDescent` are measured lazily on first per (target, style) call and cached; layout code never switches fonts merely to measure.
 
 ### `fitStyle`

@@ -102,11 +102,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../../assets/favicon.png?v=mvxaryyd">
-    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mvxaryyd">
+    <link id="site-favicon" rel="icon" href="../../assets/favicon.png?v=mwvuajyt">
+    <link rel="stylesheet" href="../../assets/css/docmd-main.css?v=mwvuajyt">
     
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mvxaryyd" id="hljs-light" >
-    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mvxaryyd" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-light.css?v=mwvuajyt" id="hljs-light" >
+    <link rel="stylesheet" href="../../assets/css/docmd-highlight-dark.css?v=mwvuajyt" id="hljs-dark" disabled>
     
     
 <meta name="description" content="The station radio service: enabled/scan/connect lifecycle, status queries, and saved credentials.">
@@ -125,13 +125,13 @@
 
 
 
-<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mvxaryyd" >
-<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mvxaryyd" >
-<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mvxaryyd" >
-<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mvxaryyd" >
+<link rel="stylesheet" href="../../assets/css/docmd-theme-ruby.css?v=mwvuajyt" >
+<link rel="stylesheet" href="../../assets/css/docmd-git.css?v=mwvuajyt" >
+<link rel="stylesheet" href="../../assets/css/docmd-openapi.css?v=mwvuajyt" >
+<link rel="stylesheet" href="../../assets/css/docmd-ai.css?v=mwvuajyt" >
 
     
-      <link rel="stylesheet" href="../../assets/css/theme.css?v=mvxaryyd">
+      <link rel="stylesheet" href="../../assets/css/theme.css?v=mwvuajyt">
     
     
   </head>
@@ -1021,6 +1021,38 @@
     
       <li class="" >
       
+        <a href="../../api/audio/" class=" "
+          >
+           
+<svg class="lucide-icon icon-volume " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-volume"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Audio and media
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
         <a href="../../api/clock/" class=" "
           >
            
@@ -1123,6 +1155,41 @@
           
           <span class="nav-item-title">
             System
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../../api/log/" class=" "
+          >
+           
+<svg class="lucide-icon icon-scroll-text " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-scroll-text"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 12h-5" />
+  <path d="M15 8h-5" />
+  <path d="M19 17V5a2 2 0 0 0-2-2H4" />
+  <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Logging
             </span>
           
           
@@ -1922,7 +1989,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22WiFi%20(pocketmage_wifi)%22%0Adescription%3A%20%22The%20station%20radio%20service%3A%20enabled%2Fscan%2Fconnect%20lifecycle%2C%20status%20queries%2C%20and%20saved%20credentials.%22%0A---%0A%0A%23%20WiFi%20API%0A%0A%60PocketMageWifi%60%20is%20the%20ESP32-S3%20station%20radio%20as%20a%20non-blocking%20service.%20All%20control%20calls%20dispatch%20to%20a%20dedicated%20task%3B%20status%20reads%20are%20thread-safe.%20On%20the%20S3%20the%20radio%20stalls%20below%20240%20MHz%2C%20so%20the%20service%20holds%20the%20CPU%20at%20%60WIFI_CPU_FREQ_MHZ%60%20(240)%20whenever%20the%20radio%20is%20not%20%60Off%60.%0A%0A%23%23%20Access%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0APocketMageWifi%26%20wifi%20%3D%20P_WIFI%3B%0A%60%60%60%0A%0A%60P_WIFI%60%20is%20a%20global%20reference%20to%20the%20singleton%20(%60PocketMageWifi%3A%3AgetInstance()%60).%20The%20host%20calls%20%60P_WIFI.begin()%60%20during%20%60PocketMage_INIT()%60%3B%20the%20radio%20stays%20off%20until%20something%20calls%20%60enable()%60.%0A%0A%23%23%20State%20model%0A%0A%60%60%60cpp%0Aenum%20class%20WifiRadioState%20%7B%0A%20%20Off%2C%20TurningOn%2C%20On%2C%20Scanning%2C%20Connecting%2C%20Connected%2C%20TurningOff%0A%7D%3B%0A%60%60%60%0A%0A%23%23%20Class%20reference%0A%0A%23%23%23%20Lifecycle%0A%0A%60%60%60cpp%0Avoid%20begin()%3B%20%20%20%2F%2F%20one-time%20service%20init%20(event%20loop%2C%20netif%2C%20task)%0Avoid%20stop()%3B%20%20%20%20%2F%2F%20clean%20service%20shutdown%0A%60%60%60%0A%0A%23%23%23%20Control%20(non-blocking%2C%20dispatched%20to%20the%20task)%0A%0A%60%60%60cpp%0Avoid%20enable()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20turn%20the%20radio%20on%0Avoid%20disable()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20turn%20the%20radio%20off%0Avoid%20scan()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20start%20a%20scan%0Avoid%20connect(const%20char*%20ssid%2C%20const%20char*%20password%2C%20bool%20save%20%3D%20true)%3B%0Avoid%20disconnect()%3B%0Avoid%20reconnect()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20retry%20with%20saved%20creds%0A%60%60%60%0A%0A%60connect(...%2C%20save)%60%20persists%20the%20credentials%20under%20the%20%60pmwifi%60%20NVS%20namespace%20when%20%60save%60%20is%20true.%20%60reconnect()%60%20and%20auto-connect%20use%20the%20saved%20networks%20on%20boot.%0A%0A%23%23%23%20Status%20(thread-safe)%0A%0A%60%60%60cpp%0AWifiRadioState%20getState()%20const%3B%0Abool%20isConnected()%20const%3B%0Abool%20isScanning()%20const%3B%0AString%20getStatusMessage()%20const%3B%0AString%20getConnectedSSID()%20const%3B%0AString%20getIpAddress()%20const%3B%0Aint%20getRssi()%20const%3B%0AString%20getLastError()%20const%3B%0A%60%60%60%0A%0A%60getStatusMessage()%60%20is%20a%20human-readable%20line%20for%20status%20displays.%20%60getLastError()%60%20carries%20the%20connection-failure%20reason%20text.%0A%0A%23%23%23%20Scan%20results%0A%0A%60%60%60cpp%0Auint16_t%20getScanResultCount()%20const%3B%0Abool%20getScanResult(uint16_t%20index%2C%20WifiApInfo%26%20out)%20const%3B%0A%60%60%60%0A%0A%60WifiApInfo%60%20is%20a%20simplified%20AP%20record%20(%60ssid%60%2C%20%60rssi%60%2C%20%60channel%60%2C%20%60authmode%60).%20Results%20are%20capped%20at%20%60MAX_SCAN_RESULTS%60%20(20).%0A%0A%23%23%23%20Saved%20credentials%0A%0A%60%60%60cpp%0Abool%20hasSavedCredentials(const%20char*%20ssid)%20const%3B%0Abool%20loadSavedCredentials(const%20char*%20ssid%2C%20char*%20password%2C%20size_t%20maxLen)%20const%3B%0Avoid%20clearSavedCredentials(const%20char*%20ssid)%3B%0A%60%60%60%0A%0A%23%23%23%20Events%0A%0A%60%60%60cpp%0Atypedef%20std%3A%3Afunction%3Cvoid(void)%3E%20WifiEventCallback%3B%0Avoid%20setEventCallback(WifiEventCallback%20cb)%3B%0Avoid%20dispatchEvents()%3B%0A%60%60%60%0A%0ASet%20a%20callback%20with%20%60setEventCallback%60%20to%20be%20notified%20of%20state%20changes%20(the%20WiFi%20command%20screen%20uses%20it%20to%20trigger%20a%20redraw)%3B%20call%20%60dispatchEvents()%60%20from%20the%20app%20loop%20to%20process%20pending%20notifications.%20The%20service%20handles%20backoff%20automatically%20(up%20to%20%60MAX_RETRIES%60%20with%20%60RETRY_BASE_DELAY_MS%60%20growing%20to%20%60RETRY_MAX_DELAY_MS%60).%0A%0A%23%23%20Threading%0A%0AControl%20methods%20only%20enqueue%20a%20command%20and%20return.%20Status%20getters%20lock%20the%20service%20mutex.%20The%20service%20task%20holds%20the%20CPU%20at%20240%20MHz%20for%20the%20whole%20session%3B%20%60pocketmage%3A%3AsetCpuSpeed%60%20refuses%20any%20drop%20while%20the%20radio%20is%20not%20%60Off%60%20(see%20%5Bsys%5D(sys.md)).%0A%0A%23%23%20Example%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0Avoid%20connectHome()%20%7B%0A%20%20P_WIFI.enable()%3B%0A%20%20delay(200)%3B%0A%20%20P_WIFI.connect(%22home-ssid%22%2C%20%22hunter2%22)%3B%0A%7D%0A%0Avoid%20drawWifiStatus()%20%7B%0A%20%20%2F%2F%20draw%20a%20status%20line%20from%20the%20thread-safe%20getters%0A%7D%0A%60%60%60%0A%0A%23%23%20C%20ABI%20(%60pm_*%60)%0A%0AExternal%20ELF%20apps%20call%20these%20C%20wrappers%20rather%20than%20the%20C%2B%2B%20class%20above%3B%20they%20are%20generated%20from%20it%20by%20%60gen_app_api.py%60%20and%20declared%20in%20%60pm_sdk_app.h%60%20(pulled%20in%20via%20%60pm_app_api.h%60).%20See%20the%20%5Bfunction%20index%5D(functions.md)%20and%20the%20%5Bprojection%20model%5D(index.md%23api-reference-the-c-abi-pm)%20for%20the%20general%20rules.%0A%0A%60%60%60c%0Avoid%20pm_wifi_begin()%3B%0Avoid%20pm_wifi_stop()%3B%0Avoid%20pm_wifi_enable()%3B%0Avoid%20pm_wifi_disable()%3B%0Avoid%20pm_wifi_scan()%3B%0Avoid%20pm_wifi_connect(const%20char*%20a0%2C%20const%20char*%20a1%2C%20bool%20a2)%3B%0Avoid%20pm_wifi_disconnect()%3B%0Avoid%20pm_wifi_reconnect()%3B%0Aint%20pm_wifi_get_state()%3B%0Abool%20pm_wifi_is_connected()%3B%0Abool%20pm_wifi_is_scanning()%3B%0Aconst%20char*%20pm_wifi_get_status_message()%3B%0Aconst%20char*%20pm_wifi_get_connected_ssid()%3B%0Aconst%20char*%20pm_wifi_get_ip_address()%3B%0Aint%20pm_wifi_get_rssi()%3B%0Aconst%20char*%20pm_wifi_get_last_error()%3B%0Auint16_t%20pm_wifi_get_scan_result_count()%3B%0Abool%20pm_wifi_has_saved_credentials(const%20char*%20a0)%3B%0Abool%20pm_wifi_load_saved_credentials(const%20char*%20a0%2C%20char*%20a1%2C%20size_t%20a2)%3B%0Avoid%20pm_wifi_clear_saved_credentials(const%20char*%20a0)%3B%0Avoid%20pm_wifi_dispatch_events()%3B%0A%60%60%60%0A%0AAll%20operate%20on%20the%20%60P_WIFI%60%20singleton.%20Every%20%60const%20char*%60%20return%20points%20into%20the%20rotating%20string%20pool%3B%20copy%20it%20before%20the%20next%20SDK%20call%20if%20it%20must%20survive%20four%20further%20string-returning%20calls.%0A%0A-%20%60pm_wifi_begin()%60%20%2F%20%60pm_wifi_stop()%60%20are%20%60begin()%60%20%2F%20%60stop()%60.%0A-%20%60pm_wifi_enable()%60%20%2F%20%60pm_wifi_disable()%60%20are%20%60enable()%60%20%2F%20%60disable()%60.%0A-%20%60pm_wifi_scan()%60%20is%20%60scan()%60.%0A-%20%60pm_wifi_connect(a0%2C%20a1%2C%20a2)%60%20is%20%60connect(ssid%2C%20password%2C%20save)%60%3B%20%60a0%60%20is%20the%20SSID%2C%20%60a1%60%20is%20the%20password%2C%20%60a2%60%20persists%20the%20credentials%20when%20true.%0A-%20%60pm_wifi_disconnect()%60%20%2F%20%60pm_wifi_reconnect()%60%20are%20%60disconnect()%60%20%2F%20%60reconnect()%60.%0A-%20%60pm_wifi_get_state()%60%20is%20%60getState()%60.%20Returns%20the%20%60WifiRadioState%60%20value%20as%20int.%0A-%20%60pm_wifi_is_connected()%60%20%2F%20%60pm_wifi_is_scanning()%60%20are%20%60isConnected()%60%20%2F%20%60isScanning()%60.%0A-%20%60pm_wifi_get_status_message()%60%20is%20%60getStatusMessage()%60%3B%20a%20human-readable%20status%20line.%0A-%20%60pm_wifi_get_connected_ssid()%60%20is%20%60getConnectedSSID()%60.%0A-%20%60pm_wifi_get_ip_address()%60%20is%20%60getIpAddress()%60.%0A-%20%60pm_wifi_get_rssi()%60%20is%20%60getRssi()%60.%0A-%20%60pm_wifi_get_last_error()%60%20is%20%60getLastError()%60%3B%20the%20connection-failure%20reason%20text.%0A-%20%60pm_wifi_get_scan_result_count()%60%20is%20%60getScanResultCount()%60.%20Returns%20the%20AP%20count%2C%20capped%20at%20%60MAX_SCAN_RESULTS%60.%20The%20per-result%20%60getScanResult()%60%20is%20not%20projected%20to%20the%20C%20ABI.%0A-%20%60pm_wifi_has_saved_credentials(a0)%60%20is%20%60hasSavedCredentials(ssid)%60.%0A-%20%60pm_wifi_load_saved_credentials(a0%2C%20a1%2C%20a2)%60%20is%20%60loadSavedCredentials(ssid%2C%20password%2C%20maxLen)%60%3B%20%60a0%60%20is%20the%20SSID%2C%20%60a1%60%20is%20the%20caller%20buffer%20the%20password%20is%20written%20into%2C%20%60a2%60%20is%20its%20size.%20Returns%20true%20when%20a%20credential%20was%20found%20and%20copied.%0A-%20%60pm_wifi_clear_saved_credentials(a0)%60%20is%20%60clearSavedCredentials(ssid)%60.%0A-%20%60pm_wifi_dispatch_events()%60%20is%20%60dispatchEvents()%60%3B%20call%20it%20from%20the%20app%20loop%20to%20process%20pending%20notifications.%20The%20%60setEventCallback()%60%20method%20is%20not%20projected%20to%20the%20C%20ABI.%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22WiFi%20(pocketmage_wifi)%22%0Adescription%3A%20%22The%20station%20radio%20service%3A%20enabled%2Fscan%2Fconnect%20lifecycle%2C%20status%20queries%2C%20and%20saved%20credentials.%22%0A---%0A%0A%23%20WiFi%20API%0A%0A%60PocketMageWifi%60%20is%20the%20ESP32-S3%20station%20radio%20as%20a%20non-blocking%20service.%20All%20control%20calls%20dispatch%20to%20a%20dedicated%20task%3B%20status%20reads%20are%20thread-safe.%20On%20the%20S3%20the%20radio%20stalls%20below%20240%20MHz%2C%20so%20the%20service%20holds%20the%20CPU%20at%20%60WIFI_CPU_FREQ_MHZ%60%20(240)%20whenever%20the%20radio%20is%20not%20%60Off%60.%0A%0A%23%23%20Access%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0APocketMageWifi%26%20wifi%20%3D%20P_WIFI%3B%0A%60%60%60%0A%0A%60P_WIFI%60%20is%20a%20global%20reference%20to%20the%20singleton%20(%60PocketMageWifi%3A%3AgetInstance()%60).%20Wi-Fi%20is%20not%20started%20at%20boot%2C%20which%20saves%20about%2012%20KB%20of%20memory.%20The%20first%20%60enable()%60%20(or%20an%20explicit%20%60begin()%60)%20sets%20it%20up%20and%20turns%20the%20radio%20on.%20Until%20then%2C%20%60getStatusMessage()%60%20reports%20idle.%0A%0A%23%23%20State%20model%0A%0A%60%60%60cpp%0Aenum%20class%20WifiRadioState%20%7B%0A%20%20Off%2C%20TurningOn%2C%20On%2C%20Scanning%2C%20Connecting%2C%20Connected%2C%20TurningOff%0A%7D%3B%0A%60%60%60%0A%0A%23%23%20Class%20reference%0A%0A%23%23%23%20Lifecycle%0A%0A%60%60%60cpp%0Avoid%20begin()%3B%20%20%20%2F%2F%20shared%20event%20loop%20and%20netif%20only%3B%20no%20dedicated%20worker%0Avoid%20stop()%3B%20%20%20%20%2F%2F%20clean%20service%20shutdown%0A%60%60%60%0A%0A%60begin()%60%20is%20safe%20to%20call%20more%20than%20once.%20The%20Wi-Fi%20task%20and%20its%2010%2C240-byte%20stack%20are%20created%20on%20the%20first%20%60enable()%60.%20If%20that%20fails%2C%20%60getLastError()%60%20says%20why%20and%20you%20can%20call%20%60enable()%60%20again.%20Other%20controls%2C%20such%20as%20%60scan()%60%2C%20do%20nothing%20until%20%60enable()%60%20has%20been%20called.%0A%0A%60disable()%60%20turns%20the%20radio%20off%20but%20keeps%20the%20task%20for%20next%20time.%20%60stop()%60%20shuts%20the%20task%20down%20and%20frees%20it%2C%20waiting%20up%20to%20five%20seconds.%20If%20it%20times%20out%2C%20the%20service%20refuses%20new%20commands%20until%20a%20later%20%60stop()%60%20succeeds.%0A%0A%23%23%23%20Control%20(non-blocking%2C%20dispatched%20to%20the%20task)%0A%0A%60%60%60cpp%0Avoid%20enable()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20turn%20the%20radio%20on%0Avoid%20disable()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20turn%20the%20radio%20off%0Avoid%20scan()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20start%20a%20scan%0Avoid%20connect(const%20char*%20ssid%2C%20const%20char*%20password%2C%20bool%20save%20%3D%20true)%3B%0Avoid%20disconnect()%3B%0Avoid%20reconnect()%3B%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%2F%2F%20retry%20with%20saved%20creds%0A%60%60%60%0A%0A%60connect(...%2C%20save)%60%20persists%20the%20credentials%20under%20the%20%60pmwifi%60%20NVS%20namespace%20when%20%60save%60%20is%20true.%20%60reconnect()%60%20and%20auto-connect%20use%20the%20saved%20networks%20on%20boot.%0A%0A%23%23%23%20Status%20(thread-safe)%0A%0A%60%60%60cpp%0AWifiRadioState%20getState()%20const%3B%0Abool%20isConnected()%20const%3B%0Abool%20isScanning()%20const%3B%0AString%20getStatusMessage()%20const%3B%0AString%20getConnectedSSID()%20const%3B%0AString%20getIpAddress()%20const%3B%0Aint%20getRssi()%20const%3B%0AString%20getLastError()%20const%3B%0A%60%60%60%0A%0A%60getStatusMessage()%60%20is%20a%20human-readable%20line%20for%20status%20displays.%20%60getLastError()%60%20carries%20the%20connection-failure%20reason%20text.%0A%0A%23%23%23%20Scan%20results%0A%0A%60%60%60cpp%0Auint16_t%20getScanResultCount()%20const%3B%0Abool%20getScanResult(uint16_t%20index%2C%20WifiApInfo%26%20out)%20const%3B%0A%60%60%60%0A%0A%60WifiApInfo%60%20is%20a%20simplified%20AP%20record%20(%60ssid%60%2C%20%60rssi%60%2C%20%60channel%60%2C%20%60authmode%60).%20Results%20are%20capped%20at%20%60MAX_SCAN_RESULTS%60%20(20).%0A%0A%23%23%23%20Saved%20credentials%0A%0A%60%60%60cpp%0Abool%20hasSavedCredentials(const%20char*%20ssid)%20const%3B%0Abool%20loadSavedCredentials(const%20char*%20ssid%2C%20char*%20password%2C%20size_t%20maxLen)%20const%3B%0Avoid%20clearSavedCredentials(const%20char*%20ssid)%3B%0A%60%60%60%0A%0A%23%23%23%20Events%0A%0A%60%60%60cpp%0Atypedef%20std%3A%3Afunction%3Cvoid(void)%3E%20WifiEventCallback%3B%0Avoid%20setEventCallback(WifiEventCallback%20cb)%3B%0Avoid%20dispatchEvents()%3B%0A%60%60%60%0A%0ASet%20a%20callback%20with%20%60setEventCallback%60%20to%20be%20notified%20of%20state%20changes%20(the%20WiFi%20command%20screen%20uses%20it%20to%20trigger%20a%20redraw)%3B%20call%20%60dispatchEvents()%60%20from%20the%20app%20loop%20to%20process%20pending%20notifications.%20The%20service%20handles%20backoff%20automatically%20(up%20to%20%60MAX_RETRIES%60%20with%20%60RETRY_BASE_DELAY_MS%60%20growing%20to%20%60RETRY_MAX_DELAY_MS%60).%0A%0A%23%23%20Threading%0A%0AControl%20methods%20queue%20a%20command%20and%20return.%20If%20the%20queue%20is%20full%2C%20the%20command%20is%20dropped%20and%20%60getLastError()%60%20reports%20it.%20Status%20getters%20lock%20the%20service%20mutex.%20The%20service%20task%20holds%20the%20CPU%20at%20240%20MHz%20for%20the%20whole%20session%3B%20%60pocketmage%3A%3AsetCpuSpeed%60%20refuses%20any%20drop%20while%20the%20radio%20is%20not%20%60Off%60%20(see%20%5Bsys%5D(sys.md)).%0A%0A%23%23%20Example%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%0Avoid%20connectHome()%20%7B%0A%20%20P_WIFI.enable()%3B%0A%20%20delay(200)%3B%0A%20%20P_WIFI.connect(%22home-ssid%22%2C%20%22hunter2%22)%3B%0A%7D%0A%0Avoid%20drawWifiStatus()%20%7B%0A%20%20%2F%2F%20draw%20a%20status%20line%20from%20the%20thread-safe%20getters%0A%7D%0A%60%60%60%0A%0A%23%23%20C%20ABI%20(%60pm_*%60)%0A%0AExternal%20ELF%20apps%20call%20these%20C%20wrappers%20rather%20than%20the%20C%2B%2B%20class%20above%3B%20they%20are%20generated%20from%20it%20by%20%60gen_app_api.py%60%20and%20declared%20in%20%60pm_sdk_app.h%60%20(pulled%20in%20via%20%60pm_app_api.h%60).%20See%20the%20%5Bfunction%20index%5D(functions.md)%20and%20the%20%5Bprojection%20model%5D(index.md%23api-reference-the-c-abi-pm)%20for%20the%20general%20rules.%0A%0A%60%60%60c%0Avoid%20pm_wifi_begin()%3B%0Avoid%20pm_wifi_stop()%3B%0Avoid%20pm_wifi_enable()%3B%0Avoid%20pm_wifi_disable()%3B%0Avoid%20pm_wifi_scan()%3B%0Avoid%20pm_wifi_connect(const%20char*%20a0%2C%20const%20char*%20a1%2C%20bool%20a2)%3B%0Avoid%20pm_wifi_disconnect()%3B%0Avoid%20pm_wifi_reconnect()%3B%0Aint%20pm_wifi_get_state()%3B%0Abool%20pm_wifi_is_connected()%3B%0Abool%20pm_wifi_is_scanning()%3B%0Aconst%20char*%20pm_wifi_get_status_message()%3B%0Aconst%20char*%20pm_wifi_get_connected_ssid()%3B%0Aconst%20char*%20pm_wifi_get_ip_address()%3B%0Aint%20pm_wifi_get_rssi()%3B%0Aconst%20char*%20pm_wifi_get_last_error()%3B%0Auint16_t%20pm_wifi_get_scan_result_count()%3B%0Abool%20pm_wifi_has_saved_credentials(const%20char*%20a0)%3B%0Abool%20pm_wifi_load_saved_credentials(const%20char*%20a0%2C%20char*%20a1%2C%20size_t%20a2)%3B%0Avoid%20pm_wifi_clear_saved_credentials(const%20char*%20a0)%3B%0Avoid%20pm_wifi_dispatch_events()%3B%0A%60%60%60%0A%0AAll%20operate%20on%20the%20%60P_WIFI%60%20singleton.%20Every%20%60const%20char*%60%20return%20points%20into%20the%20rotating%20string%20pool%3B%20copy%20it%20before%20the%20next%20SDK%20call%20if%20it%20must%20survive%20four%20further%20string-returning%20calls.%0A%0A-%20%60pm_wifi_begin()%60%20%2F%20%60pm_wifi_stop()%60%20are%20%60begin()%60%20%2F%20%60stop()%60.%0A-%20%60pm_wifi_enable()%60%20%2F%20%60pm_wifi_disable()%60%20are%20%60enable()%60%20%2F%20%60disable()%60.%0A-%20%60pm_wifi_scan()%60%20is%20%60scan()%60.%0A-%20%60pm_wifi_connect(a0%2C%20a1%2C%20a2)%60%20is%20%60connect(ssid%2C%20password%2C%20save)%60%3B%20%60a0%60%20is%20the%20SSID%2C%20%60a1%60%20is%20the%20password%2C%20%60a2%60%20persists%20the%20credentials%20when%20true.%0A-%20%60pm_wifi_disconnect()%60%20%2F%20%60pm_wifi_reconnect()%60%20are%20%60disconnect()%60%20%2F%20%60reconnect()%60.%0A-%20%60pm_wifi_get_state()%60%20is%20%60getState()%60.%20Returns%20the%20%60WifiRadioState%60%20value%20as%20int.%0A-%20%60pm_wifi_is_connected()%60%20%2F%20%60pm_wifi_is_scanning()%60%20are%20%60isConnected()%60%20%2F%20%60isScanning()%60.%0A-%20%60pm_wifi_get_status_message()%60%20is%20%60getStatusMessage()%60%3B%20a%20human-readable%20status%20line.%0A-%20%60pm_wifi_get_connected_ssid()%60%20is%20%60getConnectedSSID()%60.%0A-%20%60pm_wifi_get_ip_address()%60%20is%20%60getIpAddress()%60.%0A-%20%60pm_wifi_get_rssi()%60%20is%20%60getRssi()%60.%0A-%20%60pm_wifi_get_last_error()%60%20is%20%60getLastError()%60%3B%20the%20connection-failure%20reason%20text.%0A-%20%60pm_wifi_get_scan_result_count()%60%20is%20%60getScanResultCount()%60.%20Returns%20the%20AP%20count%2C%20capped%20at%20%60MAX_SCAN_RESULTS%60.%20The%20per-result%20%60getScanResult()%60%20is%20not%20projected%20to%20the%20C%20ABI.%0A-%20%60pm_wifi_has_saved_credentials(a0)%60%20is%20%60hasSavedCredentials(ssid)%60.%0A-%20%60pm_wifi_load_saved_credentials(a0%2C%20a1%2C%20a2)%60%20is%20%60loadSavedCredentials(ssid%2C%20password%2C%20maxLen)%60%3B%20%60a0%60%20is%20the%20SSID%2C%20%60a1%60%20is%20the%20caller%20buffer%20the%20password%20is%20written%20into%2C%20%60a2%60%20is%20its%20size.%20Returns%20true%20when%20a%20credential%20was%20found%20and%20copied.%0A-%20%60pm_wifi_clear_saved_credentials(a0)%60%20is%20%60clearSavedCredentials(ssid)%60.%0A-%20%60pm_wifi_dispatch_events()%60%20is%20%60dispatchEvents()%60%3B%20call%20it%20from%20the%20app%20loop%20to%20process%20pending%20notifications.%20The%20%60setEventCallback()%60%20method%20is%20not%20projected%20to%20the%20C%20ABI.%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -2024,7 +2091,7 @@
 
 PocketMageWifi<span class="hljs-operator">&amp;</span> wifi <span class="hljs-operator">=</span> P_WIFI;
 </code></pre>
-<p><code>P_WIFI</code> is a global reference to the singleton (<code>PocketMageWifi::getInstance()</code>). The host calls <code>P_WIFI.begin()</code> during <code>PocketMage_INIT()</code>; the radio stays off until something calls <code>enable()</code>.</p>
+<p><code>P_WIFI</code> is a global reference to the singleton (<code>PocketMageWifi::getInstance()</code>). Wi-Fi is not started at boot, which saves about 12 KB of memory. The first <code>enable()</code> (or an explicit <code>begin()</code>) sets it up and turns the radio on. Until then, <code>getStatusMessage()</code> reports idle.</p>
 <h2 id="wifi-api-state-model" class="docmd-heading"><a href="#wifi-api-state-model" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>State model</h2>
 <pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">enum</span> <span class="hljs-keyword">class</span> WifiRadioState {
   Off, TurningOn, On, Scanning, Connecting, Connected, TurningOff
@@ -2032,9 +2099,11 @@ PocketMageWifi<span class="hljs-operator">&amp;</span> wifi <span class="hljs-op
 </code></pre>
 <h2 id="wifi-api-class-reference" class="docmd-heading"><a href="#wifi-api-class-reference" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Class reference</h2>
 <h3 id="wifi-api-class-reference-lifecycle" class="docmd-heading"><a href="#wifi-api-class-reference-lifecycle" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Lifecycle</h3>
-<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> <span class="hljs-title function_">begin</span>();   <span class="hljs-comment">// one-time service init (event loop, netif, task)</span>
+<pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> <span class="hljs-title function_">begin</span>();   <span class="hljs-comment">// shared event loop and netif only; no dedicated worker</span>
 <span class="hljs-keyword">void</span> <span class="hljs-title function_">stop</span>();    <span class="hljs-comment">// clean service shutdown</span>
 </code></pre>
+<p><code>begin()</code> is safe to call more than once. The Wi-Fi task and its 10,240-byte stack are created on the first <code>enable()</code>. If that fails, <code>getLastError()</code> says why and you can call <code>enable()</code> again. Other controls, such as <code>scan()</code>, do nothing until <code>enable()</code> has been called.</p>
+<p><code>disable()</code> turns the radio off but keeps the task for next time. <code>stop()</code> shuts the task down and frees it, waiting up to five seconds. If it times out, the service refuses new commands until a later <code>stop()</code> succeeds.</p>
 <h3 id="wifi-api-class-reference-control-non-blocking-dispatched-to-the-task" class="docmd-heading"><a href="#wifi-api-class-reference-control-non-blocking-dispatched-to-the-task" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Control (non-blocking, dispatched to the task)</h3>
 <pre class="hljs"><code class="language-cpp"><span class="hljs-keyword">void</span> <span class="hljs-title function_">enable</span>();                          <span class="hljs-comment">// turn the radio on</span>
 <span class="hljs-keyword">void</span> <span class="hljs-title function_">disable</span>();                         <span class="hljs-comment">// turn the radio off</span>
@@ -2072,7 +2141,7 @@ String <span class="hljs-title function_">getLastError</span>() <span class="hlj
 </code></pre>
 <p>Set a callback with <code>setEventCallback</code> to be notified of state changes (the WiFi command screen uses it to trigger a redraw); call <code>dispatchEvents()</code> from the app loop to process pending notifications. The service handles backoff automatically (up to <code>MAX_RETRIES</code> with <code>RETRY_BASE_DELAY_MS</code> growing to <code>RETRY_MAX_DELAY_MS</code>).</p>
 <h2 id="wifi-api-threading" class="docmd-heading"><a href="#wifi-api-threading" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Threading</h2>
-<p>Control methods only enqueue a command and return. Status getters lock the service mutex. The service task holds the CPU at 240 MHz for the whole session; <code>pocketmage::setCpuSpeed</code> refuses any drop while the radio is not <code>Off</code> (see <a href="../sys/">sys</a>).</p>
+<p>Control methods queue a command and return. If the queue is full, the command is dropped and <code>getLastError()</code> reports it. Status getters lock the service mutex. The service task holds the CPU at 240 MHz for the whole session; <code>pocketmage::setCpuSpeed</code> refuses any drop while the radio is not <code>Off</code> (see <a href="../sys/">sys</a>).</p>
 <h2 id="wifi-api-example" class="docmd-heading"><a href="#wifi-api-example" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Example</h2>
 <pre class="hljs"><code class="language-cpp"><span class="hljs-comment">#include &lt;pocketmage.h&gt;</span>
 
@@ -2275,13 +2344,13 @@ uint16_t <span class="hljs-title function_">pm_wifi_get_scan_result_count</span>
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1793505303000">
+                <span class="git-last-updated" data-timestamp="1795593959000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1793505303000"></span>
+                  <span class="git-time" data-timestamp="1795593959000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2294,10 +2363,10 @@ uint16_t <span class="hljs-title function_">pm_wifi_get_scan_result_count</span>
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="pocketmage_audio">pocketmage_audio</div>
+                            <div class="git-commit-message" title="Merge pull request #3 from TalismanDesign/develop">Merge pull request #3 from TalismanDe...</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1793505303000"></span>
+                              <span class="git-commit-date" data-timestamp="1795593959000"></span>
                             </div>
                           </div>
                         </li>
@@ -2418,14 +2487,14 @@ uint16_t <span class="hljs-title function_">pm_wifi_get_scan_result_count</span>
         </div>
       </div>
       
-      <script src="../../assets/js/docmd-main.js?v=mvxaryyd"></script>
+      <script src="../../assets/js/docmd-main.js?v=mwvuajyt"></script>
       
-      <script src="../../assets/js/docmd-git.js?v=mvxaryyd"></script>
-      <script src="../../assets/js/docmd-image-lightbox.js?v=mvxaryyd" ></script>
-<script src="../../assets/js/vendor/minisearch.js?v=mvxaryyd" ></script>
-<script src="../../assets/js/docmd-search.js?v=mvxaryyd" ></script>
-<script src="../../assets/js/docmd-git.js?v=mvxaryyd" ></script>
-<script src="../../assets/js/docmd-ai.js?v=mvxaryyd" ></script>
+      <script src="../../assets/js/docmd-git.js?v=mwvuajyt"></script>
+      <script src="../../assets/js/docmd-image-lightbox.js?v=mwvuajyt" ></script>
+<script src="../../assets/js/vendor/minisearch.js?v=mwvuajyt" ></script>
+<script src="../../assets/js/docmd-search.js?v=mwvuajyt" ></script>
+<script src="../../assets/js/docmd-git.js?v=mwvuajyt" ></script>
+<script src="../../assets/js/docmd-ai.js?v=mwvuajyt" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
@@ -2501,7 +2570,7 @@ uint16_t <span class="hljs-title function_">pm_wifi_get_scan_result_count</span>
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
-<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Audio and media","path":"/api/audio/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"Logging","path":"/api/log/","icon":"scroll-text"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
       
       
       

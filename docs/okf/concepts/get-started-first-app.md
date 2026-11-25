@@ -4,10 +4,10 @@ title: "Your first app"
 description: "Scaffold, build, gate, pack, and install a minimal PocketMage app end to end."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/get-started/first-app/"
 path: /get-started/first-app/
-updated: 2026-11-01
+updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T03:55:48.227Z"
+  generated_at: "2026-11-25T08:06:17.938Z"
 ---
 ---
 title: "Your first app"

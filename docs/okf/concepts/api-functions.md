@@ -4,10 +4,10 @@ title: "Function index (pm_*)"
 description: "Every pm_* wrapper an external app can call, grouped by module, with its exact C signature and a link to the page that documents it."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/functions/"
 path: /api/functions/
-updated: 2026-11-01
+updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T03:55:48.224Z"
+  generated_at: "2026-11-25T08:06:17.933Z"
 ---
 ---
 title: "Function index (pm_*)"
@@ -133,6 +133,14 @@ size_t pm_layout_slice_that_fits(const char* a0, size_t a1, int a2, int a3);
 const char* pm_layout_truncate_with_ellipsis(const char* a0, int a1, int a2, int a3);
 int pm_layout_word_wrap_count(const char* a0, int a1, int a2);
 int pm_layout_word_wrap_get(const char* a0, int a1, int a2, int index, char* out, size_t out_size);
+```
+
+## Logging
+
+Documented on [Logging](log.md). Apps normally call it through the `PM_LOGE` to `PM_LOGV` macros.
+
+```c
+void pm_log_write(int level, const char *tag, const char *format, ...);
 ```
 
 ## OLED

@@ -11,6 +11,8 @@
 
 - [Built-in asset bitmaps (libAssets.h)](https://talismandesign.github.io/PocketMage_SDK/docs/api/assets/)
   Compiled-in PROGMEM bitmaps for the status bar, screensavers, and battery gauge.
+- [Audio and media](https://talismandesign.github.io/PocketMage_SDK/docs/api/audio/)
+  Shared playback, PCM timing, persistent preferences, streamed tags, and USB ownership.
 - [Buzzer (pocketmage_bz)](https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/)
   PWM buzzer output, Note/Jingle data model, and the built-in melodies.
 - [Clock (pocketmage_clock)](https://talismandesign.github.io/PocketMage_SDK/docs/api/clock/)
@@ -35,6 +37,8 @@
   The TCA8418 matrix keyboard and USB HID stack: modifiers, key events, and scanning.
 - [Layout (pocketmage_layout)](https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/)
   Canonical display geometry, the row-pitch helper, and the text-fit free functions.
+- [Logging (pocketmage_log)](https://talismandesign.github.io/PocketMage_SDK/docs/api/log/)
+  The SDK logger: levels, per-tag filtering, the serial console, the optional log file, and the log tail kept for crash reports.
 - [OLED (pocketmage_oled)](https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/)
   The 256x32 SSD1326 OLED: PocketmageOled class, the u8g2 object, and the status line.
 - [SD card (pocketmage_sd)](https://talismandesign.github.io/PocketMage_SDK/docs/api/sd/)
@@ -84,7 +88,7 @@
 - [PocketMage SDK guides](https://talismandesign.github.io/PocketMage_SDK/docs/guides/)
   How to build apps, understand their lifecycle, and draw to both displays.
 - [App lifecycle](https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/)
-  Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits.
+  Entry points, task-owned resources, idle behavior, and resident app finalization.
 - [Making an app](https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/)
   Scaffold, build, pack, and run your first PocketMage app.
 - [Publishing an app](https://talismandesign.github.io/PocketMage_SDK/docs/guides/publishing/)

@@ -6,6 +6,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/audio/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -62,6 +67,11 @@
   </url>
   <url>
     <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://talismandesign.github.io/PocketMage_SDK/docs/api/log/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

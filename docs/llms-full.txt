@@ -80,6 +80,76 @@ void drawOwnBatteryGauge(int x, int y) {
 
 ---
 
+## [Audio and media](https://talismandesign.github.io/PocketMage_SDK/docs/api/audio/) (API)
+
+---
+title: "Audio and media"
+description: "Shared playback, PCM timing, persistent preferences, streamed tags, and USB ownership."
+---
+
+# Audio and media
+
+Native apps use `P_AUDIO` and `P_MEDIA`. ELF apps include `pm_app_api.h` and use generated wrappers over the same services. The OS owns decoding, output drivers, SD access, metadata parsing, and preferences.
+
+## Playback
+
+Call `pm_audio_begin()` before playback, then `pm_audio_play(path)`. Save `pm_audio_get_playback_id()` for each request and query `pm_audio_get_playback_result(id)` for `PENDING`, `ENDED`, `FAILED`, or `CANCELLED`. Playback state is queried separately with `pm_audio_get_state()`. Natural EOF and manual stop are different results; apps should advance playlists only once for an ended request.
+
+Every `play` call creates a new ID and resets PCM time, including rejected calls. Null, empty, or overlong paths and initialization, shutdown, task, or queue failures report `FAILED`; `pm_audio_get_last_error()` describes the rejection. The previous clip is superseded, and its queued work or late decoder completion cannot turn the rejected request into `ENDED`.
+
+`pm_audio_play()` accepts `.mp3`, `.wav`, and `.ogg` paths. Ogg files can contain Vorbis or Opus audio, and unsupported extensions fail before the decoder opens. The decode task is recreated with a format-sized stack, so switching formats does not keep a larger stack resident than the current clip needs.
+
+`pm_audio_pause()`, `pm_audio_resume()`, and `pm_audio_stop_playback()` control playback within the session. `pm_audio_stop_playback()` returns right away, before the decoder has freed its memory. If you need that memory back, for example to load artwork for the next song, call `pm_audio_stop_playback_checked(timeout_ms)` instead. It waits for cleanup and returns false if it times out; new playback is refused until cleanup finishes. `pm_audio_stop_checked()` ends the service and returns false if shutdown is incomplete. It retains live resources so the control task can retry; app code must remain resident until callbacks and workers are finished. The ELF runner handles this on normal app return.
+
+`pm_audio_get_position()` is the encoded byte position. `pm_audio_get_position_ms()` reports elapsed decoded PCM frames, accounting for sample rate and channels. It avoids estimating elapsed time from compressed bytes. Gain is applied to PCM samples before either sink.
+
+## Output and preferences
+
+`pm_audio_set_output()` selects `PM_AUDIO_OUTPUT_PIEZO`, `PM_AUDIO_OUTPUT_USB`, or `PM_AUDIO_OUTPUT_AUTO`. `pm_audio_get_output()` is the preference; `pm_audio_get_active_output()` is the currently available sink. USB falls back to piezo when a compatible speaker is unavailable.
+
+`pm_audio_set_volume_level()` sets the volume from 0 to 255 and `pm_audio_get_volume_level()` reads it back. Zero mutes, and 255 plays the audio at its original level (about -48 dB at 1, never louder than the source). USB and piezo keep separate volumes, since a speaker needs much less than the piezo. The piezo starts at 160 (about -18 dB) and USB at 51 (about -36 dB, shown as 20%).
+
+These two calls change the output that will play next: USB if a speaker is playing, or connected with the output set to USB or Auto; otherwise the piezo. To change one output directly, use `pm_audio_set_volume_level_for(output, level)` and `pm_audio_get_volume_level_for(output)` with `PM_AUDIO_OUTPUT_PIEZO` or `PM_AUDIO_OUTPUT_USB`. Setting `PM_AUDIO_OUTPUT_AUTO` does nothing, and reading it returns the piezo volume.
+
+USB plays the audio as decoded, in stereo and without filtering; only the volume is applied. The piezo mixes to mono and filters out low frequencies it cannot play.
+
+`pm_audio_load_settings()` and `pm_audio_save_settings()` use the NVS namespace `PMAudio`, key `settings`, and store both volumes and the output. `begin()` loads them once. If the data is invalid or cannot be read, the call returns false and the current settings stay in use. Apps share these preferences rather than saving their own audio settings on SD.
+
+Settings saved by older firmware, which had one shared volume, are converted on load: that volume becomes the piezo volume and USB starts at its default.
+
+## Streamed metadata and artwork
+
+`pm_media_probe(path, &info)` fills `pm_media_info` on success and leaves the caller output unchanged on failure. It uses bounded reads through the SD gateway rather than loading the encoded file into RAM. Fields include UTF-8 title, artist, album, duration, MPEG audio offset, and an embedded JPEG/PNG region. Zero duration or cover length means unavailable.
+
+MP3 uses ID3v2.3/v2.4 tags and MPEG duration. Duration comes from the Xing/Info or VBRI header when the file has one; otherwise it is estimated from the average bitrate of the first 32 frames.
+
+WAV reads RIFF fmt and data chunks, LIST/INFO tags, and an embedded ID3 chunk.
+
+Ogg reads Vorbis or Opus identification and comment packets, and uses the final page granule for duration.
+
+Unsupported tag transforms leave the affected fields empty. Malformed tags, invalid paths, and I/O errors fail the probe.
+
+Ogg `METADATA_BLOCK_PICTURE` covers are exposed as a base64 byte region. The image decoder detects this region and decodes it while reading the file, so artwork is never cached in RAM. Pass the cover offset and length to the image-region decoder; the app need not implement tag scanning or cache host-owned metadata code.
+
+## Connector lifecycle
+
+`pm_usb` arbitrates the S3 internal PHY between DebugSerial, Audio, Keyboard, and Storage. Role changes are serialized; incomplete shutdown retains the current owner.
+
+- Debug serial is the unclaimed default. Opening Piezo or unattached Auto audio does not install a USB host.
+- An attached accessory receives a five-second audio enumeration window. A failed or unsupported probe is suppressed until detach or output selection is requested, restoring serial and allowing keyboard polling. A speaker that has worked once is detected again when replugged, even if the USB adapter stays attached.
+- The OS checks pending HID teardown before audio probing. HID shutdown stops new connections, joins its connection worker, disables the root port, drains device disconnects, uninstalls HID, and joins the USB library worker. Only then may the control task perform final library drainage and release the PHY.
+- Starting Auto/USB audio or selecting USB takes over an already attached accessory from HID through that same checked shutdown. A failed handoff is retried on subsequent connector polls; it does not suppress audio probing.
+- Transfer mode stops audio and HID before reserving Storage and unmounting FAT. Deep sleep also requires checked audio/HID shutdown.
+
+Call connector lifecycle functions from the OS control task, never from a USB callback. Apps normally select output and let the OS poll attachment. Physical enumeration, serial re-enumeration, audio output, and sleep must also be tested on the target board; native lifecycle tests cannot prove electrical behavior.
+
+## USB speakers
+
+USB speakers play 16-bit mono or stereo audio at up to 48 kHz. If the format is not supported, or there is not enough free memory to start the speaker, playback falls back to the piezo. Selecting an output again retries the speaker.
+
+
+---
+
 ## [Buzzer (pocketmage_bz)](https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/) (API)
 
 ---
@@ -281,39 +351,39 @@ Define exactly one. The preprocessor enforces it with a hard error.
 
 ## Tuning knobs
 
-| Constant                 | Default | Meaning                                    |
-| ------------------------ | ------- | ------------------------------------------ |
-| `KB_COOLDOWN`            | 3       | keypress cooldown (ms)                     |
-| `MAX_FILES`              | 10      | file slots in the SD file list             |
-| `FORMAT_SPIFFS_IF_FAILED`| `true`  | format SPIFFS on mount failure             |
-| `SLEEPMODE`              | `"TEXT"`| sleep screen: TEXT, SPLASH, or CLOCK        |
-| `TXT_APP_STYLE`          | 1       | TXT renderer: 1 = current, 0 = unsupported |
-| `SET_CLOCK_ON_UPLOAD`    | `false` | set the clock from compile time on upload  |
-| `TOUCH_TIMEOUT_MS`       | 1200    | ms before scrolling returns to typing      |
-| `SYS_METADATA_FILE`      | `"/sys/SDMMC_META.txt"` | filesystem metadata path |
-| `POWER_SAVE_FREQ`        | 40      | CPU MHz when power saving                  |
-| `IDLE_TIME`              | 20000   | ms of idle before sleep                    |
-| `FAST_REFRESH_AFTER`     | 5       | fast partial refreshes before a clean      |
-| `FULL_REFRESH_AFTER`     | 5 or 10 | full refresh cadence (5 beta, 10 prod)     |
+| Constant                  | Default                 | Meaning                                    |
+| ------------------------- | ----------------------- | ------------------------------------------ |
+| `KB_COOLDOWN`             | 3                       | keypress cooldown (ms)                     |
+| `MAX_FILES`               | 10                      | file slots in the SD file list             |
+| `FORMAT_SPIFFS_IF_FAILED` | `true`                  | format SPIFFS on mount failure             |
+| `SLEEPMODE`               | `"TEXT"`                | sleep screen: TEXT, SPLASH, or CLOCK       |
+| `TXT_APP_STYLE`           | 1                       | TXT renderer: 1 = current, 0 = unsupported |
+| `SET_CLOCK_ON_UPLOAD`     | `false`                 | set the clock from compile time on upload  |
+| `TOUCH_TIMEOUT_MS`        | 1200                    | ms before scrolling returns to typing      |
+| `SYS_METADATA_FILE`       | `"/sys/SDMMC_META.txt"` | filesystem metadata path                   |
+| `POWER_SAVE_FREQ`         | 40                      | CPU MHz when power saving                  |
+| `IDLE_TIME`               | 20000                   | ms of idle before sleep                    |
+| `FAST_REFRESH_AFTER`      | 5                       | fast partial refreshes before a clean      |
+| `FULL_REFRESH_AFTER`      | 5 or 10                 | full refresh cadence (5 beta, 10 prod)     |
 
 `FULL_REFRESH_AFTER` is hardware-dependent: production (`POCKETMAGE_HW_VERSION == 2`) uses 10, beta uses 5.
 
 ## Pin map
 
-| Group        | Constants   | Notes                                    |
-| ------------ | ----------- | ---------------------------------------- |
-| I2C          | `I2C_SDA=36`, `I2C_SCL=35` | primary bus: OLED, clock              |
-| Switched I2C | `SWITCHED_I2C_SDA=42`, `SWITCHED_I2C_SCL=48` | production only: touch, expansion |
-| USB mux      | `USB_MUX_PIN=7` |                                           |
-| Keyboard     | `KB_IRQ=8`  | wake source, falling edge                 |
-| Power        | `PWR_BTN=0`, `BAT_SENS=4`, `CHRG_SENS=39`, `LOAD_SWITCH=38` |  |
-| RTC          | `RTC_INT=1` |                                            |
-| OLED         | `OLED_CS=47`, `OLED_DC=46`, `OLED_RST=45` | SPI                          |
-| E-Ink        | `EPD_CS=2`, `EPD_DC=21`, `EPD_RST=9`, `EPD_BUSY=37` | SPI                |
-| SDMMC        | `SD_CLK=12`, `SD_CMD=11`, `SD_D0..D3=13,5,6,10` | 4-bit bus          |
-| SDSPI        | `SD_CS=10`, `SD_MOSI=11`, `SD_SCK=12`, `SD_MISO=13` | fallback mode   |
-| SPI shared   | `SPI_MOSI=14`, `SPI_SCK=15` | the SPI object both display drivers use |
-| Buzzer       | `BZ_PIN=17` | PWM output                                 |
+| Group        | Constants                                                   | Notes                                    |
+| ------------ | ----------------------------------------------------------- | ---------------------------------------- |
+| I2C          | `I2C_SDA=36`, `I2C_SCL=35`                                  | primary bus: OLED, clock                 |
+| Switched I2C | `SWITCHED_I2C_SDA=42`, `SWITCHED_I2C_SCL=48`                | production only: touch, expansion        |
+| USB mux      | `USB_MUX_PIN=7`                                             |                                          |
+| Keyboard     | `KB_IRQ=8`                                                  | wake source, falling edge                |
+| Power        | `PWR_BTN=0`, `BAT_SENS=4`, `CHRG_SENS=39`, `LOAD_SWITCH=38` |                                          |
+| RTC          | `RTC_INT=1`                                                 |                                          |
+| OLED         | `OLED_CS=47`, `OLED_DC=46`, `OLED_RST=45`                   | SPI                                      |
+| E-Ink        | `EPD_CS=2`, `EPD_DC=21`, `EPD_RST=9`, `EPD_BUSY=37`         | SPI                                      |
+| SDMMC        | `SD_CLK=12`, `SD_CMD=11`, `SD_D0..D3=13,5,6,10`             | 4-bit bus                                |
+| SDSPI        | `SD_CS=10`, `SD_MOSI=11`, `SD_SCK=12`, `SD_MISO=13`         | fallback mode                            |
+| SPI shared   | `SPI_MOSI=14`, `SPI_SCK=15`                                 | the SPI object both display drivers use  |
+| Buzzer       | `BZ_PIN=17`                                                 | PWM output                               |
 
 The SPI pins overlap the SDMMC pins (`SD_CLK` is also `SPI_SCK`). The two SD modes share the same physical pins by design; see [sd](sd.md) for the mode switch. `PocketMage_INIT` uses a single global `SPI` instance wired to `SPI_SCK`/`SPI_MOSI` precisely so display and SDSPI do not fight over GPIO12.
 
@@ -324,6 +394,7 @@ The SPI pins overlap the SDMMC pins (`SD_CLK` is also `SPI_SCK`). The two SD mod
 ```c
 extern int TIMEOUT;          // auto sleep timeout, seconds
 extern bool DEBUG_VERBOSE;   // extra debug output
+extern bool LOG_TO_FILE;     // copy log lines to /logs/system.txt (default off)
 extern bool SYSTEM_CLOCK;    // show clock on the OLED status line
 extern bool SHOW_YEAR;       // show year in clock
 extern bool SAVE_POWER;      // CPU frequency power saving
@@ -336,7 +407,7 @@ extern bool MUTE_BUZZER;
 extern bool SD_SPI_COMPATIBILITY;
 ```
 
-`pocketmage::loadSettings()` (see [sys](sys.md)) loads them from NVS with these defaults. Changing a value writes it back through `prefs.begin(...)` in the `"PocketMage"` namespace.
+`pocketmage::loadSettings()` (see [sys](sys.md)) loads them from NVS with these defaults. Changing a value writes it back through `prefs.begin(...)` in the `"PocketMage"` namespace. `LOG_TO_FILE` only takes effect through `pm_log::setFileEnabled`, which the Settings app calls for you; see [Logging](log.md).
 
 ## App version stamping
 
@@ -606,7 +677,7 @@ public:
 ### Measuring
 
 - `textWidth` measures without changing the currently applied font, so layout code can interleave measure/draw freely.
-- `charWidth` uses a per-style cache for codepoints 32 through 255 on the OLED target; other codepoints and the E-Ink target are measured live.
+- `charWidth` uses a per-style cache for codepoints 32 through 255 on the OLED target. Each style's 224-byte table is created the first time that style is measured, and widths are measured live if there is no memory for it. Other codepoints and the E-Ink target are always measured live.
 - `fontHeight` / `fontAscent` / `fontDescent` are measured lazily on first per (target, style) call and cached; layout code never switches fonts merely to measure.
 
 ### `fitStyle`
@@ -939,6 +1010,14 @@ int pm_layout_word_wrap_count(const char* a0, int a1, int a2);
 int pm_layout_word_wrap_get(const char* a0, int a1, int a2, int index, char* out, size_t out_size);
 ```
 
+## Logging
+
+Documented on [Logging](log.md). Apps normally call it through the `PM_LOGE` to `PM_LOGV` macros.
+
+```c
+void pm_log_write(int level, const char *tag, const char *format, ...);
+```
+
 ## OLED
 
 Documented on [OLED](oled.md).
@@ -1189,16 +1268,16 @@ The SDK exposes the PocketMage hardware and OS services to loaded apps through a
 
 `pocketmage.h` pulls in every component header, `config.h`, the `frames` and `assets` modules, and `Preferences.h`. It also includes `pocketmage_app_version.h` when the build defines `PM_TARGET_APP`, so the SDK-version macros are always available to apps.
 
-An external app does not call these C++ classes directly across the ELF boundary; it calls the flat `pm_*` C ABI that projects them. See [The C ABI (pm_*)](#api-reference-the-c-abi-pm) below, and the complete [function index](functions.md) for every wrapper and its signature.
+An external app does not call these C++ classes directly across the ELF boundary; it calls the flat `pm_*` C ABI that projects them. See [The C ABI (pm\_\*)](#the-c-abi-pm_) below, and the complete [function index](functions.md) for every wrapper and its signature.
 
 ## Compile target
 
 `config.h` requires exactly one of these to be defined, and fails the build otherwise:
 
-| Macro           | Meaning                                                       |
-| --------------- | ------------------------------------------------------------- |
-| `PM_TARGET_HOST` | the PocketMageOS firmware links the SDK in-process            |
-| `PM_TARGET_APP`  | an external app compiled to a loadable `.app.elf`            |
+| Macro            | Meaning                                            |
+| ---------------- | -------------------------------------------------- |
+| `PM_TARGET_HOST` | the PocketMageOS firmware links the SDK in-process |
+| `PM_TARGET_APP`  | an external app compiled to a loadable `.app.elf`  |
 
 The two are mutually exclusive; defining both is a build error. Apps declare `PM_TARGET_APP` (see [Building an app](../build.md)).
 
@@ -1206,29 +1285,30 @@ The two are mutually exclusive; defining both is a build error. Apps declare `PM
 
 Most components are owned by a single global instance created inside the SDK and reached through a global accessor function. The accessor returns a reference; null checks are unnecessary once the component's `setup*()` call has run in `PocketMage_INIT()`.
 
-| Component   | Accessor    | Hardware / role                                  | API page            |
-| ----------- | ----------- | ------------------------------------------------ | ------------------- |
-| OLED        | `OLED()`    | 256x32 SSD1326 OLED, status line                  | [oled](oled.md)     |
-| E-Ink       | `EINK()`    | 320x240 GDEQ031T10 panel, full-page rendering     | [eink](eink.md)     |
-| Font        | `FontEngine` | unified text on both displays                     | [font](font.md)     |
-| Layout      | (free)      | display geometry constants, text fit helpers      | [layout](layout.md) |
-| UI helpers  | (free)      | status bars, list rows, chips                     | [ui](ui.md)         |
-| SD card     | `PM_SDAUTO()` | files, metadata, dos/flash filesystem             | [sd](sd.md)         |
-| Keyboard    | `KB()`      | TCA8418 matrix + USB HID                           | [kb](kb.md)         |
-| Touch       | `TOUCH()`   | MPR121 slider, scroll gestures                     | [touch](touch.md)   |
-| Buzzer      | `BZ()`      | PWM buzzer, jingles                               | [bz](bz.md)         |
-| Clock       | `CLOCK()`   | PCF8563 RTC, timeout bookkeeping                   | [clock](clock.md)   |
-| WiFi        | `P_WIFI`    | station radio service (apps may call)              | [wifi](wifi.md)     |
-| System      | (free)      | init, CPU speed, deep sleep                        | [sys](sys.md)       |
-| I18n        | `I18n`      | language tables, command normalization             | [i18n-runtime](i18n-runtime.md) |
-| Text utils  | (free)      | string split/join/parse helpers                    | [io](io.md)         |
-| Frames      | `Frame`     | e-ink text/bitmap frame model, scrolling           | [frames](frames.md) |
-| Assets      | (free)      | PROGMEM bitmaps: battery, sleep, screensavers      | [assets](assets.md) |
-| Config      | (free)      | pins, counters, prefs, SDK version stamping        | [configuration](configuration.md) |
+| Component  | Accessor      | Hardware / role                               | API page                          |
+| ---------- | ------------- | --------------------------------------------- | --------------------------------- |
+| OLED       | `OLED()`      | 256x32 SSD1326 OLED, status line              | [oled](oled.md)                   |
+| E-Ink      | `EINK()`      | 320x240 GDEQ031T10 panel, full-page rendering | [eink](eink.md)                   |
+| Font       | `FontEngine`  | unified text on both displays                 | [font](font.md)                   |
+| Layout     | (free)        | display geometry constants, text fit helpers  | [layout](layout.md)               |
+| UI helpers | (free)        | status bars, list rows, chips                 | [ui](ui.md)                       |
+| SD card    | `PM_SDAUTO()` | files, metadata, dos/flash filesystem         | [sd](sd.md)                       |
+| Keyboard   | `KB()`        | TCA8418 matrix + USB HID                      | [kb](kb.md)                       |
+| Touch      | `TOUCH()`     | MPR121 slider, scroll gestures                | [touch](touch.md)                 |
+| Buzzer     | `BZ()`        | PWM buzzer, jingles                           | [bz](bz.md)                       |
+| Clock      | `CLOCK()`     | PCF8563 RTC, timeout bookkeeping              | [clock](clock.md)                 |
+| WiFi       | `P_WIFI`      | station radio service (apps may call)         | [wifi](wifi.md)                   |
+| System     | (free)        | init, CPU speed, deep sleep                   | [sys](sys.md)                     |
+| Logging    | `pm_log`      | console, log file, crash-report log tail      | [log](log.md)                     |
+| I18n       | `I18n`        | language tables, command normalization        | [i18n-runtime](i18n-runtime.md)   |
+| Text utils | (free)        | string split/join/parse helpers               | [io](io.md)                       |
+| Frames     | `Frame`       | e-ink text/bitmap frame model, scrolling      | [frames](frames.md)               |
+| Assets     | (free)        | PROGMEM bitmaps: battery, sleep, screensavers | [assets](assets.md)               |
+| Config     | (free)        | pins, counters, prefs, SDK version stamping   | [configuration](configuration.md) |
 
 The `frames` component is used by the OS's built-in apps. Third-party apps start from the simpler primitives in [oled](oled.md), [eink](eink.md), [font](font.md), and [layout](layout.md).
 
-## The C ABI (pm_*)
+## The C ABI (pm\_\*)
 
 The accessors and classes above are the host-side API. The SDK compiles the firmware with the C++ API directly, but an external ELF app cannot: it links `-nostdlib` and resolves symbols by name at load time, so the app-facing surface is a flat C ABI, the `pm_*` functions, generated from the C++ classes by `tools/gen_app_api.py`. An app includes the generated header through `pm_app_api.h`:
 
@@ -1238,13 +1318,13 @@ The accessors and classes above are the host-side API. The SDK compiles the firm
 
 The generator projects each exported C++ method to one C function by a fixed set of rules:
 
-| C++ shape                         | C projection                                              |
-| --------------------------------- | --------------------------------------------------------- |
-| `ClassName::method(args)`         | `pm_<module>_<method>(args)` on the module's singleton    |
-| `String` parameter or return      | `const char*` (returns point into the string pool, below) |
-| enum parameter or return          | plain `int` (values in SDK declaration order)             |
+| C++ shape                         | C projection                                                 |
+| --------------------------------- | ------------------------------------------------------------ |
+| `ClassName::method(args)`         | `pm_<module>_<method>(args)` on the module's singleton       |
+| `String` parameter or return      | `const char*` (returns point into the string pool, below)    |
+| enum parameter or return          | plain `int` (values in SDK declaration order)                |
 | `std::vector<T>` return           | a `_count` function plus a `_get(index, out, out_size)` pair |
-| scalar out-parameter by reference | `T*` out-pointer                                          |
+| scalar out-parameter by reference | `T*` out-pointer                                             |
 
 Enums become integers with generated value tables: `pm_target`, `pm_style`, `pm_lang`, `pm_refresh`, and `pm_jingle`. `PM_APP_API_ABI` tracks incompatible changes to this surface; an app compares it against `pm_app_abi()` at startup, and `pocketmage_sdk_version` (via `pm_host_sdk_version()`) gives the running host's SDK version.
 
@@ -1369,7 +1449,7 @@ void checkUSBKB();
 
 - `updateKeypress()` returns the next character from either the USB HID FIFO (checked first) or the TCA8418 event FIFO, draining one key per call. It never blocks. The TCA8418 overflow register is cleared after each read so keys are not lost on a burst; the hardware FIFO is drained until empty before the `TCA8418_event_` flag clears.
 - `acceptKey()` gating: returns true only if at least `KB_COOLDOWN` ms passed since the last accepted press. Use it before handling a key that must not auto-repeat.
-- `checkUSBKB()` services the USB HID connection (call periodically).
+- `checkUSBKB()` services the USB HID connection (call periodically). If the attached device is not a keyboard (a USB speaker, for example), the keyboard host lets go of it after 5 s and frees about 25 KB of memory until the device is unplugged. The OS also calls it while an ELF app runs, so keyboards and speakers plugged in later work without the app doing anything.
 
 The interrupt flag is exposed as a member (`TCA8418_event_`) and set by `setTCA8418Event()`; apps typically rely on the FIFO-drain behavior of `updateKeypress()` instead of the flag.
 
@@ -1579,6 +1659,191 @@ int pm_layout_word_wrap_get(const char* a0, int a1, int a2, int index, char* out
 - `pm_layout_slice_that_fits(a0, a1, a2, a3)` is `sliceThatFits(s, n, maxTextWidth, style)`; `a0` is the string, `a1` is the byte length, `a2` is the pixel budget, `a3` is a `pm_style`. Returns the byte length of the longest prefix that fits, or 0 when nothing fits.
 - `pm_layout_truncate_with_ellipsis(a0, a1, a2, a3)` is `truncateWithEllipsis(text, maxWidthPx, style, target)`; `a0` is the text, `a1` is the pixel budget, `a2` is a `pm_style`, `a3` is a `pm_target` value as int. Returns a pointer into the rotating string pool.
 - `pm_layout_word_wrap_count` / `pm_layout_word_wrap_get` project `wordWrap()`, which returns `std::vector<String>`. Call `pm_layout_word_wrap_count(a0, a1, a2)` for the line count, then `pm_layout_word_wrap_get(a0, a1, a2, index, out, out_size)` per index to copy a wrapped line into the caller buffer `out` (at most `out_size` bytes). `a0` is the text, `a1` is the pixel budget, `a2` is a `pm_style`. `_get` returns the line length or -1 for a bad index. These write into the caller buffer, not the rotating pool.
+
+
+---
+
+## [Logging (pocketmage_log)](https://talismandesign.github.io/PocketMage_SDK/docs/api/log/) (API)
+
+---
+title: "Logging (pocketmage_log)"
+description: "The SDK logger: levels, per-tag filtering, the serial console, the optional log file, and the log tail kept for crash reports."
+---
+
+# Logging API
+
+`pm_log` is the one place PocketMage writes log messages. Every line goes to the serial console at 115200 baud and into a small buffer in RAM that crash reports include. When the **Log to File** setting is on, lines are also saved to the SD card, so you can read what happened without a computer attached.
+
+A line looks like this:
+
+```log
+48213 W [AUDIO] USB speaker not ready, retrying
+```
+
+That is, the uptime in milliseconds, the level letter (`E`, `W`, `I`, `D` or `V`), the tag in brackets, and the message.
+
+## Access
+
+There is one way to write a log line, and it is the same in the OS, the SDK and ELF apps, from C or C++:
+
+```cpp
+#include <pocketmage.h>    // OS and SDK code
+#include <pm_app_api.h>    // ELF apps
+
+static constexpr const char* TAG = "NOTES";
+
+PM_LOGI(TAG, "Opened %s", path);
+PM_LOGE(TAG, "Save failed: %d", err);
+```
+
+Both includes bring in `pocketmage_log/log_api.h`, which holds the macros and the one function behind them. `pm_log::begin()` and `pm_log::setFileEnabled()` already run inside `PocketMage_INIT()`, so code only writes messages.
+
+ESP-IDF components (Wi-Fi, the USB host stack, the FAT driver and so on) send their own log lines through the logger as well, keeping their tag and level. OS and SDK code uses `PM_LOGx`; raw `Serial`/`printf` and IDF early/DRAM logging bypass the hook and stay console-only.
+
+## Writing messages
+
+```c
+PM_LOGE(tag, format, ...);
+PM_LOGW(tag, format, ...);
+PM_LOGI(tag, format, ...);
+PM_LOGD(tag, format, ...);
+PM_LOGV(tag, format, ...);
+```
+
+Each macro formats like `printf` and logs at its level: Error, Warn, Info, Debug or Verbose. A higher level means more detail.
+
+A macro above `PM_LOG_MAX_LEVEL` compiles to nothing, so its arguments are not even evaluated. All five levels are compiled in by default; define `PM_LOG_MAX_LEVEL` before the include to drop the noisier ones from one file or a whole build. Every level that is compiled in is then filtered per tag at run time; see `setLevel` below.
+
+Messages longer than 255 bytes are cut. Line breaks at the end are removed, and other control characters become spaces, so one call always makes one line.
+
+### Levels
+
+```c
+enum pm_log_level {
+  PM_LOG_LEVEL_NONE = 0,
+  PM_LOG_LEVEL_ERROR = 1,
+  PM_LOG_LEVEL_WARN = 2,
+  PM_LOG_LEVEL_INFO = 3,
+  PM_LOG_LEVEL_DEBUG = 4,
+  PM_LOG_LEVEL_VERBOSE = 5,
+};
+```
+
+The values match ESP-IDF's `esp_log_level_t`. `PM_LOG_LEVEL_NONE` is only used to turn a tag off with `setLevel` and is never written.
+
+## Controlling output
+
+These live in the `pm_log` namespace and are for OS and SDK code. They decide where lines go and which ones are kept; none of them write a message.
+
+```cpp
+namespace pm_log {
+void begin();
+void setFileEnabled(bool enabled);
+bool fileEnabled();
+bool setLevel(const char* tag, pm_log_level level);
+pm_log_level level(const char* tag);
+bool flush(uint32_t timeoutMs);
+size_t copyTail(char* out, size_t capacity);
+}
+```
+
+### `begin`
+
+Routes ESP-IDF logs through the logger and makes sure queued lines are saved when the device restarts. Calling it again does nothing. `PocketMage_INIT()` calls it right after `Serial.begin`.
+
+### `setFileEnabled`
+
+Turns saving to the SD card on or off. The first time it is turned on, a small background task named `pm_log` starts; if it cannot start, file output stays off and an error is logged. Turning file output off throws away lines that were not saved yet.
+
+Lines logged before the first call are held in memory, so the boot messages that come before the SD card is ready still reach the file. `PocketMage_INIT()` calls it with the `LOG_TO_FILE` setting once the card is set up, and the Settings app calls it again when you change the setting.
+
+### `fileEnabled`
+
+Returns whether file output is on.
+
+### `setLevel`
+
+Sets the most detailed level written for one tag, for example `pm_log::setLevel("USB", PM_LOG_LEVEL_VERBOSE)` while you chase a USB problem. A null tag or `"*"` changes the default used by every tag without its own setting. The default starts at Info. The same level is passed on to ESP-IDF, so its components with that tag follow along.
+
+Up to 24 tags can have their own level. Returns false for a value that is not a level, an empty tag, a tag longer than 15 characters, or when all 24 slots are taken. Levels are kept in RAM only and reset to Info on every boot.
+
+### `level`
+
+Returns the most detailed level written for a tag, or the default when the tag has no setting of its own.
+
+### `flush`
+
+Waits up to `timeoutMs` for the queued lines to reach the card. Returns true once everything is written. Returns false straight away when file output is off, the card is missing or in USB file transfer mode, or when called from the writer task itself. The SDK calls it before deep sleep, because deep sleep skips the restart handlers.
+
+### `copyTail`
+
+Copies the newest log text (up to 1 KB) into `out`, oldest line first, and ends it with NUL. It starts on a whole line and takes no locks, so the crash handler can use it. Returns the length without the NUL. You rarely need this; crash reports already include it.
+
+## Log file
+
+| File                  | What it is                                            |
+| --------------------- | ----------------------------------------------------- |
+| `/logs/system.txt`    | The current log                                       |
+| `/logs/system.1.txt`  | The previous log, replaced each time the file rotates |
+
+File output is off by default. Turn on **Settings > Log to File** (the `LOG_TO_FILE` preference, see [configuration](configuration.md)) to start saving.
+
+When `system.txt` would grow past 256 KB, it is renamed to `system.1.txt` (replacing the older copy) and a new file is started. So the card holds at most about 512 KB of logs.
+
+Lines are saved in batches about once a second. A warning or an error, or a queue that is half full, saves at once. The queue holds 4 KB; if the card cannot keep up, new lines are dropped and the file shows `-- N log lines dropped --` where they would have been. If a write fails, the writer tries again on its next one-second pass. While the card is shared over USB file transfer, lines wait in the queue.
+
+Crash reports are separate and are always saved, to `/logs/crash/`. Each report ends with the last 1 KB of log lines, even when file output is off. See the OS's crash log guide for how to read them.
+
+## Threading
+
+The `PM_LOGx` macros are safe from any task and from interrupt handlers. Each line is written whole, so lines from different tasks never mix. The console output is synchronous and takes about as long as any serial print; saving to the card always happens later on the `pm_log` task (priority 1, core 1), so logging never waits on the SD card.
+
+Call `setLevel`, `setFileEnabled` and `flush` from tasks only, never from an interrupt.
+
+## Example
+
+```cpp
+#include <pocketmage.h>
+
+static constexpr const char* TAG = "SYNC";
+
+bool syncNotes() {
+  PM_LOGI(TAG, "Sync started");
+  pm_log::setLevel(TAG, PM_LOG_LEVEL_DEBUG);
+  for (int attempt = 1; attempt <= 3; ++attempt) {
+    PM_LOGD(TAG, "Attempt %d", attempt);
+    if (uploadNotes())
+      return true;
+    PM_LOGW(TAG, "Attempt %d failed", attempt);
+  }
+  PM_LOGE(TAG, "Sync gave up after 3 attempts");
+  return false;
+}
+```
+
+## C ABI (`pm_*`)
+
+ELF apps use the same `PM_LOGx` macros through `pm_app_api.h`. The one function behind them is exported to apps:
+
+```c
+void pm_log_write(int level, const char *tag, const char *format, ...);
+```
+
+- `pm_log_write(level, tag, format, ...)` formats the message on the OS side and logs it under `tag`.
+  - `level` is one of `PM_LOG_LEVEL_ERROR` to `PM_LOG_LEVEL_VERBOSE`. Any other value is ignored.
+  - `tag` is the tag shown in brackets; null gives an empty tag.
+  - `format` and the arguments after it work like `printf`. A null `format` is ignored.
+
+Call it directly only when the level is chosen at run time; otherwise use the macros, which also drop lines above `PM_LOG_MAX_LEVEL` at compile time. The `pm_log::` control functions are not exported; apps cannot change levels or file output.
+
+## Limits
+
+- Arduino's `log_d` and `log_v` compile out entirely at `CORE_DEBUG_LEVEL=3` (the PocketMage build's level), so `PM_LOGD`/`PM_LOGV` are the way to get Debug and Verbose lines.
+- `isr_log_x`, `ESP_EARLY_LOGx` and `ESP_DRAM_LOGx`, and raw `Serial`/`printf` calls (GxEPD2, MP2722, LibSSH, PNGdec, wrench, usb_stream descriptor dumps) bypass the hook and stay console-only.
+- `PM_LOGx` from an interrupt only buffers in RAM; the `pm_log` writer task does the file write later. Use integer-only formats in ISRs: the ISR stack is 2096 bytes and the format buffer is 256 bytes.
+- Do not call IDF v1 `ESP_LOGx` from an interrupt handler. IDF filters the tag before calling our hook, and the call is not ISR-safe.
+- ESP-IDF's `esp_log_level_set("*", x)` clears every per-tag entry, so `setLevel` sets the default first and replays the stored entries (serialized by a mutex).
+- `ESP_LOGD` strings are compiled out unless IDF's tag level allows Debug. `LOG_LOCAL_LEVEL=3` in `build_flags` lets IDF-compiled libraries emit Info lines cheaply. Full IDF Debug coverage needs `CONFIG_LOG_MAXIMUM_LEVEL=4` and a full IDF rebuild; it is planned for the future some day (when that is, who knows).
 
 
 ---
@@ -1853,6 +2118,50 @@ All operate on the `PM_SDAUTO()` singleton. Every `const char*` return points in
 - `pm_sd_read_binary_file(a0, a1, a2)` is `readBinaryFile(path, buf, len)`; `a0` is the path, `a1` is the caller buffer, `a2` is its size. Returns false on a partial read.
 - `pm_sd_get_file_size(a0)` is `getFileSize(path)`. Returns the byte size.
 
+## Binary, directory, and stream services
+
+Binary storage, directory creation/enumeration, and streams are generated wrappers over `PocketmageSD` methods. Native and ELF callers use the same gateway task, validation, and ownership rules.
+
+```c
+bool pm_sd_write_binary_file(const char* path, const uint8_t* buf, size_t len);
+bool pm_sd_mkdir(const char* path);
+int  pm_sd_dir_open(const char* path);
+bool pm_sd_dir_entry(int i, char* name_out, size_t name_size, bool* is_dir);
+void pm_sd_dir_close(void);
+```
+
+- `pm_sd_write_binary_file(path, buf, len)` writes `len` bytes verbatim, truncating any existing file. The generated `pm_sd_write_file` text path stops at the first NUL, so binary data needs this one. Returns true on a full write.
+- `pm_sd_mkdir(path)` creates one path level, like POSIX `mkdir`. Returns true if the path exists afterwards.
+- `pm_sd_dir_open(path)` opens `path` for enumeration and returns the entry count, or -1 on error. Unlike `pm_sd_list_dir` it has no `MAX_FILES` cap and it reports subdirectories, so an app can recurse. One snapshot is live at a time, owned by the calling task. That task can replace its snapshot; another task cannot read, replace, or close it.
+- `pm_sd_dir_entry(i, name_out, name_size, is_dir)` copies entry `i`'s leaf name (no directory prefix) into `name_out`, sets `*is_dir`, and returns true. False when `i` is out of range or no enumeration is open. Copy the names you need before opening the next directory.
+- `pm_sd_dir_close()` releases the open enumeration and its table.
+
+Entry copies are serialized with snapshot creation, replacement, and cleanup. An empty snapshot still belongs to its opening task. A rejected entry read leaves the caller's output buffers unchanged; a foreign close leaves the snapshot live.
+
+### Streaming directories
+
+```c
+int pm_sd_dir_iterator_open(const char* path);
+int pm_sd_dir_iterator_read(int handle, char* name_out, size_t name_size, bool* is_dir);
+bool pm_sd_dir_iterator_close(int handle);
+```
+
+These calls list a directory one entry at a time, without loading the whole listing into memory like the snapshot does. Open returns a handle, or -1 on failure. Up to four directories can be open at once, so you can walk into subdirectories while keeping your place in each parent. Only the task that opened a handle can read or close it. Handles stop working after cleanup or a remount.
+
+Read copies the next name into `name_out` and returns its length including the terminating NUL, zero when there are no more entries, or -1 on error. To find out how big the next name is, call it with `name_out` null and `name_size` zero; this does not advance. If the buffer is too small, nothing is copied and the entry is not skipped. `.`, `..` and macOS metadata files are skipped. Files added or removed while you are listing may or may not show up.
+
+Always close the handle when you are done, even after an error. While a directory is open, the card is not put to sleep and USB file transfer cannot start.
+
+### File streams
+
+Use `pm_sd_stream_open_mode(path, mode)` with `'r'`, `'w'`, or `'a'`, followed by the generated read/write calls. `pm_sd_stream_seek_from` accepts `SEEK_SET`, `SEEK_CUR`, or `SEEK_END`. `pm_sd_stream_close_checked` reports flush/close errors and releases the slot even on failure. Stream access is restricted to the opening task. The runner closes only the exiting app task's remaining streams, directory cursors, and snapshot.
+
+Keep each stream's operations on its opening task. Foreign read/write/tell/size calls return zero, while seek and checked close return false, leaving the stream unchanged. Open a separate stream for work on another task.
+
+ABI 2 retains the read-only `pm_sd_stream_open`, absolute `pm_sd_stream_seek`, and void `pm_sd_stream_close` adapters. New code should use the complete generated contract. See [App ABI](../app-abi.md).
+
+USB transfer requires exclusive access. The OS stops audio and HID before claiming Storage, rejects the transition while gateway streams or directory cursors are still open, flushes/unmounts FAT, and then exposes raw sectors to the computer. Firmware file operations remain blocked during transfer.
+
 
 ---
 
@@ -1966,6 +2275,8 @@ void pocketmage::deepSleep(bool alternateScreenSaver = false);
 
 Full power-down sequence:
 
+Before powering down either display, the OS calls checked audio and USB keyboard shutdown. If either cannot finish, it retains live resources, shows the existing localized USB failure message, and returns without entering sleep.
+
 1. Power-saves the OLED.
 2. Stops the `einkHandlerTask` under the panel lock, so an in-flight refresh completes.
 3. Plays `Jingles::Shutdown`.
@@ -2060,6 +2371,8 @@ Adafruit_MPR121& cap = cap;   // raw driver (slider pads 0..8)
 ```
 
 `TOUCH()` is the single instance. `setupTouch()` runs in `PocketMage_INIT()`. The slider reports the lowest-touched pad, which handles physical finger overlap; a "touch" is a pad index 0..8.
+
+The touch and release thresholds are 6 and 3, low enough to pick up light touches. The release threshold is lower than the touch threshold so a resting finger does not flicker on and off. Change them with `TOUCH_THRESHOLD` and `TOUCH_RELEASE` in `config.h`; the build checks that `0 < TOUCH_RELEASE < TOUCH_THRESHOLD <= 255`.
 
 ## Reference
 
@@ -2268,7 +2581,7 @@ description: "The station radio service: enabled/scan/connect lifecycle, status 
 PocketMageWifi& wifi = P_WIFI;
 ```
 
-`P_WIFI` is a global reference to the singleton (`PocketMageWifi::getInstance()`). The host calls `P_WIFI.begin()` during `PocketMage_INIT()`; the radio stays off until something calls `enable()`.
+`P_WIFI` is a global reference to the singleton (`PocketMageWifi::getInstance()`). Wi-Fi is not started at boot, which saves about 12 KB of memory. The first `enable()` (or an explicit `begin()`) sets it up and turns the radio on. Until then, `getStatusMessage()` reports idle.
 
 ## State model
 
@@ -2283,9 +2596,13 @@ enum class WifiRadioState {
 ### Lifecycle
 
 ```cpp
-void begin();   // one-time service init (event loop, netif, task)
+void begin();   // shared event loop and netif only; no dedicated worker
 void stop();    // clean service shutdown
 ```
+
+`begin()` is safe to call more than once. The Wi-Fi task and its 10,240-byte stack are created on the first `enable()`. If that fails, `getLastError()` says why and you can call `enable()` again. Other controls, such as `scan()`, do nothing until `enable()` has been called.
+
+`disable()` turns the radio off but keeps the task for next time. `stop()` shuts the task down and frees it, waiting up to five seconds. If it times out, the service refuses new commands until a later `stop()` succeeds.
 
 ### Control (non-blocking, dispatched to the task)
 
@@ -2344,7 +2661,7 @@ Set a callback with `setEventCallback` to be notified of state changes (the WiFi
 
 ## Threading
 
-Control methods only enqueue a command and return. Status getters lock the service mutex. The service task holds the CPU at 240 MHz for the whole session; `pocketmage::setCpuSpeed` refuses any drop while the radio is not `Off` (see [sys](sys.md)).
+Control methods queue a command and return. If the queue is full, the command is dropped and `getLastError()` reports it. Status getters lock the service mutex. The service task holds the CPU at 240 MHz for the whole session; `pocketmage::setCpuSpeed` refuses any drop while the radio is not `Off` (see [sys](sys.md)).
 
 ## Example
 
@@ -2437,7 +2754,7 @@ Only the espressif `xtensa-esp-elf` toolchain emits output the loader can read. 
 
 ## Entry point
 
-The host looks up `app_main` by name and runs it on core 1 in a dedicated task with a 16 KB stack:
+The host uses the ELF entry address, pinned to `app_main` by the linker, and runs it on core 1 in a dedicated task with a 16 KB stack. The stripped file need not retain the `app_main` symbol name:
 
 ```c
 int main(int argc, char **argv);   // renamed to app_main at build time
@@ -2458,7 +2775,7 @@ The runner passes four arguments, taken from the install record and the `app.pro
 | `argv[2]` | app version string (manifest `version`)    |
 | `argv[3]` | author string (manifest `author`)          |
 
-Returning from `main` tears the app down: the overlay is unloaded, the base image is deinitialized, and control returns to the OS, which reopens HOME. There is no run-forever semantics. A UI app hands control back through the SDK/host API cooperatively, then returns. A `main` that never returns leaks the run task.
+Returning from `main` starts checked cleanup: audio stops, finalizers and app-local exit hooks run, and task-owned SD resources close while the code remains resident. Only then are the overlay and base image released and HOME reopened. See [App lifecycle](guides/lifecycle.md) for ordering, callback ownership, and retry behavior.
 
 ## How loading works
 
@@ -2468,9 +2785,9 @@ Loading is two stages: a base relocation with `esp_elf`, then an overlay pass wi
 2. Relocated `.text` lands in `MALLOC_CAP_EXEC` memory so code is executable on the S3; data and rodata land in `MALLOC_CAP_8BIT` DRAM. Code in PSRAM is not executable on the ESP32-S3, app or firmware.
 3. The `<name>.elfo` sidecar is located next to the ELF and loaded by `elf_overlay`, which pages overlay `.text` bodies into a pool of exec-RAM frames on demand, patches ISA-specific literal loads at page-in, applies redirects so resident calls route through stubs, and redirects the entry point through its stub. If no sidecar is present the app runs unredirected from the base relocation. The blob format and the full page-in sequence are in [overlay.md](overlay.md).
 
-The `esp_elf` loader does not run relocation-time constructors, so any `.init_array` the app links in is never executed. Keep the app free of constructor sections (`-fno-exceptions -fno-rtti -fno-threadsafe-statics` are on by default in `app.mk`); `pm check` warns if a `.init_array` slips in. Do not rely on static-construction order at load time.
+The pinned `esp_elf_request()` runs preinit/init arrays once before entry. The runner opens the app session before that call, so compiler-emitted destructor registrations belong to the app. `-fno-exceptions -fno-rtti -fno-threadsafe-statics` remain the app build defaults. Finalizer arrays run before deallocation, followed by any remaining session callbacks.
 
-Apps link `-nostdlib`: no newlib, no libstdc++, no SDK copy in the ELF. Everything an app references must resolve at load time from the host. Linking newlib into the app is wasteful and collides with host globals. Don't.
+Apps link `-nostdlib`: runtime and SDK services resolve from the host. The small image-local exit-hook bridge is compiled into the app to keep C/C++ exit registrations out of the firmware's process-wide registry. Do not link a second newlib or libstdc++ into the app.
 
 ## Third-party libraries
 
@@ -2496,21 +2813,28 @@ An app includes one header and calls plain C functions:
 #include <pm_app_api.h>
 
 pm_i18n_set_language(PM_LANG_ENGLISH);
-int w = pm_text_width(2, "Hello", 2);
+int w = pm_text_width(PM_TARGET_EINK, "Hello", PM_STYLE_BODY);
 pm_oled_sysmsg("saved", 1500);
 ```
 
 `pm_app_api.h` pulls in `pm_sdk_app.h`, which is generated from the SDK headers by `tools/gen_app_api.py`. Regenerate it after any SDK header change:
 
 ```sh
-python3 tools/gen_app_api.py
+python3 tools/gen_app_api.py --root . --host-root ../..
+python3 tools/gen_app_api.py --root . --host-root ../.. --verify
 ```
 
 Names are `pm_<module>_<method>` with the method converted from camelCase: `Eink::refresh` becomes `pm_eink_refresh()`. Enums are plain integers in the app, named `PM_TARGET_*`, `PM_STYLE_*` and `PM_LANG_*`, and they are generated in the SDK's own declaration order, so a value always means the same language or target. `PM_APP_API_ABI` in the generated header changes when a signature does.
 
 C++ types are projected at the boundary. `String` arguments become `const char*`, returned strings and `const char*` point into a small rotating pool that is overwritten by later calls, and an SDK method that needs the filesystem gets the host's global handle rather than taking one. Methods returning an SDK type an app cannot construct, such as `DateTime` or `WifiApInfo`, have no wrapper. Where the value matters, the accessor is flattened into plain fields instead: `pm_clock_epoch()` and `pm_clock_timestamp()` rather than a `DateTime` return.
 
-Blob storage and directory creation have no SDK method to project. The text `writeFile` path truncates on the first NUL and the read pool is 256 bytes, so `pm_sd_write_binary_file()` and `pm_sd_mkdir()` are hand-written host primitives in `pm_app_api.h`, backed by raw `File::write` and `FS::mkdir`, and `pm_sd_read_binary_file()` reads back arbitrary sizes.
+Native SDK services own behavior and validation. Binary file I/O, directory enumeration, playback queries, image-region decoding, and OLED/e-ink canvas operations are generated wrappers over those services. SD access goes through the gateway task. The text `writeFile` path truncates on the first NUL and the string pool is 256 bytes; use the binary or stream APIs for larger data.
+
+The full native stream contract is available as `pm_sd_stream_open_mode(path, mode)` (`'r'`, `'w'`, or `'a'`), `pm_sd_stream_read`, `pm_sd_stream_write`, `pm_sd_stream_seek_from(slot, offset, whence)` (`SEEK_SET`, `SEEK_CUR`, or `SEEK_END` from `<stdio.h>`), and `pm_sd_stream_close_checked(slot)`. Close reports flush/close errors. The slot is released even if close returns false. `pm_sd_stream_tell` and `pm_sd_stream_size` return zero on error.
+
+New apps should use those generated functions. ABI 2's read-only `pm_sd_stream_open`, absolute `pm_sd_stream_seek`, and void `pm_sd_stream_close` remain compatibility adapters. The absolute adapter rejects offsets larger than `LONG_MAX`. `pm_image_decode` takes an explicit fit/fill choice; the older `pm_image_decode_to_1bit` retains fit-only behavior.
+
+`pm_app_api.h` owns the remaining C adapters: checked font-enum conversion, legacy ink-color semantics, jingle indices, flattened clock/image values, activity reporting, and compatibility signatures. `pm_overlay_api.h` owns the OS overlay-provider declarations. The generator reads their declarations directly into both export manifests; there is no separate handwritten symbol registry. `ADOPTED` validates projected adapter signatures and `GENERATED_NAMES` selects stable C names for ordinary wrappers. Conflicting owners and ambiguous overloads fail generation.
 
 A function returning `std::vector<String>`, such as word wrapping, becomes a count call and an indexed getter, matching how the SDK already hands out scan results:
 
@@ -2525,7 +2849,7 @@ for (int i = 0; i < lines; i++) {
 
 The getter writes into a buffer the caller owns rather than the string pool, because a wrapped paragraph can be far longer than the pool holds, and it returns `-1` for an out of range index. A function taking `const std::vector<String>&` takes a C array and a count instead: `pm_io_join_string(const char* const* items, int count, char delimiter)`.
 
-The generated wrappers are exported through `symbols.list`, so an app that links against `pm_sdk_app.h` resolves every symbol it names. A new wrapper belongs in that list before any app can call it; a name that is missing fails at load with `Can't find common <name>` rather than at link time.
+Regeneration updates `pm_sdk_app.h`, the OS wrapper source, `symbols.list`, and `host_exports.list`. `--verify` checks all four without writing and fails on stale signatures or exports. `--check` prints the projected and skipped surface. After changing exports, regenerate the firmware's `esp_all_symbol.cpp` with `tools/symbols.py` as described in [symbols.md](symbols.md), then rebuild the OS. A symbol must appear in the loader's compiled export table to resolve at runtime; a firmware global alone is insufficient.
 
 ## SDK version stamp
 
@@ -2542,7 +2866,7 @@ Keeping VERSION, the string literal, the header macros, and `library.json` in sy
 ## Runtime environment
 
 - The app shares the host's heap. Loading costs roughly the ELF size plus a fixed reserve; `runElfApp` refuses to launch when free `MALLOC_CAP_8BIT` drops below that floor. Keep the app small.
-- The app runs in-process. It can call anything the host exports - the display, keyboard stack, translation engine, peripheral drivers - at native speed, no IPC.
+- The app runs in-process. It can call anything the host exports: the display, keyboard stack, translation engine, and peripheral drivers at native speed, no IPC.
 - Stack is not heap. The run task gives 16 KB; deep recursion or fat frames blow it. Move working sets to the heap.
 - E-ink refreshes use the differential partial waveform while an app runs, regardless of the device's FAST_REFRESH setting; the setting is restored when the app exits. Redraw on change, not on a timer: even partial updates are visible, and a periodic slow clean still flashes the panel.
 
@@ -2686,6 +3010,7 @@ An app that shows strings uses its own catalog; see [i18n.md](i18n.md). The shor
 Run `make clean all` then `pm check` before every commit; `pm check` is the gate CI runs, and `--host-elf <firmware.elf>` pins the host export surface exactly (see [symbols.md](symbols.md)). `make pack` is the deliverable; verify the tar's members with `tar -tf build/<name>.tar`. It should list `<name>.app.elf`, `<name>.elfo`, `<name>_ICON.bin`, and `app.properties`.
 
 `pm new myapp` scaffolds from the official [PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template. The SDK's `pm` CLI is the fastest path from scaffold to shippable tar; the full command surface is in [cli.md](cli.md). CI builds that same template against the SDK on every push, and rejects a `broken_app` fixture that references a symbol the host does not export and so must fail `pm check`.
+
 
 ---
 
@@ -3185,7 +3510,7 @@ The delivery tar, the 40x40 icon, asset sharing, and what APPLOADER does with th
 
 ---
 title: "App lifecycle"
-description: "Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits."
+description: "Entry points, task-owned resources, idle behavior, and resident app finalization."
 ---
 
 # App lifecycle
@@ -3205,8 +3530,8 @@ with `main` linked to `app_main`. `argc`/`argv` are the invocation arguments the
 ## Who owns the world
 
 - The app owns its code, its static data, and its calls into the host.
-- The host owns all hardware, all SDK singletons, the memory manager the app allocates from, and the thread that runs the app's entry nightly.
-- Nothing is statically linked into the app (`-nostdlib`, undefined references resolved at load). Any symbol the app uses that is not defined inside it must be in the host export table, or load fails the `pm check` surface (see [symbols](../symbols.md)).
+- The host owns hardware, SDK singletons, the shared heap, and the task running the app.
+- The app links its own source and the SDK's small exit-hook bridge. `-nostdlib` leaves runtime and SDK references for the loader to resolve through its enabled export tables (see [symbols](../symbols.md)).
 
 Build-time version macros (`PM_SDK_VERSION_*`) are baked into the app; the host exports the matching `pocketmage_sdk_version` string/runtime parts it was built against. An app compares its own compile-time version against the host's export to present a compatible pair.
 
@@ -3226,9 +3551,9 @@ While running, the app owns the loop:
 
 - Poll input: `pm_kb_read()` for a keypress, `pm_kb_state()` for the current modifier state.
 - Draw: build the E-Ink buffer, refresh once, draw OLED text.
-- Sleep on idle: the host skips the idle timeout while an ELF app runs. Avoid poking the host idle timer and call `pocketmage::deepSleep()` explicitly when you want to enter deep sleep.
+- Idle timeout belongs to the OS for both native and ELF apps. Keyboard/touch input and `pm_activity()` reset the shared clock. Playback, an attached USB speaker, open SD streams, transfer mode, and timeout-inhibition flags keep the device awake. Use the configured `TIMEOUT` rather than an app-local sleep timer.
 
-There is no cooperative yield handshake: the app either returns, sleeps, or keeps its own loop going. A CPU-heavy loop starves the WiFi and E-Ink tasks; prefer `pocketmage::ScopedCpuBoost` for short bursts and yield with `delay()` between frames.
+The app owns its loop while the OS continues accessory and idle polling. Yield with `delay()` between frames. Deep sleep first checks audio and keyboard shutdown; if cleanup is incomplete, the device remains awake and displays the existing USB failure message.
 
 ## Exiting
 
@@ -3236,11 +3561,25 @@ There is no cooperative yield handshake: the app either returns, sleeps, or keep
 return 0;   // plain exit; control returns to the OS cleanly
 ```
 
-Exiting is a `return` from `main`. There is no reboot handoff and no exit API. The loader tears down the app context, restores `HOME`, and repaints. A crashing app (fault, uncaught aborts) follows the same OS recovery path as the built-in apps ([`recoverFromCrash`](../api/sys.md)); the device boots back to HOME rather than leaving the app stuck.
+Return from `main` to exit. Before releasing executable memory, the runner:
+
+1. Waits for checked audio shutdown, retaining the image if a worker has not stopped.
+2. Runs the ELF finalizer arrays while the base image and overlay remain resident.
+3. Drains the task's registered exit callbacks and C++ destructors in reverse registration order. Callbacks added during finalization are drained as well.
+4. Stops any audio restarted by finalizers, then closes only that app task's SD streams and directory snapshot.
+5. Unloads the overlay, deallocates the ELF, restores HOME, and repaints.
+
+`tools/runtime/exit.cpp`, linked by `tools/app.mk`, routes `atexit`, `__cxa_atexit`, and `__cxa_finalize` to the app session. `pm_app_at_exit()` is the explicit C entry point. The registry has 32 pending slots; registration returns `-1` for a null callback, a full/inactive registry, or a caller other than the app task. A callback is removed before invocation, so recursive finalization cannot run it twice. Firmware-task registrations are not attached to an app.
+
+The base ELF's SD stream closes after relocation. Overlay reads use logical handles and short-lived gateway streams, so an otherwise idle app does not keep a stream open merely because its code came from SD. Apps must still stop their own background work before returning; the runner cannot infer ownership of arbitrary app-created tasks.
+
+Static destructors and `.fini_array` run before the app's memory is freed, using `esp_elf_finalize()`. They can still register exit callbacks. `esp_elf_deinit()` then frees the app without running them a second time.
+
+A fault or watchdog reset uses the OS [crash recovery](../api/sys.md) path and boots back to HOME. Normal exit callbacks are not guaranteed on a reset.
 
 ## Built-in vs third-party
 
-The OS's `HOME`, TXT, and friends are compiled-in apps that live entirely on the host side. Third-party apps are the ELF path described here. Both inhabit the same `lib/PocketMage_SDK` API, so the same app code
+The OS's HOME, TXT, and other built-in apps use native SDK services. ELF apps use generated C wrappers over those same services. Validation, audio preferences, media parsing, key codes, canvas behavior, and idle policy have one implementation; ABI 2 compatibility adapters preserve existing ELF call signatures.
 
 
 ---
@@ -3275,23 +3614,25 @@ App names are `[A-Za-z][A-Za-z0-9_]*`; the name becomes the ELF, tar, icon, and 
 ## 2. Write code
 
 ```cpp
-#include <stdio.h>
+#include <pm_app_api.h>
 #include <unistd.h>
+
+static constexpr const char* kLogTag = "HELLO";
 
 extern "C" int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
-  printf("hello from pocketmage sdk app\n");
+  PM_LOGD(kLogTag, "hello from pocketmage sdk app");
   for (int i = 0; i < 3; ++i) {
-    printf("tick %d\n", i);
+    PM_LOGD(kLogTag, "tick %d", i);
     sleep(1);
   }
-  printf("app done\n");
+  PM_LOGD(kLogTag, "app done");
   return 0;
 }
 ```
 
-That is the whole starter app: `main` with C linkage (the ABI entry point), libc working (`printf`, `sleep`), and a plain `return` to exit. Add `#include <pm_app_api.h>` and call the `pm_*` functions, such as `pm_oled_send` or `pm_eink_refresh`, and you have a UI app.
+That is the whole starter app: `main` with C linkage (the ABI entry point), libc working (`sleep`), logging through `PM_LOGx`, and a plain `return` to exit. `printf` still works for text formatting, but `PM_LOGx` is the one logging API; its lines reach the console, the crash log tail, and the optional log file. Call the `pm_*` functions, such as `pm_oled_send` or `pm_eink_refresh`, and you have a UI app.
 
 Third-party C and C++ libraries work too. Compile their source into the app by overriding `APP_SRCS`; the host resolves their libc and runtime references. See [app-abi.md](../app-abi.md).
 
@@ -3599,6 +3940,7 @@ python3 -m unittest discover -s pocketmage_i18n/tests
 
 The suite covers catalog merging, language fallback, alias merging, and every validation failure above, using small in-test catalogs.
 
+
 ---
 
 ## [PocketMage SDK Documentation](https://talismandesign.github.io/PocketMage_SDK/docs/)
@@ -3874,7 +4216,7 @@ The OS keeps app code out of PSRAM by design; code runs from IRAM. That is the l
 1. **Get the toolchain.** Install the espressif `xtensa-esp-elf` toolchain into `~/.espressif/...` as shown in [build.md](build.md). Do not rely on the PlatformIO toolchain; it emits big-endian ELFs the loader cannot read.
 2. **Scaffold.** Run `pm new myapp`. Its `Makefile` (`include tools/app.mk`) is the whole build system.
 3. **Port the entry.** Wrap your start logic in `extern "C" int main(int, char**)`. The build renames it to `app_main`. Fit the previous app's lifetime to the return-from-`main` model ([app-abi.md](app-abi.md)).
-4. **Replace dependencies.** Every call must resolve at load time. Host exports are the curated surface in [symbols.md](symbols.md) plus the host's newlib/IDF/Arduino globals. That covers display, keyboard, buzzer, clock, IO, and the standard library. If you depended on app-side firmware globals that are not exported, move that dependency to API calls.
+4. **Replace dependencies.** Every import must resolve through the enabled loader tables described in [symbols.md](symbols.md). Firmware globals alone are insufficient. Use SDK calls for display, input, audio, metadata, SD, and system services, then verify with `pm check --host-elf` against the matching firmware.
 5. **Move assets.** Files the app used at compile time become a top-level `assets/` directory in the tar, read at runtime from `/assets/<name>` ([publishing](guides/publishing.md)).
 6. **Localize.** If the app contained strings, move them into an app catalog (`src/i18n/`, merged per [i18n.md](i18n.md)) instead of hardcoding.
 7. **Verify.** `make clean all check` must succeed, list a sane set of undefined symbols, and the endianness check must pass. Then `make pack` and `tar -tvf build/<name>.tar`.
@@ -3890,6 +4232,7 @@ The OS keeps app code out of PSRAM by design; code runs from IRAM. That is the l
 ## Announcement
 
 If you maintained published apps pre-ELF, publish a migration notice: existing packages targeting production will not launch on the new firmware, and step 8 above is the path forward.
+
 
 ---
 
@@ -4042,12 +4385,13 @@ Apps link `-nostdlib`. Nothing ships with the binary that satisfies a reference;
 
 ## The surface
 
-An app can call anything the host exports as a global symbol. The export surface has two curated parts, backed by two committed lists at the SDK root:
+An app can call symbols exposed by the loader's enabled export tables. A global symbol in `firmware.elf` is not an export by itself. The generated customer table is controlled by these SDK-root lists:
 
 - `symbols.list` - the PocketMage `pm_*` ABI plus a handful of host primitives. Its `pm_*` block is generated; do not hand edit it (see below).
-- `host_baseline.list` - the C/C++ runtime, newlib, and POSIX symbols the firmware exports unconditionally. Apps may rely on these without listing them. Generated from the firmware's export table; do not hand edit it.
+- `host_baseline.list` - the selected C/C++ runtime and newlib symbols emitted into the customer table. Generated by `symbols.py --write-baseline`; do not hand edit it. Availability still depends on the compiled firmware configuration.
+- `host_exclusions.list` - symbols deliberately withheld from the export surface: the raw stdio, dirent and POSIX file calls plus their newlib reentrant forms. All card access goes through the `pm_sd_*` gateway API, so an app referencing an excluded symbol fails the gate and the load. Exclusions are applied at generation (`--exclude-file`) and the baseline is rewritten to match (`--write-baseline`), so regenerating the table can never silently restore them. Kept on the surface: stdout-only calls (`fflush`, `setvbuf`) and the newlib-internal plumbing printf chains need (`_fstat_r`, `_write_r`, `_read_r`, `_lseek_r`, `_putc_r`, `_fflush_r`, `_sfread_r`, `__seofread`), none of which can reach the card once `fopen`/`open` are unobtainable.
 
-The `pm` gate reads both lists and takes their union as the curated surface (`tools/pm/gate.py:read_curated`). An undefined symbol in an app must appear in that union, or be confirmed present in a supplied host ELF, for the app to pass.
+Without `--host-elf`, the `pm` gate uses the curated lists and generated table as a provisional surface. With `--host-elf`, only entries in the firmware's compiled loader registry count. The registry is the one the loader's default resolver `elf_find_sym_default()` searches, so disabled tables and unexported global symbols cannot produce false passes. The first enabled table containing a name wins. Firmware without this registry must be rebuilt before running an exact check. Runtime-registered symbols cannot be confirmed statically.
 
 **The C and C++ runtime.** `libc`, `libm`, `libgcc`, `libstdc++` and `libsupc++` symbols the firmware already links are exported so apps can use third-party libraries, and `host_baseline.list` records them. `tools/symbols.py` derives this set by reading the toolchain archives with `nm` and keeping the symbols that are present in the firmware image:
 
@@ -4056,26 +4400,28 @@ python3 tools/symbols.py --list symbols.list --baseline host_baseline.list \
   --host-elf <firmware.elf> --cpp \
   --include-header pm_app_api.h --include-header pm_sdk_app.h \
   --output-file ../../src/ELF_SYMS/esp_all_symbol.cpp \
+  --exclude-file host_exclusions.list \
+  --write-baseline host_baseline.list \
   --toolchain-lib-dir <toolchain>/xtensa-esp-elf/lib/esp32s3/no-rtti \
   --framework-lib-dir <framework-libs>/esp32s3/lib \
   --print-cost
 ```
 
 ```
-libc        248 symbols   4,434 bytes
-libm         14 symbols     238 bytes
-libstdc++    87 symbols   3,403 bytes
+libc        252 symbols   4,501 bytes
+libm         18 symbols     303 bytes
+libstdc++   103 symbols   4,229 bytes
 libsupc++    58 symbols   2,362 bytes
 libgcc       65 symbols   1,552 bytes
-libnewlib    94 symbols   2,478 bytes
-total       620 symbols  15,468 bytes (15.1 KB)
+libnewlib   100 symbols   2,669 bytes
+total       735 symbols  19,193 bytes (18.7 KB)
 ```
 
 `--toolchain-lib-dir` must point at the full newlib archives (`xtensa-esp-elf/lib/<target>/no-rtti`), not the picolibc stubs under `picolibc/...`: the picolibc `libm.a` is empty and its `libc.a` omits the dtoa and stdio-reentrancy helpers. `libgcc.a` is found by ascending to the toolchain root, so any lib dir below it resolves.
 
-`--baseline host_baseline.list` folds the recorded baseline back in as runtime externs. Its only effect beyond the archive scan is the POSIX directory calls (`opendir`, `readdir`, `closedir`, `rewinddir`, `seekdir`), which the firmware exports from the IDF VFS layer rather than from any scanned archive.
+`--baseline host_baseline.list` folds the recorded baseline back in as runtime externs. `--exclude-file` still removes the denied file APIs.
 
-That total includes the curated `pm_*` entries. The runtime adds about 11.2 KB of flash in the firmware image, once. It is not a per-app cost. Apps stay small: a hello world is 1.3 KB, an app using `std::vector` and `std::string` is 2.3 KB, an app with cJSON linked in is 5.2 KB. `--gc-sections` and `--strip-all` in `tools/app.mk` do that work.
+That total includes curated SDK entries. It estimates table and name storage, not the complete linked code cost, and is paid once by the firmware. Counts change with the linked runtime. Rebuild after regeneration before running an exact check against that firmware.
 
 A symbol in `symbols.list` that the firmware does not define is reported as a warning but still emitted into the table. A newly added wrapper cannot appear in `--host-elf` until the host is rebuilt, so dropping it would omit it on the one run that adds it. Regenerate once more after building and the warning should be gone.
 
@@ -4104,9 +4450,9 @@ make check   # prints entry + every undefined symbol
 pm check     # classifies each symbol and exits non-zero on a broken contract
 ```
 
-Everything in that list must exist in the host's global view when the app loads, or the load fails. `pm check` with `--host-elf` is the exact gate: every undefined symbol must resolve to a host global.
+Every import must resolve through the loader. `pm check --host-elf` verifies the compiled static tables in that exact firmware, not its general symbol table. Dynamically registered exports and shared objects cannot be proven available by this offline check.
 
-Without a host ELF, `pm check` reads the generated export table that the firmware links, which is the same file the loader searches. It does not keep a separate allowlist, because a hand-written list drifts from the table and the drift shows up only on device. An earlier allowlist claimed `memmove` and `sprintf` were resolvable when no table exported them, so those apps passed the gate and failed at load with `Can't find common memmove`. Reading the generated table makes that class of bug impossible.
+Without a host ELF, the generated table and curated lists are a provisional check. They can detect missing entries but cannot prove that the table was enabled and linked into the deployed firmware. Use the matching `firmware.elf` for release verification.
 
 ## Editing the surface
 

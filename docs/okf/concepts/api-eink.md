@@ -4,10 +4,10 @@ title: "E-Ink (pocketmage_eink)"
 description: "The 320x240 GDEQ031T10 panel: PocketmageEink, the background refresh task, and refresh policy."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/eink/"
 path: /api/eink/
-updated: 2026-11-01
+updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T03:55:48.223Z"
+  generated_at: "2026-11-25T08:06:17.932Z"
 ---
 ---
 title: "E-Ink (pocketmage_eink)"

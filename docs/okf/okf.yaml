@@ -5,12 +5,12 @@ bundle:
   description: ""
   url: "https://talismandesign.github.io/PocketMage_SDK/docs"
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T03:55:48.231Z"
+  generated_at: "2026-11-25T08:06:17.942Z"
   default_type: concept
 stats:
-  concepts: 39
+  concepts: 41
   by_type:
-    api: 19
+    api: 21
     concept: 14
     guide: 6
   locales: 
@@ -22,6 +22,15 @@ concepts:
     description: "Compiled-in PROGMEM bitmaps for the status bar, screensavers, and battery gauge."
     path: /api/assets/
     file: concepts/api-assets.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-audio
+    type: api
+    title: "Audio and media"
+    description: "Shared playback, PCM timing, persistent preferences, streamed tags, and USB ownership."
+    path: /api/audio/
+    file: concepts/api-audio.md
     locale: ""
     version: ""
     tags: 
@@ -130,6 +139,15 @@ concepts:
     description: "Canonical display geometry, the row-pitch helper, and the text-fit free functions."
     path: /api/layout/
     file: concepts/api-layout.md
+    locale: ""
+    version: ""
+    tags: 
+  - id: api-log
+    type: api
+    title: "Logging (pocketmage_log)"
+    description: "The SDK logger: levels, per-tag filtering, the serial console, the optional log file, and the log tail kept for crash reports."
+    path: /api/log/
+    file: concepts/api-log.md
     locale: ""
     version: ""
     tags: 
@@ -271,7 +289,7 @@ concepts:
   - id: guides-lifecycle
     type: guide
     title: "App lifecycle"
-    description: "Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits."
+    description: "Entry points, task-owned resources, idle behavior, and resident app finalization."
     path: /guides/lifecycle/
     file: concepts/guides-lifecycle.md
     locale: ""

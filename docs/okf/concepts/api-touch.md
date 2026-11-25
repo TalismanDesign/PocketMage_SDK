@@ -4,10 +4,10 @@ title: "Touch (pocketmage_touch)"
 description: "The MPR121 capacitive slider: scroll offsets, line scrolling, and gesture vectors."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/touch/"
 path: /api/touch/
-updated: 2026-11-01
+updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T03:55:48.226Z"
+  generated_at: "2026-11-25T08:06:17.936Z"
 ---
 ---
 title: "Touch (pocketmage_touch)"
@@ -28,6 +28,8 @@ Adafruit_MPR121& cap = cap;   // raw driver (slider pads 0..8)
 ```
 
 `TOUCH()` is the single instance. `setupTouch()` runs in `PocketMage_INIT()`. The slider reports the lowest-touched pad, which handles physical finger overlap; a "touch" is a pad index 0..8.
+
+The touch and release thresholds are 6 and 3, low enough to pick up light touches. The release threshold is lower than the touch threshold so a resting finger does not flicker on and off. Change them with `TOUCH_THRESHOLD` and `TOUCH_RELEASE` in `config.h`; the build checks that `0 < TOUCH_RELEASE < TOUCH_THRESHOLD <= 255`.
 
 ## Reference
 

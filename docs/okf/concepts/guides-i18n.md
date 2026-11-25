@@ -4,10 +4,10 @@ title: Internationalization
 description: "Give an app translatable strings: the catalog an app ships, how it merges with the SDK base catalog, and resolving strings at runtime."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/guides/i18n/"
 path: /guides/i18n/
-updated: 2026-11-01
+updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T03:55:48.228Z"
+  generated_at: "2026-11-25T08:06:17.939Z"
 ---
 ---
 title: "Internationalization"

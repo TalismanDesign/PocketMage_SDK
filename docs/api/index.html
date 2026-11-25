@@ -102,11 +102,11 @@
     
     
 
-    <link id="site-favicon" rel="icon" href="../assets/favicon.png?v=mvxaryyd">
-    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mvxaryyd">
+    <link id="site-favicon" rel="icon" href="../assets/favicon.png?v=mwvuajyt">
+    <link rel="stylesheet" href="../assets/css/docmd-main.css?v=mwvuajyt">
     
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mvxaryyd" id="hljs-light" >
-    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mvxaryyd" id="hljs-dark" disabled>
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-light.css?v=mwvuajyt" id="hljs-light" >
+    <link rel="stylesheet" href="../assets/css/docmd-highlight-dark.css?v=mwvuajyt" id="hljs-dark" disabled>
     
     
 <meta name="description" content="Every component an app links against: the umbrella header, the singleton accessors, and the per-component pages.">
@@ -125,13 +125,13 @@
 
 
 
-<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mvxaryyd" >
-<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mvxaryyd" >
-<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mvxaryyd" >
-<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mvxaryyd" >
+<link rel="stylesheet" href="../assets/css/docmd-theme-ruby.css?v=mwvuajyt" >
+<link rel="stylesheet" href="../assets/css/docmd-git.css?v=mwvuajyt" >
+<link rel="stylesheet" href="../assets/css/docmd-openapi.css?v=mwvuajyt" >
+<link rel="stylesheet" href="../assets/css/docmd-ai.css?v=mwvuajyt" >
 
     
-      <link rel="stylesheet" href="../assets/css/theme.css?v=mvxaryyd">
+      <link rel="stylesheet" href="../assets/css/theme.css?v=mwvuajyt">
     
     
   </head>
@@ -1021,6 +1021,38 @@
     
       <li class="" >
       
+        <a href="../api/audio/" class=" "
+          >
+           
+<svg class="lucide-icon icon-volume " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-volume"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Audio and media
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
         <a href="../api/clock/" class=" "
           >
            
@@ -1123,6 +1155,41 @@
           
           <span class="nav-item-title">
             System
+            </span>
+          
+          
+        </a>
+        
+
+        
+      </li>
+    
+      <li class="" >
+      
+        <a href="../api/log/" class=" "
+          >
+           
+<svg class="lucide-icon icon-scroll-text " width="1em" height="1em" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"
+  class="lucide lucide-scroll-text"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M15 12h-5" />
+  <path d="M15 8h-5" />
+  <path d="M19 17V5a2 2 0 0 0-2-2H4" />
+  <path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3" />
+</svg>
+
+          
+          <span class="nav-item-title">
+            Logging
             </span>
           
           
@@ -1922,7 +1989,7 @@
             <div class="content-layout">
               <div class="main-content">
                 <div class="docmd-breadcrumbs-row">
-                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22API%20Reference%22%0Adescription%3A%20%22Every%20component%20an%20app%20links%20against%3A%20the%20umbrella%20header%2C%20the%20singleton%20accessors%2C%20and%20the%20per-component%20pages.%22%0A---%0A%0A%23%20API%20Reference%0A%0AThe%20SDK%20exposes%20the%20PocketMage%20hardware%20and%20OS%20services%20to%20loaded%20apps%20through%20a%20set%20of%20component%20objects%20plus%20free%20functions.%20Every%20component%20is%20declared%20in%20%60pocketmage.h%60%2C%20the%20umbrella%20header%20an%20app%20includes%20first%3A%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%60%60%60%0A%0A%60pocketmage.h%60%20pulls%20in%20every%20component%20header%2C%20%60config.h%60%2C%20the%20%60frames%60%20and%20%60assets%60%20modules%2C%20and%20%60Preferences.h%60.%20It%20also%20includes%20%60pocketmage_app_version.h%60%20when%20the%20build%20defines%20%60PM_TARGET_APP%60%2C%20so%20the%20SDK-version%20macros%20are%20always%20available%20to%20apps.%0A%0AAn%20external%20app%20does%20not%20call%20these%20C%2B%2B%20classes%20directly%20across%20the%20ELF%20boundary%3B%20it%20calls%20the%20flat%20%60pm_*%60%20C%20ABI%20that%20projects%20them.%20See%20%5BThe%20C%20ABI%20(pm_*)%5D(%23api-reference-the-c-abi-pm)%20below%2C%20and%20the%20complete%20%5Bfunction%20index%5D(functions.md)%20for%20every%20wrapper%20and%20its%20signature.%0A%0A%23%23%20Compile%20target%0A%0A%60config.h%60%20requires%20exactly%20one%20of%20these%20to%20be%20defined%2C%20and%20fails%20the%20build%20otherwise%3A%0A%0A%7C%20Macro%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------%20%7C%20-------------------------------------------------------------%20%7C%0A%7C%20%60PM_TARGET_HOST%60%20%7C%20the%20PocketMageOS%20firmware%20links%20the%20SDK%20in-process%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60PM_TARGET_APP%60%20%20%7C%20an%20external%20app%20compiled%20to%20a%20loadable%20%60.app.elf%60%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AThe%20two%20are%20mutually%20exclusive%3B%20defining%20both%20is%20a%20build%20error.%20Apps%20declare%20%60PM_TARGET_APP%60%20(see%20%5BBuilding%20an%20app%5D(..%2Fbuild.md)).%0A%0A%23%23%20The%20singleton%20pattern%0A%0AMost%20components%20are%20owned%20by%20a%20single%20global%20instance%20created%20inside%20the%20SDK%20and%20reached%20through%20a%20global%20accessor%20function.%20The%20accessor%20returns%20a%20reference%3B%20null%20checks%20are%20unnecessary%20once%20the%20component&#039;s%20%60setup*()%60%20call%20has%20run%20in%20%60PocketMage_INIT()%60.%0A%0A%7C%20Component%20%20%20%7C%20Accessor%20%20%20%20%7C%20Hardware%20%2F%20role%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20API%20page%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20-----------%20%7C%20-----------%20%7C%20------------------------------------------------%20%7C%20-------------------%20%7C%0A%7C%20OLED%20%20%20%20%20%20%20%20%7C%20%60OLED()%60%20%20%20%20%7C%20256x32%20SSD1326%20OLED%2C%20status%20line%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Boled%5D(oled.md)%20%20%20%20%20%7C%0A%7C%20E-Ink%20%20%20%20%20%20%20%7C%20%60EINK()%60%20%20%20%20%7C%20320x240%20GDEQ031T10%20panel%2C%20full-page%20rendering%20%20%20%20%20%7C%20%5Beink%5D(eink.md)%20%20%20%20%20%7C%0A%7C%20Font%20%20%20%20%20%20%20%20%7C%20%60FontEngine%60%20%7C%20unified%20text%20on%20both%20displays%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bfont%5D(font.md)%20%20%20%20%20%7C%0A%7C%20Layout%20%20%20%20%20%20%7C%20(free)%20%20%20%20%20%20%7C%20display%20geometry%20constants%2C%20text%20fit%20helpers%20%20%20%20%20%20%7C%20%5Blayout%5D(layout.md)%20%7C%0A%7C%20UI%20helpers%20%20%7C%20(free)%20%20%20%20%20%20%7C%20status%20bars%2C%20list%20rows%2C%20chips%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bui%5D(ui.md)%20%20%20%20%20%20%20%20%20%7C%0A%7C%20SD%20card%20%20%20%20%20%7C%20%60PM_SDAUTO()%60%20%7C%20files%2C%20metadata%2C%20dos%2Fflash%20filesystem%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bsd%5D(sd.md)%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Keyboard%20%20%20%20%7C%20%60KB()%60%20%20%20%20%20%20%7C%20TCA8418%20matrix%20%2B%20USB%20HID%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bkb%5D(kb.md)%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Touch%20%20%20%20%20%20%20%7C%20%60TOUCH()%60%20%20%20%7C%20MPR121%20slider%2C%20scroll%20gestures%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Btouch%5D(touch.md)%20%20%20%7C%0A%7C%20Buzzer%20%20%20%20%20%20%7C%20%60BZ()%60%20%20%20%20%20%20%7C%20PWM%20buzzer%2C%20jingles%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bbz%5D(bz.md)%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Clock%20%20%20%20%20%20%20%7C%20%60CLOCK()%60%20%20%20%7C%20PCF8563%20RTC%2C%20timeout%20bookkeeping%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bclock%5D(clock.md)%20%20%20%7C%0A%7C%20WiFi%20%20%20%20%20%20%20%20%7C%20%60P_WIFI%60%20%20%20%20%7C%20station%20radio%20service%20(apps%20may%20call)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bwifi%5D(wifi.md)%20%20%20%20%20%7C%0A%7C%20System%20%20%20%20%20%20%7C%20(free)%20%20%20%20%20%20%7C%20init%2C%20CPU%20speed%2C%20deep%20sleep%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bsys%5D(sys.md)%20%20%20%20%20%20%20%7C%0A%7C%20I18n%20%20%20%20%20%20%20%20%7C%20%60I18n%60%20%20%20%20%20%20%7C%20language%20tables%2C%20command%20normalization%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bi18n-runtime%5D(i18n-runtime.md)%20%7C%0A%7C%20Text%20utils%20%20%7C%20(free)%20%20%20%20%20%20%7C%20string%20split%2Fjoin%2Fparse%20helpers%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bio%5D(io.md)%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Frames%20%20%20%20%20%20%7C%20%60Frame%60%20%20%20%20%20%7C%20e-ink%20text%2Fbitmap%20frame%20model%2C%20scrolling%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bframes%5D(frames.md)%20%7C%0A%7C%20Assets%20%20%20%20%20%20%7C%20(free)%20%20%20%20%20%20%7C%20PROGMEM%20bitmaps%3A%20battery%2C%20sleep%2C%20screensavers%20%20%20%20%20%20%7C%20%5Bassets%5D(assets.md)%20%7C%0A%7C%20Config%20%20%20%20%20%20%7C%20(free)%20%20%20%20%20%20%7C%20pins%2C%20counters%2C%20prefs%2C%20SDK%20version%20stamping%20%20%20%20%20%20%20%20%7C%20%5Bconfiguration%5D(configuration.md)%20%7C%0A%0AThe%20%60frames%60%20component%20is%20used%20by%20the%20OS&#039;s%20built-in%20apps.%20Third-party%20apps%20start%20from%20the%20simpler%20primitives%20in%20%5Boled%5D(oled.md)%2C%20%5Beink%5D(eink.md)%2C%20%5Bfont%5D(font.md)%2C%20and%20%5Blayout%5D(layout.md).%0A%0A%23%23%20The%20C%20ABI%20(pm_*)%0A%0AThe%20accessors%20and%20classes%20above%20are%20the%20host-side%20API.%20The%20SDK%20compiles%20the%20firmware%20with%20the%20C%2B%2B%20API%20directly%2C%20but%20an%20external%20ELF%20app%20cannot%3A%20it%20links%20%60-nostdlib%60%20and%20resolves%20symbols%20by%20name%20at%20load%20time%2C%20so%20the%20app-facing%20surface%20is%20a%20flat%20C%20ABI%2C%20the%20%60pm_*%60%20functions%2C%20generated%20from%20the%20C%2B%2B%20classes%20by%20%60tools%2Fgen_app_api.py%60.%20An%20app%20includes%20the%20generated%20header%20through%20%60pm_app_api.h%60%3A%0A%0A%60%60%60cpp%0A%23include%20%3Cpm_app_api.h%3E%0A%60%60%60%0A%0AThe%20generator%20projects%20each%20exported%20C%2B%2B%20method%20to%20one%20C%20function%20by%20a%20fixed%20set%20of%20rules%3A%0A%0A%7C%20C%2B%2B%20shape%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20C%20projection%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------------------------%20%7C%20---------------------------------------------------------%20%7C%0A%7C%20%60ClassName%3A%3Amethod(args)%60%20%20%20%20%20%20%20%20%20%7C%20%60pm_%3Cmodule%3E_%3Cmethod%3E(args)%60%20on%20the%20module&#039;s%20singleton%20%20%20%20%7C%0A%7C%20%60String%60%20parameter%20or%20return%20%20%20%20%20%20%7C%20%60const%20char*%60%20(returns%20point%20into%20the%20string%20pool%2C%20below)%20%7C%0A%7C%20enum%20parameter%20or%20return%20%20%20%20%20%20%20%20%20%20%7C%20plain%20%60int%60%20(values%20in%20SDK%20declaration%20order)%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60std%3A%3Avector%3CT%3E%60%20return%20%20%20%20%20%20%20%20%20%20%20%7C%20a%20%60_count%60%20function%20plus%20a%20%60_get(index%2C%20out%2C%20out_size)%60%20pair%20%7C%0A%7C%20scalar%20out-parameter%20by%20reference%20%7C%20%60T*%60%20out-pointer%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AEnums%20become%20integers%20with%20generated%20value%20tables%3A%20%60pm_target%60%2C%20%60pm_style%60%2C%20%60pm_lang%60%2C%20%60pm_refresh%60%2C%20and%20%60pm_jingle%60.%20%60PM_APP_API_ABI%60%20tracks%20incompatible%20changes%20to%20this%20surface%3B%20an%20app%20compares%20it%20against%20%60pm_app_abi()%60%20at%20startup%2C%20and%20%60pocketmage_sdk_version%60%20(via%20%60pm_host_sdk_version()%60)%20gives%20the%20running%20host&#039;s%20SDK%20version.%0A%0AEvery%20%60const%20char*%60%20return%20points%20into%20a%20shared%20rotating%20string%20pool%3A%20four%20256-byte%20slots%2C%20where%20the%20fifth%20string-returning%20call%20overwrites%20the%20first.%20Copy%20a%20returned%20string%20before%20making%20further%20SDK%20calls%20if%20you%20need%20to%20keep%20it.%20Functions%20that%20can%20return%20arbitrary%20length%20write%20into%20a%20caller-owned%20buffer%20instead.%20The%20full%20rule%20and%20the%20per-function%20list%20are%20in%20the%20%5Bfunction%20index%5D(functions.md%23function-index-string-return-lifetime).%0A%0AThe%20%60pm_*%60%20names%20are%20the%20app&#039;s%20real%20dependency%20contract%20and%20are%20gated%20at%20load%20time%20against%20the%20curated%20host%20surface%3B%20see%20%5Bsymbols.md%5D(..%2Fsymbols.md).%20Each%20component%20page%20below%20documents%20its%20%60pm_*%60%20wrappers%20alongside%20the%20C%2B%2B%20class%20they%20project.%0A%0A%23%23%20Reading%20a%20component%20page%0A%0AEvery%20API%20page%20follows%20the%20same%20shape%3A%0A%0A-%20**Access**%3A%20how%20the%20object%20is%20reached%20and%20what%20to%20include.%0A-%20**Lifecycle**%3A%20the%20%60setup*()%60%20call%20in%20%60PocketMage_INIT()%60%20that%20must%20run%20first%2C%20and%20how%20the%20component%20behaves%20across%20deep%20sleep%20and%20app%20load.%0A-%20**Reference**%3A%20one%20section%20per%20class%20or%20function.%20Signatures%20are%20verbatim%20from%20the%20headers%3B%20notes%20state%20runtime%20behavior%2C%20threading%20constraints%2C%20and%20return%20values.%0A-%20**Example**%3A%20a%20minimal%20snippet%2C%20usually%20drawing%20to%20one%20of%20the%20two%20displays.%0A%0AThreading%20notes%20matter%3A%20the%20E-Ink%20panel%20is%20guarded%20by%20a%20recursive%20mutex%20and%20refreshed%20from%20a%20background%20task%3B%20code%20running%20in%20other%20tasks%20must%20take%20the%0A" style="display: none;"></div>
+                  <div id="docmd-raw-markdown" data-content="---%0Atitle%3A%20%22API%20Reference%22%0Adescription%3A%20%22Every%20component%20an%20app%20links%20against%3A%20the%20umbrella%20header%2C%20the%20singleton%20accessors%2C%20and%20the%20per-component%20pages.%22%0A---%0A%0A%23%20API%20Reference%0A%0AThe%20SDK%20exposes%20the%20PocketMage%20hardware%20and%20OS%20services%20to%20loaded%20apps%20through%20a%20set%20of%20component%20objects%20plus%20free%20functions.%20Every%20component%20is%20declared%20in%20%60pocketmage.h%60%2C%20the%20umbrella%20header%20an%20app%20includes%20first%3A%0A%0A%60%60%60cpp%0A%23include%20%3Cpocketmage.h%3E%0A%60%60%60%0A%0A%60pocketmage.h%60%20pulls%20in%20every%20component%20header%2C%20%60config.h%60%2C%20the%20%60frames%60%20and%20%60assets%60%20modules%2C%20and%20%60Preferences.h%60.%20It%20also%20includes%20%60pocketmage_app_version.h%60%20when%20the%20build%20defines%20%60PM_TARGET_APP%60%2C%20so%20the%20SDK-version%20macros%20are%20always%20available%20to%20apps.%0A%0AAn%20external%20app%20does%20not%20call%20these%20C%2B%2B%20classes%20directly%20across%20the%20ELF%20boundary%3B%20it%20calls%20the%20flat%20%60pm_*%60%20C%20ABI%20that%20projects%20them.%20See%20%5BThe%20C%20ABI%20(pm%5C_%5C*)%5D(%23the-c-abi-pm_)%20below%2C%20and%20the%20complete%20%5Bfunction%20index%5D(functions.md)%20for%20every%20wrapper%20and%20its%20signature.%0A%0A%23%23%20Compile%20target%0A%0A%60config.h%60%20requires%20exactly%20one%20of%20these%20to%20be%20defined%2C%20and%20fails%20the%20build%20otherwise%3A%0A%0A%7C%20Macro%20%20%20%20%20%20%20%20%20%20%20%20%7C%20Meaning%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------------%20%7C%20--------------------------------------------------%20%7C%0A%7C%20%60PM_TARGET_HOST%60%20%7C%20the%20PocketMageOS%20firmware%20links%20the%20SDK%20in-process%20%7C%0A%7C%20%60PM_TARGET_APP%60%20%20%7C%20an%20external%20app%20compiled%20to%20a%20loadable%20%60.app.elf%60%20%20%7C%0A%0AThe%20two%20are%20mutually%20exclusive%3B%20defining%20both%20is%20a%20build%20error.%20Apps%20declare%20%60PM_TARGET_APP%60%20(see%20%5BBuilding%20an%20app%5D(..%2Fbuild.md)).%0A%0A%23%23%20The%20singleton%20pattern%0A%0AMost%20components%20are%20owned%20by%20a%20single%20global%20instance%20created%20inside%20the%20SDK%20and%20reached%20through%20a%20global%20accessor%20function.%20The%20accessor%20returns%20a%20reference%3B%20null%20checks%20are%20unnecessary%20once%20the%20component&#039;s%20%60setup*()%60%20call%20has%20run%20in%20%60PocketMage_INIT()%60.%0A%0A%7C%20Component%20%20%7C%20Accessor%20%20%20%20%20%20%7C%20Hardware%20%2F%20role%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20API%20page%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20----------%20%7C%20-------------%20%7C%20---------------------------------------------%20%7C%20---------------------------------%20%7C%0A%7C%20OLED%20%20%20%20%20%20%20%7C%20%60OLED()%60%20%20%20%20%20%20%7C%20256x32%20SSD1326%20OLED%2C%20status%20line%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Boled%5D(oled.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20E-Ink%20%20%20%20%20%20%7C%20%60EINK()%60%20%20%20%20%20%20%7C%20320x240%20GDEQ031T10%20panel%2C%20full-page%20rendering%20%7C%20%5Beink%5D(eink.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Font%20%20%20%20%20%20%20%7C%20%60FontEngine%60%20%20%7C%20unified%20text%20on%20both%20displays%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bfont%5D(font.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Layout%20%20%20%20%20%7C%20(free)%20%20%20%20%20%20%20%20%7C%20display%20geometry%20constants%2C%20text%20fit%20helpers%20%20%7C%20%5Blayout%5D(layout.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20UI%20helpers%20%7C%20(free)%20%20%20%20%20%20%20%20%7C%20status%20bars%2C%20list%20rows%2C%20chips%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bui%5D(ui.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20SD%20card%20%20%20%20%7C%20%60PM_SDAUTO()%60%20%7C%20files%2C%20metadata%2C%20dos%2Fflash%20filesystem%20%20%20%20%20%20%20%20%20%7C%20%5Bsd%5D(sd.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Keyboard%20%20%20%7C%20%60KB()%60%20%20%20%20%20%20%20%20%7C%20TCA8418%20matrix%20%2B%20USB%20HID%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bkb%5D(kb.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Touch%20%20%20%20%20%20%7C%20%60TOUCH()%60%20%20%20%20%20%7C%20MPR121%20slider%2C%20scroll%20gestures%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Btouch%5D(touch.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Buzzer%20%20%20%20%20%7C%20%60BZ()%60%20%20%20%20%20%20%20%20%7C%20PWM%20buzzer%2C%20jingles%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bbz%5D(bz.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Clock%20%20%20%20%20%20%7C%20%60CLOCK()%60%20%20%20%20%20%7C%20PCF8563%20RTC%2C%20timeout%20bookkeeping%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bclock%5D(clock.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20WiFi%20%20%20%20%20%20%20%7C%20%60P_WIFI%60%20%20%20%20%20%20%7C%20station%20radio%20service%20(apps%20may%20call)%20%20%20%20%20%20%20%20%20%7C%20%5Bwifi%5D(wifi.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20System%20%20%20%20%20%7C%20(free)%20%20%20%20%20%20%20%20%7C%20init%2C%20CPU%20speed%2C%20deep%20sleep%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bsys%5D(sys.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Logging%20%20%20%20%7C%20%60pm_log%60%20%20%20%20%20%20%7C%20console%2C%20log%20file%2C%20crash-report%20log%20tail%20%20%20%20%20%20%7C%20%5Blog%5D(log.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20I18n%20%20%20%20%20%20%20%7C%20%60I18n%60%20%20%20%20%20%20%20%20%7C%20language%20tables%2C%20command%20normalization%20%20%20%20%20%20%20%20%7C%20%5Bi18n-runtime%5D(i18n-runtime.md)%20%20%20%7C%0A%7C%20Text%20utils%20%7C%20(free)%20%20%20%20%20%20%20%20%7C%20string%20split%2Fjoin%2Fparse%20helpers%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20%5Bio%5D(io.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Frames%20%20%20%20%20%7C%20%60Frame%60%20%20%20%20%20%20%20%7C%20e-ink%20text%2Fbitmap%20frame%20model%2C%20scrolling%20%20%20%20%20%20%7C%20%5Bframes%5D(frames.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Assets%20%20%20%20%20%7C%20(free)%20%20%20%20%20%20%20%20%7C%20PROGMEM%20bitmaps%3A%20battery%2C%20sleep%2C%20screensavers%20%7C%20%5Bassets%5D(assets.md)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20Config%20%20%20%20%20%7C%20(free)%20%20%20%20%20%20%20%20%7C%20pins%2C%20counters%2C%20prefs%2C%20SDK%20version%20stamping%20%20%20%7C%20%5Bconfiguration%5D(configuration.md)%20%7C%0A%0AThe%20%60frames%60%20component%20is%20used%20by%20the%20OS&#039;s%20built-in%20apps.%20Third-party%20apps%20start%20from%20the%20simpler%20primitives%20in%20%5Boled%5D(oled.md)%2C%20%5Beink%5D(eink.md)%2C%20%5Bfont%5D(font.md)%2C%20and%20%5Blayout%5D(layout.md).%0A%0A%23%23%20The%20C%20ABI%20(pm%5C_%5C*)%0A%0AThe%20accessors%20and%20classes%20above%20are%20the%20host-side%20API.%20The%20SDK%20compiles%20the%20firmware%20with%20the%20C%2B%2B%20API%20directly%2C%20but%20an%20external%20ELF%20app%20cannot%3A%20it%20links%20%60-nostdlib%60%20and%20resolves%20symbols%20by%20name%20at%20load%20time%2C%20so%20the%20app-facing%20surface%20is%20a%20flat%20C%20ABI%2C%20the%20%60pm_*%60%20functions%2C%20generated%20from%20the%20C%2B%2B%20classes%20by%20%60tools%2Fgen_app_api.py%60.%20An%20app%20includes%20the%20generated%20header%20through%20%60pm_app_api.h%60%3A%0A%0A%60%60%60cpp%0A%23include%20%3Cpm_app_api.h%3E%0A%60%60%60%0A%0AThe%20generator%20projects%20each%20exported%20C%2B%2B%20method%20to%20one%20C%20function%20by%20a%20fixed%20set%20of%20rules%3A%0A%0A%7C%20C%2B%2B%20shape%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%20C%20projection%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20---------------------------------%20%7C%20------------------------------------------------------------%20%7C%0A%7C%20%60ClassName%3A%3Amethod(args)%60%20%20%20%20%20%20%20%20%20%7C%20%60pm_%3Cmodule%3E_%3Cmethod%3E(args)%60%20on%20the%20module&#039;s%20singleton%20%20%20%20%20%20%20%7C%0A%7C%20%60String%60%20parameter%20or%20return%20%20%20%20%20%20%7C%20%60const%20char*%60%20(returns%20point%20into%20the%20string%20pool%2C%20below)%20%20%20%20%7C%0A%7C%20enum%20parameter%20or%20return%20%20%20%20%20%20%20%20%20%20%7C%20plain%20%60int%60%20(values%20in%20SDK%20declaration%20order)%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%7C%20%60std%3A%3Avector%3CT%3E%60%20return%20%20%20%20%20%20%20%20%20%20%20%7C%20a%20%60_count%60%20function%20plus%20a%20%60_get(index%2C%20out%2C%20out_size)%60%20pair%20%7C%0A%7C%20scalar%20out-parameter%20by%20reference%20%7C%20%60T*%60%20out-pointer%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7C%0A%0AEnums%20become%20integers%20with%20generated%20value%20tables%3A%20%60pm_target%60%2C%20%60pm_style%60%2C%20%60pm_lang%60%2C%20%60pm_refresh%60%2C%20and%20%60pm_jingle%60.%20%60PM_APP_API_ABI%60%20tracks%20incompatible%20changes%20to%20this%20surface%3B%20an%20app%20compares%20it%20against%20%60pm_app_abi()%60%20at%20startup%2C%20and%20%60pocketmage_sdk_version%60%20(via%20%60pm_host_sdk_version()%60)%20gives%20the%20running%20host&#039;s%20SDK%20version.%0A%0AEvery%20%60const%20char*%60%20return%20points%20into%20a%20shared%20rotating%20string%20pool%3A%20four%20256-byte%20slots%2C%20where%20the%20fifth%20string-returning%20call%20overwrites%20the%20first.%20Copy%20a%20returned%20string%20before%20making%20further%20SDK%20calls%20if%20you%20need%20to%20keep%20it.%20Functions%20that%20can%20return%20arbitrary%20length%20write%20into%20a%20caller-owned%20buffer%20instead.%20The%20full%20rule%20and%20the%20per-function%20list%20are%20in%20the%20%5Bfunction%20index%5D(functions.md%23function-index-string-return-lifetime).%0A%0AThe%20%60pm_*%60%20names%20are%20the%20app&#039;s%20real%20dependency%20contract%20and%20are%20gated%20at%20load%20time%20against%20the%20curated%20host%20surface%3B%20see%20%5Bsymbols.md%5D(..%2Fsymbols.md).%20Each%20component%20page%20below%20documents%20its%20%60pm_*%60%20wrappers%20alongside%20the%20C%2B%2B%20class%20they%20project.%0A%0A%23%23%20Reading%20a%20component%20page%0A%0AEvery%20API%20page%20follows%20the%20same%20shape%3A%0A%0A-%20**Access**%3A%20how%20the%20object%20is%20reached%20and%20what%20to%20include.%0A-%20**Lifecycle**%3A%20the%20%60setup*()%60%20call%20in%20%60PocketMage_INIT()%60%20that%20must%20run%20first%2C%20and%20how%20the%20component%20behaves%20across%20deep%20sleep%20and%20app%20load.%0A-%20**Reference**%3A%20one%20section%20per%20class%20or%20function.%20Signatures%20are%20verbatim%20from%20the%20headers%3B%20notes%20state%20runtime%20behavior%2C%20threading%20constraints%2C%20and%20return%20values.%0A-%20**Example**%3A%20a%20minimal%20snippet%2C%20usually%20drawing%20to%20one%20of%20the%20two%20displays.%0A%0AThreading%20notes%20matter%3A%20the%20E-Ink%20panel%20is%20guarded%20by%20a%20recursive%20mutex%20and%20refreshed%20from%20a%20background%20task%3B%20code%20running%20in%20other%20tasks%20must%20take%20the%0A" style="display: none;"></div>
                   
                     <nav aria-label="breadcrumb" class="docmd-breadcrumbs">
                       <ol>
@@ -1998,7 +2065,7 @@
 <pre class="hljs"><code class="language-cpp"><span class="hljs-comment">#include &lt;pocketmage.h&gt;</span>
 </code></pre>
 <p><code>pocketmage.h</code> pulls in every component header, <code>config.h</code>, the <code>frames</code> and <code>assets</code> modules, and <code>Preferences.h</code>. It also includes <code>pocketmage_app_version.h</code> when the build defines <code>PM_TARGET_APP</code>, so the SDK-version macros are always available to apps.</p>
-<p>An external app does not call these C++ classes directly across the ELF boundary; it calls the flat <code>pm_*</code> C ABI that projects them. See <a href="#api-reference-the-c-abi-pm">The C ABI (pm_*)</a> below, and the complete <a href="functions/">function index</a> for every wrapper and its signature.</p>
+<p>An external app does not call these C++ classes directly across the ELF boundary; it calls the flat <code>pm_*</code> C ABI that projects them. See <a href="#the-c-abi-pm_">The C ABI (pm_*)</a> below, and the complete <a href="functions/">function index</a> for every wrapper and its signature.</p>
 <h2 id="api-reference-compile-target" class="docmd-heading"><a href="#api-reference-compile-target" class="heading-anchor" aria-label="Permalink to this section"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-link2-icon lucide-link-2"><path d="M9 17H7A5 5 0 0 1 7 7h2m6 0h2a5 5 0 1 1 0 10h-2m-7-5h8"/></svg></a>Compile target</h2>
 <p><code>config.h</code> requires exactly one of these to be defined, and fails the build otherwise:</p>
 <div class="table-wrapper"><table>
@@ -2103,6 +2170,12 @@
 <td>(free)</td>
 <td>init, CPU speed, deep sleep</td>
 <td><a href="sys/">sys</a></td>
+</tr>
+<tr>
+<td>Logging</td>
+<td><code>pm_log</code></td>
+<td>console, log file, crash-report log tail</td>
+<td><a href="log/">log</a></td>
 </tr>
 <tr>
 <td>I18n</td>
@@ -2297,13 +2370,13 @@
             <div class="page-footer-actions">
               
               
-                <span class="git-last-updated" data-timestamp="1793505303000">
+                <span class="git-last-updated" data-timestamp="1795593959000">
                   <svg class="git-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                   <span class="git-label">Last updated:</span>
-                  <span class="git-time" data-timestamp="1793505303000"></span>
+                  <span class="git-time" data-timestamp="1795593959000"></span>
                   
                   <div class="git-commit-tooltip" role="tooltip">
                     <div class="git-tooltip-title">Recent commits</div>
@@ -2316,10 +2389,10 @@
                             
                           </div>
                           <div class="git-commit-details">
-                            <div class="git-commit-message" title="pocketmage_audio">pocketmage_audio</div>
+                            <div class="git-commit-message" title="Merge pull request #3 from TalismanDesign/develop">Merge pull request #3 from TalismanDe...</div>
                             <div class="git-commit-meta">
                               <span class="git-commit-author">NellowTCS</span>
-                              <span class="git-commit-date" data-timestamp="1793505303000"></span>
+                              <span class="git-commit-date" data-timestamp="1795593959000"></span>
                             </div>
                           </div>
                         </li>
@@ -2440,14 +2513,14 @@
         </div>
       </div>
       
-      <script src="../assets/js/docmd-main.js?v=mvxaryyd"></script>
+      <script src="../assets/js/docmd-main.js?v=mwvuajyt"></script>
       
-      <script src="../assets/js/docmd-git.js?v=mvxaryyd"></script>
-      <script src="../assets/js/docmd-image-lightbox.js?v=mvxaryyd" ></script>
-<script src="../assets/js/vendor/minisearch.js?v=mvxaryyd" ></script>
-<script src="../assets/js/docmd-search.js?v=mvxaryyd" ></script>
-<script src="../assets/js/docmd-git.js?v=mvxaryyd" ></script>
-<script src="../assets/js/docmd-ai.js?v=mvxaryyd" ></script>
+      <script src="../assets/js/docmd-git.js?v=mwvuajyt"></script>
+      <script src="../assets/js/docmd-image-lightbox.js?v=mwvuajyt" ></script>
+<script src="../assets/js/vendor/minisearch.js?v=mwvuajyt" ></script>
+<script src="../assets/js/docmd-search.js?v=mwvuajyt" ></script>
+<script src="../assets/js/docmd-git.js?v=mwvuajyt" ></script>
+<script src="../assets/js/docmd-ai.js?v=mwvuajyt" ></script>
 
   <!-- Search Modal (Injected by @docmd/plugin-search) -->
   <div id="docmd-search-modal" class="docmd-search-modal" style="display: none;" data-show-confidence="false" data-show-filters="true"
@@ -2523,7 +2596,7 @@
     </script>
 
 <script>window.__git_config={"repo":"https://github.com/TalismanDesign/PocketMage_SDK/edit/main/Docs/docs","branch":"main","editLink":true,"lastUpdated":true,"commitHistory":true,"maxCommits":5,"dateFormat":"relative"};window.__git_i18n={"lastUpdated":"Last updated","recentCommits":"Recent commits","viewCommitHistory":"View commit history","editOnGitHub":"Edit on GitHub","editOnGitLab":"Edit on GitLab","editOnBitbucket":"Edit on Bitbucket","editThisPage":"Edit this page","justNow":"just now","minutesAgo":"{n}m ago","hoursAgo":"{n}h ago","daysAgo":"{n}d ago"}</script>
-<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
+<div id="docmd-ai-root"></div><script>window.__docmd_ai_config={"endpoint":"","cloud":{},"captcha":true,"position":"bottom-center","siteTitle":"PocketMage SDK","siteBase":"/PocketMage_SDK/docs/","siteUrl":"https://talismandesign.github.io/PocketMage_SDK/docs","versions":null,"i18n":null,"navigation":[{"title":"Home","path":"/","icon":"home"},{"title":"Get Started","icon":"rocket","collapsible":true,"path":"/get-started/","children":[{"title":"Install the toolchain","path":"/get-started/toolchain/","icon":"settings"},{"title":"Your first app","path":"/get-started/first-app/","icon":"play"}]},{"title":"Guides","icon":"book","collapsible":true,"path":"/guides/","children":[{"title":"Making an app","path":"/guides/making-apps/","icon":"code"},{"title":"App lifecycle","path":"/guides/lifecycle/","icon":"activity"},{"title":"Rendering","path":"/guides/rendering/","icon":"monitor"},{"title":"Internationalization","path":"/guides/i18n/","icon":"languages"},{"title":"Publishing an app","path":"/guides/publishing/","icon":"package"}]},{"title":"API Reference","icon":"boxes","collapsible":true,"path":"/api/","children":[{"title":"Function index","path":"/api/functions/","icon":"list"},{"title":"Configuration","path":"/api/configuration/","icon":"sliders"},{"title":"OLED","path":"/api/oled/","icon":"monitor"},{"title":"E-Ink","path":"/api/eink/","icon":"monitor"},{"title":"Fonts & text","path":"/api/font/","icon":"text"},{"title":"Layout","path":"/api/layout/","icon":"ruler"},{"title":"UI helpers","path":"/api/ui/","icon":"layout-grid"},{"title":"SD card","path":"/api/sd/","icon":"hard-drive"},{"title":"Keyboard","path":"/api/kb/","icon":"keyboard"},{"title":"Touch","path":"/api/touch/","icon":"hand"},{"title":"Buzzer","path":"/api/bz/","icon":"volume"},{"title":"Audio and media","path":"/api/audio/","icon":"volume"},{"title":"Clock","path":"/api/clock/","icon":"clock"},{"title":"WiFi","path":"/api/wifi/","icon":"wifi"},{"title":"System","path":"/api/sys/","icon":"cpu"},{"title":"Logging","path":"/api/log/","icon":"scroll-text"},{"title":"i18n (runtime)","path":"/api/i18n-runtime/","icon":"languages"},{"title":"Text utilities","path":"/api/io/","icon":"type"},{"title":"Frames","path":"/api/frames/","icon":"frame"},{"title":"Built-in assets","path":"/api/assets/","icon":"image"}]},{"title":"Binary Contract","icon":"file-code","collapsible":true,"children":[{"title":"App ABI","path":"/app-abi/","icon":"book"},{"title":"Overlay format (.elfo)","path":"/overlay/","icon":"layers"},{"title":"Symbol surface","path":"/symbols/","icon":"box"}]},{"title":"Tooling","icon":"wrench","collapsible":true,"children":[{"title":"Building apps","path":"/build/","icon":"code"},{"title":"pm CLI","path":"/cli/","icon":"terminal"},{"title":"i18n catalogs","path":"/i18n/","icon":"languages"}]},{"title":"Troubleshooting","path":"/troubleshooting/","icon":"life-buoy"},{"title":"Glossary","path":"/glossary/","icon":"book-open"},{"title":"Migration","path":"/migration/","icon":"git-branch"},{"title":"PocketMageOS docs","path":"https://talismandesign.github.io/PocketMage_PDA/docs","icon":"cpu","external":true},{"title":"GitHub","path":"https://github.com/TalismanDesign/PocketMage_SDK","icon":"github","external":true}],"searchCapabilities":{"keyword":true,"semantic":false},"isWorkspace":false,"workspaceProjects":[],"messageActions":false,"contextLimit":5};</script>
       
       
       

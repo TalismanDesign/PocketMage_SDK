@@ -10,6 +10,13 @@
       "priority": "medium"
     },
     {
+      "title": "Audio and media",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/audio/",
+      "description": "Shared playback, PCM timing, persistent preferences, streamed tags, and USB ownership.",
+      "section": "API",
+      "priority": "medium"
+    },
+    {
       "title": "Buzzer (pocketmage_bz)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/",
       "description": "PWM buzzer output, Note/Jingle data model, and the built-in melodies.",
@@ -90,6 +97,13 @@
       "title": "Layout (pocketmage_layout)",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/layout/",
       "description": "Canonical display geometry, the row-pitch helper, and the text-fit free functions.",
+      "section": "API",
+      "priority": "medium"
+    },
+    {
+      "title": "Logging (pocketmage_log)",
+      "url": "https://talismandesign.github.io/PocketMage_SDK/docs/api/log/",
+      "description": "The SDK logger: levels, per-tag filtering, the serial console, the optional log file, and the log tail kept for crash reports.",
       "section": "API",
       "priority": "medium"
     },
@@ -201,7 +215,7 @@
     {
       "title": "App lifecycle",
       "url": "https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/",
-      "description": "Entry points, build-time vs host symbols, the APP_INIT hook, and how an app exits.",
+      "description": "Entry points, task-owned resources, idle behavior, and resident app finalization.",
       "section": "Guides",
       "priority": "medium"
     },

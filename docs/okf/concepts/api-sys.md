@@ -4,10 +4,10 @@ title: "System (pocketmage_sys, pocketmage_globals)"
 description: "Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/"
 path: /api/sys/
-updated: 2026-11-01
+updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-01T03:55:48.225Z"
+  generated_at: "2026-11-25T08:06:17.936Z"
 ---
 ---
 title: "System (pocketmage_sys, pocketmage_globals)"
@@ -116,6 +116,8 @@ void pocketmage::deepSleep(bool alternateScreenSaver = false);
 ```
 
 Full power-down sequence:
+
+Before powering down either display, the OS calls checked audio and USB keyboard shutdown. If either cannot finish, it retains live resources, shows the existing localized USB failure message, and returns without entering sleep.
 
 1. Power-saves the OLED.
 2. Stops the `einkHandlerTask` under the panel lock, so an in-flight refresh completes.
