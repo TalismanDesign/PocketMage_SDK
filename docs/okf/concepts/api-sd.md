@@ -7,7 +7,7 @@ path: /api/sd/
 updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T08:06:17.935Z"
+  generated_at: "2026-11-25T09:08:48.884Z"
 ---
 ---
 title: "SD card (pocketmage_sd)"

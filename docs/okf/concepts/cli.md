@@ -7,7 +7,7 @@ path: /cli/
 updated: 2026-11-25
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T08:06:17.938Z"
+  generated_at: "2026-11-25T09:08:48.888Z"
 ---
 ---
 title: "pm CLI"
