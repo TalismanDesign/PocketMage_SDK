@@ -322,15 +322,11 @@ static size_t streamFill(FILE *f, uint8_t *buf, size_t len) {
 }
 
 static bool removeTreeInner(const char *path) {
-  struct stat st;
-  if (stat(path, &st) != 0)
+  if (remove(path) == 0)
     return true;
-  if (!S_ISDIR(st.st_mode))
-    return remove(path) == 0;
-
   DIR *dir = opendir(path);
   if (!dir)
-    return false;
+    return errno == ENOENT;
 
   bool ok = true;
   struct dirent *entry;

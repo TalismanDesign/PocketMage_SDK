@@ -5,9 +5,8 @@ Registry layout: esp_elf_symbol_registry_t in esp-iot-solution
 components/elf_loader/include/esp_elf.h (ESP_ELF_SYMBOL_REGISTRY_VERSION 1).
 """
 
-from dataclasses import dataclass
 import struct
-
+from dataclasses import dataclass
 
 _HEADER = struct.Struct("<16sHHIIIIIHHHHHH")
 _SECTION = struct.Struct("<10I")
