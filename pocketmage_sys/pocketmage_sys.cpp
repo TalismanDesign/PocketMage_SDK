@@ -6,61 +6,124 @@
 //  dP        `88888P' `88888P' dP   `YP `88888P'   dP   dP  dP  dP `88888P8 `8888P88 `88888P'  //
 //                                                                                .88           //
 //                                                                            d8888P            //
-// AUDIT 1
 
 #include <Preferences.h>
 #include <RTClib.h>
-#include <SD.h>
-#include <SD_MMC.h>
-#include <SPI.h>
+#include <pocketmage_kb/usb_keyboard.h>
+#include <pocketmage_sd/pocketmage_sd.h>
+#include <pocketmage_sd/sd_gateway.h>
+
+void setupSD();
 #include <config.h>
-#include <esp_log.h>
 #include <pocketmage_globals.h>
 #include <pocketmage_wifi/pocketmage_wifi.h>
+#include "idle_timer.h"
 
 #include "driver/gpio.h"
 #include "driver/rtc_io.h"
 #include "esp_system.h"
 #include "esp_task_wdt.h"
 
-static constexpr const char* TAG = "SYSTEM";
+#include <atomic>
+#include <cstdint>
+
+static constexpr const char *TAG = "SYSTEM";
+static constexpr uint32_t kSleepLogFlushMs = 500;
+static std::atomic<bool> s_displayRefreshing{false};
 
 volatile bool PWR_BTN_event = false;
-bool noTimeout = false;  // Disable timeout
+bool noTimeout = false; // Disable timeout
 bool mscEnabled = false;
 bool sinkEnabled = false;
 volatile bool SDActive = false;
-volatile int battState = 0;  // Battery state
+volatile int battState = 0; // Battery state
 
 namespace pocketmage {
+static IdleTimer idleTimer;
+
+void reportActivity() {
+  idleTimer.activity(millis());
+}
+
+uint32_t randomU32() {
+  return esp_random();
+}
+
+uint32_t randomRange(uint32_t min, uint32_t max) {
+  if (max <= min)
+    return min;
+  if (min == 0 && max == UINT32_MAX)
+    return esp_random();
+  const uint32_t span = max - min + 1;
+  const uint32_t limit = UINT32_MAX - (UINT32_MAX % span);
+  uint32_t value = esp_random();
+  while (value > limit)
+    value = esp_random();
+  return min + value % span;
+}
+
+bool idleSleepDue(bool inhibited) {
+  return idleTimer.poll(millis(), TIMEOUT, inhibited);
+}
+
+void beginDisplayRefresh() {
+  s_displayRefreshing.store(true, std::memory_order_release);
+}
+
+void endDisplayRefresh() {
+  s_displayRefreshing.store(false, std::memory_order_release);
+}
+
+bool displayRefreshing() {
+  return s_displayRefreshing.load(std::memory_order_acquire);
+}
+
 void setCpuSpeed(int newFreq) {
+  // A clock change during a panel refresh re-times the shared SPI bus mid-waveform.
+  if (displayRefreshing())
+    return;
+  // USB raw I/O bypasses stream handles and still needs the SDMMC clock.
+  if (newFreq < 80 && (CurrentAppState == USB_APP || pm_sd_gateway::usbAccessActive()))
+    return;
   // WiFi stalls below 240MHz on the S3, so ignore any power-save drop while
-  // the radio is active. Runs before the frequency check so a redundant drop
-  // attempt still gets blocked.
+  // the radio is active
   if (newFreq < WIFI_CPU_FREQ_MHZ && P_WIFI.getState() != WifiRadioState::Off)
+    return;
+
+  // SDMMC stalls below 80MHz on the S3, so ignore any power-save drop while
+  // the device is active
+  if (newFreq < 80 && pm_sd_gateway::streamsOpen())
     return;
 
   // Return early if the frequency is already set
   if (getCpuFrequencyMhz() == newFreq)
     return;
 
-  int validFreqs[] = {240, 160, 80, 40, 20, 10};
+  constexpr int validFreqs[] = {240, 160, 80, 40, 20, 10};
   bool isValid = false;
 
-  for (int i = 0; i < sizeof(validFreqs) / sizeof(validFreqs[0]); i++) {
-    if (newFreq == validFreqs[i]) {
+  for (int frequency : validFreqs) {
+    if (newFreq == frequency) {
       isValid = true;
       break;
     }
   }
 
   if (isValid) {
-    setCpuFrequencyMhz(newFreq);
-    ESP_LOGV(TAG, "CPU Speed changed to: %d MHz", newFreq);
+    if (!setCpuFrequencyMhz(newFreq)) {
+      PM_LOGE(TAG, "CPU speed change to %d MHz failed", newFreq);
+      return;
+    }
+    PM_LOGV(TAG, "CPU Speed changed to: %d MHz", newFreq);
   }
 }
 
 void deepSleep(bool alternateScreenSaver) {
+  if (!P_AUDIO.stopChecked() || !pm_keyboard::stopUsb()) {
+    PM_LOGE(TAG, "Sleep postponed: USB or audio cleanup incomplete");
+    OLED().sysMessage(TR(STR_USB_DEVICE_FAIL), 1000);
+    return;
+  }
   // Put OLED to sleep
   u8g2.setPowerSave(1);
 
@@ -78,26 +141,20 @@ void deepSleep(bool alternateScreenSaver) {
 
   if (alternateScreenSaver == false) {
     SDActive = true;
-    pocketmage::setCpuSpeed(240);
-    delay(50);
 
     // Screensavers are authored for the canonical rotation; HOME_INIT() may have
     // left the panel at rotation 1 (180 degrees off), so force rotation 3 here.
     display.setRotation(3);
 
     // Check if there are custom screensavers
-    File dir = global_fs->open("/assets/backgrounds");
+    std::vector<PocketmageSD::DirItem> items;
     std::vector<String> binFiles;
 
-    if (dir) {
-      File file;
-      while ((file = dir.openNextFile())) {
-        String name = file.name();
-        if (name.endsWith(".bin"))
-          binFiles.push_back(name);
-        file.close();
+    if (PM_SD().listDirItems("/assets/backgrounds", items)) {
+      for (const auto &item : items) {
+        if (item.name.endsWith(".bin"))
+          binFiles.push_back(item.name);
       }
-      dir.close();
     }
 
     display.setFullWindow();
@@ -106,26 +163,18 @@ void deepSleep(bool alternateScreenSaver) {
     if (!binFiles.empty()) {
       int fileIndex = esp_random() % binFiles.size();
       String path = "/assets/backgrounds/" + binFiles[fileIndex];
-      File f = global_fs->open(path);
-      if (f) {
-        size_t fSize = f.size();
-        if (fSize == 9600) {
-          uint8_t* buf = (uint8_t*)malloc(9600);
-          if (buf) {
-            if (f.read(buf, 9600) == 9600) {
-              f.close();
-              display.drawBitmap(0, 0, buf, 320, 240, GxEPD_BLACK);
-              FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
-              FontEngine::drawText(DisplayTarget::EINK, 5, display.height() - 5,
-                                   binFiles[fileIndex], FontStyle::MonoBold);
-            } else {
-              f.close();
-            }
-            free(buf);
-            buf = nullptr;
+      if (PM_SD().getFileSize(path.c_str()) == 9600) {
+        uint8_t *buf = (uint8_t *)malloc(9600);
+        if (buf) {
+          if (PM_SD().readBinaryFile(path.c_str(), buf, 9600)) {
+            display.drawBitmap(0, 0, buf, 320, 240, GxEPD_BLACK);
+            FontEngine::setTextColor(DisplayTarget::EINK, GxEPD_BLACK);
+            FontEngine::drawText(DisplayTarget::EINK, 5, display.height() - 5, binFiles[fileIndex],
+                                 FontStyle::MonoBold);
           }
+          free(buf);
+          buf = nullptr;
         }
-        f.close();
       }
     }
     // Use standard screensavers
@@ -136,8 +185,6 @@ void deepSleep(bool alternateScreenSaver) {
       display.drawBitmap(0, 0, ScreenSaver_allArray[randomScreenSaver_], 320, 240, GxEPD_BLACK);
     }
 
-    if (SAVE_POWER)
-      pocketmage::setCpuSpeed(POWER_SAVE_FREQ);
     SDActive = false;
 
     EINK().forceSlowFullUpdate(true);
@@ -167,16 +214,18 @@ void deepSleep(bool alternateScreenSaver) {
   setLoadSwitch(false);
 #endif
 
+  pm_log::flush(kSleepLogFlushMs);
+
   // Sleep the ESP32
   esp_deep_sleep_start();
 }
 
-void IRAM_ATTR PWR_BTN_irq() {
+void PWR_BTN_irq() {
   PWR_BTN_event = true;
 }
 
 // Hard reset to home
-void hardReset(void* parameter) {
+void hardReset(void *parameter) {
   vTaskDelay(pdMS_TO_TICKS(250));
   unsigned long heldSince = millis();
   for (;;) {
@@ -190,13 +239,13 @@ void hardReset(void* parameter) {
 
       resetRequested = true;
 
-      heldSince = millis();  // Reset so it doesn't constantly trigger
+      heldSince = millis(); // Reset so it doesn't constantly trigger
     }
 
     vTaskDelay(pdMS_TO_TICKS(50));
   }
 }
-}
+} // namespace pocketmage
 
 volatile bool resetRequested = false;
 
@@ -238,12 +287,13 @@ void PocketMage_INIT() {
 
   // Serial, I2C, SPI
   Serial.begin(115200);
+  pm_log::begin();
   Wire.begin(I2C_SDA, I2C_SCL);
 
 // Initialize Second I2C Bus (prod only)
 #if POCKETMAGE_HW_VERSION == 2
   Wire1.begin(SWITCHED_I2C_SDA,
-              SWITCHED_I2C_SCL);  // Note: Devices on Wire1 - Cap Touch, Expansion Port
+              SWITCHED_I2C_SCL); // Note: Devices on Wire1 - Cap Touch, Expansion Port
 #endif
 
   // Use the global SPI instance pinned to the dedicated bus pins.
@@ -256,7 +306,6 @@ void PocketMage_INIT() {
   // WAKE INTERRUPT SETUP
   pinMode(KB_IRQ, INPUT);
   esp_sleep_enable_ext0_wakeup((gpio_num_t)KB_IRQ, 0);
-  ESP_LOGE(TAG, "set wakeup pin");
 
   // OLED SETUP
   setupOled();
@@ -269,15 +318,12 @@ void PocketMage_INIT() {
 
   // KEYBOARD SETUP
   setupKB(KB_IRQ);
-  ESP_LOGD(TAG, "setup keyboard");
 
   // EINK HANDLER SETUP
   setupEink();
-  ESP_LOGD(TAG, "setup eink");
 
   // SD CARD SETUP
   setupSD();
-  ESP_LOGD(TAG, "setup sd");
 
   // POWER SETUP
   pinMode(PWR_BTN, INPUT_PULLUP);
@@ -285,17 +331,18 @@ void PocketMage_INIT() {
   pinMode(CHRG_SENS, INPUT);
   pinMode(BAT_SENS, INPUT);
   if (!PowerSystem.init(I2C_SDA, I2C_SCL, MP2722_ADDR, USB_MUX_PIN)) {
-    ESP_LOGV(TAG, "MP2722 Failed to Init");
+    PM_LOGE(TAG, "MP2722 failed to init");
   }
+  PowerSystem.setUSBControlESP();
 
   // Start hardreset task
-  xTaskCreatePinnedToCore(pocketmage::hardReset,  // Function name
-                          "hardReset",            // Task name
-                          2048,                   // Stack size
-                          NULL,                   // Parameters
-                          0,                      // Priority
-                          NULL,                   // Task handle
-                          1                       // Core ID
+  xTaskCreatePinnedToCore(pocketmage::hardReset, // Function name
+                          "hardReset",           // Task name
+                          2048,                  // Stack size
+                          NULL,                  // Parameters
+                          0,                     // Priority
+                          NULL,                  // Task handle
+                          1                      // Core ID
   );
 
   // SET CPU CLOCK FOR POWER SAVE MODE
@@ -306,11 +353,9 @@ void PocketMage_INIT() {
 
   // CAPACATIVE TOUCH SETUP
   setupTouch();
-  ESP_LOGD(TAG, "setup touch");
 
   // RTC SETUP
   setupClock();
-  ESP_LOGD(TAG, "setup clock");
 
   // Set "random" seed
   randomSeed(analogRead(BAT_SENS));
@@ -321,7 +366,7 @@ void PocketMage_INIT() {
 #else
   loadState();
 #endif
-  ESP_LOGD(TAG, "loaded state");
+  pm_log::setFileEnabled(LOG_TO_FILE);
 
   // Recover persisted state after an abnormal reset.
 #if PM_TARGET_APP
@@ -332,16 +377,8 @@ void PocketMage_INIT() {
 
   // STARTUP JINGLE
   setupBZ();
-  ESP_LOGD(TAG, "setup buzzer");
   if (!seamlessReboot)
     BZ().playJingle(Jingles::Startup);
-
-  // WiFi task (radio stays off until a wifi* or ssh command enables it)
-  // Audio task (piezo stays with the buzzer until a clip is played)
-#if PM_TARGET_HOST
-  P_WIFI.begin();
-  P_AUDIO.begin();
-#endif
 
   // Clear any excess keystrokes
   keypad.flush();
@@ -379,8 +416,8 @@ void setLoadSwitch(bool state) {
 }
 
 // ===================== GLOBAL TEXT HELPERS =====================
-volatile bool newLineAdded = true;  // New line added in TXT
-std::vector<String> allLines;       // All lines in TXT
+volatile bool newLineAdded = true; // New line added in TXT
+std::vector<String> allLines;      // All lines in TXT
 
 String vectorToString() {
   String result;
@@ -418,7 +455,7 @@ void stringToVector(String inputText) {
           String partialWord = currentLine_.substring(lastSpace + 1);
           currentLine_ = currentLine_.substring(0, lastSpace);
           allLines.push_back(currentLine_);
-          currentLine_ = partialWord;  // Start new line with partial word
+          currentLine_ = partialWord; // Start new line with partial word
         } else {
           // No spaces, whole line is a single word
           allLines.push_back(currentLine_);

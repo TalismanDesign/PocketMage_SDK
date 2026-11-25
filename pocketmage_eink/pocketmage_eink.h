@@ -10,11 +10,11 @@
 #include <Arduino.h>
 #include <GxEPD2_BW.h>
 #include <U8g2_for_Adafruit_GFX.h>
-#include <vector>
 #include <config.h>
+#include <vector>
 
 // Type alias for readability
-using PanelT   = GxEPD2_310_GDEQ031T10;
+using PanelT = GxEPD2_310_GDEQ031T10;
 using DisplayT = GxEPD2_BW<PanelT, PanelT::HEIGHT>;
 
 // E-ink display
@@ -27,41 +27,67 @@ extern void einkHandler(void *parameter);
 
 class PocketmageEink {
 public:
-  explicit PocketmageEink(DisplayT& display) : display_(display) {}
+  explicit PocketmageEink(DisplayT &display) : display_(display) {
+  }
 
-  void setLineSpacing(uint8_t lineSpacing)              { lineSpacing_ = lineSpacing; };
-  void setFullRefreshAfter(uint8_t fullRefreshAfter)    { fullRefreshAfter_ = fullRefreshAfter; };
+  void setLineSpacing(uint8_t lineSpacing) {
+    lineSpacing_ = lineSpacing;
+  };
+  void setFullRefreshAfter(uint8_t fullRefreshAfter) {
+    fullRefreshAfter_ = fullRefreshAfter;
+  };
 
+  /** Return the canvas width in pixels. */
+  int width() const;
+  /** Return the canvas height in pixels. */
+  int height() const;
+  /** Clear the canvas to white without refreshing the panel. */
+  void clear();
+  /** Set one canvas pixel to black (ink=true) or white; off-panel input is ignored. */
+  void pixel(int x, int y, bool ink);
+  /** Draw an inclusive rectangle; corner order is immaterial.
+   * Coordinates and spans outside the driver's signed-16-bit range are ignored.
+   */
+  void rect(int x0, int y0, int x1, int y1, bool fill, bool ink);
+  /** Draw a triangle in black or white; ignore vertices outside signed-16-bit range. */
+  void triangle(int x0, int y0, int x1, int y1, int x2, int y2, bool fill, bool ink);
   void refresh();
   void setFastFullRefresh(bool setting);
-  void statusBar(const String& input, bool fullWindow=false);
-  void drawStatusBar(const String& input);
-  void resetDisplay(bool clearScreen=true, uint16_t color = GxEPD_WHITE);
-  int  countLines(const String& input, size_t maxLineLength = 29);
+  void statusBar(const String &input, bool fullWindow = false);
+  void drawStatusBar(const String &input);
+  void resetDisplay(bool clearScreen = true, uint16_t color = GxEPD_WHITE);
+  int countLines(const String &input, size_t maxLineLength = 29);
 
   uint8_t getFontHeight();
   int maxLines() {
     int divisor = getFontHeight() + lineSpacing_;
-    if (divisor <= 0) return 0;
+    if (divisor <= 0)
+      return 0;
     return display_.height() / divisor;
   }
-  uint16_t getEinkTextWidth(const String& s);
-  uint8_t getLineSpacing() { return lineSpacing_; };
-  DisplayT& getDisplay() { return display_; };
+  uint16_t getEinkTextWidth(const String &s);
+  uint8_t getLineSpacing() {
+    return lineSpacing_;
+  };
+  DisplayT &getDisplay() {
+    return display_;
+  };
   void forceSlowFullUpdate(bool force);
-  void markPanelNeedsFullRefresh() { panelNeedsFullRefresh_ = true; };
+  void markPanelNeedsFullRefresh() {
+    panelNeedsFullRefresh_ = true;
+  };
   void lockPanel();
   void unlockPanel();
 
 private:
-  DisplayT&             display_;
-  bool                  forceSlowFullUpdate_  = false;
-  bool                  panelNeedsFullRefresh_ = true;
-  uint8_t               partialCounter_       = 0;
-  uint8_t               fullRefreshAfter_     = FULL_REFRESH_AFTER;
-  uint8_t               lineSpacing_          = 6;
+  DisplayT &display_;
+  bool forceSlowFullUpdate_ = false;
+  bool panelNeedsFullRefresh_ = true;
+  uint8_t partialCounter_ = 0;
+  uint8_t fullRefreshAfter_ = FULL_REFRESH_AFTER;
+  uint8_t lineSpacing_ = 6;
 };
 
 void setupEink();
 
-PocketmageEink& EINK();
+PocketmageEink &EINK();

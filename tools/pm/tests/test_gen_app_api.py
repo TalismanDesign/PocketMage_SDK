@@ -1,10 +1,10 @@
-
 import os
 import sys
 import unittest
 
-SDK_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(
-    os.path.dirname(os.path.abspath(__file__)))))
+SDK_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 sys.path.insert(0, os.path.join(SDK_ROOT, "tools"))
 
@@ -12,7 +12,6 @@ import gen_app_api as gen  # noqa: E402  path must be set first
 
 
 class TypeProjection(unittest.TestCase):
-
     def param(self, raw):
         return gen.project_param(raw, 0)
 
@@ -87,8 +86,7 @@ class Naming(unittest.TestCase):
     def test_camel_case_becomes_snake_case(self):
         self.assertEqual(gen.snake("getWorkingFile"), "get_working_file")
         self.assertEqual(gen.snake("dispatchEvents"), "dispatch_events")
-        self.assertEqual(gen.snake("loadSavedCredentials"),
-                         "load_saved_credentials")
+        self.assertEqual(gen.snake("loadSavedCredentials"), "load_saved_credentials")
 
     def test_acronyms_do_not_split_into_letters(self):
         self.assertEqual(gen.snake("readFileToString"), "read_file_to_string")
@@ -100,22 +98,44 @@ class Naming(unittest.TestCase):
 
 
 class EnumParsing(unittest.TestCase):
-
     def test_values_are_read_from_the_header(self):
         tables = gen.load_enums(SDK_ROOT)
         names = {c_name for c_name, _host, _v, _t in tables}
-        self.assertEqual(names, {"pm_target", "pm_style", "pm_lang",
-                                 "pm_refresh", "pm_audio_state", "pm_jingle"})
+        self.assertEqual(
+            names,
+            {
+                "pm_target",
+                "pm_style",
+                "pm_lang",
+                "pm_refresh",
+                "pm_audio_state",
+                "pm_jingle",
+                "pm_audio_output",
+                "pm_audio_result",
+                "pm_image_format",
+                "pm_key",
+                "pm_transport_icon",
+            },
+        )
 
     def test_refresh_enum_comes_from_the_ui_header(self):
-        modes = dict((c, v) for c, _h, values, _t in gen.load_enums(SDK_ROOT)
-                     for c, v in values if c.startswith("PM_REFRESH_"))
-        self.assertEqual(modes, {"PM_REFRESH_NORMAL": "Normal",
-                                 "PM_REFRESH_FORCE_FULL": "ForceFull"})
+        modes = dict(
+            (c, v)
+            for c, _h, values, _t in gen.load_enums(SDK_ROOT)
+            for c, v in values
+            if c.startswith("PM_REFRESH_")
+        )
+        self.assertEqual(
+            modes, {"PM_REFRESH_NORMAL": "Normal", "PM_REFRESH_FORCE_FULL": "ForceFull"}
+        )
 
     def test_lang_order_matches_the_sdk_header(self):
-        langs = dict((c, v) for c, _h, values, _t in gen.load_enums(SDK_ROOT)
-                     for c, v in values if c.startswith("PM_LANG_"))
+        langs = dict(
+            (c, v)
+            for c, _h, values, _t in gen.load_enums(SDK_ROOT)
+            for c, v in values
+            if c.startswith("PM_LANG_")
+        )
         self.assertEqual(langs["PM_LANG_ENGLISH"], "English")
         self.assertEqual(langs["PM_LANG_FRENCH"], "French")
         self.assertEqual(langs["PM_LANG_SPANISH"], "Spanish")
@@ -135,7 +155,6 @@ class EnumParsing(unittest.TestCase):
 
 
 class NamespaceConstParsing(unittest.TestCase):
-
     def setUp(self):
         self.sdk_root = SDK_ROOT
 
@@ -143,8 +162,7 @@ class NamespaceConstParsing(unittest.TestCase):
         tables = gen.load_namespace_const_tables(self.sdk_root)
         self.assertEqual(len(tables), 1)
         c_name, namespace, values, type_name = tables[0]
-        self.assertEqual((c_name, namespace, type_name),
-                         ("pm_jingle", "Jingles", "Jingle"))
+        self.assertEqual((c_name, namespace, type_name), ("pm_jingle", "Jingles", "Jingle"))
         names = [name for _const, name in values if name is not None]
         self.assertEqual(names, ["Startup", "Shutdown"])
 
@@ -155,65 +173,74 @@ class NamespaceConstParsing(unittest.TestCase):
         self.assertEqual(len(values) - 1, 2)
 
     def test_braces_inside_the_namespace_do_not_end_it(self):
-        text = ('namespace Jingles { constexpr static const Note notes[] = {'
-                ' {1, 2} }; const Jingle Startup = {notes, 1}; }')
-        self.assertEqual(gen.parse_namespace_consts(text, "Jingles", "Jingle"),
-                         ["Startup"])
+        text = (
+            "namespace Jingles { constexpr static const Note notes[] = {"
+            " {1, 2} }; const Jingle Startup = {notes, 1}; }"
+        )
+        self.assertEqual(gen.parse_namespace_consts(text, "Jingles", "Jingle"), ["Startup"])
 
     def test_missing_namespace_is_an_error(self):
         with self.assertRaises(SystemExit):
-            gen.parse_namespace_consts("namespace Other { }", "Jingles",
-                                       "Jingle")
+            gen.parse_namespace_consts("namespace Other { }", "Jingles", "Jingle")
 
 
 class FreeFunctionParsing(unittest.TestCase):
-
     def names(self, header):
-        return {e["name"] for e in gen.parse_free_functions(
-            os.path.join(SDK_ROOT, header))}
+        return {e["name"] for e in gen.parse_free_functions(os.path.join(SDK_ROOT, header))}
 
     def test_io_header_functions(self):
-        self.assertEqual(self.names("pocketmage_io/pocketmage_io.h"),
-                         {"splitString", "joinString", "removeChar",
-                          "stringToInt"})
+        self.assertEqual(
+            self.names("pocketmage_io/pocketmage_io.h"),
+            {"splitString", "joinString", "removeChar", "stringToInt"},
+        )
 
     def test_layout_header_functions(self):
-        self.assertEqual(self.names("pocketmage_layout/pocketmage_layout.h"),
-                         {"sliceThatFits", "truncateWithEllipsis",
-                          "wordWrap", "einkRowPitch"})
+        self.assertEqual(
+            self.names("pocketmage_layout/pocketmage_layout.h"),
+            {"sliceThatFits", "truncateWithEllipsis", "wordWrap", "einkRowPitch"},
+        )
 
     def test_ui_header_functions(self):
-        self.assertEqual(self.names("pocketmage_ui/pocketmage_ui.h"),
-                         {"drawScrollbar", "beginEinkScreen", "endEinkScreen",
-                          "drawListItem", "drawChipText",
-                          "drawCyclePickerOLED"})
+        self.assertEqual(
+            self.names("pocketmage_ui/pocketmage_ui.h"),
+            {
+                "drawScrollbar",
+                "beginEinkScreen",
+                "endEinkScreen",
+                "drawListItem",
+                "drawChipText",
+                "drawCyclePickerOLED",
+                "drawTransportIcon",
+            },
+        )
 
     def test_enum_definition_is_not_a_function(self):
-        entries = gen.parse_free_functions(
-            os.path.join(SDK_ROOT, "pocketmage_ui/pocketmage_ui.h"))
+        entries = gen.parse_free_functions(os.path.join(SDK_ROOT, "pocketmage_ui/pocketmage_ui.h"))
         for entry in entries:
             self.assertNotIn("EinkRefresh", entry["ret"])
 
     def test_default_argument_is_dropped_from_the_type(self):
-        entry = next(e for e in gen.parse_free_functions(
-            os.path.join(SDK_ROOT, "pocketmage_ui/pocketmage_ui.h"))
-            if e["name"] == "endEinkScreen")
-        self.assertEqual([p["type"] for p in entry["params"]],
-                         ["const char*", "EinkRefresh"])
+        entry = next(
+            e
+            for e in gen.parse_free_functions(
+                os.path.join(SDK_ROOT, "pocketmage_ui/pocketmage_ui.h")
+            )
+            if e["name"] == "endEinkScreen"
+        )
+        self.assertEqual(
+            [gen.normalize_type(p["type"]) for p in entry["params"]], ["const char*", "EinkRefresh"]
+        )
 
     def test_template_arguments_are_not_comparisons(self):
-        entries = gen.parse_free_functions(
-            os.path.join(SDK_ROOT, "pocketmage_io/pocketmage_io.h"))
+        entries = gen.parse_free_functions(os.path.join(SDK_ROOT, "pocketmage_io/pocketmage_io.h"))
         join = next(e for e in entries if e["name"] == "joinString")
         self.assertEqual(join["ret"], "String")
 
 
 class FreeFunctionProjection(unittest.TestCase):
     def build(self, basename, module):
-        header = os.path.join(
-            SDK_ROOT, gen.FREE_FUNCTION_HEADERS_PATH[basename])
-        return gen.build_free_module(basename, module,
-                                     gen.parse_free_functions(header))
+        header = os.path.join(SDK_ROOT, gen.FREE_FUNCTION_HEADERS_PATH[basename])
+        return gen.build_free_module(basename, module, gen.parse_free_functions(header))
 
     def by_name(self, methods):
         return {m.name: m for m in methods}
@@ -229,16 +256,16 @@ class FreeFunctionProjection(unittest.TestCase):
         names = self.by_name(methods)
         self.assertIn("pm_io_split_string_count", names)
         getter = names["pm_io_split_string_get"]
-        self.assertEqual([p.c_type for p in getter.params],
-                         ["const char*", "char", "int", "char*", "size_t"])
+        self.assertEqual(
+            [p.c_type for p in getter.params], ["const char*", "char", "int", "char*", "size_t"]
+        )
         self.assertIn("v.size()", getter.statement)
         self.assertGreaterEqual(len(getter.statement.split("\n")), 4)
 
     def test_vector_param_becomes_array_plus_count(self):
         methods, _ = self.build("pocketmage_io.h", "io")
         join = self.by_name(methods)["pm_io_join_string"]
-        self.assertEqual([p.c_type for p in join.params],
-                         ["const char* const*", "int", "char"])
+        self.assertEqual([p.c_type for p in join.params], ["const char* const*", "int", "char"])
         self.assertIn("std::vector<String>(a0_items", join.call)
 
     def test_enum_params_are_cast(self):
@@ -255,19 +282,13 @@ class FreeFunctionProjection(unittest.TestCase):
 
 class CallConstruction(unittest.TestCase):
     def test_singleton_accessor_uses_a_dot(self):
-        self.assertEqual(
-            gen.build_call("PocketmageEink", "refresh", []),
-            "EINK().refresh()")
+        self.assertEqual(gen.build_call("PocketmageEink", "refresh", []), "EINK().refresh()")
 
     def test_global_reference_accessor_uses_a_dot(self):
-        self.assertEqual(
-            gen.build_call("PocketMageWifi", "getRssi", []),
-            "P_WIFI.getRssi()")
+        self.assertEqual(gen.build_call("PocketMageWifi", "getRssi", []), "P_WIFI.getRssi()")
 
     def test_static_class_uses_a_scope_operator(self):
-        self.assertEqual(
-            gen.build_call("I18n", "languageCount", []),
-            "I18n::languageCount()")
+        self.assertEqual(gen.build_call("I18n", "languageCount", []), "I18n::languageCount()")
 
 
 if __name__ == "__main__":

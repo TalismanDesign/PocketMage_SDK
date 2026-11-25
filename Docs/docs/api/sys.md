@@ -106,6 +106,8 @@ void pocketmage::deepSleep(bool alternateScreenSaver = false);
 
 Full power-down sequence:
 
+Before powering down either display, the OS calls checked audio and USB keyboard shutdown. If either cannot finish, it retains live resources, shows the existing localized USB failure message, and returns without entering sleep.
+
 1. Power-saves the OLED.
 2. Stops the `einkHandlerTask` under the panel lock, so an in-flight refresh completes.
 3. Plays `Jingles::Shutdown`.

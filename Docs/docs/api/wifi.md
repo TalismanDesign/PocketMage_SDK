@@ -15,7 +15,7 @@ description: "The station radio service: enabled/scan/connect lifecycle, status 
 PocketMageWifi& wifi = P_WIFI;
 ```
 
-`P_WIFI` is a global reference to the singleton (`PocketMageWifi::getInstance()`). The host calls `P_WIFI.begin()` during `PocketMage_INIT()`; the radio stays off until something calls `enable()`.
+`P_WIFI` is a global reference to the singleton (`PocketMageWifi::getInstance()`). Wi-Fi is not started at boot, which saves about 12 KB of memory. The first `enable()` (or an explicit `begin()`) sets it up and turns the radio on. Until then, `getStatusMessage()` reports idle.
 
 ## State model
 
@@ -30,9 +30,13 @@ enum class WifiRadioState {
 ### Lifecycle
 
 ```cpp
-void begin();   // one-time service init (event loop, netif, task)
+void begin();   // shared event loop and netif only; no dedicated worker
 void stop();    // clean service shutdown
 ```
+
+`begin()` is safe to call more than once. The Wi-Fi task and its 10,240-byte stack are created on the first `enable()`. If that fails, `getLastError()` says why and you can call `enable()` again. Other controls, such as `scan()`, do nothing until `enable()` has been called.
+
+`disable()` turns the radio off but keeps the task for next time. `stop()` shuts the task down and frees it, waiting up to five seconds. If it times out, the service refuses new commands until a later `stop()` succeeds.
 
 ### Control (non-blocking, dispatched to the task)
 
@@ -91,7 +95,7 @@ Set a callback with `setEventCallback` to be notified of state changes (the WiFi
 
 ## Threading
 
-Control methods only enqueue a command and return. Status getters lock the service mutex. The service task holds the CPU at 240 MHz for the whole session; `pocketmage::setCpuSpeed` refuses any drop while the radio is not `Off` (see [sys](sys.md)).
+Control methods queue a command and return. If the queue is full, the command is dropped and `getLastError()` reports it. Status getters lock the service mutex. The service task holds the CPU at 240 MHz for the whole session; `pocketmage::setCpuSpeed` refuses any drop while the radio is not `Off` (see [sys](sys.md)).
 
 ## Example
 

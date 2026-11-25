@@ -1,4 +1,3 @@
-
 import os
 import tempfile
 import unittest
@@ -74,30 +73,42 @@ class ParseSymbols(unittest.TestCase):
 
 
 class Classify(unittest.TestCase):
+    def test_compiled_exports_override_curated_and_source_only_names(self):
+        result = gate_mod.classify(
+            ["pm_audio_play", "not_linked", "source_only"],
+            {"not_linked"},
+            host_view={"pm_audio_play"},
+            available_table={"source_only"},
+        )
+        self.assertEqual(result.ok, ["pm_audio_play"])
+        self.assertEqual(result.broken, ["not_linked", "source_only"])
+
     def test_curated_and_table_ok(self):
         curated = {"pm_sdk_version"}
-        result = gate_mod.classify(["printf", "pm_sdk_version"], curated,
-                                   host_view=None, available_table={"printf"})
+        result = gate_mod.classify(
+            ["printf", "pm_sdk_version"], curated, host_view=None, available_table={"printf"}
+        )
         self.assertTrue(result.passed)
         self.assertEqual(result.ok, ["printf", "pm_sdk_version"])
 
     def test_unknown_is_unconfirmed_without_host(self):
-        result = gate_mod.classify(["pm_sdk_version", "mystery_api"], {"pm_sdk_version"},
-                                   host_view=None)
+        result = gate_mod.classify(
+            ["pm_sdk_version", "mystery_api"], {"pm_sdk_version"}, host_view=None
+        )
         self.assertFalse(result.passed)
         self.assertEqual(result.unconfirmed, ["mystery_api"])
         self.assertEqual(result.broken, [])
 
     def test_unknown_is_broken_with_host(self):
         host_view = {"printf", "pm_sdk_version"}
-        result = gate_mod.classify(["pm_sdk_version", "mystery_api"],
-                                   {"pm_sdk_version"}, host_view=host_view)
+        result = gate_mod.classify(
+            ["pm_sdk_version", "mystery_api"], {"pm_sdk_version"}, host_view=host_view
+        )
         self.assertEqual(result.ok, ["pm_sdk_version"])
         self.assertEqual(result.broken, ["mystery_api"])
 
 
 class SymbolInGeneratedTable(unittest.TestCase):
-
     def test_parses_export_lines(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = os.path.join(tmp, "table.cpp")
@@ -109,9 +120,7 @@ class SymbolInGeneratedTable(unittest.TestCase):
                     "    ESP_ELFSYM_END\n"
                     "};\n"
                 )
-            self.assertEqual(
-                gate_mod.generated_table_symbols(path), {"memmove", "_Znwj"}
-            )
+            self.assertEqual(gate_mod.generated_table_symbols(path), {"memmove", "_Znwj"})
 
     def test_absent_file_is_empty(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -261,9 +270,11 @@ class SdkRoot(unittest.TestCase):
     def test_ancestor_walk_finds_checkout(self):
         sdk = app_mod.sdk_root()
         deep = os.path.join(sdk, "docs", "docs", "build")
-        with mock.patch.dict(os.environ, {}, clear=True), \
-             mock.patch.object(app_mod, "_is_sdk_root", side_effect=lambda p: p == sdk), \
-             mock.patch.object(app_mod.os, "getcwd", return_value=deep):
+        with (
+            mock.patch.dict(os.environ, {}, clear=True),
+            mock.patch.object(app_mod, "_is_sdk_root", side_effect=lambda p: p == sdk),
+            mock.patch.object(app_mod.os, "getcwd", return_value=deep),
+        ):
             self.assertEqual(app_mod.sdk_root(), sdk)
 
 

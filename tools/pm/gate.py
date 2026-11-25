@@ -1,25 +1,23 @@
-
 from __future__ import annotations
 
 import os
 import re
 import subprocess
 from dataclasses import dataclass
+from pathlib import Path
 
 from tools import symbols as symbols_mod
+from tools.pm.compiled_exports import parse_compiled_exports
 
 _EXPORT_LINE = re.compile(r"ESP_ELFSYM_EXPORT\(\s*(\w+)\s*\)")
 
 _ALIAS_LINE = re.compile(r'\{\s*"([^"]+)"\s*,\s*\(void\s*\*\)\s*&pm_elfsym_')
 
-_SYM_LINE = re.compile(
-    r"^\s*\d+:\s+\S+\s+\d+\s+\S+\s+(\S+)\s+\S+\s+UND\s+(\S+)\s*$"
-)
+_SYM_LINE = re.compile(r"^\s*\d+:\s+\S+\s+\d+\s+\S+\s+(\S+)\s+\S+\s+UND\s+(\S+)\s*$")
 
 
 @dataclass(frozen=True)
 class ElfHeader:
-
     data: str
     etype: str
     machine: str
@@ -36,7 +34,6 @@ class ElfHeader:
 
 @dataclass
 class GateResult:
-
     ok: list[str]
     unconfirmed: list[str]
     broken: list[str]
@@ -67,9 +64,7 @@ def parse_readelf_h(stdout: str) -> ElfHeader:
 
 
 def find_app_main(stdout: str) -> str | None:
-    pattern = re.compile(
-        r"^\s*\d+:\s+(\S+)\s+\d+\s+FUNC\s+GLOBAL\s+DEFAULT\s+\S+\s+app_main.*$"
-    )
+    pattern = re.compile(r"^\s*\d+:\s+(\S+)\s+\d+\s+FUNC\s+GLOBAL\s+DEFAULT\s+\S+\s+app_main.*$")
     for line in stdout.splitlines():
         m = pattern.match(line)
         if m:
@@ -77,7 +72,7 @@ def find_app_main(stdout: str) -> str | None:
     return None
 
 
-_APP_ICON_SIZE = 200  
+_APP_ICON_SIZE = 200
 
 
 def validate_icon(path: str) -> str | None:
@@ -92,9 +87,7 @@ def validate_icon(path: str) -> str | None:
     return None
 
 
-_INIT_ARRAY_RE = re.compile(
-    r"^\s*\[\s*\d+\]\s+\.init_array\s+INIT_ARRAY\s+\S+\s+\S+\s+(\S+)"
-)
+_INIT_ARRAY_RE = re.compile(r"^\s*\[\s*\d+\]\s+\.init_array\s+INIT_ARRAY\s+\S+\s+\S+\s+(\S+)")
 
 
 def init_array_size(section_stdout: str) -> str:
@@ -143,15 +136,21 @@ def read_curated(sdk_root: str) -> set[str]:
     return curated
 
 
-def reconcile_exports(sdk_symbols: str, host_exports: str,
-                      ) -> tuple[list[str], list[str]]:
+def reconcile_exports(
+    sdk_symbols: str,
+    host_exports: str,
+) -> tuple[list[str], list[str]]:
     curated = set(symbols_mod.read_curated_list(sdk_symbols))
     host = set(symbols_mod.read_curated_list(host_exports))
     return sorted(curated - host), sorted(host - curated)
 
 
-def host_globals(readelf: str, host_elf: str) -> set[str]:
-    return symbols_mod.get_host_globals(readelf, host_elf, symbol_types=("FUNC", "OBJECT"))
+def host_exports(host_elf: str) -> set[str]:
+    """Return linked resolver names; report unreadable or unsupported firmware with context."""
+    try:
+        return set(parse_compiled_exports(Path(host_elf).read_bytes()))
+    except (OSError, ValueError) as error:
+        raise RuntimeError(f"Cannot read compiled exports from {host_elf}: {error}") from error
 
 
 def generated_table_symbols(path: str) -> set[str]:
@@ -167,7 +166,7 @@ def generated_table_symbols(path: str) -> set[str]:
 def find_export_table(sdk_root: str) -> str | None:
     current = os.path.abspath(sdk_root)
     for _ in range(4):
-        candidate = os.path.join(current, 'src', 'ELF_SYMS', 'esp_all_symbol.cpp')
+        candidate = os.path.join(current, "src", "ELF_SYMS", "esp_all_symbol.cpp")
         if os.path.isfile(candidate):
             return candidate
         current = os.path.dirname(current)
@@ -178,20 +177,24 @@ def resolve_available(curated: set[str], table_path: str | None) -> set[str]:
     return set(curated) | generated_table_symbols(table_path or "")
 
 
-def available_symbols(curated: set[str],
-                      available_table: set[str]) -> set[str]:
+def available_symbols(curated: set[str], available_table: set[str]) -> set[str]:
     return set(curated) | set(available_table)
 
 
-def classify(und: list[str], curated: set[str], host_view: set[str] | None,
-             entry: str = "", available_table: set[str] = frozenset()) -> GateResult:
+def classify(
+    und: list[str],
+    curated: set[str],
+    host_view: set[str] | None,
+    entry: str = "",
+    available_table: set[str] = frozenset(),
+) -> GateResult:
     available = available_symbols(curated, available_table)
     ok: list[str] = []
     unconfirmed: list[str] = []
     broken: list[str] = []
     for name in und:
         if host_view is not None:
-            if name in available or name in host_view:
+            if name in host_view:
                 ok.append(name)
             else:
                 broken.append(name)
@@ -220,9 +223,7 @@ def check_app(info, readelf: str | None, host_elf: str | None) -> GateResult:
             "little-endian ELFs (use the espressif xtensa-esp-elf toolchain)"
         )
     if not header.is_shared:
-        raise RuntimeError(
-            f"{os.path.basename(info.out)} is {header.etype}, expected DYN"
-        )
+        raise RuntimeError(f"{os.path.basename(info.out)} is {header.etype}, expected DYN")
 
     syms_out = run_readelf(tool, "-s", "-W", info.out)
     app_main = find_app_main(syms_out)
@@ -238,10 +239,15 @@ def check_app(info, readelf: str | None, host_elf: str | None) -> GateResult:
 
     und = parse_undefined(syms_out)
     curated = read_curated(info.sdk_root)
-    host_view = host_globals(tool, host_elf) if host_elf else None
+    host_view = host_exports(host_elf) if host_elf else None
     table_path = find_export_table(info.sdk_root)
-    result = classify(und, curated, host_view, entry=header.entry,
-                      available_table=generated_table_symbols(table_path))
+    result = classify(
+        und,
+        curated,
+        host_view,
+        entry=header.entry,
+        available_table=generated_table_symbols(table_path),
+    )
     result.app_main_stripped = app_main_stripped
     sections_out = run_readelf(tool, "-S", "-W", info.out)
     result.init_array_size = init_array_size(sections_out)

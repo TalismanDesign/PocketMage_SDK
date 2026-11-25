@@ -1,17 +1,13 @@
-
 import os
 import subprocess
 import tempfile
 import textwrap
 import unittest
 
-OS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                      "..", "..", "..", "..", ".."))
+OS_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", ".."))
 SOURCE = os.path.join(OS_ROOT, "src", "elf_app_manifest.cpp")
 HEADER = os.path.join(OS_ROOT, "include", "elf_app_manifest.h")
 
-# The manifest parser lives in the firmware, which is present only when the
-# SDK is checked out inside PocketMageOS.
 HAVE_FIRMWARE_SOURCE = os.path.isfile(SOURCE) and os.path.isfile(HEADER)
 
 HARNESS = r"""
@@ -49,32 +45,45 @@ int main(void) {
 
 
 def c_string_literal(text):
-    escaped = (text.replace("\\", "\\\\").replace('"', '\\"')
-               .replace("\n", "\\n").replace("\r", "\\r"))
+    escaped = (
+        text.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\r", "\\r")
+    )
     return '"%s"' % escaped
 
 
 class ManifestHarness:
-
     def __init__(self, manifest, probes=()):
         with tempfile.TemporaryDirectory() as tmp:
             probe_list = "".join(c_string_literal(p) + ", " for p in probes)
             if not probe_list:
                 probe_list = '""'
-            source = (textwrap.dedent(HARNESS)
-                      .replace("$MANIFEST_TEXT", c_string_literal(manifest))
-                      .replace("$PROBES", probe_list))
+            source = (
+                textwrap.dedent(HARNESS)
+                .replace("$MANIFEST_TEXT", c_string_literal(manifest))
+                .replace("$PROBES", probe_list)
+            )
             harness = os.path.join(tmp, "harness.cpp")
             with open(harness, "w", encoding="utf-8") as fh:
                 fh.write(source)
             binary = os.path.join(tmp, "probe")
             subprocess.run(
-                ["c++", "-std=c++17", "-Wall", "-Wextra", "-Werror",
-                 "-I", os.path.dirname(HEADER), harness, SOURCE,
-                 "-o", binary],
-                check=True, capture_output=True)
-            out = subprocess.run([binary], check=True, capture_output=True,
-                                 text=True).stdout
+                [
+                    "c++",
+                    "-std=c++17",
+                    "-Wall",
+                    "-Wextra",
+                    "-Werror",
+                    "-I",
+                    os.path.dirname(HEADER),
+                    harness,
+                    SOURCE,
+                    "-o",
+                    binary,
+                ],
+                check=True,
+                capture_output=True,
+            )
+            out = subprocess.run([binary], check=True, capture_output=True, text=True).stdout
 
         self._lines = out.splitlines()
         self.fields = int(self.value("FIELDS"))
@@ -84,9 +93,9 @@ class ManifestHarness:
         self.scope_text = self.value("SCOPE")
         self.all = bool(int(self.value("ALL")))
         self.count = int(self.value("COUNT"))
-        self.prefixes = [line.split(" ", 1)[1]
-                         for line in self._lines
-                         if line.startswith("PREFIX ")]
+        self.prefixes = [
+            line.split(" ", 1)[1] for line in self._lines if line.startswith("PREFIX ")
+        ]
         self.allows = {}
         self.allow_null = self.value("ALLOW_NULL") == "1"
         for line in self._lines:
@@ -97,16 +106,14 @@ class ManifestHarness:
     def value(self, tag):
         for line in self._lines:
             if line.startswith(tag + " "):
-                return line[len(tag) + 1:]
+                return line[len(tag) + 1 :]
         raise AssertionError("no %s line in harness output" % tag)
 
 
-@unittest.skipUnless(HAVE_FIRMWARE_SOURCE,
-                     "firmware elf_app_manifest source not in this checkout")
+@unittest.skipUnless(HAVE_FIRMWARE_SOURCE, "firmware elf_app_manifest source not in this checkout")
 class ManifestParsing(unittest.TestCase):
     def test_all_fields_are_read(self):
-        h = ManifestHarness(
-            "name=Stopwatch\nversion=1.2.0\nauthor=Ada\nscope=all\n")
+        h = ManifestHarness("name=Stopwatch\nversion=1.2.0\nauthor=Ada\nscope=all\n")
         self.assertEqual(h.name, "Stopwatch")
         self.assertEqual(h.version, "1.2.0")
         self.assertEqual(h.author, "Ada")
@@ -130,12 +137,7 @@ class ManifestParsing(unittest.TestCase):
         self.assertEqual(h.scope_text, "")
 
     def test_comments_and_blank_lines_are_ignored(self):
-        h = ManifestHarness(
-            "# a comment\n"
-            "\n"
-            "   ; another comment\n"
-            "name=Notes\n"
-            "\n")
+        h = ManifestHarness("# a comment\n\n   ; another comment\nname=Notes\n\n")
         self.assertEqual(h.name, "Notes")
         self.assertEqual(h.fields, 1)
 
@@ -175,8 +177,7 @@ class ManifestParsing(unittest.TestCase):
         self.assertEqual(h.name, "Notes")
 
 
-@unittest.skipUnless(HAVE_FIRMWARE_SOURCE,
-                     "firmware elf_app_manifest source not in this checkout")
+@unittest.skipUnless(HAVE_FIRMWARE_SOURCE, "firmware elf_app_manifest source not in this checkout")
 class ScopeParsing(unittest.TestCase):
     def test_all_is_unrestricted(self):
         h = ManifestHarness("scope=all\n")
@@ -222,8 +223,7 @@ class ScopeParsing(unittest.TestCase):
         self.assertEqual(h.prefixes, ["pm_eink_"])
 
 
-@unittest.skipUnless(HAVE_FIRMWARE_SOURCE,
-                     "firmware elf_app_manifest source not in this checkout")
+@unittest.skipUnless(HAVE_FIRMWARE_SOURCE, "firmware elf_app_manifest source not in this checkout")
 class ScopeGating(unittest.TestCase):
     def allows(self, scope, probes):
         return ManifestHarness("scope=%s\n" % scope, probes).allows
@@ -232,8 +232,7 @@ class ScopeGating(unittest.TestCase):
         self.assertTrue(self.allows("eink", ["pm_eink_clear"]))
 
     def test_unlisted_module_is_hidden(self):
-        self.assertIs(self.allows("eink", ["pm_wifi_connect"])["pm_wifi_connect"],
-                      False)
+        self.assertIs(self.allows("eink", ["pm_wifi_connect"])["pm_wifi_connect"], False)
 
     def test_prefix_match_is_not_a_substring_match(self):
         result = self.allows("eink", ["pm_einkfoo_bar"])
