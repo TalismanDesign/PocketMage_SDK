@@ -10,10 +10,23 @@ import sys
 from collections import Counter, defaultdict
 
 PRIMITIVE_RETURNS = {
-    "void", "bool", "char", "int", "unsigned", "long",
-    "int8_t", "int16_t", "int32_t", "int64_t",
-    "uint8_t", "uint16_t", "uint32_t", "uint64_t",
-    "size_t", "float", "double",
+    "void",
+    "bool",
+    "char",
+    "int",
+    "unsigned",
+    "long",
+    "int8_t",
+    "int16_t",
+    "int32_t",
+    "int64_t",
+    "uint8_t",
+    "uint16_t",
+    "uint32_t",
+    "uint64_t",
+    "size_t",
+    "float",
+    "double",
 }
 
 CONVERTIBLE_PARAM = re.compile(
@@ -119,14 +132,16 @@ def parse_header(path: str) -> tuple[list[dict], str]:
             if depth == 0:
                 endpos = i
                 break
-        class_body = text[brace:endpos + 1]
+        class_body = text[brace : endpos + 1]
         cls_methods = []
         for pub in re.finditer(r"\bpublic\s*:", class_body):
-            body = class_body[pub.end():]
+            body = class_body[pub.end() :]
             stop = re.search(r"\n\s*(private|protected)\s*:", body)
             if stop:
                 body = body[: stop.start()]
-            for line in body.splitlines():
+            for line in re.sub(
+                r"\([^;{}]*\)", lambda m: " ".join(m.group().split()), body
+            ).splitlines():
                 stripped = line.strip()
                 if not stripped or stripped.startswith(("#", "//", "*", "}")):
                     continue
@@ -156,19 +171,22 @@ def parse_header(path: str) -> tuple[list[dict], str]:
                 is_ctor = not ret or ret == prefix_text(m)
                 args = split_args(args_raw)
                 params = [classify_param(a) for a in args] if args and args != ["void"] else []
-                cls_methods.append({
-                    "class": cname,
-                    "ret": ret,
-                    "name": name,
-                    "params": params,
-                    "inline_def": "{" in tail,
-                    "operator": name.startswith("operator"),
-                    "constructor": is_ctor,
-                })
+                cls_methods.append(
+                    {
+                        "class": cname,
+                        "ret": ret,
+                        "name": name,
+                        "params": params,
+                        "inline_def": "{" in tail,
+                        "operator": name.startswith("operator"),
+                        "constructor": is_ctor,
+                    }
+                )
         if cls_methods:
             methods.extend(cls_methods)
             class_name = cname
     return methods, class_name
+
 
 def prefix_text(m) -> str:
     return " ".join(m.group("prefix").split())
@@ -199,20 +217,19 @@ def analyze(headers: list[str]) -> dict:
         for arity, same_arity in arities.items():
             if len(same_arity) < 2:
                 continue
-            sigs = {
-                tuple(p["type"] for p in m["params"]) for m in same_arity
-            }
-            collisions.append({
-                "class": cls,
-                "method": name,
-                "arity": arity,
-                "variants": [
-                    f"{m['ret']} {name}(" + ", ".join(
-                        p["type"] for p in m["params"]) + ")"
-                    for m in same_arity
-                ],
-                "distinct_types": len(sigs),
-            })
+            sigs = {tuple(p["type"] for p in m["params"]) for m in same_arity}
+            collisions.append(
+                {
+                    "class": cls,
+                    "method": name,
+                    "arity": arity,
+                    "variants": [
+                        f"{m['ret']} {name}(" + ", ".join(p["type"] for p in m["params"]) + ")"
+                        for m in same_arity
+                    ],
+                    "distinct_types": len(sigs),
+                }
+            )
 
     param_types = Counter()
     ret_types = Counter()
@@ -227,10 +244,9 @@ def analyze(headers: list[str]) -> dict:
             kinds[p["kind"]] += 1
 
     hard_returns = [
-        m for m in real
-        if m["ret"] not in PRIMITIVE_RETURNS
-        and not m["ret"].endswith("*")
-        and "&" not in m["ret"]
+        m
+        for m in real
+        if m["ret"] not in PRIMITIVE_RETURNS and not m["ret"].endswith("*") and "&" not in m["ret"]
     ]
 
     defaulted = [m for m in real if any(p["has_default"] for p in m["params"])]
@@ -250,15 +266,15 @@ def analyze(headers: list[str]) -> dict:
         "return_type_top": ret_types.most_common(15),
         "returns_needing_conversion": [
             f"{m['class']}::{m['ret']} {m['name']}("
-            + ", ".join(p["type"] for p in m["params"]) + ")"
+            + ", ".join(p["type"] for p in m["params"])
+            + ")"
             for m in hard_returns
         ],
         "methods_with_defaults": len(defaulted),
         "methods_with_references": len(refs),
         "methods_with_opaque_params": len(opaque),
         "opaque_param_examples": [
-            f"{m['class']}::{m['name']}("
-            + ", ".join(p["type"] for p in m["params"]) + ")"
+            f"{m['class']}::{m['name']}(" + ", ".join(p["type"] for p in m["params"]) + ")"
             for m in opaque[:25]
         ],
     }
@@ -273,8 +289,7 @@ def main() -> int:
     headers = sorted(
         os.path.join(args.root, name, h)
         for name in os.listdir(args.root)
-        if name.startswith("pocketmage_")
-        and os.path.isdir(os.path.join(args.root, name))
+        if name.startswith("pocketmage_") and os.path.isdir(os.path.join(args.root, name))
         for h in os.listdir(os.path.join(args.root, name))
         if h.startswith("pocketmage_") and h.endswith(".h")
     )
@@ -288,9 +303,7 @@ def main() -> int:
     print(f"overload collisions    : {report['overload_collision_groups']}")
     print()
     print("parameter kinds:")
-    for kind, count in sorted(
-        report["param_kind_counts"].items(), key=lambda kv: -kv[1]
-    ):
+    for kind, count in sorted(report["param_kind_counts"].items(), key=lambda kv: -kv[1]):
         print(f"  {kind:<12} {count}")
     print()
     print("most common parameter types:")

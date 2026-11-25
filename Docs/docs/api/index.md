@@ -13,16 +13,16 @@ The SDK exposes the PocketMage hardware and OS services to loaded apps through a
 
 `pocketmage.h` pulls in every component header, `config.h`, the `frames` and `assets` modules, and `Preferences.h`. It also includes `pocketmage_app_version.h` when the build defines `PM_TARGET_APP`, so the SDK-version macros are always available to apps.
 
-An external app does not call these C++ classes directly across the ELF boundary; it calls the flat `pm_*` C ABI that projects them. See [The C ABI (pm_*)](#api-reference-the-c-abi-pm) below, and the complete [function index](functions.md) for every wrapper and its signature.
+An external app does not call these C++ classes directly across the ELF boundary; it calls the flat `pm_*` C ABI that projects them. See [The C ABI (pm\_\*)](#the-c-abi-pm_) below, and the complete [function index](functions.md) for every wrapper and its signature.
 
 ## Compile target
 
 `config.h` requires exactly one of these to be defined, and fails the build otherwise:
 
-| Macro           | Meaning                                                       |
-| --------------- | ------------------------------------------------------------- |
-| `PM_TARGET_HOST` | the PocketMageOS firmware links the SDK in-process            |
-| `PM_TARGET_APP`  | an external app compiled to a loadable `.app.elf`            |
+| Macro            | Meaning                                            |
+| ---------------- | -------------------------------------------------- |
+| `PM_TARGET_HOST` | the PocketMageOS firmware links the SDK in-process |
+| `PM_TARGET_APP`  | an external app compiled to a loadable `.app.elf`  |
 
 The two are mutually exclusive; defining both is a build error. Apps declare `PM_TARGET_APP` (see [Building an app](../build.md)).
 
@@ -30,29 +30,30 @@ The two are mutually exclusive; defining both is a build error. Apps declare `PM
 
 Most components are owned by a single global instance created inside the SDK and reached through a global accessor function. The accessor returns a reference; null checks are unnecessary once the component's `setup*()` call has run in `PocketMage_INIT()`.
 
-| Component   | Accessor    | Hardware / role                                  | API page            |
-| ----------- | ----------- | ------------------------------------------------ | ------------------- |
-| OLED        | `OLED()`    | 256x32 SSD1326 OLED, status line                  | [oled](oled.md)     |
-| E-Ink       | `EINK()`    | 320x240 GDEQ031T10 panel, full-page rendering     | [eink](eink.md)     |
-| Font        | `FontEngine` | unified text on both displays                     | [font](font.md)     |
-| Layout      | (free)      | display geometry constants, text fit helpers      | [layout](layout.md) |
-| UI helpers  | (free)      | status bars, list rows, chips                     | [ui](ui.md)         |
-| SD card     | `PM_SDAUTO()` | files, metadata, dos/flash filesystem             | [sd](sd.md)         |
-| Keyboard    | `KB()`      | TCA8418 matrix + USB HID                           | [kb](kb.md)         |
-| Touch       | `TOUCH()`   | MPR121 slider, scroll gestures                     | [touch](touch.md)   |
-| Buzzer      | `BZ()`      | PWM buzzer, jingles                               | [bz](bz.md)         |
-| Clock       | `CLOCK()`   | PCF8563 RTC, timeout bookkeeping                   | [clock](clock.md)   |
-| WiFi        | `P_WIFI`    | station radio service (apps may call)              | [wifi](wifi.md)     |
-| System      | (free)      | init, CPU speed, deep sleep                        | [sys](sys.md)       |
-| I18n        | `I18n`      | language tables, command normalization             | [i18n-runtime](i18n-runtime.md) |
-| Text utils  | (free)      | string split/join/parse helpers                    | [io](io.md)         |
-| Frames      | `Frame`     | e-ink text/bitmap frame model, scrolling           | [frames](frames.md) |
-| Assets      | (free)      | PROGMEM bitmaps: battery, sleep, screensavers      | [assets](assets.md) |
-| Config      | (free)      | pins, counters, prefs, SDK version stamping        | [configuration](configuration.md) |
+| Component  | Accessor      | Hardware / role                               | API page                          |
+| ---------- | ------------- | --------------------------------------------- | --------------------------------- |
+| OLED       | `OLED()`      | 256x32 SSD1326 OLED, status line              | [oled](oled.md)                   |
+| E-Ink      | `EINK()`      | 320x240 GDEQ031T10 panel, full-page rendering | [eink](eink.md)                   |
+| Font       | `FontEngine`  | unified text on both displays                 | [font](font.md)                   |
+| Layout     | (free)        | display geometry constants, text fit helpers  | [layout](layout.md)               |
+| UI helpers | (free)        | status bars, list rows, chips                 | [ui](ui.md)                       |
+| SD card    | `PM_SDAUTO()` | files, metadata, dos/flash filesystem         | [sd](sd.md)                       |
+| Keyboard   | `KB()`        | TCA8418 matrix + USB HID                      | [kb](kb.md)                       |
+| Touch      | `TOUCH()`     | MPR121 slider, scroll gestures                | [touch](touch.md)                 |
+| Buzzer     | `BZ()`        | PWM buzzer, jingles                           | [bz](bz.md)                       |
+| Clock      | `CLOCK()`     | PCF8563 RTC, timeout bookkeeping              | [clock](clock.md)                 |
+| WiFi       | `P_WIFI`      | station radio service (apps may call)         | [wifi](wifi.md)                   |
+| System     | (free)        | init, CPU speed, deep sleep                   | [sys](sys.md)                     |
+| Logging    | `pm_log`      | console, log file, crash-report log tail      | [log](log.md)                     |
+| I18n       | `I18n`        | language tables, command normalization        | [i18n-runtime](i18n-runtime.md)   |
+| Text utils | (free)        | string split/join/parse helpers               | [io](io.md)                       |
+| Frames     | `Frame`       | e-ink text/bitmap frame model, scrolling      | [frames](frames.md)               |
+| Assets     | (free)        | PROGMEM bitmaps: battery, sleep, screensavers | [assets](assets.md)               |
+| Config     | (free)        | pins, counters, prefs, SDK version stamping   | [configuration](configuration.md) |
 
 The `frames` component is used by the OS's built-in apps. Third-party apps start from the simpler primitives in [oled](oled.md), [eink](eink.md), [font](font.md), and [layout](layout.md).
 
-## The C ABI (pm_*)
+## The C ABI (pm\_\*)
 
 The accessors and classes above are the host-side API. The SDK compiles the firmware with the C++ API directly, but an external ELF app cannot: it links `-nostdlib` and resolves symbols by name at load time, so the app-facing surface is a flat C ABI, the `pm_*` functions, generated from the C++ classes by `tools/gen_app_api.py`. An app includes the generated header through `pm_app_api.h`:
 
@@ -62,13 +63,13 @@ The accessors and classes above are the host-side API. The SDK compiles the firm
 
 The generator projects each exported C++ method to one C function by a fixed set of rules:
 
-| C++ shape                         | C projection                                              |
-| --------------------------------- | --------------------------------------------------------- |
-| `ClassName::method(args)`         | `pm_<module>_<method>(args)` on the module's singleton    |
-| `String` parameter or return      | `const char*` (returns point into the string pool, below) |
-| enum parameter or return          | plain `int` (values in SDK declaration order)             |
+| C++ shape                         | C projection                                                 |
+| --------------------------------- | ------------------------------------------------------------ |
+| `ClassName::method(args)`         | `pm_<module>_<method>(args)` on the module's singleton       |
+| `String` parameter or return      | `const char*` (returns point into the string pool, below)    |
+| enum parameter or return          | plain `int` (values in SDK declaration order)                |
 | `std::vector<T>` return           | a `_count` function plus a `_get(index, out, out_size)` pair |
-| scalar out-parameter by reference | `T*` out-pointer                                          |
+| scalar out-parameter by reference | `T*` out-pointer                                             |
 
 Enums become integers with generated value tables: `pm_target`, `pm_style`, `pm_lang`, `pm_refresh`, and `pm_jingle`. `PM_APP_API_ABI` tracks incompatible changes to this surface; an app compares it against `pm_app_abi()` at startup, and `pocketmage_sdk_version` (via `pm_host_sdk_version()`) gives the running host's SDK version.
 

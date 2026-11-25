@@ -15,19 +15,19 @@ def read_curated_list(list_path):
     with open(list_path) as f:
         for line in f:
             line = line.strip()
-            if not line or line.startswith('#'):
+            if not line or line.startswith("#"):
                 continue
             symbols.append(line)
     return symbols
 
 
 def get_host_globals(readelf, host_elf, symbol_types=None):
-    cmd = [readelf, '-s', '-W', host_elf]
+    cmd = [readelf, "-s", "-W", host_elf]
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
-        sys.exit(f'readelf failed on {host_elf}: {result.stderr}')
+        sys.exit(f"readelf failed on {host_elf}: {result.stderr}")
     pattern = re.compile(
-        r'^\s*\d+:\s+(\S+)\s+(\d+)\s+(FUNC|OBJECT)\s+GLOBAL\s+DEFAULT\s+(?:\d+|ABS|UND|COM|DEBUG)\s+(\S+)',
+        r"^\s*\d+:\s+(\S+)\s+(\d+)\s+(FUNC|OBJECT)\s+GLOBAL\s+DEFAULT\s+(?:\d+|ABS|UND|COM|DEBUG)\s+(\S+)",
         re.MULTILINE,
     )
     globals_ = set()
@@ -42,14 +42,26 @@ def get_host_globals(readelf, host_elf, symbol_types=None):
     return globals_
 
 
-RUNTIME_ARCHIVES = ('libc', 'libm', 'libstdc++', 'libsupc++')
-GCC_ARCHIVES = ('libgcc',)
+RUNTIME_ARCHIVES = ("libc", "libm", "libstdc++", "libsupc++")
+GCC_ARCHIVES = ("libgcc",)
 
-FRAMEWORK_ARCHIVES = ('libnewlib',)
+FRAMEWORK_ARCHIVES = ("libnewlib",)
 
 ESLSYM_ENTRY_BYTES = 8
 
-BUILTIN_PREFIXES = ('__atomic', '__sync', '__builtin')
+BUILTIN_PREFIXES = ("__atomic", "__sync", "__builtin")
+
+BASELINE_HEADER = (
+    "# Host runtime baseline: C/C++ runtime, newlib and POSIX symbols the\n"
+    "# PocketMage firmware exports unconditionally. Apps may rely on these\n"
+    "# without listing them. Generated from the firmware export surface by\n"
+    "# tools/symbols.py --write-baseline; regenerate alongside the export\n"
+    "# table whenever the host surface changes. Do not hand edit.\n"
+    "#\n"
+    "# The gate treats these as resolvable when no --host-elf is supplied, so\n"
+    "# a standalone app checkout can be gated without the firmware tree.\n"
+    "#\n"
+)
 
 
 def is_gcc_builtin(name):
@@ -58,17 +70,17 @@ def is_gcc_builtin(name):
 
 def read_archive_symbols(nm, archive):
     if not os.path.isfile(archive):
-        print(f'warning: archive not found, skipping: {archive}', file=sys.stderr)
+        print(f"warning: archive not found, skipping: {archive}", file=sys.stderr)
         return []
-    cmd = [nm, '--defined-only', archive]
+    cmd = [nm, "--defined-only", archive]
     result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     if result.returncode != 0:
-        print(f'warning: nm failed on {archive}: {result.stderr}', file=sys.stderr)
+        print(f"warning: nm failed on {archive}: {result.stderr}", file=sys.stderr)
         return []
     names = set()
     for line in result.stdout.splitlines():
         fields = line.split()
-        if len(fields) == 3 and fields[1] in ('T', 'W', 'i'):
+        if len(fields) == 3 and fields[1] in ("T", "W", "i"):
             names.add(fields[2])
     return sorted(names)
 
@@ -77,8 +89,8 @@ def find_gcc_archive(lib_dir, name):
     roots = []
     current = os.path.normpath(os.path.abspath(lib_dir))
     while True:
-        for prefix in ('lib', 'picolibc'):
-            candidate = os.path.join(current, prefix, 'lib', 'gcc')
+        for prefix in ("lib", "picolibc"):
+            candidate = os.path.join(current, prefix, "lib", "gcc")
             if os.path.isdir(candidate):
                 roots.append(candidate)
         if roots:
@@ -90,11 +102,11 @@ def find_gcc_archive(lib_dir, name):
     matches = []
     for root in roots:
         for dirpath, _dirnames, filenames in os.walk(root):
-            if f'{name}.a' in filenames:
-                matches.append(os.path.join(dirpath, f'{name}.a'))
+            if f"{name}.a" in filenames:
+                matches.append(os.path.join(dirpath, f"{name}.a"))
     if not matches:
         return None
-    matches.sort(key=lambda p: ('no-rtti' not in p, 'psram' not in p, p))
+    matches.sort(key=lambda p: ("no-rtti" not in p, "psram" not in p, p))
     return matches[0]
 
 
@@ -102,10 +114,10 @@ def toolchain_lib_dir(readelf, explicit=None):
     if explicit:
         return explicit
     bin_dir = os.path.dirname(os.path.abspath(readelf))
-    triple = os.path.basename(readelf).replace('-readelf', '')
+    triple = os.path.basename(readelf).replace("-readelf", "")
     candidates = [
-        os.path.normpath(os.path.join(bin_dir, os.pardir, triple, 'lib', 'no-rtti')),
-        os.path.normpath(os.path.join(bin_dir, os.pardir, 'lib', 'no-rtti')),
+        os.path.normpath(os.path.join(bin_dir, os.pardir, triple, "lib", "no-rtti")),
+        os.path.normpath(os.path.join(bin_dir, os.pardir, "lib", "no-rtti")),
     ]
     for candidate in candidates:
         if os.path.isdir(candidate):
@@ -116,13 +128,14 @@ def toolchain_lib_dir(readelf, explicit=None):
 def framework_lib_dir(readelf, explicit=None):
     if explicit:
         return explicit if os.path.isdir(explicit) else None
-    triple = os.path.basename(readelf).replace('-readelf', '')
-    parts = triple.split('-')
+    triple = os.path.basename(readelf).replace("-readelf", "")
+    parts = triple.split("-")
     target = parts[1] if len(parts) > 2 else triple
-    home = os.path.expanduser('~')
+    home = os.path.expanduser("~")
     candidates = [
-        os.path.join(home, '.platformio', 'packages',
-                     'framework-arduinoespressif32-libs', target, 'lib'),
+        os.path.join(
+            home, ".platformio", "packages", "framework-arduinoespressif32-libs", target, "lib"
+        ),
     ]
     for candidate in candidates:
         if os.path.isdir(candidate):
@@ -133,23 +146,21 @@ def framework_lib_dir(readelf, explicit=None):
 def classify_runtime_symbols(nm, lib_dir, host_globals, framework_dir=None):
     result = {}
     for name in RUNTIME_ARCHIVES:
-        archive = os.path.join(lib_dir, f'{name}.a')
+        archive = os.path.join(lib_dir, f"{name}.a")
         available = set(read_archive_symbols(nm, archive))
         result[name] = sorted(available & host_globals)
     for name in GCC_ARCHIVES:
         archive = find_gcc_archive(lib_dir, name)
         if archive is None:
-            print(f'warning: {name}.a not found next to the toolchain; skipping',
-                  file=sys.stderr)
+            print(f"warning: {name}.a not found next to the toolchain; skipping", file=sys.stderr)
             continue
         available = set(read_archive_symbols(nm, archive))
         result[name] = sorted(available & host_globals)
     for name in FRAMEWORK_ARCHIVES:
         if framework_dir is None:
-            print(f'warning: {name}.a needs --framework-lib-dir; skipping',
-                  file=sys.stderr)
+            print(f"warning: {name}.a needs --framework-lib-dir; skipping", file=sys.stderr)
             continue
-        archive = os.path.join(framework_dir, f'{name}.a')
+        archive = os.path.join(framework_dir, f"{name}.a")
         available = set(read_archive_symbols(nm, archive))
         result[name] = sorted(available & host_globals)
     return result
@@ -161,11 +172,18 @@ def table_cost_bytes(symbols):
     return entries + names
 
 
-def save_c_file(symbols, output, symbol_table, exclude_symbols=None,
-                cpp=False, include_headers=None, runtime_symbols=None,
-                extra_externs=None):
+def save_c_file(
+    symbols,
+    output,
+    symbol_table,
+    exclude_symbols=None,
+    cpp=False,
+    include_headers=None,
+    runtime_symbols=None,
+    extra_externs=None,
+):
     if exclude_symbols is None:
-        exclude_symbols = ['elf_find_sym']
+        exclude_symbols = ["elf_find_sym"]
     if runtime_symbols is None:
         runtime_symbols = frozenset()
     if extra_externs is None:
@@ -173,211 +191,229 @@ def save_c_file(symbols, output, symbol_table, exclude_symbols=None,
 
     filtered_symbols = [name for name in symbols if name not in exclude_symbols]
 
-    buf = '/*\n'
-    buf += ' * SPDX-FileCopyrightText: 2024 Espressif Systems (Shanghai) CO LTD\n'
-    buf += ' *\n'
-    buf += ' * SPDX-License-Identifier: Apache-2.0\n'
-    buf += ' *\n'
-    buf += ' * Generated from the curated PocketMage SDK export list.\n'
-    buf += ' * DO NOT EDIT: regenerate with tools/symbols.py.\n'
-    buf += ' */\n\n'
+    buf = "/*\n"
+    buf += " * SPDX-FileCopyrightText: 2024 Espressif Systems (Shanghai) CO LTD\n"
+    buf += " *\n"
+    buf += " * SPDX-License-Identifier: Apache-2.0\n"
+    buf += " *\n"
+    buf += " * Generated from the curated PocketMage SDK export list.\n"
+    buf += " * DO NOT EDIT: regenerate with tools/symbols.py.\n"
+    buf += " */\n\n"
 
-    buf += '#include <stddef.h>\n\n'
+    buf += "#include <stddef.h>\n\n"
     buf += '#include "private/elf_symbol.h"\n\n'
 
     if cpp:
-        for header in (include_headers or []):
-            buf += f'#include <{header}>\n'
+        for header in include_headers or []:
+            buf += f"#include <{header}>\n"
         if include_headers:
-            buf += '\n'
-        runtime = [name for name in filtered_symbols
-                   if name in runtime_symbols or name in extra_externs]
+            buf += "\n"
+        runtime = [
+            name for name in filtered_symbols if name in runtime_symbols or name in extra_externs
+        ]
         builtins = [name for name in runtime if is_gcc_builtin(name)]
         plain_runtime = [name for name in runtime if not is_gcc_builtin(name)]
         if plain_runtime:
-            buf += '/* Runtime symbols: unmangled prototypes so the emitted reference is\n'
-            buf += ' * the literal archive symbol, whatever its real C++ type. The\n'
-            buf += ' * builtin mismatch warning is expected and harmless, since only the\n'
-            buf += ' * address is taken and never called through this type. */\n'
-            buf += '#pragma GCC diagnostic push\n'
+            buf += "/* Runtime symbols: unmangled prototypes so the emitted reference is\n"
+            buf += " * the literal archive symbol, whatever its real C++ type. The\n"
+            buf += " * builtin mismatch warning is expected and harmless, since only the\n"
+            buf += " * address is taken and never called through this type. */\n"
+            buf += "#pragma GCC diagnostic push\n"
             buf += '#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"\n'
             buf += 'extern "C" {\n'
             for symbol_name in plain_runtime:
-                buf += f'int {symbol_name}();\n'
-            buf += '}\n'
-            buf += '#pragma GCC diagnostic pop\n\n'
+                buf += f"int {symbol_name}();\n"
+            buf += "}\n"
+            buf += "#pragma GCC diagnostic pop\n\n"
         if builtins:
-            buf += '/* Builtin-named symbols: a private identifier keeps the address\n'
-            buf += ' * takeable while the asm label emits the real symbol name. */\n'
+            buf += "/* Builtin-named symbols: a private identifier keeps the address\n"
+            buf += " * takeable while the asm label emits the real symbol name. */\n"
             buf += 'extern "C" {\n'
             for symbol_name in builtins:
                 buf += f'int pm_elfsym_{symbol_name}() asm("{symbol_name}");\n'
-            buf += '}\n\n'
+            buf += "}\n\n"
     elif filtered_symbols:
-        buf += '/* Extern declarations from curated export list */\n\n'
-        buf += '#pragma GCC diagnostic push\n'
+        buf += "/* Extern declarations from curated export list */\n\n"
+        buf += "#pragma GCC diagnostic push\n"
         buf += '#pragma GCC diagnostic ignored "-Wbuiltin-declaration-mismatch"\n'
         for symbol_name in filtered_symbols:
             if is_gcc_builtin(symbol_name):
                 continue
-            buf += f'extern int {symbol_name};\n'
-        buf += '#pragma GCC diagnostic pop\n\n'
+            buf += f"extern int {symbol_name};\n"
+        buf += "#pragma GCC diagnostic pop\n\n"
         builtins = [name for name in filtered_symbols if is_gcc_builtin(name)]
         if builtins:
             for symbol_name in builtins:
                 buf += f'int pm_elfsym_{symbol_name}() __asm__("{symbol_name}");\n'
-            buf += '\n'
+            buf += "\n"
 
-    symbol_table_var = f'g_{symbol_table}_elfsyms'
-    buf += f'/* Available ELF symbols table: {symbol_table_var} */\n'
+    symbol_table_var = f"g_{symbol_table}_elfsyms"
+    buf += f"/* Available ELF symbols table: {symbol_table_var} */\n"
     if cpp:
-        buf += '/* C linkage: the loader core is C and references this unmangled. */\n'
-        buf += '/* Explicit extern: namespace-scope const defaults to internal\n'
-        buf += ' * linkage in C++, which would let the compiler discard the table. */\n'
+        buf += "/* C linkage: the loader core is C and references this unmangled. */\n"
+        buf += "/* Explicit extern: namespace-scope const defaults to internal\n"
+        buf += " * linkage in C++, which would let the compiler discard the table. */\n"
         buf += '\nextern "C" {\n'
-        buf += f'\nextern const struct esp_elfsym {symbol_table_var}[] = {{\n'
+        buf += f"\nextern const struct esp_elfsym {symbol_table_var}[] = {{\n"
     else:
-        buf += f'\nconst struct esp_elfsym {symbol_table_var}[] = {{\n'
+        buf += f"\nconst struct esp_elfsym {symbol_table_var}[] = {{\n"
 
     for symbol_name in filtered_symbols:
         if is_gcc_builtin(symbol_name):
             buf += f'    {{ "{symbol_name}", (void*)&pm_elfsym_{symbol_name} }},\n'
         else:
-            buf += f'    ESP_ELFSYM_EXPORT({symbol_name}),\n'
+            buf += f"    ESP_ELFSYM_EXPORT({symbol_name}),\n"
 
-    buf += '    ESP_ELFSYM_END\n'
-    buf += '};\n'
+    buf += "    ESP_ELFSYM_END\n"
+    buf += "};\n"
     if cpp:
-        buf += '}\n'
+        buf += "}\n"
 
-    with open(output, 'w+') as f:
+    with open(output, "w+") as f:
         f.write(buf)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Generate the curated PocketMage SDK host-export table',
-        prog='symbols',
+        description="Generate the curated PocketMage SDK host-export table",
+        prog="symbols",
     )
     parser.add_argument(
-        '--list',
+        "--list",
         required=True,
-        help='Path to the curated symbol list (one symbol per line, # comments allowed)',
+        help="Path to the curated symbol list (one symbol per line, # comments allowed)",
     )
     parser.add_argument(
-        '--baseline',
+        "--baseline",
         default=None,
-        help='Path to host_baseline.list. Its symbols are added to the table as '
-             'unmangled runtime externs, covering POSIX entry points (opendir and '
-             'the other dir calls) that live in archives outside the scanned set.',
+        help="Path to host_baseline.list. Its symbols are added to the table as "
+        "unmangled runtime externs, covering POSIX entry points (opendir and "
+        "the other dir calls) that live in archives outside the scanned set.",
     )
     parser.add_argument(
-        '--host-elf',
+        "--host-elf",
         default=None,
-        help='Host firmware ELF to validate the curated list against. Symbols missing '
-             'from the GLOBAL view of this ELF are reported as warnings so the host '
-             'build is checked to export every app-facing symbol.',
+        help="Host firmware ELF to validate the curated list against. Symbols missing "
+        "from the GLOBAL view of this ELF are reported as warnings so the host "
+        "build is checked to export every app-facing symbol.",
     )
     parser.add_argument(
-        '--readelf',
+        "--readelf",
         default=None,
-        help='Path to the toolchain readelf; defaults to xtensa-esp32s3-elf-readelf on PATH',
+        help="Path to the toolchain readelf; defaults to xtensa-esp32s3-elf-readelf on PATH",
     )
     parser.add_argument(
-        '--symbol-table',
-        default='customer',
+        "--symbol-table",
+        default="customer",
         help='Symbol table name suffix; default "customer" produces g_customer_elfsyms',
     )
     parser.add_argument(
-        '--output-file',
+        "--output-file",
         required=True,
-        help='Output path for the generated table',
+        help="Output path for the generated table",
     )
     parser.add_argument(
-        '--cpp',
-        action='store_true',
-        help='Emit C++ (for hosts exporting C++ symbols): includes from '
-             '--include-header replace the `extern int` declarations and the '
-             'table gets C linkage',
+        "--cpp",
+        action="store_true",
+        help="Emit C++ (for hosts exporting C++ symbols): includes from "
+        "--include-header replace the `extern int` declarations and the "
+        "table gets C linkage",
     )
     parser.add_argument(
-        '--include-header',
-        action='append',
+        "--include-header",
+        action="append",
         default=[],
-        help='Header owning exported symbols (repeatable, --cpp only)',
+        help="Header owning exported symbols (repeatable, --cpp only)",
     )
     parser.add_argument(
-        '--exclude',
-        nargs='+',
+        "--exclude",
+        nargs="+",
         default=[],
-        help='Additional symbols to exclude from the generated table',
+        help="Additional symbols to exclude from the generated table",
     )
     parser.add_argument(
-        '--extra-extern',
-        action='append',
+        "--exclude-file",
+        default=None,
+        help="Path to a symbol exclusion list (one symbol per line, # comments "
+        "allowed). Excluded symbols are never emitted into the table, so "
+        "an app referencing one fails the load; used to keep raw file and "
+        "directory I/O off the app surface so the card is reachable only "
+        "through the SD gateway (see host_exclusions.list)",
+    )
+    parser.add_argument(
+        "--write-baseline",
+        default=None,
+        help="Rewrite the baseline list at this path to match the generated "
+        "surface: runtime archive symbols plus the folded baseline, minus "
+        "the curated list and minus the exclusions.",
+    )
+    parser.add_argument(
+        "--extra-extern",
+        action="append",
         default=[],
         help='Curated symbol to declare as an unmangled extern "C" prototype '
-             'instead of taking it from an --include-header. Repeatable. '
-             'Use for symbols whose declaring header pulls in a toolchain we '
-             'do not want in this translation unit.',
+        "instead of taking it from an --include-header. Repeatable. "
+        "Use for symbols whose declaring header pulls in a toolchain we "
+        "do not want in this translation unit.",
     )
     parser.add_argument(
-        '--no-runtime',
-        dest='runtime',
-        action='store_false',
-        help='Export only the curated SDK list, omitting the C and C++ runtime. '
-             'Apps then cannot link third-party libraries that pull in libc, '
-             'soft-float helpers, or the C++ runtime.',
+        "--no-runtime",
+        dest="runtime",
+        action="store_false",
+        help="Export only the curated SDK list, omitting the C and C++ runtime. "
+        "Apps then cannot link third-party libraries that pull in libc, "
+        "soft-float helpers, or the C++ runtime.",
     )
     parser.set_defaults(runtime=True)
     parser.add_argument(
-        '--nm',
+        "--nm",
         default=None,
-        help='Path to the toolchain nm for reading the runtime archives; '
-             'defaults to xtensa-esp32s3-elf-nm on PATH',
+        help="Path to the toolchain nm for reading the runtime archives; "
+        "defaults to xtensa-esp32s3-elf-nm on PATH",
     )
     parser.add_argument(
-        '--toolchain-lib-dir',
+        "--toolchain-lib-dir",
         default=None,
-        help='Directory holding libc.a, libgcc.a and libstdc++.a; defaults to '
-             'lib/no-rtti relative to the readelf path',
+        help="Directory holding libc.a, libgcc.a and libstdc++.a; defaults to "
+        "lib/no-rtti relative to the readelf path",
     )
     parser.add_argument(
-        '--framework-lib-dir',
+        "--framework-lib-dir",
         default=None,
-        help='Directory holding libnewlib.a; defaults to the '
-             'Arduino-ESP32 framework libs for the readelf target',
+        help="Directory holding libnewlib.a; defaults to the "
+        "Arduino-ESP32 framework libs for the readelf target",
     )
     parser.add_argument(
-        '--print-cost',
-        action='store_true',
-        help='Print the generated table size per category and exit summary',
+        "--print-cost",
+        action="store_true",
+        help="Print the generated table size per category and exit summary",
     )
     args = parser.parse_args()
 
     curated = read_curated_list(args.list)
     if not curated:
-        sys.exit(f'no symbols found in curated list {args.list}')
+        sys.exit(f"no symbols found in curated list {args.list}")
+    curated_set = set(curated)
 
     baseline_symbols = set()
     if args.baseline:
         baseline_symbols = set(read_curated_list(args.baseline))
 
-    readelf = args.readelf or os.environ.get('XTENSA_READELF') or 'xtensa-esp32s3-elf-readelf'
+    readelf = args.readelf or os.environ.get("XTENSA_READELF") or "xtensa-esp32s3-elf-readelf"
     runtime_categories = {}
     if args.runtime:
         if not args.host_elf:
-            sys.exit('--runtime requires --host-elf so the export list only '
-                     'covers symbols the firmware actually links')
-        nm = args.nm or os.environ.get('XTENSA_NM') or 'xtensa-esp32s3-elf-nm'
+            sys.exit(
+                "--runtime requires --host-elf so the export list only "
+                "covers symbols the firmware actually links"
+            )
+        nm = args.nm or os.environ.get("XTENSA_NM") or "xtensa-esp32s3-elf-nm"
         lib_dir = toolchain_lib_dir(readelf, args.toolchain_lib_dir)
         if not lib_dir:
-            sys.exit('could not locate the toolchain lib directory; pass '
-                     '--toolchain-lib-dir')
+            sys.exit("could not locate the toolchain lib directory; pass --toolchain-lib-dir")
         host_globals = get_host_globals(readelf, args.host_elf)
         framework_dir = framework_lib_dir(readelf, args.framework_lib_dir)
-        runtime_categories = classify_runtime_symbols(nm, lib_dir, host_globals,
-                                                      framework_dir)
+        runtime_categories = classify_runtime_symbols(nm, lib_dir, host_globals, framework_dir)
         runtime_symbols = set()
         for category, names in runtime_categories.items():
             runtime_symbols.update(names)
@@ -387,29 +423,52 @@ def main():
         host_globals = get_host_globals(readelf, args.host_elf)
         missing = [name for name in curated if name not in host_globals]
         for name in missing:
-            print(f'warning: {name} is not a GLOBAL symbol in {args.host_elf}; '
-                  'rebuild the host if it is a new export')
+            print(
+                f"warning: {name} is not a GLOBAL symbol in {args.host_elf}; "
+                "rebuild the host if it is a new export"
+            )
 
-    exclude = ['elf_find_sym', 'g_customer_elfsyms'] + args.exclude
+    excluded = set()
+    if args.exclude_file:
+        excluded = set(read_curated_list(args.exclude_file))
+    exclude = ["elf_find_sym", "g_customer_elfsyms"] + args.exclude + sorted(excluded)
     runtime_union = set(baseline_symbols)
     for names in runtime_categories.values():
         runtime_union.update(names)
-    save_c_file(curated, args.output_file, args.symbol_table,
-                exclude_symbols=exclude, cpp=args.cpp,
-                include_headers=args.include_header,
-                runtime_symbols=runtime_union,
-                extra_externs=set(args.extra_extern))
-    print(f'saved {len(curated)} exported symbols to {args.output_file}')
+    save_c_file(
+        curated,
+        args.output_file,
+        args.symbol_table,
+        exclude_symbols=exclude,
+        cpp=args.cpp,
+        include_headers=args.include_header,
+        runtime_symbols=runtime_union,
+        extra_externs=set(args.extra_extern),
+    )
+    print(f"saved {len(curated)} exported symbols to {args.output_file}")
+
+    if args.write_baseline:
+        if not args.runtime:
+            sys.exit("--write-baseline requires --runtime and --host-elf")
+        baseline_out = sorted(runtime_union - curated_set - set(exclude))
+        with open(args.write_baseline, "w") as f:
+            f.write(BASELINE_HEADER)
+            for name in baseline_out:
+                f.write(f"{name}\n")
+        print(f"rewrote {args.write_baseline} with {len(baseline_out)} symbols")
 
     if args.print_cost:
         for category, names in runtime_categories.items():
             if names:
-                print(f'  {category:<10} {len(names):>4} symbols '
-                      f'{table_cost_bytes(names):>7,} bytes')
-        print(f'  {"total":<10} {len(curated):>4} symbols '
-              f'{table_cost_bytes(curated):>7,} bytes '
-              f'({table_cost_bytes(curated) / 1024:.1f} KB)')
+                print(
+                    f"  {category:<10} {len(names):>4} symbols {table_cost_bytes(names):>7,} bytes"
+                )
+        print(
+            f"  {'total':<10} {len(curated):>4} symbols "
+            f"{table_cost_bytes(curated):>7,} bytes "
+            f"({table_cost_bytes(curated) / 1024:.1f} KB)"
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

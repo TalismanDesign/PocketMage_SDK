@@ -1,12 +1,16 @@
 #ifdef PM_TARGET_APP
 #include <pocketmage_app_version.h>
 #endif
+#include <pocketmage_log/pocketmage_log.h>
 #include <pocketmage_oled/pocketmage_oled.h>
 #include <pocketmage_eink/pocketmage_eink.h>
 #include <pocketmage_sd/pocketmage_sd.h>
 #include <pocketmage_kb/pocketmage_kb.h>
 #include <pocketmage_bz/pocketmage_bz.h>
 #include <pocketmage_audio/pocketmage_audio.h>
+#include <pocketmage_app/pocketmage_app.h>
+#include <pocketmage_image/pocketmage_image.h>
+#include <pocketmage_media/pocketmage_media.h>
 #include <pocketmage_touch/pocketmage_touch.h>
 #include <pocketmage_clock/pocketmage_clock.h>
 #include <pocketmage_wifi/pocketmage_wifi.h>

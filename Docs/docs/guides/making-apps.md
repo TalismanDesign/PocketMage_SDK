@@ -26,23 +26,25 @@ App names are `[A-Za-z][A-Za-z0-9_]*`; the name becomes the ELF, tar, icon, and 
 ## 2. Write code
 
 ```cpp
-#include <stdio.h>
+#include <pm_app_api.h>
 #include <unistd.h>
+
+static constexpr const char* kLogTag = "HELLO";
 
 extern "C" int main(int argc, char **argv) {
   (void)argc;
   (void)argv;
-  printf("hello from pocketmage sdk app\n");
+  PM_LOGD(kLogTag, "hello from pocketmage sdk app");
   for (int i = 0; i < 3; ++i) {
-    printf("tick %d\n", i);
+    PM_LOGD(kLogTag, "tick %d", i);
     sleep(1);
   }
-  printf("app done\n");
+  PM_LOGD(kLogTag, "app done");
   return 0;
 }
 ```
 
-That is the whole starter app: `main` with C linkage (the ABI entry point), libc working (`printf`, `sleep`), and a plain `return` to exit. Add `#include <pm_app_api.h>` and call the `pm_*` functions, such as `pm_oled_send` or `pm_eink_refresh`, and you have a UI app.
+That is the whole starter app: `main` with C linkage (the ABI entry point), libc working (`sleep`), logging through `PM_LOGx`, and a plain `return` to exit. `printf` still works for text formatting, but `PM_LOGx` is the one logging API; its lines reach the console, the crash log tail, and the optional log file. Call the `pm_*` functions, such as `pm_oled_send` or `pm_eink_refresh`, and you have a UI app.
 
 Third-party C and C++ libraries work too. Compile their source into the app by overriding `APP_SRCS`; the host resolves their libc and runtime references. See [app-abi.md](../app-abi.md).
 

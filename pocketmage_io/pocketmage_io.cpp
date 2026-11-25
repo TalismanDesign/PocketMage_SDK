@@ -1,6 +1,6 @@
 #include "pocketmage_io.h"
 
-std::vector<String> splitString(const String& str, char delimiter) {
+std::vector<String> splitString(const String &str, char delimiter) {
   std::vector<String> result;
   int start = 0;
   while (true) {
@@ -15,10 +15,11 @@ std::vector<String> splitString(const String& str, char delimiter) {
   return result;
 }
 
-String joinString(const std::vector<String>& parts, char delimiter) {
+String joinString(const std::vector<String> &parts, char delimiter) {
   String result;
   for (size_t i = 0; i < parts.size(); ++i) {
-    if (i > 0) result += delimiter;
+    if (i > 0)
+      result += delimiter;
     result += parts[i];
   }
   return result;
@@ -34,13 +35,15 @@ String removeChar(String str, char character) {
   return result;
 }
 
-int stringToInt(const String& str, int defaultVal) {
+int stringToInt(const String &str, int defaultVal) {
   String s = str;
   s.trim();
-  if (s.length() == 0) return defaultVal;
+  if (s.length() == 0)
+    return defaultVal;
   unsigned int start = (s.charAt(0) == '+' || s.charAt(0) == '-') ? 1 : 0;
   for (unsigned int i = start; i < s.length(); i++) {
-    if (!isDigit(s.charAt(i))) return defaultVal;
+    if (!isDigit(s.charAt(i)))
+      return defaultVal;
   }
   return s.toInt();
 }
