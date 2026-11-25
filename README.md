@@ -1,101 +1,75 @@
-# PocketMage_SDK
+# PocketMage SDK
 
-The official SDK for building PocketMage apps. An app ships as an ELF the OS loads from the SD card at runtime and runs in-process. There is no firmware reflash. This repo defines the contract: the build rules, the curated symbol surface, the overlay format, the translation engine, and the `pm` CLI.
+PocketMage apps are small programs you drop onto the SD card. No firmware reflash, no wiring, no waiting on a full OS build. Write one against this SDK, pack it, and install it from APPLOADER.
 
-## Repositories
+@Ashtf 2026
 
-- **PocketMage_SDK** (this repo): the app-facing contract, build tools, the base i18n catalog, and the `pm` CLI.
-- **PocketMage_App**: the official app template `pm new` clones. CI builds it against this SDK on every push.
-- **elf_overlay**: the ISA-abstracted overlay runtime and the host tools (`elf_overlay_relink`, `elf_overlay_emit`) that emit the `.elfo` sidecar.
-- **PocketMage_PDA**: the OS. Ships the firmware, the ELF loader (`esp_elf` + `elf_overlay`), slot management, and the APPLOADER installer. Vendors this repo as a submodule at `Code/PocketMageOS/lib/PocketMage_SDK`.
+## [Project Summary]
 
-## Quick start
+This repo is the SDK for standalone PocketMage apps. An app is an ELF file the OS loads from the SD card while the device is running. You build it on your computer, copy one archive over, and install it from the app loader. That is the whole loop.
 
-Install the CLI and scaffold an app from the template:
+The SDK holds the parts an app needs to fit in: the headers, the build tools, the exported symbols, the translation engine, the overlay format, and the `pm` CLI. It is deliberately small and a little strict, because an app and the OS have to agree on where the edges are. If you only want to know what PocketMage is, start with the [PDA README](https://github.com/TalismanDesign/PocketMage_PDA#readme).
+
+The goal is to let apps feel like they belong on the device without becoming part of the firmware. That means people can write, share, and remove apps without asking me to rebuild the OS. It is still a work in progress, and the rough edges are mostly in setup and packaging rather than in the apps themselves.
+
+## [Getting Started]
+
+Start with the OS README if you have not used the device yet. It explains the hardware, the built-in apps, and the docs. Then come back here.
+
+- [OS README](https://github.com/TalismanDesign/PocketMage_PDA#readme)
+- [OS Docs](https://talismandesign.github.io/PocketMage_PDA/docs/)
+- [SDK Docs](https://talismandesign.github.io/PocketMage_SDK/docs/)
+- [Get Started](https://talismandesign.github.io/PocketMage_SDK/docs/get-started/)
+- [App API Reference](https://talismandesign.github.io/PocketMage_SDK/docs/api/)
+- [App walkthrough video](https://www.youtube.com/watch?v=3Ytc-3-BbMM)
+
+Install the CLI and make a first app:
 
 ```sh
-pip install .            # installs the `pm` CLI
+pip install .
 pm new hello
 cd hello
-pm build --pack          # build/hello.app.elf, build/hello.elfo, build/hello.tar
-pm check                 # gate the app's undefined symbols against the host surface
+pm build --pack
+pm check
 ```
 
-Drop `build/hello.tar` in `/apps/` on the device SD card and install it through APPLOADER. The build needs the pinned espressif Xtensa toolchain and the `elf_overlay` host tools on `PATH`; see the [toolchain guide](Docs/docs/get-started/toolchain.md).
+Drop `build/hello.tar` into `/apps/` on the SD card and install it through APPLOADER. The toolchain setup is in the [toolchain guide](https://talismandesign.github.io/PocketMage_SDK/docs/get-started/toolchain/) if the build complains.
 
-`pm check --host-elf firmware.elf` is the exact dependency gate; without a host ELF it checks against the curated surface. `pm exports` reconciles the SDK's surface with a host checkout's `host_exports.list`, and `pm release <major|minor|patch>` bumps the version across all four version lands at once. The full CLI surface is in [cli.md](Docs/docs/cli.md).
+### Build and test
 
-## Documentation
-
-The SDK ships its own DocMD site (`Docs/`): build it with `cd Docs && npm install && npm run build` and preview `Docs/site/`. Published at `https://talismandesign.github.io/PocketMage_SDK/docs`. Entry points:
-
-| Doc                                            | Covers                                                        |
-| ---------------------------------------------- | ------------------------------------------------------------- |
-| [Get Started](Docs/docs/get-started/index.md)  | Toolchain install and a first app end to end                  |
-| [API Reference](Docs/docs/api/index.md)        | Every component, the `pm_*` C ABI, and the projection model   |
-| [App ABI](Docs/docs/app-abi.md)                | The ELF binary contract and the two-stage load                |
-| [App lifecycle](Docs/docs/guides/lifecycle.md) | Resident finalization, task-owned cleanup, and idle policy    |
-| [Audio and media](Docs/docs/api/audio.md)      | Shared playback, tags, preferences, and connector ownership   |
-| [Overlay format](Docs/docs/overlay.md)         | The `.elfo` sidecar that pages app code into executable RAM   |
-| [Building](Docs/docs/build.md)                 | Toolchain, project layout, `make` targets                     |
-| [Symbols](Docs/docs/symbols.md)                | The curated export surface and the dependency contract        |
-| [Publishing](Docs/docs/guides/publishing.md)   | Packaging the delivery tar and what the installer expects     |
-| [i18n](Docs/docs/i18n.md)                      | Translation catalogs, the generator, and string ownership     |
-| [Migration](Docs/docs/migration.md)            | Moving an existing app to the ELF flow                        |
-
-## Layout
-
-```text
-PocketMage_SDK/
-  tools/
-    app.mk            # compile, strip, check, overlay-emit, pack recipe
-    gen_app_api.py    # projects the C++ API to the pm_* C ABI (symbols.list)
-    symbols.py        # curated host-export table helper
-    pm/               # the pm CLI (pyproject-driven), with tests/fixtures/
-  pyproject.toml      # pip install ., entry point `pm`
-  symbols.list        # curated host-export surface the SDK commits to
-  host_baseline.list  # selected runtime symbols emitted into the customer table
-  pocketmage_*/       # the SDK modules: eink, oled, sd, kb, touch, clock, bz,
-                      # wifi, font, layout, ui, i18n, sys, globals, app, audio, media
-  pocketmage.h        # umbrella header an app includes first
-  pocketmage_i18n/    # translation engine, base catalog, generator
-  Docs/               # DocMD docs site (config, pages, lockfile)
-  .github/workflows/  # SDK CI (app-template build, version sync, i18n,
-                      # lint, pm CLI tests, docs deploy)
-```
-
-The SDK has no `examples/` directory. The runnable reference app is the external [PocketMage_App](https://github.com/TalismanDesign/PocketMage_App) template; CI checks it out and builds it against the SDK on every push. Test fixtures (a negative `broken_app`, a golden `hello_app.app.elf`, a callgraph case, and a scaffold template) live under `tools/pm/tests/fixtures/`.
-
-## CI
-
-Run the local tool and API-generation regression suite with:
+With Python 3 and a C11 compiler installed, run from the SDK root:
 
 ```sh
 python3 -m unittest discover -s tools/pm/tests -t .
 ```
 
-The generator tests cover handwritten exports, duplicate ownership, signature
-drift, multiline declarations, C consumer compilation, and repeatable output.
-The C compilation check requires a C11 compiler; other tests require Python 3.
-See [App ABI](Docs/docs/app-abi.md) for regeneration and `--verify` commands.
+The tests cover the CLI, the generated exports, and the packaging checks. See the [docs](https://talismandesign.github.io/PocketMage_SDK/docs/) for the rest.
 
-Hardware-bound service regressions live in the consuming OS checkout. From
-`PocketMage_PDA/Code/PocketMageOS`, run
-`python3 -m unittest discover -s tests/host -p 'test_*.py'`. These require a C++17
-compiler with AddressSanitizer/UBSan, and the input-report test uses the HID
-headers installed by the PlatformIO build. They cover USB ownership and retry,
-PCM timing/gain, media parsing, app finalization, and task-scoped SD cleanup.
+## [Where things live]
 
-`.github/workflows/sdk.yml` runs five jobs on a fresh runner that installs the pinned espressif Xtensa toolchain itself:
+- `pocketmage_*` - the app-facing SDK modules
+- `pocketmage.h` - the header an app includes first
+- `tools/` - build rules, symbol generation, and the `pm` CLI
+- `Docs/` - the Docs site
+- `PocketMage_App` - the app template `pm new` clones, in its own repo
+- `elf_overlay` - the overlay tools, also in their own repo
+- `PocketMage_PDA` - the OS that loads the finished app
 
-- **app-template** - checks out `PocketMage_App` and `elf_overlay`, builds the overlay host tools, builds and packs the template against this SDK, asserts the artifact is little-endian with a 200-byte icon and that the tar carries the ELF, and gates it with `pm check`.
-- **version-sync** - asserts `VERSION`, `pocketmage_sdk_version` in `pocketmage_globals.cpp`, the macros in `pocketmage_app_version.h`, and `library.json` all agree.
-- **i18n-generate** - runs `gen_i18n.py` and the i18n unit tests.
-- **lint** - `ruff` on the Python and `clang-format` on the C++.
-- **pm-cli** - runs the pm CLI test suite (parsing, gate, release, golden) on Linux, macOS, and Windows.
+## [Native apps]
 
-`.github/workflows/docs.yml` builds the DocMD site and deploys it to GitHub Pages. Keep both green.
+Not every app needs to be an ELF. If an app belongs inside the firmware, start from [APP_TEMPLATE.cpp](https://github.com/TalismanDesign/PocketMage_PDA/blob/main/Code/PocketMageOS/src/APP_TEMPLATE.cpp) and the [App API Reference](https://talismandesign.github.io/PocketMage_PDA/docs/reference/app-api). The [PDA README](https://github.com/TalismanDesign/PocketMage_PDA#readme) explains the difference between native and ELF apps.
 
-## Contributing
+## [Planned Features]
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). The short version: never break the binary contract, keep every exported symbol curated and accounted for, and leave CI green.
+- More example apps
+- A gentler toolchain setup
+- Fewer sharp edges in packaging and install
+- More APIs exposed to standalone apps
+
+## License
+
+All files are distributed under the Apache-2.0 license:
+
+PocketMage SDK - the build tools and app-facing libraries for PocketMage apps.
+
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
