@@ -4,10 +4,10 @@ title: "App lifecycle"
 description: "Entry points, task-owned resources, idle behavior, and resident app finalization."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/guides/lifecycle/"
 path: /guides/lifecycle/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.892Z"
+  generated_at: "2026-11-26T04:24:34.161Z"
 ---
 ---
 title: "App lifecycle"

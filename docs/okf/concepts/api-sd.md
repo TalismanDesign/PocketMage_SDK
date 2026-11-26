@@ -4,10 +4,10 @@ title: "SD card (pocketmage_sd)"
 description: "Filesystems, files, metadata, and the dual SDMMC/SDSPI mode switch."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/sd/"
 path: /api/sd/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.884Z"
+  generated_at: "2026-11-26T04:24:34.155Z"
 ---
 ---
 title: "SD card (pocketmage_sd)"

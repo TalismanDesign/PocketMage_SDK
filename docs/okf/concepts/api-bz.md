@@ -4,10 +4,10 @@ title: "Buzzer (pocketmage_bz)"
 description: "PWM buzzer output, Note/Jingle data model, and the built-in melodies."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/bz/"
 path: /api/bz/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.877Z"
+  generated_at: "2026-11-26T04:24:34.149Z"
 ---
 ---
 title: "Buzzer (pocketmage_bz)"

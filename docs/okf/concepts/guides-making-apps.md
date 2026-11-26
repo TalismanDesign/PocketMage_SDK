@@ -4,10 +4,10 @@ title: "Making an app"
 description: "Scaffold, build, pack, and run your first PocketMage app."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/guides/making-apps/"
 path: /guides/making-apps/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.892Z"
+  generated_at: "2026-11-26T04:24:34.161Z"
 ---
 ---
 title: "Making an app"

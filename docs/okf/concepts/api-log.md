@@ -4,10 +4,10 @@ title: "Logging (pocketmage_log)"
 description: "The SDK logger: levels, per-tag filtering, the serial console, the optional log file, and the log tail kept for crash reports."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/log/"
 path: /api/log/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.883Z"
+  generated_at: "2026-11-26T04:24:34.154Z"
 ---
 ---
 title: "Logging (pocketmage_log)"

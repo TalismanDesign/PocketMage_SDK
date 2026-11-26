@@ -4,10 +4,10 @@ title: "OLED (pocketmage_oled)"
 description: "The 256x32 SSD1326 OLED: PocketmageOled class, the u8g2 object, and the status line."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/oled/"
 path: /api/oled/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.884Z"
+  generated_at: "2026-11-26T04:24:34.155Z"
 ---
 ---
 title: "OLED (pocketmage_oled)"
@@ -60,7 +60,7 @@ Renders one editor line at the edit baseline with a block cursor at `input_pos`,
 
 #### `sysMessage`
 
-Raises a framed message from the bottom of the display, holds it for `showTime` ms, and lowers it. Temporarily bumps the CPU to 240 MHz for the animation and restores `POWER_SAVE_FREQ` when `SAVE_POWER` is set. Use it for transient confirmations and errors.
+Raises a framed message from the bottom of the display, holds it for `showTime` ms, and lowers it. Temporarily bumps the CPU to 240 MHz for the animation and requests `POWER_SAVE_FREQ` again when `SAVE_POWER` is set; `setCpuSpeed` keeps 240 MHz while WiFi or USB Serial/JTAG requires it. Use it for transient confirmations and errors.
 
 #### `oledScroll`
 

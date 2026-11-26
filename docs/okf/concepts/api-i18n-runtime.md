@@ -4,10 +4,10 @@ title: "Internationalization (i18n)"
 description: "Lang/StringID tables, the TR() lookup, runtime language switching, and command aliases."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/i18n-runtime/"
 path: /api/i18n-runtime/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.881Z"
+  generated_at: "2026-11-26T04:24:34.152Z"
 ---
 ---
 title: "Internationalization (i18n)"

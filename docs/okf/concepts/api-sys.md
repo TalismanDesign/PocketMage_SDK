@@ -4,10 +4,10 @@ title: "System (pocketmage_sys, pocketmage_globals)"
 description: "Peripheral init, CPU speed, deep sleep, crash recovery, and the shared global state."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/sys/"
 path: /api/sys/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.885Z"
+  generated_at: "2026-11-26T04:24:34.156Z"
 ---
 ---
 title: "System (pocketmage_sys, pocketmage_globals)"
@@ -93,9 +93,12 @@ inline float getBatteryVoltage() {
 
 ```cpp
 void pocketmage::setCpuSpeed(int newFreq);
+void pocketmage::maintainDebugConsoleCpuSpeed();
 ```
 
-Clamps to the valid S3 frequencies `{240, 160, 80, 40, 20, 10}` and returns early if the CPU is already there. WiFi stalls below 240 MHz on the S3, so a request that would drop the clock below `WIFI_CPU_FREQ_MHZ` (240) while `P_WIFI` is not `Off` is ignored. `POWER_SAVE_FREQ` (40) is the OS's idle speed; `sysMessage` and the WiFi service bump back to 240 when they need it.
+Clamps to the valid S3 frequencies `{240, 160, 80, 40, 20, 10}` and returns early if the CPU is already there. Requests that would drop the clock below 240 MHz are ignored while WiFi is not `Off` or USB Serial/JTAG is connected to a host, since both share the PLL-derived clocks the displays need. `POWER_SAVE_FREQ` (40) is the OS's idle speed; `sysMessage` and the WiFi service bump back to 240 when they need it.
+
+`maintainDebugConsoleCpuSpeed()` restores the 240 MHz floor if USB Serial/JTAG was attached after the CPU had already dropped. The OS calls it from `checkIdleSleep()`, so plugging in a data cable recovers the display speed without a reboot. It does nothing when no host is attached or the CPU is already fast enough.
 
 ### Scope guard
 

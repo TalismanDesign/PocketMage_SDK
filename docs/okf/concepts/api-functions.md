@@ -4,10 +4,10 @@ title: "Function index (pm_*)"
 description: "Every pm_* wrapper an external app can call, grouped by module, with its exact C signature and a link to the page that documents it."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/api/functions/"
 path: /api/functions/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.880Z"
+  generated_at: "2026-11-26T04:24:34.152Z"
 ---
 ---
 title: "Function index (pm_*)"

@@ -4,10 +4,10 @@ title: "App binary contract (ABI)"
 description: "The binary shape the loader accepts, how it is mapped and run, and the failure modes that bite."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/app-abi/"
 path: /app-abi/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.887Z"
+  generated_at: "2026-11-26T04:24:34.157Z"
 ---
 ---
 title: "App binary contract (ABI)"

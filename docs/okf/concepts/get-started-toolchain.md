@@ -4,10 +4,10 @@ title: "Install the toolchain"
 description: "The pinned espressif Xtensa compiler, the elf_overlay host tools, and the pm CLI an app build needs."
 source: "https://talismandesign.github.io/PocketMage_SDK/docs/get-started/toolchain/"
 path: /get-started/toolchain/
-updated: 2026-11-25
+updated: 2026-11-26
 okf:
   generated_by: "@docmd/plugin-okf"
-  generated_at: "2026-11-25T09:08:48.889Z"
+  generated_at: "2026-11-26T04:24:34.159Z"
 ---
 ---
 title: "Install the toolchain"
