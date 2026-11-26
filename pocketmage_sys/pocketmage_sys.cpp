@@ -23,6 +23,9 @@ void setupSD();
 #include "driver/rtc_io.h"
 #include "esp_system.h"
 #include "esp_task_wdt.h"
+#if defined(CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG)
+#include "driver/usb_serial_jtag.h"
+#endif
 
 #include <atomic>
 #include <cstdint>
@@ -39,6 +42,18 @@ volatile bool SDActive = false;
 volatile int battState = 0; // Battery state
 
 namespace pocketmage {
+namespace {
+constexpr int kDebugConsoleCpuFreqMHz = 240;
+
+bool debugConsoleAttached() {
+#if defined(CONFIG_ESP_CONSOLE_SECONDARY_USB_SERIAL_JTAG)
+  return usb_serial_jtag_is_connected();
+#else
+  return false;
+#endif
+}
+} // namespace
+
 static IdleTimer idleTimer;
 
 void reportActivity() {
@@ -89,6 +104,8 @@ void setCpuSpeed(int newFreq) {
   // the radio is active
   if (newFreq < WIFI_CPU_FREQ_MHZ && P_WIFI.getState() != WifiRadioState::Off)
     return;
+  if (newFreq < kDebugConsoleCpuFreqMHz && debugConsoleAttached())
+    return;
 
   // SDMMC stalls below 80MHz on the S3, so ignore any power-save drop while
   // the device is active
@@ -116,6 +133,14 @@ void setCpuSpeed(int newFreq) {
     }
     PM_LOGV(TAG, "CPU Speed changed to: %d MHz", newFreq);
   }
+}
+
+void maintainDebugConsoleCpuSpeed() {
+  if (!debugConsoleAttached())
+    return;
+  if (getCpuFrequencyMhz() >= kDebugConsoleCpuFreqMHz)
+    return;
+  setCpuSpeed(kDebugConsoleCpuFreqMHz);
 }
 
 void deepSleep(bool alternateScreenSaver) {

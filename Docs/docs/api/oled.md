@@ -49,7 +49,7 @@ Renders one editor line at the edit baseline with a block cursor at `input_pos`,
 
 #### `sysMessage`
 
-Raises a framed message from the bottom of the display, holds it for `showTime` ms, and lowers it. Temporarily bumps the CPU to 240 MHz for the animation and restores `POWER_SAVE_FREQ` when `SAVE_POWER` is set. Use it for transient confirmations and errors.
+Raises a framed message from the bottom of the display, holds it for `showTime` ms, and lowers it. Temporarily bumps the CPU to 240 MHz for the animation and requests `POWER_SAVE_FREQ` again when `SAVE_POWER` is set; `setCpuSpeed` keeps 240 MHz while WiFi or USB Serial/JTAG requires it. Use it for transient confirmations and errors.
 
 #### `oledScroll`
 

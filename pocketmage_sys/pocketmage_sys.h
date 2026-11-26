@@ -20,7 +20,11 @@ extern volatile int battState;      // Battery state
 extern volatile bool PWR_BTN_event; // Power button event **shared with library**
 
 namespace pocketmage {
+/** Request an S3 CPU frequency from the supported set */
 void setCpuSpeed(int newFreq);
+
+/** Restore the CPU floor required by an attached USB Serial/JTAG console */
+void maintainDebugConsoleCpuSpeed();
 
 /** Return one 32-bit value from the hardware random source. */
 uint32_t randomU32();
